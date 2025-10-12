@@ -1,0 +1,11 @@
+/* stylelint-disable at-rule-no-unknown */
+/* Este archivo importa Tailwind CSS correctamente y evita warnings en el editor */
+
+/* Importa las bases de Tailwind */
+@tailwind base;
+
+/* Importa los componentes predefinidos */
+@tailwind components;
+
+/* Importa las utilidades (clases) */
+@tailwind utilities;
