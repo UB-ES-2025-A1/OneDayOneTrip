@@ -18,13 +18,13 @@ export default function Register() {
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError("Les contrassenyes no coincideixen");
       return;
     }
 
     try {
       // Aquí puedes usar Firebase auth
-      alert("Usuario registrado correctamente ✅");
+      alert("Usuari registrat correctament");
       navigate("/login");
     } catch (error: any) {
       setError(error.message);
@@ -78,11 +78,11 @@ export default function Register() {
   );
 
   return (
-    <AuthLayout title="Registro">
+    <AuthLayout title="Registrar-se">
       <form onSubmit={handleRegister} className="auth-form">
         <input
           type="text"
-          placeholder="Nombre de usuario"
+          placeholder="Nom d'usuari"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
@@ -91,7 +91,7 @@ export default function Register() {
 
         <input
           type="text"
-          placeholder="Nombre completo"
+          placeholder="Nom complet"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           required
@@ -100,7 +100,7 @@ export default function Register() {
 
         <input
           type="email"
-          placeholder="Correo electrónico"
+          placeholder="Correu electrònic"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -110,7 +110,7 @@ export default function Register() {
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
-            placeholder="Contraseña"
+            placeholder=" Contrasenya"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -121,7 +121,7 @@ export default function Register() {
         <div className="relative">
           <input
             type={showConfirmPassword ? "text" : "password"}
-            placeholder="Confirmar contraseña"
+            placeholder="Confirmar contrasenya"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
@@ -137,9 +137,9 @@ export default function Register() {
       {error && <p className="text-red-500 mt-4">{error}</p>}
 
       <p className="auth-footer">
-        ¿Ya tienes cuenta?{" "}
+        Ja tens compte?{" "}
         <a href="/login" className="auth-link">
-          Inicia sesión
+          Inicia sessió
         </a>
       </p>
     </AuthLayout>

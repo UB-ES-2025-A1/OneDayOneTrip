@@ -13,7 +13,7 @@ export default function Login() {
     setError("");
     try {
       // Aquí puedes usar Firebase auth
-      alert("¡Login exitoso!");
+      alert("Login exitos!");
       navigate("/dashboard");
     } catch (err: any) {
       setError("Error: " + err.message);
@@ -21,11 +21,11 @@ export default function Login() {
   };
 
   return (
-    <AuthLayout title="Iniciar sesión">
+    <AuthLayout title="Iniciar sessió">
       <form onSubmit={handleLogin} className="auth-form">
         <input
           type="email"
-          placeholder="Correo electrónico"
+          placeholder="Correu electrònic"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -34,7 +34,7 @@ export default function Login() {
 
         <input
           type="password"
-          placeholder="Contraseña"
+          placeholder="Contrasenya"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -49,9 +49,9 @@ export default function Login() {
       {error && <p className="text-red-500 mt-4">{error}</p>}
 
       <p className="auth-footer">
-        ¿No tienes cuenta?{" "}
+        No tens compte?{" "}
         <a href="/register" className="auth-link">
-          Regístrate
+          Registra't
         </a>
       </p>
     </AuthLayout>
