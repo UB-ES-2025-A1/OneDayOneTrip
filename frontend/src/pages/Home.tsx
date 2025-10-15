@@ -1,10 +1,13 @@
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Home.css";
+import "../styles/LoginReg.css";
 import AnimatedText1 from "../components/AnimatedText1";
-
+import LoginModal from "../components/LoginModal";
 
 export default function Home() {
   const navigate = useNavigate();
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   return (
     <div className="home">
@@ -12,11 +15,12 @@ export default function Home() {
       <header className="home-header">
         <h1 className="logo">OneDayOneTrip</h1>
         <div className="header-buttons">
-          <button onClick={() => navigate("/login")} className="header-btn">
-            Iniciar sesión
+          <button onClick={() => setIsLoginOpen(true)} 
+          className="header-btn">
+            Iniciar sessió
           </button>
           <button onClick={() => navigate("/register")} className="header-btn">
-            Registrarse
+            Registrar-se
           </button>
         </div>
       </header>
@@ -30,6 +34,9 @@ export default function Home() {
         </div>
       </section>
 
+    {isLoginOpen && (
+        <LoginModal onClose={() => setIsLoginOpen(false)}        />
+      )}
     </div>
   );
 }
