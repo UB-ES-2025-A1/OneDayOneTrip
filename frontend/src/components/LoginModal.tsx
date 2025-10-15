@@ -4,9 +4,10 @@ import ImageCarousel from "../components/ImageCarousel";
 
 interface LoginProps {
   onClose: () => void;
+  openRegister: () => void;
 }
 
-export default function LoginModal({ onClose }: LoginProps) {
+export default function LoginModal({ onClose, openRegister }: LoginProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,7 +17,6 @@ export default function LoginModal({ onClose }: LoginProps) {
     e.preventDefault();
     setError("");
     try {
-      // Aquí puedes usar Firebase auth
       alert("Login exitos!");
       navigate("/dashboard"); 
       onClose(); // Cerramos el modal al loguearse
@@ -29,7 +29,7 @@ export default function LoginModal({ onClose }: LoginProps) {
   return (
     <div className="modal-backdrop">
       <div className="login-card">
-        <button className="close-btn" onClick={onClose}>
+        <button className="close-btn-login" onClick={onClose}>
             &times;
         </button>
 
@@ -76,9 +76,13 @@ export default function LoginModal({ onClose }: LoginProps) {
 
           <p className="auth-footer">
             No tens compte?{" "}
-            <a href="/register" className="auth-link">
+            <button
+              type="button"
+              onClick={() => { onClose(); openRegister(); }}
+              className="auth-link"
+            >
               Registra't
-            </a>
+            </button>
           </p>
         </div>
       </div>

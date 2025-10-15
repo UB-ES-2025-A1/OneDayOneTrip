@@ -4,22 +4,21 @@ import "../styles/Home.css";
 import "../styles/LoginReg.css";
 import AnimatedText1 from "../components/AnimatedText1";
 import LoginModal from "../components/LoginModal";
+import RegisterModal from "../components/RegisterModal";
 
 export default function Home() {
   const navigate = useNavigate();
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-
+  const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
   return (
     <div className="home">
       {/* Header */}
       <header className="home-header">
         <h1 className="logo">OneDayOneTrip</h1>
         <div className="header-buttons">
-          <button onClick={() => setIsLoginOpen(true)} 
-          className="header-btn">
+          <button onClick={() => setModalOpen("login")} className="header-btn">
             Iniciar sessió
           </button>
-          <button onClick={() => navigate("/register")} className="header-btn">
+          <button onClick={() => setModalOpen("register")} className="header-btn">
             Registrar-se
           </button>
         </div>
@@ -34,8 +33,12 @@ export default function Home() {
         </div>
       </section>
 
-    {isLoginOpen && (
-        <LoginModal onClose={() => setIsLoginOpen(false)}        />
+      {modalOpen === "login" && (
+        <LoginModal onClose={() => setModalOpen(null)} openRegister={() => setModalOpen("register")} />
+      )}
+
+      {modalOpen === "register" && (
+        <RegisterModal onClose={() => setModalOpen(null)} openLogin={() => setModalOpen("login")} />
       )}
     </div>
   );

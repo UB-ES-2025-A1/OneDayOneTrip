@@ -18,10 +18,21 @@
   border-radius: 16px;
   overflow: hidden;
   position: relative;
-  padding: 0; /* padding ahora en login-form */
+  padding: 0; 
 }
 
-.close-btn {
+.register-card {
+  display: flex;
+  width: 1300px;
+  max-width: 95%;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  padding: 0; 
+}
+
+.close-btn-login {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -29,6 +40,20 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+  z-index: 50;
+  color: #000000; 
+}
+
+.close-btn-reg {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 50;
+  color: #fff; 
 }
 
 .login-content {
@@ -43,17 +68,8 @@
   justify-content: center;
   overflow: hidden;
   background-color: #000;
-}
-
-.login-gallery img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 6s ease;
-}
-
-.login-gallery:hover img {
-  transform: scale(1.1);
+  position: relative; 
+  z-index: 1; 
 }
 
 .login-form {
@@ -102,6 +118,8 @@
 .auth-link {
   color: #356a36;
   text-decoration: underline;
+  border: none; 
+  cursor: pointer;
 }
 
 /* Carousel */
