@@ -29,7 +29,7 @@ export default function AnimatedText1({ text, className="", delay = 0.03 }: Anim
       spans,
       { opacity: 0, y: 40 },
       {
-        opacity: 0.7,
+        opacity: 0.8,
         y: 0,
         duration: 0.75,         
         ease: "power3.out",
