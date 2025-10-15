@@ -138,9 +138,12 @@ export default function Register() {
 
       <p className="auth-footer">
         Ja tens compte?{" "}
-        <a href="/login" className="auth-link">
+        <button
+          onClick={() => navigate("/?login=true")}
+          className="auth-link"
+        >
           Inicia sessió
-        </a>
+        </button>
       </p>
     </AuthLayout>
   );
