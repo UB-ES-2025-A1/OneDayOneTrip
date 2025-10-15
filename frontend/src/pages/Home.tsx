@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import "../styles/Home.css";
+import AnimatedText1 from "../components/AnimatedText1";
+
 
 export default function Home() {
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ export default function Home() {
 
       <section className="hero">
         <div className="hero-content">
-          <h2 className="hero-title">La teva pròxima aventura t'espera</h2>
+          <AnimatedText1 text="La teva pròxima aventura t'espera" className="animated-text"/>
           <p className="hero-text">
             Troba l'experiència perfecta per a tu
           </p>
@@ -31,3 +33,4 @@ export default function Home() {
     </div>
   );
 }
+
