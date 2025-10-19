@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ImageCarousel from "./ImageCarousel";
+import { validateRegisterForm } from "../firebase/validation";
+import { registerUser } from "../firebase/register";
 
 interface RegisterProps {
   onClose: () => void;
@@ -8,143 +10,152 @@ interface RegisterProps {
 }
 
 export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
-   const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (password !== confirmPassword) {
-      setError("Les contrassenyes no coincideixen");
+    // Validacions locals
+    const errs = validateRegisterForm({
+      email,
+      password,
+      confirmPassword,
+      username,
+      fullName,
+    });
+    if (errs.length) {
+      setError(errs[0]); // mostra el primer error (o pinta'ls tots si vols)
       return;
     }
 
     try {
-      // Aquí puedes usar Firebase auth
+      setLoading(true);
+      const res = await registerUser({
+        email,
+        password,
+        displayName: fullName, // guardem el nom complet com a displayName
+        username,
+      });
+
+      if (!res.ok) {
+        setError(res.message);
+        return;
+      }
+
+      // Èxit
       alert("Usuari registrat correctament");
       navigate("/login");
-    } catch (error: any) {
-      setError(error.message);
+      onClose?.();
+    } catch (err: any) {
+      setError("S'ha produït un error inesperat. Torna-ho a intentar.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const EyeIcon = ({ visible }: { visible: boolean }) => (
+  const EyeIcon = ({ visible }: { visible: boolean }) =>
     visible ? (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 text-gray-500"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-        />
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
       </svg>
     ) : (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 text-gray-500"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.959 9.959 0 012.478-3.446M6.223 6.223A9.953 9.953 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.953 9.953 0 01-1.68 2.942M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 3l18 18"
-        />
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.959 9.959 0 012.478-3.446M6.223 6.223A9.953 9.953 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.953 9.953 0 01-1.68 2.942M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
       </svg>
-    )
-  );
+    );
 
   return (
     <div className="modal-backdrop">
       <div className="register-card">
         <button className="close-btn-reg" onClick={onClose}>
-            &times;
+          &times;
         </button>
 
         <div className="login-form">
           <h2 className="login-title">Registra't</h2>
+
           <form onSubmit={handleRegister} className="auth-form">
-        <input
-          type="text"
-          placeholder="Nom d'usuari"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          className="auth-input"
-        />
+            <input
+              type="text"
+              placeholder="Nom d'usuari"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="auth-input"
+            />
 
-        <input
-          type="text"
-          placeholder="Nom complet"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          required
-          className="auth-input"
-        />
+            <input
+              type="text"
+              placeholder="Nom complet"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              className="auth-input"
+            />
 
-        <input
-          type="email"
-          placeholder="Correu electrònic"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="auth-input"
-        />
+            <input
+              type="email"
+              placeholder="Correu electrònic"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="auth-input"
+            />
 
-        <div className="relative">
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder=" Contrasenya"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="auth-input pr-10"
-          />
-        </div>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Contrasenya"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="auth-input pr-10"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Amaga contrasenya" : "Mostra contrasenya"}
+              >
+                <EyeIcon visible={showPassword} />
+              </button>
+            </div>
 
-        <div className="relative">
-          <input
-            type={showConfirmPassword ? "text" : "password"}
-            placeholder="Confirmar contrasenya"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            className="auth-input pr-10"
-          />
-        </div>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirmar contrasenya"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="auth-input pr-10"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+                onClick={() => setShowConfirmPassword((v) => !v)}
+                aria-label={showConfirmPassword ? "Amaga confirmació" : "Mostra confirmació"}
+              >
+                <EyeIcon visible={showConfirmPassword} />
+              </button>
+            </div>
 
-        <button type="submit" className="auth-button">
-          Registrar-se
-        </button>
-      </form>
+            <button type="submit" className="auth-button" disabled={loading}>
+              {loading ? "Registrant..." : "Registrar-se"}
+            </button>
+          </form>
 
           {error && <p className="text-red-500 mt-4">{error}</p>}
 
@@ -152,7 +163,10 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
             Ja tens un compte?{" "}
             <button
               type="button"
-              onClick={() => { onClose(); openLogin(); }}
+              onClick={() => {
+                onClose();
+                openLogin();
+              }}
               className="auth-link"
             >
               Inicia sessió
@@ -160,19 +174,13 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
           </p>
         </div>
 
-        
         <div className="login-gallery">
           <ImageCarousel
-            images={[
-              "/images/bcn.png",
-              "/images/madrid.jpg",
-              "/images/paris.png",
-              "/images/londres.png",
-            ]}
+            images={["/images/bcn.png", "/images/madrid.jpg", "/images/paris.png", "/images/londres.png"]}
             interval={3000}
           />
+        </div>
       </div>
-    </div>
     </div>
   );
 }
