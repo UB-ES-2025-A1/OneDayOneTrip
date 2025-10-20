@@ -45,6 +45,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
       // Puedes cerrar el modal o redirigir directamente
       onClose();
       navigate("/login");
+      navigate("/");
     } catch (err: any) {
       setError(err.message);
     } finally {

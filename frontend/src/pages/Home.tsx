@@ -11,7 +11,8 @@ import Footer from "../components/Footer";
 export default function Home() {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
-   const data = [
+  const [isLogged, setIsLogged] = useState(false);
+  const data = [
     {
       Nombre: "Un dia per València",
       Descripcio: "Un dia explorant la ciutat de les arts i les ciències",
