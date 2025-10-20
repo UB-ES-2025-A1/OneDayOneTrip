@@ -7,8 +7,20 @@ import AnimatedText1 from "../components/AnimatedText1";
 import LoginModal from "../components/LoginModal";
 import RegisterModal from "../components/RegisterModal";
 import Footer from "../components/Footer";
+import { onUserStateChange } from "../firebase/auth";
 
 export default function Home() {
+  useEffect(() => {
+    const unsubscribe = onUserStateChange((user) => {
+      if (user) {
+        console.log("✅ Usuario logueado:", user.email);
+      } else {
+        console.log("🚪 Ningún usuario logueado");
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
    const data = [

@@ -6,6 +6,8 @@ import {
   updateProfile,
   signOut,
   onAuthStateChanged,
+  setPersistence,
+  browserSessionPersistence,
   type User,
 } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -14,16 +16,11 @@ import { db } from "./firestore";
 
 const auth = getAuth(app);
 
-class AuthService {
+setPersistence(auth, browserSessionPersistence).catch(() => {});
 
-    async register(
-    fullname: string,
-    username: string,
-    mail: string,
-    password: string
-  ) {
-    
-    const userCredential = await createUserWithEmailAndPassword(auth, mail, password); 
+class AuthService {
+  async register(fullname: string, username: string, mail: string, password: string) {
+    const userCredential = await createUserWithEmailAndPassword(auth, mail, password);
     const user = userCredential.user;
 
     await updateProfile(user, { displayName: fullname });
@@ -57,6 +54,10 @@ class AuthService {
     return auth.currentUser;
   }
 }
+
+export const onUserStateChange = (callback: (user: any) => void) => {
+  return onAuthStateChanged(auth, callback);
+};
 
 export const Auth = new AuthService();
 export { auth };
