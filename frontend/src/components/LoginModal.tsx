@@ -28,7 +28,9 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
 
       alert("Login exitos! ");
       onClose(); // Cerramos modal
-      navigate("/"); // Redirigimos al dashboard
+      navigate("/login"); 
+      navigate("/");
+      
 
     } catch (err: any) {
       console.error("Error en login:", err);

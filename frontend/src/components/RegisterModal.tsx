@@ -43,7 +43,8 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
       alert("Usuari registrat correctament");
 
       onClose();
-      openLogin();
+      navigate("/login");
+      navigate("/");
     } catch (err: any) {
       setError(err.message);
     } finally {
