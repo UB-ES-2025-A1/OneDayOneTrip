@@ -7,7 +7,7 @@ import {
   signOut,
   onAuthStateChanged,
   setPersistence,
-  browserSessionPersistence,
+  browserLocalPersistence,
   type User,
 } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -16,10 +16,15 @@ import { db } from "./firestore";
 
 const auth = getAuth(app);
 
-setPersistence(auth, browserSessionPersistence).catch(() => {});
+setPersistence(auth, browserLocalPersistence).catch(() => {});
 
 class AuthService {
-  async register(fullname: string, username: string, mail: string, password: string) {
+  async register(
+    fullname: string,
+    username: string,
+    mail: string,
+    password: string
+  ) {
     const userCredential = await createUserWithEmailAndPassword(auth, mail, password);
     const user = userCredential.user;
 
