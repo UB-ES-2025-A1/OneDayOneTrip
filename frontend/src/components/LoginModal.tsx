@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Auth } from "../firebase/auth";
 import ImageCarousel from "../components/ImageCarousel";
 
 interface LoginProps {
@@ -11,18 +12,35 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
     try {
-      alert("Login exitos!");
-      navigate("/dashboard"); 
-      onClose(); // Cerramos el modal al loguearse
+      setLoading(true);
+
+      // Autenticación con Firebase
+      const user = await Auth.login(email, password);
+      console.log("Usuario logueado:", user);
+
+      alert("Login exitos! ");
+      onClose(); // Cerramos modal
+      navigate("/dashboard"); // Redirigimos al dashboard
 
     } catch (err: any) {
-      setError("Error: " + err.message);
+      console.error("Error en login:", err);
+      if (err.code === "auth/user-not-found") {
+        setError("No s'ha trobat cap compte amb aquest correu");
+      } else if (err.code === "auth/wrong-password") {
+        setError("Contrasenya incorrecta");
+      } else {
+        setError("Error: " + err.message);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -30,7 +48,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
     <div className="modal-backdrop">
       <div className="login-card">
         <button className="close-btn-login" onClick={onClose}>
-            &times;
+          &times;
         </button>
 
         <div className="login-content">
@@ -44,49 +62,52 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
               ]}
               interval={3000}
             />
-        </div>
+          </div>
 
-        <div className="login-form">
-          <h2 className="login-title">Iniciar sessió</h2>
-          <form onSubmit={handleLogin} className="auth-form">
-            <input
-              type="email"
-              placeholder="Correu electrònic"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="auth-input"
-            />
+          <div className="login-form">
+            <h2 className="login-title">Iniciar sessió</h2>
+            <form onSubmit={handleLogin} className="auth-form">
+              <input
+                type="email"
+                placeholder="Correu electrònic"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="auth-input"
+              />
 
-            <input
-              type="password"
-              placeholder="Contrasenya"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="auth-input"
-            />
+              <input
+                type="password"
+                placeholder="Contrasenya"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="auth-input"
+              />
 
-            <button type="submit" className="auth-button">
-              Entrar
-            </button>
-          </form>
+              <button type="submit" className="auth-button" disabled={loading}>
+                {loading ? "Iniciant sessió..." : "Entrar"}
+              </button>
+            </form>
 
-          {error && <p className="text-red-500 mt-4">{error}</p>}
+            {error && <p className="text-red-500 mt-4">{error}</p>}
 
-          <p className="auth-footer">
-            No tens compte?{" "}
-            <button
-              type="button"
-              onClick={() => { onClose(); openRegister(); }}
-              className="auth-link"
-            >
-              Registra't
-            </button>
-          </p>
+            <p className="auth-footer">
+              No tens compte?{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  openRegister();
+                }}
+                className="auth-link"
+              >
+                Registra't
+              </button>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }
