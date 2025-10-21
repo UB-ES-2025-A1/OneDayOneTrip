@@ -1,0 +1,201 @@
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.home {
+  font-family: "Inter", sans-serif;
+  background-color: #f8f9fa;
+  color: #1b1b1b;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+
+.home-header {
+  width: 100%;
+  background-color: #2e492e;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  position: relative; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); 
+}
+
+.header-buttons {
+    margin-left: auto;
+    margin-right: 3rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.header-btn {
+  background-color: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+  white-space: nowrap;
+}
+
+.header-btn:hover {
+  background-color: white;
+  color: #2e492e;
+}
+
+
+.hero {
+  position: relative;   /* necesario para que ::before se posicione respecto a .hero */
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4rem 6rem;
+  border-radius: 0 0 40px 40px;
+  box-sizing: border-box;
+
+  background-image: url('/images/pantalla_principal1.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+}
+
+.hero::before {
+  content: '';           /* esto es obligatorio para que aparezca */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, #356a36, #52a052);
+  opacity: 0.2;
+  z-index: 0;           /* detrás del contenido */
+}
+
+.hero-content {
+  position: relative;   /* para que esté encima del overlay */
+  z-index: 1;
+  max-width: 50%;
+}
+
+/* .hero-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem; 
+} */
+
+.animated-text {
+  font-size: 5rem;       /* tamaño grande */
+  white-space: pre;      /* respeta espacios */
+  line-height: 1.1;
+}
+
+.animated-text span {
+  display: inline-block;
+  font-size: 5rem;       /* fuerza el tamaño en los spans */
+  white-space: pre;      /* respeta espacios */
+}
+
+.hero-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.hero-image img {
+  width: 220px;
+  height: auto;
+  border-radius: 16px;
+}
+
+.trip-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 🔹 centra horitzontalment */
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.trip-card {
+  width: 90%;
+  max-width: 800px; /* 🔹 límit d’amplada */
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+}
+
+.trip-card:hover {
+  transform: translateY(-3px);
+}
+
+.trip-image {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-right: 1rem;
+}
+
+.trip-info {
+  flex: 1;
+}
+
+.trip-title {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #2b2b2b;
+  margin-bottom: 0.2rem;
+}
+
+.trip-description {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 0.6rem;
+}
+
+.trip-details {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.trip-difficulty {
+  background-color: #e8f9ee;
+  color: #3a9d5d;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.trip-button {
+  background-color: #2e492e;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.trip-button:hover {
+  background-color: #3c6b2b;
+}

@@ -1,5 +1,84 @@
-node_modules/
+# -----------------------------------
+# Backend 
+# -----------------------------------
+backend/HELP.md
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+!backend/**/src/main/**/target/
+!backend/**/src/test/**/target/
+backend/build/
+!backend/**/src/main/**/build/
+!backend/**/src/test/**/build/
+
+# IDE files - Backend
+backend/.apt_generated
+backend/.classpath
+backend/.factorypath
+backend/.project
+backend/.settings
+backend/.springBeans
+backend/.sts4-cache
+backend/.idea
+backend/*.iws
+backend/*.iml
+backend/*.ipr
+
+# -----------------------------------
+# Frontend 
+# -----------------------------------
+# Logs
+frontend/logs
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/firebase-debug.log*
+frontend/firebase-debug.*.log*
+frontend/.firebase/
+
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+
+frontend/pids/
+frontend/*.pid
+frontend/*.seed
+frontend/*.pid.lock
+
+frontend/lib-cov/
+frontend/coverage/
+frontend/.nyc_output/
+frontend/.grunt/
+frontend/bower_components/
+frontend/.lock-wscript
+frontend/build/Release/
+frontend/.npm/
+frontend/.eslintcache
+frontend/.node_repl_history
+frontend/*.tgz
+
+frontend/.yarn-integrity
+frontend/.dataconnect
+
+
+# Compilados y dependencias
+frontend/node_modules
+frontend/dist
+frontend/dist-ssr
+frontend/*.local
+
+# -----------------------------------
+# IDE y SO - Reglas generales (sin prefijo de carpeta)
+# -----------------------------------
+.vscode/
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# -----------------------------------
+# variables de entorno
+# -----------------------------------
 .env
-package-lock.json
-package.json
-venv/
