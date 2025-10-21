@@ -199,3 +199,28 @@ html, body, #root {
 .trip-button:hover {
   background-color: #3c6b2b;
 }
+
+.intro-text {
+    margin-top: 3rem; /* Espai extra sobre el text */
+}
+
+.intro-text p:first-of-type {
+    text-align: center;
+    font-size: 2rem;      /* Més gran per la primera línia */
+    font-weight: 700;     /* Negreta */
+    color: #222;
+    margin: 0 auto 0.5rem auto; /* Espai petit sota per apropar la segona línia */
+    max-width: 900px;
+}
+
+.intro-text p:last-of-type {
+    text-align: center;
+    font-size: 1.25rem;  /* Més petita per la segona línia */
+    font-weight: 400;     /* Lletra més fina */
+    color: #555;
+    margin: 0 auto;       /* Sense marge superior per apropar-la a la primera línia */
+    max-width: 900px;
+    line-height: 1.4;
+}
+
+

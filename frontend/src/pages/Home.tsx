@@ -91,8 +91,12 @@ export default function Home() {
           <AnimatedText1 text="La teva pròxima aventura t'espera" className="animated-text"/>
         </div>
       </section>
+      <section className="intro-text">
+        <p>Descobreix rutes d’un dia ideals per escapades exprés!</p>
+        <p>Rutes guiades amb horaris, dificultat i recomanacions locals perquè aprofitis al màxim cada ciutat.</p>
+    </section>
 
-       <section className="trip-list-section">
+      <section className="trip-list-section">
         <MasonryGrid items={data} openRegister={() => setModalOpen("register")} />
       </section>
 
