@@ -93,7 +93,7 @@ export default function Home() {
       </section>
 
        <section className="trip-list-section">
-        <MasonryGrid items={data} />
+        <MasonryGrid items={data} openRegister={() => setModalOpen("register")} />
       </section>
 
 

@@ -14,9 +14,10 @@ interface MasonryItem {
 
 interface MasonryGridProps {
   items: MasonryItem[];
+  openRegister: () => void;
 }
 
-export default function MasonryGrid({ items }: MasonryGridProps) {
+export default function MasonryGrid({ items, openRegister }: MasonryGridProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -34,11 +35,14 @@ export default function MasonryGrid({ items }: MasonryGridProps) {
       }
     );
   }, [items]);
+  const handleClick = () => {
+    openRegister(); 
+  };
 
   return (
     <div ref={containerRef} className="masonry-container">
         {items.map((item) => (
-        <div key={item.id} className="masonry-item">
+        <div key={item.id} className="masonry-item" onClick={handleClick}>
             <div
             className="masonry-image"
             style={{ backgroundImage: `url(${item.img})` }}
