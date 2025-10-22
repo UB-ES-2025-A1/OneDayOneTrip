@@ -7,7 +7,10 @@ import AnimatedText1 from "../components/AnimatedText1";
 import LoginModal from "../components/LoginModal";
 import RegisterModal from "../components/RegisterModal";
 import Footer from "../components/Footer";
+
+import MasonryGrid from "../components/MasonryGrid";
 import { onUserStateChange } from "../firebase/auth";
+
 
 export default function Home() {
   useEffect(() => {
@@ -23,63 +26,66 @@ export default function Home() {
   }, []);
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
-   const data = [
+  const [isLogged, setIsLogged] = useState(false);
+
+//,temps,dificultat
+
+  const data = [
     {
-      Nombre: "Un dia per València",
-      Descripcio: "Un dia explorant la ciutat de les arts i les ciències",
-      Imatge: "https://www.saltinourhair.com/wp-content/uploads/2019/07/valencia-spain-city-arts-sciences.jpg",
-      usuari: "María González",
-      temps: "8 hores",
-      valoracio: 4.8,
-      dificultat: "Moderat",
-    },
-    {
-      Nombre: "Barcelona en un dia",
-      Descripcio: "Els imprescindibles de la ciutat de Barcelona",
-      Imatge: "https://tse4.mm.bing.net/th/id/OIP.xHRrbk9fp8E3ixh-jbeCEwHaE7?pid=Api&P=0&h=180",
-      usuari: "Pedro Martínez",
+      id: "1",
+      title: "Un dia per València",
+      img: "https://www.saltinourhair.com/wp-content/uploads/2019/07/valencia-spain-city-arts-sciences.jpg",
+      user: "María González",
+      rating: 4.8,
       temps: "5 hores",
-      valoracio: 4.6,
       dificultat: "Fàcil",
     },
     {
-      Nombre: "Ruta gastronòmica a Madrid",
-      Descripcio: "Gaudeix dels millors sabors locals a Madrid",
-      Imatge: "https://tse3.mm.bing.net/th/id/OIP.O2p1K5kRge8QkgbscMu7IwHaFj?pid=Api&P=0&h=180",
-      usuari: "Juana López",
-      temps: "7 hores",
-      valoracio: 4.9,
-      dificultat: "Fàcil",
-    },
-    {
-      Nombre: "Descobrint Sevilla",
-      Descripcio: "Un dia ple d'història i cultura a Sevilla",
-      Imatge: "https://www.tripsavvy.com/thmb/O3YIUMm2yYDv_d4FqFaMGIarf78=/3865x2576/filters:no_upscale():max_bytes(150000):strip_icc()/plaza-de-espa-a-at-dusk--seville--spain-499790854-5aa55d6c1f4e130037937244.jpg",
-      usuari: "Lourdes Fernández",
+      id: "2",
+      title: "Barcelona en un dia",
+      img: "https://tse4.mm.bing.net/th/id/OIP.xHRrbk9fp8E3ixh-jbeCEwHaE7?pid=Api&P=0&h=180",
+      user: "Pedro Martínez",
+      rating: 4.6,
       temps: "6 hores",
-      valoracio: 4.7,
-      dificultat: "Moderat",
+      dificultat: "Mitjana",
+    },
+    {
+      id: "3",
+      title: "Ruta gastronòmica a Madrid",
+      img: "https://tse3.mm.bing.net/th/id/OIP.O2p1K5kRge8QkgbscMu7IwHaFj?pid=Api&P=0&h=180",
+      user: "Juana López",
+      rating: 4.9,
+      temps: "4 hores",
+      dificultat: "Fàcil",
+    },
+    {
+      id: "4",
+      title: "Descobrint Sevilla",
+      img: "https://th.bing.com/th/id/R.756df7df9c567148ef25303fe5e6dcd6?rik=FCX09fvWm6ulew&riu=http%3a%2f%2fsevillaintercambio.com%2fwp-content%2fuploads%2fPlaza-Espa%c3%b1a-Sevilla.jpg&ehk=eo3yevR0cdGsjmz04lMxmOY5qr3HucYYJ5Srk%2blgOjc%3d&risl=&pid=ImgRaw&r=0",
+      user: "Lourdes Fernández",
+      rating: 4.7,
+      temps: "7 hores",
+      dificultat: "Difícil",
+    },
+    {
+      id: "5",
+      title: "Passeig exprés per Lisboa",
+      img: "https://www.transfeero.com/wp-content/uploads/2020/07/lisbon-2048x1366.jpg",
+      user: "Clara Rodríguez",
+      rating: 4.6,
+      temps: "6 hores",
+      dificultat: "Fàcil",
+    },
+    {
+      id: "6",
+      title: "Ruta històrica a Roma",
+      img: "https://www.enroma.com/wp-content/uploads/2017/02/Tour-Coliseo-Foro-y-Palatino-3-2048x1365.jpg",
+      user: "Giulia Rossi",
+      rating: 4.9,
+      temps: "9 hores",
+      dificultat: "Fàcil",
     }
   ];
-  const renderList = (data: any[]) => {
-    return data.map((item, index) => (
-      <div className="trip-card" key={index}>
-        <img src={item.Imatge} alt={item.Nombre} className="trip-image" />
-        <div className="trip-info">
-          <h3 className="trip-title">{item.Nombre}</h3>
-          <p className="trip-description">{item.Descripcio}</p>
-          <div className="trip-details">
-            <span className="trip-user">👤 {item.usuari}</span>
-            <span className="trip-rating">⭐ {item.valoracio}</span>
-            <span className="trip-time">⏱ {item.temps}</span>
-            <span className="trip-difficulty">{item.dificultat}</span>
-          </div>
-        </div>
-        <button className="trip-button">Veure Ruta</button>
-      </div>
-    ));
-  };
-
   return (
     <div className="home">
       <header className="home-header">
@@ -99,9 +105,13 @@ export default function Home() {
           <AnimatedText1 text="La teva pròxima aventura t'espera" className="animated-text"/>
         </div>
       </section>
+      <section className="intro-text">
+        <p>Descobreix rutes d’un dia ideals per escapades exprés!</p>
+        <p>Rutes guiades amb horaris, dificultat i recomanacions locals perquè aprofitis al màxim cada ciutat.</p>
+    </section>
 
-       <section className="trip-list-section">
-        <div className="trip-list">{renderList(data)}</div>
+      <section className="trip-list-section">
+        <MasonryGrid items={data} openRegister={() => setModalOpen("register")} />
       </section>
 
 
