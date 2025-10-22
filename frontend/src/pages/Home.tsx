@@ -8,6 +8,8 @@ import LoginModal from "../components/LoginModal";
 import RegisterModal from "../components/RegisterModal";
 import Footer from "../components/Footer";
 import { UserCircle } from "lucide-react"; // puedes usar este icono o el tuyo
+import MasonryGrid from "../components/MasonryGrid";
+
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
@@ -65,23 +67,15 @@ export default function Home() {
     } 
   ];
 
-  const renderList = (data: any[]) =>
-    data.map((item, index) => (
-      <div className="trip-card" key={index}>
-        <img src={item.Imatge} alt={item.Nombre} className="trip-image" />
-        <div className="trip-info">
-          <h3 className="trip-title">{item.Nombre}</h3>
-          <p className="trip-description">{item.Descripcio}</p>
-          <div className="trip-details">
-            <span className="trip-user">👤 {item.usuari}</span>
-            <span className="trip-rating">⭐ {item.valoracio}</span>
-            <span className="trip-time">⏱ {item.temps}</span>
-            <span className="trip-difficulty">{item.dificultat}</span>
-          </div>
-        </div>
-        <button className="trip-button">Ver Ruta</button>
-      </div>
-    ));
+  const masonryItems = data.map((item, index) => ({
+    id: String(index),
+    img: item.Imatge,
+    title: item.Nombre,
+    user: item.usuari,
+    rating: item.valoracio,
+    temps: item.temps,
+    dificultat: item.dificultat,
+  }));
 
   return (
     <div className="home">
@@ -151,9 +145,10 @@ export default function Home() {
             <p>Aún no sigues a nadie. ¡Explora rutas y conecta con otros!</p>
           </div>
         ) : (
-          <div className="trip-list">{renderList(data)}</div>
+          <MasonryGrid items={masonryItems} openRegister={() => setModalOpen("register")} />
         )}
       </section>
+
 
       {modalOpen === "login" && (
         <LoginModal

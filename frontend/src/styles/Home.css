@@ -1,44 +1,49 @@
+/* ==== RESETEO GLOBAL ==== */
 html, body, #root {
   margin: 0;
   padding: 0;
   width: 100%;
+  height: 100%;
   overflow-x: hidden;
-}
-
-.home {
   font-family: "Inter", sans-serif;
   background-color: #f8f9fa;
   color: #1b1b1b;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
 }
 
+/* ==== HOME WRAPPER ==== */
+.home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
+/* ==== HEADER ==== */
 .home-header {
   width: 100%;
   background-color: #2e492e;
   color: white;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 1rem 2rem;
-  position: relative; 
+  position: relative;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
 .logo {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
   position: absolute;
   left: 50%;
-  transform: translateX(-50%); 
+  transform: translateX(-50%);
 }
 
 .header-buttons {
-    margin-left: auto;
-    margin-right: 3rem;
-    display: flex;
-    gap: 0.75rem;
+  margin-left: auto;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 .header-btn {
@@ -48,7 +53,7 @@ html, body, #root {
   padding: 0.5rem 1rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.3s ease;
   white-space: nowrap;
 }
 
@@ -57,25 +62,80 @@ html, body, #root {
   color: #2e492e;
 }
 
+/* ---------- TABS SECTION ---------- */
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 2rem auto;
+  width: 320px;
+  height: 45px;
+  background-color: #e6f3e6; /* verde muy claro */
+  border-radius: 30px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
 
+/* Botones dentro del contenedor */
+.tab-btn {
+  flex: 1;
+  z-index: 2;
+  border: none;
+  background: none;
+  color: #2e492e;
+  font-weight: 600;
+  cursor: pointer;
+  height: 100%;
+  transition: color 0.3s ease;
+  position: relative;
+  font-size: 1rem;
+}
+
+.tab-btn.active {
+  color: white;
+}
+
+/* Elemento deslizante (highlight) */
+.tabs-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%; /* ocupa la mitad */
+  height: 100%;
+  background: linear-gradient(135deg, #3a6b3a, #356935);
+  border-radius: 30px;
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+/* Cuando el tab seleccionado es “recomendados” */
+.tabs-container[data-active="recomendados"]::before {
+  transform: translateX(100%);
+}
+
+
+/* ==== LISTA DE RUTAS (Modo clásico, fallback) ==== */
 .trip-list {
   display: flex;
   flex-direction: column;
-  align-items: center; /* 🔹 centra horitzontalment */
+  align-items: center;
   gap: 1rem;
-  margin-top: 1rem;
+  margin: 1rem auto 3rem;
+  width: 100%;
+  max-width: 900px;
 }
 
 .trip-card {
-  width: 90%;
-  max-width: 800px; /* 🔹 límit d’amplada */
   display: flex;
   align-items: center;
+  justify-content: space-between;
   background-color: #fff;
   border-radius: 10px;
   padding: 1rem 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  width: 100%;
   transition: transform 0.2s ease;
 }
 
@@ -86,7 +146,8 @@ html, body, #root {
 .trip-image {
   width: 100px;
   height: 100px;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 8px;
   margin-right: 1rem;
 }
 
@@ -109,6 +170,7 @@ html, body, #root {
 
 .trip-details {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.8rem;
   align-items: center;
   font-size: 0.9rem;
@@ -137,27 +199,135 @@ html, body, #root {
   background-color: #3c6b2b;
 }
 
+/* ==== SECCIÓN INTRO ==== */
 .intro-text {
-    margin-top: 3rem; /* Espai extra sobre el text */
+  margin-top: 3rem;
+  text-align: center;
+  padding: 0 1rem;
 }
 
 .intro-text p:first-of-type {
-    text-align: center;
-    font-size: 2rem;      /* Més gran per la primera línia */
-    font-weight: 700;     /* Negreta */
-    color: #222;
-    margin: 0 auto 0.5rem auto; /* Espai petit sota per apropar la segona línia */
-    max-width: 900px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.5rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .intro-text p:last-of-type {
-    text-align: center;
-    font-size: 1.25rem;  /* Més petita per la segona línia */
-    font-weight: 400;     /* Lletra més fina */
-    color: #555;
-    margin: 0 auto;       /* Sense marge superior per apropar-la a la primera línia */
-    max-width: 900px;
-    line-height: 1.4;
+  font-size: 1.25rem;
+  color: #555;
+  max-width: 900px;
+  margin: 0 auto;
+  line-height: 1.5;
 }
 
+/* ==== MASONRY GRID (nuevo diseño animado) ==== */
+.masonry-container {
+  column-count: 3;
+  column-gap: 1rem;
+  padding: 2rem;
+}
 
+.masonry-item {
+  background-color: white;
+  display: inline-block;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  break-inside: avoid;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.masonry-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.masonry-image {
+  width: 100%;
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+}
+
+.masonry-info {
+  padding: 0.8rem 1rem;
+}
+
+.masonry-info h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  color: #2b2b2b;
+}
+
+.masonry-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.masonry-meta {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.masonry-meta .difficulty {
+  background-color: #e8f9ee;
+  color: #3a9d5d;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.rating {
+  font-weight: 600;
+  color: #2e492e;
+  margin-top: 0.4rem;
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 1024px) {
+  .masonry-container {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 700px) {
+  .masonry-container {
+    column-count: 1;
+  }
+
+  .logo {
+    position: static;
+    transform: none;
+    margin-right: auto;
+  }
+
+  .header-buttons {
+    margin-right: 0;
+  }
+
+  .trip-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .trip-image {
+    width: 100%;
+    height: 180px;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .trip-button {
+    align-self: stretch;
+    text-align: center;
+  }
+}
