@@ -1,0 +1,166 @@
+/* ---------- HERO CAROUSEL ---------- */
+.hero-carousel {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  overflow: hidden;
+  border-radius: 0 0 40px 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Contenedor del track de slides */
+.carousel-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s ease-in-out;
+}
+
+/* Cada slide */
+.carousel-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  position: relative;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4rem 6rem;
+  box-sizing: border-box;
+}
+
+/* Degradado verde sobre la imagen */
+.carousel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(46, 73, 46, 0.8),
+    rgba(82, 160, 82, 0.3)
+  );
+  z-index: 0;
+}
+
+/* Contenido del texto */
+.carousel-content {
+  position: relative;
+  z-index: 1;
+  max-width: 50%;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.carousel-title {
+  font-size: 3.2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.carousel-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* ✨ Animación de entrada del texto */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------------------- BOTONES DE NAVEGACIÓN ---------------------- */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(46, 73, 46, 0.6);
+  color: white;
+  border: none;
+  font-size: 2.2rem;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.3s ease, transform 0.2s ease;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-btn:hover {
+  background: rgba(82, 160, 82, 0.9);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn.prev {
+  left: 1.2rem;
+}
+
+.carousel-btn.next {
+  right: 1.2rem;
+}
+
+/* ---------------------- INDICADORES INFERIORES ---------------------- */
+.carousel-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 4;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.dot:hover {
+  background-color: #6dcf78;
+}
+
+.dot.active {
+  background-color: #52a052;
+}
+
+/* ---------------------- RESPONSIVE ---------------------- */
+@media (max-width: 768px) {
+  .carousel-slide {
+    padding: 2rem;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .carousel-content {
+    max-width: 90%;
+  }
+
+  .carousel-title {
+    font-size: 2rem;
+  }
+
+  .carousel-subtitle {
+    font-size: 1rem;
+  }
+
+  .carousel-btn {
+    font-size: 1.6rem;
+    padding: 0.3rem 0.6rem;
+  }
+}
