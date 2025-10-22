@@ -92,7 +92,7 @@ body {
   color: #6b7280;
 }
 
-.auth-button {
+/* .auth-button {
   background-color: #065f46;
   color: white;
   font-weight: 600;
@@ -105,11 +105,11 @@ body {
   width: auto;
   margin: 1rem auto 0 auto; 
   display: block;
-}
+} */
 
-.auth-button:hover {
+/* .auth-button:hover {
   background-color: #047857;
-}
+} */
 
 /* Texto de enlace */
 .auth-link {

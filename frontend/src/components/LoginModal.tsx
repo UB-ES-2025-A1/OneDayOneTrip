@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Auth } from "../firebase/auth";
+import "../styles/LoginReg.css";
 import ImageCarousel from "../components/ImageCarousel";
 
 interface LoginProps {
@@ -88,7 +89,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
               />
 
               <button type="submit" className="auth-button" disabled={loading}>
-                {loading ? "Iniciant sessió..." : "Entrar"}
+                {loading ? "Iniciant sessió..." : "Iniciar Sessió"}
               </button>
             </form>
 
