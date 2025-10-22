@@ -42,7 +42,6 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
 
       alert("Usuari registrat correctament");
 
-      // Puedes cerrar el modal o redirigir directamente
       onClose();
       navigate("/");
     } catch (err: any) {
