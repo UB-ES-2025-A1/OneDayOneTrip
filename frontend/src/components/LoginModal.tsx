@@ -29,9 +29,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
 
       alert("Login exitos! ");
       onClose(); // Cerramos modal
-      navigate("/login"); 
-      navigate("/");
-      
+      navigate("/"); // Redirigimos al dashboard
 
     } catch (err: any) {
       console.error("Error en login:", err);
@@ -58,10 +56,10 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
           <div className="login-gallery">
             <ImageCarousel
               images={[
-                "/images/bcn.png",
-                "/images/madrid.jpg",
-                "/images/paris.png",
-                "/images/londres.png",
+                "images/bcn.png",
+                "images/madrid.jpg",
+                "images/paris.png",
+                "images/londres.png",
               ]}
               interval={3000}
             />
@@ -89,7 +87,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
               />
 
               <button type="submit" className="auth-button" disabled={loading}>
-                {loading ? "Iniciant sessió..." : "Iniciar Sessió"}
+                {loading ? "Iniciant sessió..." : "Iniciar Sessió"}              
               </button>
             </form>
 
