@@ -55,10 +55,10 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
           <div className="login-gallery">
             <ImageCarousel
               images={[
-                "public/images/bcn.png",
-                "public/images/madrid.jpg",
-                "public/images/paris.png",
-                "public/images/londres.png",
+                "images/bcn.png",
+                "images/madrid.jpg",
+                "images/paris.png",
+                "images/londres.png",
               ]}
               interval={3000}
             />
