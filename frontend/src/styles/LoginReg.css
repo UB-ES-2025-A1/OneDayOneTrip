@@ -97,19 +97,7 @@
   width: 100%;
 }
 
-.auth-button {
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: none;
-  background-color: #356a36;
-  color: white;
-  cursor: pointer;
-  transition: background 0.3s;
-}
 
-.auth-button:hover {
-  background-color: #2a5228;
-}
 
 .auth-footer {
   margin-top: 1rem;
@@ -121,6 +109,23 @@
   text-decoration: underline;
   border: none; 
   cursor: pointer;
+}
+
+.login-form .auth-button {
+  background-color: #356a36 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px;
+  padding: 0.5rem 0.5rem;          
+  font-size: 0.9rem;            
+  font-weight: 500;             
+  max-width: 320px;             
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.login-form .auth-button:hover {
+  background-color: #2a5228 !important;
+  transform: scale(1.03);      
 }
 
 /* Carousel */
