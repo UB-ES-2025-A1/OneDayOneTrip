@@ -2,6 +2,7 @@
 ├── api
 │   ├── app
 │   │   ├── auth
+│   │   │   └── verify_token.py
 │   │   ├── main.py
 │   │   ├── models
 │   │   ├── routers
@@ -34,6 +35,8 @@
 │   │   └── vite.svg
 │   ├── README.md
 │   ├── src
+│   │   ├── api
+│   │   │   └── client.ts
 │   │   ├── App.css
 │   │   ├── App.tsx
 │   │   ├── assets
@@ -50,9 +53,7 @@
 │   │   ├── firebase
 │   │   │   ├── auth.ts
 │   │   │   ├── config.ts
-│   │   │   ├── error.ts
-│   │   │   ├── firestore.ts
-│   │   │   └── storage.ts
+│   │   │   └── firestore.ts
 │   │   ├── firebase.ts
 │   │   ├── main.tsx
 │   │   ├── pages
@@ -74,4 +75,4 @@
 ├── .gitignore
 └── README.md
 
-15 directories, 59 files
+16 directories, 59 files
