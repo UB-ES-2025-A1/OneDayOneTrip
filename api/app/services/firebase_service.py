@@ -1,14 +1,14 @@
 import os
 import json
+from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# Obtener JSON desde variable de entorno
-firebase_key = json.loads(os.environ["FIREBASE_CREDENTIALS"])
+load_dotenv()  # <--- carga variables de .env en local
 
-cred = credentials.Certificate(firebase_key)
+firebase_credentials = json.loads(os.environ["FIREBASE_CREDENTIALS"])
+cred = credentials.Certificate(firebase_credentials)
 
-# Inicializar solo una vez (evita error de "app already exists")
 if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
 

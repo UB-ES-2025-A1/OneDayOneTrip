@@ -1,43 +1,25 @@
-// src/firebase/auth.ts
 import {
   getAuth,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   updateProfile,
+  signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence,
   type User,
 } from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { app } from "./config";
-import { db } from "./firestore";
+import { apiPost } from "../api/client";
 
 const auth = getAuth(app);
 
-setPersistence(auth, browserLocalPersistence).catch(() => {});
-
 class AuthService {
-  async register(
-    fullname: string,
-    username: string,
-    mail: string,
-    password: string
-  ) {
+  async register(fullname: string, username: string, mail: string, password: string) {
     const userCredential = await createUserWithEmailAndPassword(auth, mail, password);
     const user = userCredential.user;
 
     await updateProfile(user, { displayName: fullname });
 
-    await setDoc(doc(db, "users", user.uid), {
-      uid: user.uid,
-      fullname,
-      username,
-      mail,
-      role: "user",
-      createdAt: serverTimestamp(),
-    });
+    await apiPost("/users/register", { fullname, username, mail });
 
     return user;
   }
@@ -59,10 +41,6 @@ class AuthService {
     return auth.currentUser;
   }
 }
-
-export const onUserStateChange = (callback: (user: any) => void) => {
-  return onAuthStateChanged(auth, callback);
-};
 
 export const Auth = new AuthService();
 export { auth };

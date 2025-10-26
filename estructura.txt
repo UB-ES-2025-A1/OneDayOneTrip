@@ -7,7 +7,9 @@
 │   │   ├── routers
 │   │   │   └── users.py
 │   │   └── services
-│   └── .env
+│   │       └── firebase_service.py
+│   ├── .env
+│   └── requirements.txt
 ├── estructura.txt
 ├── frontend
 │   ├── .env
@@ -72,4 +74,4 @@
 ├── .gitignore
 └── README.md
 
-15 directories, 57 files
+15 directories, 59 files
