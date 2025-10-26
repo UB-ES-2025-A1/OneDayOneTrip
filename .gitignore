@@ -5,7 +5,10 @@ backend/node_modules
 backed/dist
 backend/dist-ssr
 backend/*.local
-backend/venv 
+venv/
+**/venv/
+
+
 
 # -----------------------------------
 # Frontend 
