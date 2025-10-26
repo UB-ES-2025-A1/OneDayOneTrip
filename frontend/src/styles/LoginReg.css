@@ -195,7 +195,24 @@
   cursor: pointer;
 }
 
-/* Centra verticalment i ajusta mida si cal */
+.login-form .auth-button {
+  background-color: #356a36 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px;
+  padding: 0.5rem 0.5rem;          
+  font-size: 0.9rem;            
+  font-weight: 500;             
+  max-width: 320px;             
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.login-form .auth-button:hover {
+  background-color: #2a5228 !important;
+  transform: scale(1.03);      
+}
+
+
 .auth-input + button svg {
   width: 20px;
   height: 20px;

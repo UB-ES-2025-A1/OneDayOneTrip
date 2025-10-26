@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Auth } from "../firebase/auth";
+import "../styles/LoginReg.css";
 import ImageCarousel from "../components/ImageCarousel";
 import "../styles/LoginReg.css";
 
