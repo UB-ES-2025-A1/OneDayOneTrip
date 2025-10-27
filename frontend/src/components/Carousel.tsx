@@ -10,20 +10,20 @@ interface Slide {
 const slides: Slide[] = [
   {
     image: "/images/pantalla_principal1.png",
-    title: "Tu próxima aventura te espera",
+    title: "La teva propera aventura t'espera",
     subtitle:
-      "Desde senderismo hasta gastronomía local, encuentra la experiencia perfecta para ti",
+      "Des de senderisme fins a gastronomia local, troba l'experiència perfecta per a tu",
   },
   {
     image: "/images/paris.png",
-    title: "Explora nuevas rutas y culturas",
+    title: "Explora noves rutes i cultures",
     subtitle:
-      "Viaja, descubre y comparte tus mejores experiencias con otros viajeros",
+      "Viatja, descobreix i comparteix les teves millors experiències amb altres viatgers",
   },
   {
     image: "/images/londres.png",
-    title: "Cada día, una historia que contar",
-    subtitle: "Encuentra inspiración para tu próximo destino",
+    title: "Cada dia, una història que explicar",
+    subtitle: "Troba inspiració per al teu proper destí",
   },
 ];
 
