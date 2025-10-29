@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import StyleSheet from "react"
 
 export default function Footer({ children }: { children?: ReactNode }) {
   return (
