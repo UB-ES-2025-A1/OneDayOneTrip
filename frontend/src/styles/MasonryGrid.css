@@ -1,26 +1,24 @@
 .masonry-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 36px;
   padding: 3rem 4rem;
   max-width: 1400px;
-  margin: 0 auto;
+  margin: 0 auto 4rem;
+  box-sizing: border-box;
 }
 
 .masonry-item {
   position: relative;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  transition: transform 0.3s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   background-color: #fff;
+  transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
-.masonry-item:hover {
-  transform: scale(0.97);
-}
+.masonry-item:hover { transform: scale(0.98); }
 
 .masonry-image {
   background-size: cover;
@@ -31,15 +29,14 @@
 
 .masonry-info {
   background: white;
-  padding: 0.9rem 1.1rem;
-  text-align: left;
+  padding: 1rem;
 }
 
 .masonry-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap; /* per no desbordar si és llarg */
+  align-items: center;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
@@ -50,14 +47,8 @@
   font-weight: 600;
   color: #222;
 }
-.masonry-info h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #333;
-  font-weight: 600;
-}
 
-.masonry-header .meta {
+.meta {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -65,12 +56,12 @@
   color: #555;
 }
 
-.masonry-header .meta .difficulty {
-  background-color: #f3f3f3;
-  padding: 0.2rem 0.6rem;
+.meta .difficulty {
+  background-color: #e8f9ee;
+  color: #3a9d5d;
+  padding: 2px 8px;
   border-radius: 6px;
-  font-weight: 500;
-  text-transform: capitalize;
+  font-size: 0.8rem;
 }
 
 .masonry-footer {
@@ -87,26 +78,11 @@
   font-weight: 500;
 }
 
-.masonry-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap; /* per si el títol és llarg */
-  margin-bottom: 0.4rem;
-}
+@media (max-width: 768px) {
+  .masonry-container {
+    padding: 2rem 1rem;
+    gap: 20px;
+  }
 
-.masonry-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.9rem;
-  color: #555;
-}
-
-.masonry-meta .difficulty {
-  background-color: #f3f3f3;
-  padding: 0.2rem 0.6rem;
-  border-radius: 8px;
-  font-weight: 500;
-  text-transform: capitalize;
+  .masonry-image { height: 220px; }
 }

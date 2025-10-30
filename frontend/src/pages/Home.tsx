@@ -1,34 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { onAuthStateChanged, signOut, type User } from "firebase/auth";
+import { auth } from "../firebase.ts";
 import "../styles/Home.css";
 import "../styles/LoginReg.css";
-import AnimatedText1 from "../components/AnimatedText1";
+import Carousel from "../components/Carousel";
 import LoginModal from "../components/LoginModal";
 import RegisterModal from "../components/RegisterModal";
 import Footer from "../components/Footer";
-
+import { UserCircle } from "lucide-react"; // puedes usar este icono o el tuyo
 import MasonryGrid from "../components/MasonryGrid";
-import { onUserStateChange } from "../firebase/auth";
 
 
 export default function Home() {
-  useEffect(() => {
-    const unsubscribe = onUserStateChange((user) => {
-      if (user) {
-        console.log("✅ Usuario logueado:", user.email);
-      } else {
-        console.log("🚪 Ningún usuario logueado");
-      }
-    });
+  const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [selectedTab, setSelectedTab] = useState<"recomendados" | "siguiendo">(
+    "recomendados"
+  );
 
+  // Detecta el estado de sesión
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
     return () => unsubscribe();
   }, []);
-  const navigate = useNavigate();
-  const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
-  const [isLogged, setIsLogged] = useState(false);
 
-//,temps,dificultat
+  const handleLogout = async () => {
+    await signOut(auth);
+    setCurrentUser(null);
+    setSelectedTab("recomendados");
+  };
 
   const data = [
     {
@@ -86,47 +88,100 @@ export default function Home() {
       dificultat: "Fàcil",
     }
   ];
+
   return (
     <div className="home">
       <header className="home-header">
         <h1 className="logo">OneDayOneTrip</h1>
+
         <div className="header-buttons">
-          <button onClick={() => setModalOpen("login")} className="header-btn">
-            Iniciar sessió
-          </button>
-          <button onClick={() => setModalOpen("register")} className="header-btn">
-            Registrar-se
-          </button>
+          {currentUser ? (
+            <>
+              <button
+                className="profile-btn"
+                title="Ver perfil"
+                onClick={() => alert("Perfil próximamente")}
+              >
+                <UserCircle size={28} />
+              </button>
+              <button onClick={handleLogout} className="header-btn">
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setModalOpen("login")}
+                className="header-btn"
+              >
+                Iniciar sesión
+              </button>
+              <button
+                onClick={() => setModalOpen("register")}
+                className="header-btn"
+              >
+                Registrarse
+              </button>
+            </>
+          )}
         </div>
+
       </header>
 
-      <section className="hero">
-        <div className="hero-content">
-          <AnimatedText1 text="La teva pròxima aventura t'espera" className="animated-text"/>
-        </div>
-      </section>
+      <Carousel />  
+
       <section className="intro-text">
         <p>Descobreix rutes d’un dia ideals per escapades exprés!</p>
         <p>Rutes guiades amb horaris, dificultat i recomanacions locals perquè aprofitis al màxim cada ciutat.</p>
-    </section>
+      </section>
 
+      {/* Tabs (solo visibles si hay sesión) */}
+      {currentUser && (
+        <div
+          className="tabs-container"
+          data-active={selectedTab} // <- necesario para mover el deslizador
+        >
+          <button
+            className={`tab-btn ${selectedTab === "siguiendo" ? "active" : ""}`}
+            onClick={() => setSelectedTab("siguiendo")}
+          >
+            Siguiendo
+          </button>
+          <button
+            className={`tab-btn ${selectedTab === "recomendados" ? "active" : ""}`}
+            onClick={() => setSelectedTab("recomendados")}
+          >
+            Recomendados
+          </button>
+        </div>
+      )}
       <section className="trip-list-section">
-        <MasonryGrid items={data} openRegister={() => setModalOpen("register")} />
+        {selectedTab === "siguiendo" && currentUser ? (
+          <div className="trip-list empty">
+            <p>Aún no sigues a nadie. ¡Explora rutas y conecta con otros!</p>
+          </div>
+        ) : (
+          <MasonryGrid items={data} openRegister={() => setModalOpen("register")} />
+        )}
       </section>
 
 
-
       {modalOpen === "login" && (
-        <LoginModal onClose={() => setModalOpen(null)} openRegister={() => setModalOpen("register")} />
+        <LoginModal
+          onClose={() => setModalOpen(null)}
+          openRegister={() => setModalOpen("register")}
+        />
       )}
 
       {modalOpen === "register" && (
-        <RegisterModal onClose={() => setModalOpen(null)} openLogin={() => setModalOpen("login")} />
+        <RegisterModal
+          onClose={() => setModalOpen(null)}
+          openLogin={() => setModalOpen("login")}
+        />
       )}
+
       <Footer />
     </div>
-
-    
   );
 }
 

@@ -1,0 +1,130 @@
+.hero-carousel {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  max-height: 700px; /* evita overflow */
+  overflow: hidden;
+  border-radius: 0 0 40px 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 2rem;
+}
+
+.carousel-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s ease-in-out;
+}
+
+.carousel-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4rem 6rem;
+  box-sizing: border-box;
+}
+
+.carousel-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(46, 73, 46, 0.85),
+    rgba(46, 73, 46, 0.35)
+  );
+  z-index: 0;
+}
+
+.carousel-content {
+  position: relative;
+  z-index: 1;
+  max-width: 50%;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.carousel-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.carousel-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(46, 73, 46, 0.6);
+  color: white;
+  border: none;
+  font-size: 2rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  z-index: 5;
+}
+
+.carousel-btn:hover {
+  background: rgba(132, 190, 132, 0.9);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn.prev { left: 1rem; }
+.carousel-btn.next { right: 1rem; }
+
+.carousel-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 4;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6);
+  transition: background-color 0.3s;
+  cursor: pointer;
+}
+
+.dot.active { background-color: #52a052; }
+
+@media (max-width: 768px) {
+  .carousel-slide {
+    padding: 2rem;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .carousel-content {
+    max-width: 90%;
+  }
+
+  .carousel-title {
+    font-size: 2rem;
+  }
+
+  .carousel-subtitle {
+    font-size: 1rem;
+  }
+}
