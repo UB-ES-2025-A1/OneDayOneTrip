@@ -69,3 +69,4 @@ frontend/*.local
 # variables de entorno
 # -----------------------------------
 .env
+venv/
