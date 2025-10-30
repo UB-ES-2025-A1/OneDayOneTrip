@@ -1,27 +1,14 @@
 # -----------------------------------
 # Backend 
 # -----------------------------------
-backend/HELP.md
-backend/target/
-backend/.mvn/wrapper/maven-wrapper.jar
-!backend/**/src/main/**/target/
-!backend/**/src/test/**/target/
-backend/build/
-!backend/**/src/main/**/build/
-!backend/**/src/test/**/build/
+backend/node_modules
+backed/dist
+backend/dist-ssr
+backend/*.local
+venv/
+**/venv/
 
-# IDE files - Backend
-backend/.apt_generated
-backend/.classpath
-backend/.factorypath
-backend/.project
-backend/.settings
-backend/.springBeans
-backend/.sts4-cache
-backend/.idea
-backend/*.iws
-backend/*.iml
-backend/*.ipr
+
 
 # -----------------------------------
 # Frontend 
