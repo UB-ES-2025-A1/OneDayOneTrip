@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { auth } from "../firebase.ts";
 import "../styles/Home.css";
@@ -17,6 +18,7 @@ export default function Home() {
   const [selectedTab, setSelectedTab] = useState<"recomendados" | "siguiendo">(
     "recomendados"
   );
+  const navigate = useNavigate();
 
   // Detecta el estado de sesión
   useEffect(() => {
@@ -100,7 +102,7 @@ export default function Home() {
               <button
                 className="profile-btn"
                 title="Veure perfil"
-                onClick={() => alert("Perfil próximament")}
+                onClick={() => navigate("/userprofile")}
               >
                 <UserCircle size={28} />
               </button>
