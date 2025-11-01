@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import "../styles/MasonryGrid.css";
+import { type User } from "firebase/auth";
+
 
 interface MasonryItem {
   id: string;
@@ -15,9 +17,10 @@ interface MasonryItem {
 interface MasonryGridProps {
   items: MasonryItem[];
   openRegister: () => void;
+  currentUser: User | null;
 }
 
-export default function MasonryGrid({ items, openRegister }: MasonryGridProps) {
+export default function MasonryGrid({ items, openRegister, currentUser }: MasonryGridProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -35,14 +38,18 @@ export default function MasonryGrid({ items, openRegister }: MasonryGridProps) {
       }
     );
   }, [items]);
-  const handleClick = () => {
-    openRegister(); 
-  };
+  const handleClick = (itemId: string) => {
+  if (!currentUser) {
+    openRegister();
+  } else {
+    console.log(`Usuari loguejat: clic a la ruta ${itemId}`);
+  }
+};
 
   return (
     <div ref={containerRef} className="masonry-container">
         {items.map((item) => (
-        <div key={item.id} className="masonry-item" onClick={handleClick}>
+        <div key={item.id} className="masonry-item" onClick={() => handleClick(item.id)}>
             <div
             className="masonry-image"
             style={{ backgroundImage: `url(${item.img})` }}

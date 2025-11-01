@@ -19,7 +19,7 @@ export default function Home() {
   );
 
   // Detecta el estado de sesión
-  
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
@@ -162,7 +162,12 @@ export default function Home() {
             <p>Aún no sigues a nadie. ¡Explora rutas y conecta con otros!</p>
           </div>
         ) : (
-          <MasonryGrid items={data} openRegister={() => setModalOpen("register")} />
+          <MasonryGrid 
+          items={data} 
+          openRegister={() => 
+            setModalOpen("register")} 
+            currentUser={currentUser}
+            />
         )}
       </section>
 
