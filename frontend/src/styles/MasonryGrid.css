@@ -86,3 +86,21 @@
 
   .masonry-image { height: 220px; }
 }
+
+.veure-ruta-btn {
+  position: absolute;
+  bottom: 25px;
+  right: 18px;
+  background-color: #356a36;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 1.0rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.veure-ruta-btn:hover {
+  background-color: #356a36cc;
+}

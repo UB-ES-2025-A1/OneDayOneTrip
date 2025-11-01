@@ -64,6 +64,14 @@ export default function MasonryGrid({ items, openRegister, currentUser }: Masonr
                 </div>
             </div>
             <p className="rating">⭐ {item.rating}</p>
+            {currentUser && (
+              <button
+                className="veure-ruta-btn"
+                onClick={() => console.log(`Veure ruta ${item.id}`)}
+              >
+                Veure ruta
+              </button>
+            )}
             </div>
         </div>
         ))}
