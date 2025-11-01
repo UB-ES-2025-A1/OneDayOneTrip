@@ -1,0 +1,175 @@
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.home {
+  font-family: "Inter", sans-serif;
+  background-color: #f8f9fa;
+  color: #1b1b1b;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+
+.home-header {
+  width: 100%;
+  background-color: #2e492e;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  position: relative; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); 
+}
+
+.header-buttons {
+    margin-left: auto;
+    margin-right: 3rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.header-btn {
+  background-color: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+  white-space: nowrap;
+}
+
+.header-btn:hover {
+  background-color: white;
+  color: #2e492e;
+}
+
+/* ---------- TABS SECTION ---------- */
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 2rem auto;
+  width: 320px;
+  height: 45px;
+  background-color: #e6f3e6; /* verde muy claro */
+  border-radius: 30px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Botones dentro del contenedor */
+.tab-btn {
+  flex: 1;
+  z-index: 2;
+  border: none;
+  background: none;
+  color: #2e492e;
+  font-weight: 600;
+  cursor: pointer;
+  height: 100%;
+  transition: color 0.3s ease;
+  position: relative;
+  font-size: 1rem;
+}
+
+.tab-btn.active {
+  color: white;
+}
+
+/* Elemento deslizante (highlight) */
+.tabs-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%; 
+  height: 100%;
+  background: linear-gradient(135deg, #3a6b3a, #56a856);
+  border-radius: 30px;
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+/* Cuando el tab seleccionado es “guardat” */
+.tabs-container[data-active="guardat"]::before {
+  transform: translateX(100%);
+}
+
+.hero-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.trip-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.trip-card:hover {
+  transform: translateY(-3px);
+}
+
+.trip-info {
+  flex: 1;
+}
+
+.trip-title {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #2b2b2b;
+  margin-bottom: 0.2rem;
+}
+
+.trip-description {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 0.6rem;
+}
+
+.trip-details {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.trip-difficulty {
+  background-color: #e8f9ee;
+  color: #3a9d5d;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.trip-button {
+  background-color: #2e492e;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.trip-button:hover {
+  background-color: #3c6b2b;
+}

@@ -14,7 +14,8 @@ interface MasonryItem {
 
 interface MasonryGridProps {
   items: MasonryItem[];
-  openRegister: () => void;
+  openRegister?: () => void; 
+
 }
 
 export default function MasonryGrid({ items, openRegister }: MasonryGridProps) {
@@ -36,8 +37,10 @@ export default function MasonryGrid({ items, openRegister }: MasonryGridProps) {
     );
   }, [items]);
   const handleClick = () => {
-    openRegister(); 
-  };
+  if (openRegister) {
+    openRegister();
+  }
+};
 
   return (
     <div ref={containerRef} className="masonry-container">
