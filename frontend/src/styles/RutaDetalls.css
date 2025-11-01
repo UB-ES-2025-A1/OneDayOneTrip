@@ -1,0 +1,17 @@
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); 
+}
+.home-header {
+  width: 100%;
+  background-color: #2e492e;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  position: relative; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

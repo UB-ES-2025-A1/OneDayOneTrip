@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import "../styles/MasonryGrid.css";
 import { type User } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 
 interface MasonryItem {
@@ -22,6 +23,7 @@ interface MasonryGridProps {
 
 export default function MasonryGrid({ items, openRegister, currentUser }: MasonryGridProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const boxes = gsap.utils.toArray<HTMLElement>(".masonry-item");
@@ -45,6 +47,9 @@ export default function MasonryGrid({ items, openRegister, currentUser }: Masonr
     console.log(`Usuari loguejat: clic a la ruta ${itemId}`);
   }
 };
+  const handleViewRoute = (itemId: string) => {
+    navigate(`/ruta/${itemId}`);
+  };
 
   return (
     <div ref={containerRef} className="masonry-container">
@@ -67,7 +72,7 @@ export default function MasonryGrid({ items, openRegister, currentUser }: Masonr
             {currentUser && (
               <button
                 className="veure-ruta-btn"
-                onClick={() => console.log(`Veure ruta ${item.id}`)}
+                onClick={() => handleViewRoute(item.id)}
               >
                 Veure ruta
               </button>
