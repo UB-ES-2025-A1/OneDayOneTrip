@@ -19,6 +19,7 @@ export default function Home() {
   );
 
   // Detecta el estado de sesión
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
