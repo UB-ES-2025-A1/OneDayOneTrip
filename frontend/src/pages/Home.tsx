@@ -8,9 +8,9 @@ import Carousel from "../components/Carousel";
 import LoginModal from "../components/LoginModal";
 import RegisterModal from "../components/RegisterModal";
 import Footer from "../components/Footer";
-import { UserCircle } from "lucide-react"; // puedes usar este icono o el tuyo
+// import { UserCircle } from "lucide-react"; // puedes usar este icono o el tuyo
 import MasonryGrid from "../components/MasonryGrid";
-
+import { UserCircle } from 'iconoir-react';
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
@@ -99,12 +99,8 @@ export default function Home() {
         <div className="header-buttons">
           {currentUser ? (
             <>
-              <button
-                className="profile-btn"
-                title="Veure perfil"
-                onClick={() => navigate("/userprofile")}
-              >
-                <UserCircle size={28} />
+              <button onClick={() => navigate("/userprofile")} className="header-btn-user">
+                  <UserCircle width={30} height={30} color="white" />
               </button>
               <button onClick={handleLogout} className="header-btn">
                 Cerrar sesión

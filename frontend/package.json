@@ -12,6 +12,7 @@
   "dependencies": {
     "firebase": "^12.4.0",
     "gsap": "^3.13.0",
+    "iconoir-react": "^7.11.0",
     "lucide-react": "^0.546.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

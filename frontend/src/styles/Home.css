@@ -51,6 +51,19 @@ html, body, #root {
   transition: 0.3s;
   white-space: nowrap;
 }
+.header-btn-user {
+  width: 40px;           /* tamaño fijo del botón */
+  height: 40px;
+  display: flex;         /* usar flex para centrar el icono */
+  align-items: center;   /* centrar vertical */
+  justify-content: center; /* centrar horizontal */
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 0;            /* sin padding extra */
+  transition: 0.3s;
+}
 
 .header-btn:hover {
   background-color: white;
