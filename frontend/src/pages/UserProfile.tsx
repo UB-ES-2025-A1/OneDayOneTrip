@@ -21,6 +21,7 @@ export default function UserProfile() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
+      
     });
     return () => unsubscribe();
   }, []);
@@ -30,6 +31,15 @@ export default function UserProfile() {
     setCurrentUser(null);
     navigate("/");
   };
+
+  const user = {
+    image: "/images/perfil.jpg",
+    seguidors: 0, 
+    seguits: 0,
+    publicacions: 6,
+    guardades:6 
+  }
+
 
   const data = [
     {
@@ -109,6 +119,39 @@ export default function UserProfile() {
 
       {currentUser && (
         <>
+        <div className="user-profile">
+          <div className="user-photo">
+            <img
+              src={user.image}
+              alt="Foto de usuario"
+            />
+          </div>
+          <div className="user-details">
+            <div className="user-info">
+              <h2>{currentUser.displayName || "Usuario"}</h2>
+              <p>{currentUser.email}</p>
+            </div>
+            <div className="user-stats">
+              <div className="stat">
+                <span className="number">{user.seguidors}</span>
+                <span className="label">Seguidors</span>
+              </div>
+              <div className="stat">
+                <span className="number">{user.seguits}</span>
+                <span className="label">Seguits</span>
+              </div>
+              <div className="stat">
+                <span className="number">{user.publicacions}</span>
+                <span className="label">Publicacions</span>
+              </div>
+              <div className="stat">
+                <span className="number">{user.guardades}</span>
+                <span className="label">Guardades</span>
+              </div>
+            </div>
+          </div>
+        </div>
+    
         <div
           className="tabs-container"
           data-active={selectedTab} 
