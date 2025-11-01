@@ -33,7 +33,8 @@ export default function UserProfile() {
   };
 
   const user = {
-    image: "/images/perfil.jpg",
+    image: "/images/perfil.png",
+    image2: "/images/ny.jpg",
     seguidors: 0, 
     seguits: 0,
     publicacions: 6,
@@ -119,17 +120,20 @@ export default function UserProfile() {
 
       {currentUser && (
         <>
-        <div className="user-profile">
+        <div
+          className="user-profile"
+          style={{
+            background: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${user.image2}) center/cover no-repeat`,
+          }}
+        >
           <div className="user-photo">
-            <img
-              src={user.image}
-              alt="Foto de usuario"
-            />
+            <img src={user.image} alt="Foto de usuario" />
           </div>
+
           <div className="user-details">
             <div className="user-info">
               <h2>{currentUser.displayName || "Usuario"}</h2>
-              <p>{currentUser.email}</p>
+              <h3>{currentUser.email}</h3>
             </div>
             <div className="user-stats">
               <div className="stat">
