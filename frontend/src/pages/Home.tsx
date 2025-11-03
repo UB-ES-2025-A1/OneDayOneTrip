@@ -106,7 +106,7 @@ export default function Home() {
                 <UserCircle size={28} />
               </button>
               <button onClick={handleLogout} className="header-btn">
-                Cerrar sesión
+                Tancar sessió
               </button>
             </>
           ) : (
