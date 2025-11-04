@@ -95,13 +95,57 @@
   border: 3px solid #2e492e;
 }
 
+
+.mes-fotos {
+  width: 100%;
+  height: 150px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: background 0.3s, opacity 0.3s, transform 0.3s;
+}
+
+.mes-fotos:hover {
+  background: rgba(0, 0, 0, 0.7);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.zoom-gallery {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.zoom-gallery img {
+  max-width: 90%;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s;
+}
+
+.zoom-gallery img:hover {
+  transform: scale(1.02);
+}
+
+
 /* CONTINGUT */
 .ruta-detall {
-  max-width: 1000px;
-  margin: 20px 0 40px 40px;
-  padding: 0 20px;
-  font-family: 'Inter', sans-serif;
-  color: #333;
+  max-width: 100%; /* elimina el límit d'amplada */
+  width: 100%;
+  margin: 20px 0 40px 0; /* elimina el marge esquerra que la feia més estreta */
+  padding: 0 50px; /* deixa un marge lateral bonic */
+  box-sizing: border-box; /* assegura que no desbordi */
 }
 
 /* TITOL I AUTOR */
@@ -132,60 +176,73 @@
   margin: 25px 0;
 }
 
-.ruta-descripcio,
-.ruta-recomanacions,
-.ruta-punts {
-  margin-top: 30px;
+.ruta-descripcio {
+  width: 100%;
+  margin: 50px 30px;
+  text-align: justify;
 }
 
-.ruta-descripcio h2,
-.ruta-recomanacions h2,
-.ruta-punts h2 {
+.ruta-descripcio h2 {
   color: #2e492e;
   margin-bottom: 10px;
   font-size: 1.3rem;
+  font-weight: 600;
 }
+
+.ruta-descripcio p {
+  line-height: 1.7;
+  font-size: 1.05rem;
+  color: #333;
+}
+
 
 .ruta-punts ul {
   padding-left: 20px;
   margin: 0;
   list-style-type: disc;
 }
+
 .zoom-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 1000;
+  align-items: center;
+  z-index: 999;
 }
 
-.zoom-content {
-  position: relative;
+.zoom-gallery {
+  display: flex;
+  flex-direction: row; /* 👈 imatges en fila */
+  gap: 15px;
+  padding: 20px;
   max-width: 90%;
-  max-height: 90%;
+  overflow-x: auto;
+  background: #000;
+  border-radius: 12px;
+  position: relative;
 }
 
-.zoom-content img {
-  width: 100%;
-  height: auto;
+.zoom-gallery img {
+  height: 400px;
   border-radius: 10px;
-  box-shadow: 0 0 15px rgba(255,255,255,0.2);
+  object-fit: cover;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .close-zoom {
   position: absolute;
-  top: -10px;
-  right: -10px;
-  background: #fff;
+  top: 10px;
+  right: 15px;
+  background: transparent;
   border: none;
-  border-radius: 50%;
-  font-size: 1.2rem;
+  color: white;
+  font-size: 2rem;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
 }
+
 
 .ubicacio {
   display: flex;
@@ -217,11 +274,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 50px; 
-  font-size: 1rem;
-  color: #333;
+  border: 1.5px solid #d3d3d3; /* marge gris clar */
+  background-color: #fff; /* fons blanc */
+  padding: 15px 15px;
+  border-radius: 10px; /* cantonades arrodonides */
+  width: 100%; /* només ocupa l'espai del contingut */
+  margin-top: 20px;
 }
-
 .autor-icon {
   width: 45px;
   height: 45px;
@@ -297,4 +356,12 @@
   font-size: 1.1rem;
   font-weight: 500;
   color: #333;
+}
+.ruta-etapes h2 {
+  color: #2e492e;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-left: 30px; /* desplaça el títol cap a la dreta */
+  margin-top: 60px;
+  margin-bottom: 20px;
 }

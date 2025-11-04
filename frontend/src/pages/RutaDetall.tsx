@@ -5,6 +5,7 @@ import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { auth } from "../firebase";
 import { UserCircle } from "lucide-react";
 import "../styles/RutaDetalls.css";
+import EtapesList from "../components/EtapesList";
 
 export default function RutaDetall() {
   const { id } = useParams();
@@ -36,19 +37,13 @@ export default function RutaDetall() {
     distance: "8 km",
     duration: "5 hores",
     description:
-      "Una ruta per descobrir els punts més emblemàtics de Barcelona: des de la Sagrada Família fins al Barri Gòtic, passant per la Rambla i el Passeig de Gràcia.",
-    recommendations:
-      "Porta calçat còmode i aigua. Evita les hores de més calor si la fas a l’estiu.",
-    highlights: [
-      "Sagrada Família",
-      "Casa Batlló",
-      "Barri Gòtic",
-      "Parc de la Ciutadella",
-    ],
+      "Aquesta ruta et portarà pels racons més emblemàtics de Barcelona, combinant història, art i cultura moderna. Començaràs al majestuós temple de la Sagrada Família, una de les obres més reconegudes de Gaudí, i continuaràs pel Passeig de Gràcia, on podràs admirar edificis modernistes com la Casa Batlló i La Pedrera. Després, et submergiràs en l’ambient històric del Barri Gòtic, amb carrers estrets i places plenes d’encant, per acabar gaudint d’un moment de calma al Parc de la Ciutadella, un dels espais verds més estimats pels barcelonins.",
     gallery: [
       "https://img2.huffingtonpost.es/files/og_thumbnail/uploads/2025/10/24/la-sagrada-familia-de-antonio-gaudi-en-barcelona-espana.jpeg",
       "https://th.bing.com/th/id/R.e8606b4befe61808babf6f0ce4b44964?rik=K7Vn%2fNqjosTs5w&pid=ImgRaw&r=0",
-      "https://cdn.thecrazytourist.com/wp-content/uploads/2017/05/Barcelona-Cathedral.jpg",
+      "https://th.bing.com/th/id/R.ba1d1dcbb56bd815a5333a09ef1c1d6e?rik=jA8MvFABgkhGQQ&pid=ImgRaw&r=0",
+      "https://a.cdn-hotels.com/gdcs/production90/d1945/826cf933-461d-4df0-957b-d3b602bf7baa.jpg"
+      
     ],
     author: "Maria González",
   };
@@ -58,6 +53,7 @@ export default function RutaDetall() {
   }, []);
 
   const [zoomImage, setZoomImage] = useState<string | null>(null);
+  const [zoomGallery, setZoomGallery] = useState<string[] | null>(null);
 
 
   return (
@@ -98,18 +94,35 @@ export default function RutaDetall() {
             onClick={() => setZoomImage(mainImage)}
           />
         </div>
+        {/* Miniatures */}
         <div className="miniatures">
-          {routeData.gallery.map((img, index) => (
+          {routeData.gallery.slice(0, 2).map((img, index) => (
             <img
               key={index}
               src={img}
               alt={`Miniatura ${index + 1}`}
-              onClick={() => setZoomImage(img)}
+              onClick={() => setZoomGallery([img])}
               className={mainImage === img ? "active" : ""}
             />
           ))}
+
+          {/* Targeta "Més fotos" */}
+          {routeData.gallery.length > 2 && (
+            <div
+              className="mes-fotos"
+              onClick={() =>
+                setZoomGallery(routeData.gallery.slice(2)) // només les fotos que no es veuen
+              }
+            >
+              <span>+{routeData.gallery.length - 2} fotos</span>
+            </div>
+
+
+          )}
         </div>
+
       </div>
+
 
       {/* CONTINGUT DE LA RUTA */}
       <div className="ruta-detall">
@@ -161,40 +174,78 @@ export default function RutaDetall() {
 
 
         <div className="ruta-descripcio">
-          <h2>Descripció general</h2>
+          <h2>Descripció</h2>
           <p>{routeData.description}</p>
         </div>
 
-        <div className="ruta-recomanacions">
-          <h2>Recomanacions</h2>
-          <p>{routeData.recommendations}</p>
-        </div>
+        {/* ETAPES */}
+        <div className="ruta-etapes">
+          <h2>Etapes de la Ruta</h2>
+          <EtapesList
+            etapes={[
+              {
+                id: 1,
+                titol: 'Plaça Catalunya',
+                descripcio: 'Punt de partida emblemàtic on convergeixen diverses avingudes i la vida urbana barcelonina.',
+                ubicacio: 'Plaça Catalunya, Barcelona'
+              },
+              {
+                id: 2,
+                titol: 'Passeig de Gràcia',
+                descripcio: 'Avinguda icònica amb edificis modernistes com la Casa Batlló i La Pedrera.',
+                ubicacio: 'Passeig de Gràcia, Barcelona'
+              },
+              {
+                id: 3,
+                titol: 'Sagrada Família',
+                descripcio: 'Basílica monumental dissenyada per Antoni Gaudí, símbol de la ciutat.',
+                ubicacio: 'Carrer de Mallorca, 401, Barcelona'
+              }
+            ]}
+          />
+        </div>        
 
-        <div className="ruta-punts">
-          <h2>Punts destacats</h2>
-          <ul>
-            {routeData.highlights.map((p, i) => (
-              <li key={i}>• {p}</li>
-            ))}
-          </ul>
-        </div>
+
       </div>
       {zoomImage && (
-        <div className="zoom-overlay" onClick={() => setZoomImage(null)}>
-          <div className="zoom-content">
+      <div className="zoom-overlay" onClick={() => setZoomImage(null)}>
+        <div className="zoom-content" onClick={(e) => e.stopPropagation()}>
+          <button
+            className="close-zoom"
+            onClick={() => setZoomImage(null)}
+          >
+            ✕
+          </button>
+
+          {zoomImage === "all" ? (
+            <div className="zoom-gallery">
+              {routeData.gallery.map((img, index) => (
+                <img key={index} src={img} alt={`Foto ${index + 1}`} />
+              ))}
+            </div>
+          ) : (
             <img src={zoomImage} alt="Imatge ampliada" />
+          )}
+        </div>
+      </div>
+    )}
+
+      {zoomGallery && (
+        <div className="zoom-overlay" onClick={() => setZoomGallery(null)}>
+          <div className="zoom-gallery" onClick={(e) => e.stopPropagation()}>
+            {zoomGallery.map((img, i) => (
+              <img key={i} src={img} alt={`Foto ${i + 1}`} />
+            ))}
             <button
               className="close-zoom"
-              onClick={(e) => {
-                e.stopPropagation();
-                setZoomImage(null);
-              }}
+              onClick={() => setZoomGallery(null)}
             >
               ✕
             </button>
           </div>
         </div>
       )}
+
 
       <Footer />
     </div>
