@@ -41,15 +41,17 @@ Aquí dejo las instrucciones para runear el código en local.
 
 ```
 
-
 ## Hosteo
 
 Por el momento ya se realiza el hosteo de nuestra api que se aprovecha de que nuestras bases de datos son accesibles desde internet.
 Lo realizamos mediante render, donde la tenemos levantada, solo hace falta cambiar en el client.ts la url para que apunte a la api levantada.
 Cambiando esta url pasamos a un entorno local poniendo el link (http://127.0.0.1:8000).
 
+Link donde esta hosteado la api -> (https://onedayonetrip-api.onrender.com)
+
 ## Estructura del proyecto
 
+```
 OneDayOneTrip
 |
 ├── api
@@ -127,6 +129,8 @@ OneDayOneTrip
 │   └── vite.config.ts
 ├── .gitignore
 └── README.md
+```
+
 
 
 
