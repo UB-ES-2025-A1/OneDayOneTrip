@@ -23,3 +23,5 @@ def get_trip(trip_id: str):
         raise HTTPException(status_code=404, detail="Trip not found")
     trip["_id"] = str(trip["_id"])
     return trip
+
+#Otro comentario de para la estructuración de las branches
