@@ -15,3 +15,5 @@ db = client["OneDayOneTrip"]
 trips_collection = db["trips"]
 comments_collection = db["comments"] 
 ratings_collection = db["ratings"]
+
+#Esto es para un commit forzado para la estructura 
