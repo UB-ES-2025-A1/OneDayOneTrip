@@ -15,18 +15,18 @@ Este documento explica **cómo crear, nombrar y gestionar ramas** dentro del pro
 
 production
 staging
-US-XX/
-├── feature/<nombre-descriptivo>
-└── fix/<nombre-descriptivo>
+US-XX-
+├── feature-<nombre-descriptivo>
+└── fix-<nombre-descriptivo>
 
 ````
 
 ### Descripción:
 - **main** → Rama principal (producción).
 - **staging** → Rama de desarrollo general (integración de features).
-- **US-XX/** → Rama que representa una *User Story* (por ejemplo, `US-06`).
-  - **feature/** → Subrama para una nueva funcionalidad.
-  - **fix/** → Subrama para corrección de errores dentro de esa US.
+- **US-XX-** → Rama que representa una *User Story* (por ejemplo, `US-06`).
+  - **feature-** → Subrama para una nueva funcionalidad.
+  - **fix-** → Subrama para corrección de errores dentro de esa US.
 
 ---
 
@@ -58,8 +58,8 @@ git push -u origin US-06
 ```bash
 git checkout US-06
 git pull origin US-06
-git checkout -b US-06/feature/tasca1-pantalla-login
-git push -u origin US-06/feature/tasca1-pantalla-login
+git checkout -b US-06-feature-tasca1-pantalla-login
+git push -u origin US-06-feature-tasca1-pantalla-login
 ```
 
 ---
@@ -69,8 +69,8 @@ git push -u origin US-06/feature/tasca1-pantalla-login
 **Fix (bug en desarrollo):**
 
 ```bash
-git checkout -b US-06/fix/correccio-validacio
-git push -u origin US-06/fix/correccio-validacio
+git checkout -b US-06-fix-correccio-validacio
+git push -u origin US-06-fix-correccio-validacio
 ```
 
 ---
@@ -91,7 +91,7 @@ git push -u origin US-06/fix/correccio-validacio
 ### Estás trabajando en tu rama feature
 
 ```bash
-git checkout US-06/feature/tasca1-pantalla-login
+git checkout US-06-feature-tasca1-pantalla-login
 git add .
 git commit -m "feat: finalizada la pantalla de login"
 git push
@@ -102,7 +102,7 @@ git push
 ```bash
 git checkout US-06
 git pull origin US-06
-git merge US-06/feature/tasca1-pantalla-login
+git merge US-06-feature-tasca1-pantalla-login
 ```
 
 ### Subes la US-06 actualizada con los cambios fusionados
@@ -131,12 +131,12 @@ production
 │
 ├── staging
    ├── US-03
-   │   ├── US-03/feature/tasca1-login
-   │   ├── US-03/feature/tasca2-register
+   │   ├── US-03-feature-tasca1-login
+   │   ├── US-03-feature-tasca2-register
    │   └── US-03/fix/correccio-login
    └── US-06
-       ├── US-06/feature/tasca1-pantalla-login
-       └── US-06/feature/tasca2-validacio-usuari
+       ├── US-06-feature-tasca1-pantalla-login
+       └── US-06-feature-tasca2-validacio-usuari
 ```
 
 ---
