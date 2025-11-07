@@ -76,34 +76,52 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
           <h2 className="login-title">Registra't</h2>
 
           <form onSubmit={handleRegister} className="auth-form">
-            <input
-              type="text"
-              placeholder="Nom d'usuari"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              className="auth-input"
-            />
+            <div className="input-wrapper">
+              <div className="input-icon">
+                <img src="/images/person.png" alt="Usuari" />
+              </div>
+              <input
+                type="text"
+                placeholder="Nom d'usuari"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                className="auth-input pr-10"
+              />
+            </div>
 
-            <input
-              type="text"
-              placeholder="Nom complet"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-              className="auth-input"
-            />
+            <div className="input-wrapper">
+              <div className="input-icon">
+                <img src="/images/person.png" alt="Nom complet" />
+              </div>
+              <input
+                type="text"
+                placeholder="Nom complet"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                className="auth-input pr-10"
+              />
+            </div>
 
-            <input
-              type="email"
-              placeholder="Correu electrònic"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="auth-input"
-            />
+            <div className="input-wrapper">
+              <div className="input-icon">
+                <img src="/images/ema.png" alt="Email" />
+              </div>
+              <input
+                type="email"
+                placeholder="Correu electrònic"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="auth-input pr-10"
+              />
+            </div>
 
-            <div className="relative">
+            <div className="relative input-wrapper">
+              <div className="input-icon">
+                <img src="/images/lockk.png" alt="Contrasenya" />
+              </div>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Contrasenya"
@@ -121,7 +139,10 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
               </button>
             </div>
 
-            <div className="relative">
+            <div className="relative input-wrapper">
+              <div className="input-icon">
+                <img src="/images/lockk.png" alt="Confirmar contrasenya" />
+              </div>
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirmar contrasenya"

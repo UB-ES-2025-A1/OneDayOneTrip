@@ -98,21 +98,23 @@
 }
 
 .login-form .auth-button {
-  background-color: #356a36 !important;
-  color: white !important;
-  border: none !important;
+  background-color: #356a36; /* gris subtil */
+  color: white !important; /* blanc */
+  border: 1px solid #5e605e;
   border-radius: 10px;
-  padding: 0.5rem 0.5rem;          
-  font-size: 0.9rem;            
-  font-weight: 500;             
-  max-width: 320px;             
+  padding: 0.5rem 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  max-width: 320px;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .login-form .auth-button:hover {
-  background-color: #2a5228 !important;
-  transform: scale(1.03);      
+  color: white !important; 
+  transform: scale(1.03);
 }
+
+
 
 .auth-footer {
   margin-top: 1rem;
@@ -126,22 +128,6 @@
   cursor: pointer;
 }
 
-.login-form .auth-button {
-  background-color: #356a36 !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 10px;
-  padding: 0.5rem 0.5rem;          
-  font-size: 0.9rem;            
-  font-weight: 500;             
-  max-width: 320px;             
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.login-form .auth-button:hover {
-  background-color: #2a5228 !important;
-  transform: scale(1.03);      
-}
 
 /* Carousel */
 .carousel-container {
@@ -195,22 +181,6 @@
   cursor: pointer;
 }
 
-.login-form .auth-button {
-  background-color: #356a36 !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 10px;
-  padding: 0.5rem 0.5rem;          
-  font-size: 0.9rem;            
-  font-weight: 500;             
-  max-width: 320px;             
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.login-form .auth-button:hover {
-  background-color: #2a5228 !important;
-  transform: scale(1.03);      
-}
 
 
 .auth-input + button svg {
@@ -228,3 +198,41 @@
 .auth-input.pr-10 {
   padding-right: 2.5rem; /* deixa espai per l’ull */
 }
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+.input-wrapper .auth-input {
+  width: 100%;
+  padding: 0.75rem 0.75rem 0.75rem 3rem; /* espai per la icona */
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  height: 40px; /* assegura alçada uniforme */
+  box-sizing: border-box;
+}
+
+.input-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px; 
+  height: 100%; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #356a36;
+  color: #fff; 
+  border-radius: 8px 0 0 8px; 
+  font-size: 1rem;
+}
+.input-icon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: brightness(0) invert(1); 
+}
+

@@ -99,8 +99,8 @@ export default function Home() {
             <>
               <button
                 className="profile-btn"
-                title="Ver perfil"
-                onClick={() => alert("Perfil próximamente")}
+                title="Veure perfil"
+                onClick={() => alert("Perfil próximament")}
               >
                 <UserCircle size={28} />
               </button>
@@ -114,13 +114,13 @@ export default function Home() {
                 onClick={() => setModalOpen("login")}
                 className="header-btn"
               >
-                Iniciar sesión
+                Iniciar sessió
               </button>
               <button
                 onClick={() => setModalOpen("register")}
                 className="header-btn"
               >
-                Registrarse
+                Registrar-se
               </button>
             </>
           )}

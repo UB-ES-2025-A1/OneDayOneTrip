@@ -36,8 +36,8 @@
   inset: 0;
   background: linear-gradient(
     to right,
-    rgba(46, 73, 46, 0.85),
-    rgba(46, 73, 46, 0.35)
+    rgba(46, 73, 46, 0.6),
+    rgba(46, 73, 46, 0.15)
   );
   z-index: 0;
 }
