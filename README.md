@@ -52,7 +52,7 @@ Link donde esta hosteado la api -> (https://onedayonetrip-api.onrender.com)
 ## Estructura del proyecto
 
 
-comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv" > estructura.txt
+comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv|__pycache__" > estructura.txt
 
 ```
 .

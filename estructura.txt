@@ -5,19 +5,20 @@
 │   │   │   └── verify_token.py
 │   │   ├── main.py
 │   │   ├── models
+│   │   │   ├── comment_model.py
 │   │   │   ├── rating_model.py
+│   │   │   ├── trip_create_in.py
 │   │   │   └── trip_model.py
 │   │   ├── routers
-│   │   │   ├── __pycache__
-│   │   │   │   └── trips.cpython-310.pyc
+│   │   │   ├── comments.py
+│   │   │   ├── images.py
 │   │   │   ├── ratings.py
 │   │   │   ├── trips.py
 │   │   │   └── users.py
 │   │   └── services
 │   │       ├── firebase_service.py
-│   │       ├── mongo_service.py
-│   │       └── __pycache__
-│   │           └── mongo_service.cpython-310.pyc
+│   │       ├── image_service.py
+│   │       └── mongo_service.py
 │   ├── .env
 │   └── requirements.txt
 ├── estructura.txt
@@ -88,4 +89,4 @@
 ├── README_Branching.md
 └── README.md
 
-18 directories, 70 files
+16 directories, 73 files
