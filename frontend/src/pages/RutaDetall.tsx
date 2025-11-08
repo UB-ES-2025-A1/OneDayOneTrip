@@ -6,14 +6,20 @@ import { auth } from "../firebase";
 import { UserCircle } from "lucide-react";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
+import { getTripById, getAllTrips, type Trip } from "../api/trips";
+
+const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
+const isNumericIndex = (s: string) => /^\d+$/.test(s || "");
 
 export default function RutaDetall() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [tripData, setTripData] = useState<Trip | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [mainImage, setMainImage] = useState<string>("");
 
-  // Detecta l’estat d’autenticació
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
@@ -27,34 +33,81 @@ export default function RutaDetall() {
     navigate("/");
   };
 
-  // Dades de prova (més endavant vindran de l’API)
-  const routeData = {
-    title: "Descobrint Barcelona",
-    mainImage:
-      "https://www.fodors.com/wp-content/uploads/2018/11/22-Parc-de-la-Ciutadella.jpg",
-    location: "Barcelona, Catalunya",
-    type: "Cultural, arquitectònica",
-    distance: "8 km",
-    duration: "5 hores",
-    description:
-      "Aquesta ruta et portarà pels racons més emblemàtics de Barcelona, combinant història, art i cultura moderna. Començaràs al majestuós temple de la Sagrada Família, una de les obres més reconegudes de Gaudí, i continuaràs pel Passeig de Gràcia, on podràs admirar edificis modernistes com la Casa Batlló i La Pedrera. Després, et submergiràs en l’ambient històric del Barri Gòtic, amb carrers estrets i places plenes d’encant, per acabar gaudint d’un moment de calma al Parc de la Ciutadella, un dels espais verds més estimats pels barcelonins.",
-    gallery: [
-      "https://img2.huffingtonpost.es/files/og_thumbnail/uploads/2025/10/24/la-sagrada-familia-de-antonio-gaudi-en-barcelona-espana.jpeg",
-      "https://th.bing.com/th/id/R.e8606b4befe61808babf6f0ce4b44964?rik=K7Vn%2fNqjosTs5w&pid=ImgRaw&r=0",
-      "https://th.bing.com/th/id/R.ba1d1dcbb56bd815a5333a09ef1c1d6e?rik=jA8MvFABgkhGQQ&pid=ImgRaw&r=0",
-      "https://a.cdn-hotels.com/gdcs/production90/d1945/826cf933-461d-4df0-957b-d3b602bf7baa.jpg"
-      
-    ],
-    author: "Maria González",
-  };
-
   useEffect(() => {
-    setMainImage(routeData.mainImage);
-  }, []);
+    const fetchTrip = async () => {
+      if (!id) {
+        setError("Identificador de la ruta no informat.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        if (isMongoObjectId(id)) {
+          const data = await getTripById(id);
+          setTripData(data);
+          const firstGallery = data.gallery && data.gallery.length > 0 ? data.gallery[0] : "";
+          setMainImage(data.coverImage || firstGallery || "");
+          return;
+        }
+
+        if (isNumericIndex(id)) {
+          const oneBased = parseInt(id, 10);
+          const idx = Number.isFinite(oneBased) ? oneBased - 1 : -1; // 1-based → 0-based
+
+          const trips = await getAllTrips(false);
+
+          if (!trips || trips.length === 0) {
+            setError("Encara no hi ha cap ruta disponible.");
+            return;
+          }
+
+          const tripAtIndex = trips[idx];
+
+          if (tripAtIndex?._id) {
+            navigate(`/ruta/${tripAtIndex._id}`, { replace: true });
+            return;
+          }
+
+          const first = trips[0];
+          if (first?._id) {
+            navigate(`/ruta/${first._id}`, { replace: true });
+            return;
+          }
+
+          setError(`No s'ha trobat cap ruta a la posició ${oneBased}.`);
+          return;
+        }
+
+        setError(`ID invàlid: "${id}".`);
+      } catch (err: any) {
+        console.error("Error carregant la ruta:", err);
+        setError("No s'ha pogut carregar la ruta");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrip();
+  }, [id, navigate]);
 
   const [zoomImage, setZoomImage] = useState<string | null>(null);
   const [zoomGallery, setZoomGallery] = useState<string[] | null>(null);
 
+  if (loading) {
+    return <div className="loading">Carregant ruta...</div>;
+  }
+
+  if (error || !tripData) {
+    return (
+      <div className="error">
+        <p>{error || "No s'ha trobat la ruta"}</p>
+        <button onClick={() => navigate(-1)}>← Tornar</button>
+      </div>
+    );
+  }
 
   return (
     <div className="ruta-detall-page">
@@ -85,18 +138,21 @@ export default function RutaDetall() {
         </div>
       </header>
 
-      {/* GALERIA PRINCIPAL */}
       <div className="ruta-galeria-principal">
         <div className="imatge-gran">
-          <img
-            src={mainImage}
-            alt="Imatge principal de la ruta"
-            onClick={() => setZoomImage(mainImage)}
-          />
+          {mainImage ? (
+            <img
+              src={mainImage}
+              alt="Imatge principal de la ruta"
+              onClick={() => setZoomImage(mainImage)}
+            />
+          ) : (
+            <div className="no-image">Sense imatge</div>
+          )}
         </div>
-        {/* Miniatures */}
+
         <div className="miniatures">
-          {routeData.gallery.slice(0, 2).map((img, index) => (
+          {tripData.gallery?.slice(0, 2).map((img, index) => (
             <img
               key={index}
               src={img}
@@ -106,47 +162,38 @@ export default function RutaDetall() {
             />
           ))}
 
-          {/* Targeta "Més fotos" */}
-          {routeData.gallery.length > 2 && (
+          {tripData.gallery && tripData.gallery.length > 2 && (
             <div
               className="mes-fotos"
-              onClick={() =>
-                setZoomGallery(routeData.gallery.slice(2)) // només les fotos que no es veuen
-              }
+              onClick={() => setZoomGallery(tripData.gallery.slice(2))}
             >
-              <span>+{routeData.gallery.length - 2} fotos</span>
+              <span>+{tripData.gallery.length - 2} fotos</span>
             </div>
-
-
           )}
         </div>
-
       </div>
 
-
-      {/* CONTINGUT DE LA RUTA */}
       <div className="ruta-detall">
         <div className="ruta-header">
-          <h1>{routeData.title}</h1>
+          <h1>{tripData.title}</h1>
 
-          {/* UBICACIÓ */}
+        {/* UBICACIÓ */}
           <div className="ubicacio">
             <img src="/images/ubi.png" alt="Ubicació" className="ubi-icon" />
-            <span>{routeData.location}</span>
-            <span className="tipus">{routeData.type}</span>
+            <span>
+              {tripData.city}
+              {tripData.region ? `, ${tripData.region}` : ""}
+            </span>
+            {tripData.category && <span className="tipus">{tripData.category}</span>}
           </div>
 
-          {/* AUTOR */}
           <div className="autor">
             <div className="autor-icon">
-              <img src="/images/person.png"/>
+              <img src="/images/person.png" alt="Autor" className="author-icon" />
             </div>
-            <span className="autor-nom">{routeData.author}</span>
+            <span className="autor-nom">{tripData.author.name}</span>
           </div>
         </div>
-
-
-
 
         <div className="ruta-info-extra">
           <div className="info-card">
@@ -155,7 +202,9 @@ export default function RutaDetall() {
             </div>
             <div className="info-text">
               <span className="info-title">Distància</span>
-              <span className="info-value">{routeData.distance}</span>
+              <span className="info-value">
+                {typeof tripData.distance === "number" ? `${tripData.distance} km` : "—"}
+              </span>
             </div>
           </div>
 
@@ -165,70 +214,40 @@ export default function RutaDetall() {
             </div>
             <div className="info-text">
               <span className="info-title">Duració</span>
-              <span className="info-value">{routeData.duration}</span>
+              <span className="info-value">{tripData.duration || "—"}</span>
             </div>
           </div>
         </div>
 
-
-
-
         <div className="ruta-descripcio">
           <h2>Descripció</h2>
-          <p>{routeData.description}</p>
+          <p>{tripData.description}</p>
         </div>
 
-        {/* ETAPES */}
         <div className="ruta-etapes">
           <h2>Etapes de la Ruta</h2>
           <EtapesList
-            etapes={[
-              {
-                id: 1,
-                titol: 'Plaça Catalunya',
-                descripcio: 'Punt de partida emblemàtic on convergeixen diverses avingudes i la vida urbana barcelonina.',
-                ubicacio: 'Plaça Catalunya, Barcelona'
-              },
-              {
-                id: 2,
-                titol: 'Passeig de Gràcia',
-                descripcio: 'Avinguda icònica amb edificis modernistes com la Casa Batlló i La Pedrera.',
-                ubicacio: 'Passeig de Gràcia, Barcelona'
-              },
-              {
-                id: 3,
-                titol: 'Sagrada Família',
-                descripcio: 'Basílica monumental dissenyada per Antoni Gaudí, símbol de la ciutat.',
-                ubicacio: 'Carrer de Mallorca, 401, Barcelona'
-              }
-            ]}
+            etapes={tripData.trip_points.map((p, i) => ({
+              id: i,
+              titol: p.title,
+              descripcio: p.description,
+              ubicacio: `${p.coordinates.lat}, ${p.coordinates.lng}`,
+              imatge: p.image,
+            }))}
           />
-        </div>        
-
-
-      </div>
-      {zoomImage && (
-      <div className="zoom-overlay" onClick={() => setZoomImage(null)}>
-        <div className="zoom-content" onClick={(e) => e.stopPropagation()}>
-          <button
-            className="close-zoom"
-            onClick={() => setZoomImage(null)}
-          >
-            ✕
-          </button>
-
-          {zoomImage === "all" ? (
-            <div className="zoom-gallery">
-              {routeData.gallery.map((img, index) => (
-                <img key={index} src={img} alt={`Foto ${index + 1}`} />
-              ))}
-            </div>
-          ) : (
-            <img src={zoomImage} alt="Imatge ampliada" />
-          )}
         </div>
       </div>
-    )}
+
+      {zoomImage && (
+        <div className="zoom-overlay" onClick={() => setZoomImage(null)}>
+          <div className="zoom-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-zoom" onClick={() => setZoomImage(null)}>
+              ✕
+            </button>
+            <img src={zoomImage} alt="Imatge ampliada" />
+          </div>
+        </div>
+      )}
 
       {zoomGallery && (
         <div className="zoom-overlay" onClick={() => setZoomGallery(null)}>
@@ -236,16 +255,12 @@ export default function RutaDetall() {
             {zoomGallery.map((img, i) => (
               <img key={i} src={img} alt={`Foto ${i + 1}`} />
             ))}
-            <button
-              className="close-zoom"
-              onClick={() => setZoomGallery(null)}
-            >
+            <button className="close-zoom" onClick={() => setZoomGallery(null)}>
               ✕
             </button>
           </div>
         </div>
       )}
-
 
       <Footer />
     </div>

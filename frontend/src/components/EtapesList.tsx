@@ -25,7 +25,7 @@ const EtapesList: React.FC<EtapesListProps> = ({ etapes }) => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.4, delay: index * 0.1 }}
         >
-          <div className="etapa-numero">{etapa.id}</div>
+          <div className="etapa-numero">{etapa.id + 1}</div>
           <div className="etapa-contingut">
             <h3 className="etapa-titol">{etapa.titol}</h3>
             <p className="etapa-descripcio">{etapa.descripcio}</p>
