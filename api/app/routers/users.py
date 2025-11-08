@@ -28,7 +28,7 @@ async def register_user(data: dict, user=Depends(verify_token)):
 
 
 @router.get("/")
-async def get_all_users(user=Depends(verify_token)):
+async def get_all_users():
     """
     Devuelve todos los usuarios si el usuario está autenticado.
     """
