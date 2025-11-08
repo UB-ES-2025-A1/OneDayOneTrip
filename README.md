@@ -41,27 +41,40 @@ Aquí dejo las instrucciones para runear el código en local.
 
 ```
 
-
 ## Hosteo
 
 Por el momento ya se realiza el hosteo de nuestra api que se aprovecha de que nuestras bases de datos son accesibles desde internet.
 Lo realizamos mediante render, donde la tenemos levantada, solo hace falta cambiar en el client.ts la url para que apunte a la api levantada.
 Cambiando esta url pasamos a un entorno local poniendo el link (http://127.0.0.1:8000).
 
+Link donde esta hosteado la api -> (https://onedayonetrip-api.onrender.com)
+
 ## Estructura del proyecto
 
-OneDayOneTrip
-|
+
+comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv|__pycache__" > estructura.txt
+
+```
+.
 ├── api
 │   ├── app
 │   │   ├── auth
 │   │   │   └── verify_token.py
 │   │   ├── main.py
 │   │   ├── models
+│   │   │   ├── rating_model.py
+│   │   │   └── trip_model.py
 │   │   ├── routers
+│   │   │   ├── __pycache__
+│   │   │   │   └── trips.cpython-310.pyc
+│   │   │   ├── ratings.py
+│   │   │   ├── trips.py
 │   │   │   └── users.py
 │   │   └── services
-│   │       └── firebase_service.py
+│   │       ├── firebase_service.py
+│   │       ├── mongo_service.py
+│   │       └── __pycache__
+│   │           └── mongo_service.cpython-310.pyc
 │   ├── .env
 │   └── requirements.txt
 ├── estructura.txt
@@ -79,11 +92,14 @@ OneDayOneTrip
 │   ├── public
 │   │   ├── images
 │   │   │   ├── bcn.png
+│   │   │   ├── ema.png
+│   │   │   ├── lockk.png
 │   │   │   ├── logo_OneDayOneTrip.png
 │   │   │   ├── londres.png
 │   │   │   ├── madrid.jpg
 │   │   │   ├── pantalla_principal1.png
-│   │   │   └── paris.png
+│   │   │   ├── paris.png
+│   │   │   └── person.png
 │   │   ├── index.html
 │   │   └── vite.svg
 │   ├── README.md
@@ -126,7 +142,13 @@ OneDayOneTrip
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
 ├── .gitignore
+├── README_Branching.md
 └── README.md
+
+18 directories, 70 files
+
+```
+
 
 
 
