@@ -209,6 +209,32 @@
 .dot.active {
   background: white;
 }
+/* ---------- Eye (Mostrar/Ocultar contrasenya) ---------- */
+.input-wrapper button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.input-wrapper button svg {
+  width: 20px;
+  height: 20px;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.input-wrapper button:hover svg {
+  color: #2e492e;
+}
+
 
 /* ---------- RESPONSIVE DESIGN ---------- */
 
