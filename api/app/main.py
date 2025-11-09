@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import users
+from app.routers import trips
 
 app = FastAPI(title="OneDayOneTrip API")
 
@@ -15,6 +16,7 @@ app.add_middleware(
 
 # Rutas
 app.include_router(users.router)
+app.include_router(trips.router) 
 
 @app.get("/")
 def root():

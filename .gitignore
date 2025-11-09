@@ -1,12 +1,47 @@
 # -----------------------------------
-# Backend 
+#  Backend general
 # -----------------------------------
-backend/node_modules
-backed/dist
-backend/dist-ssr
+backend/node_modules/
+backend/dist/
+backend/dist-ssr/
 backend/*.local
-venv/
+backend/venv/
 **/venv/
+backend/__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# -----------------------------------
+#  Entornos virtuales y dependencias
+# -----------------------------------
+.env
+.env.*
+*.env
+Pipfile
+Pipfile.lock
+poetry.lock
+
+# -----------------------------------
+#  Archivos temporales y de logs
+# -----------------------------------
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.DS_Store
+
+# -----------------------------------
+#  Herramientas y caches
+# -----------------------------------
+.cache/
+.pytest_cache/
+.mypy_cache/
+__pypackages__/
+.coverage
+htmlcov/
+
 
 
 

@@ -145,20 +145,20 @@ export default function Home() {
             className={`tab-btn ${selectedTab === "siguiendo" ? "active" : ""}`}
             onClick={() => setSelectedTab("siguiendo")}
           >
-            Siguiendo
+            Seguint
           </button>
           <button
             className={`tab-btn ${selectedTab === "recomendados" ? "active" : ""}`}
             onClick={() => setSelectedTab("recomendados")}
           >
-            Recomendados
+            Recomenats
           </button>
         </div>
       )}
       <section className="trip-list-section">
         {selectedTab === "siguiendo" && currentUser ? (
           <div className="trip-list empty">
-            <p>Aún no sigues a nadie. ¡Explora rutas y conecta con otros!</p>
+            <p>Encara no segueixes a ningú. Explora rutes i connecta amb altres!</p>
           </div>
         ) : (
           <MasonryGrid items={data} openRegister={() => setModalOpen("register")} />
