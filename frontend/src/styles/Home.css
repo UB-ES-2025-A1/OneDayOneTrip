@@ -14,32 +14,33 @@ html, body, #root {
   padding: 0;
 }
 
-/* ---------- HEADER ---------- */
 .home-header {
   width: 100%;
   background-color: #2e492e;
   color: white;
   display: flex;
   align-items: center;
-  padding: 1rem 1.5rem;
+  justify-content: center; 
+  padding: 1.8rem 0.2rem;
   position: relative;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex-wrap: wrap;
 }
 
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  text-align: right;
-  flex: 1;
+  text-align: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   cursor: pointer;
 }
 
 .header-buttons {
+  position: absolute;
+  right: 1.5rem;
   display: flex;
   gap: 0.75rem;
-  align-items: right;
-  justify-content: flex-end;
 }
 
 .header-btn {
@@ -57,6 +58,7 @@ html, body, #root {
   background-color: white;
   color: #2e492e;
 }
+
 
 /* ---------- TABS SECTION ---------- */
 .tabs-container {
@@ -241,21 +243,35 @@ html, body, #root {
 
 /* 📱 Mobile (≤ 600px) */
 @media (max-width: 600px) {
-  .home-header {
-    flex-direction: column;
-    gap: 0.75rem;
-    text-align: center;
-  }
+.home-header {
+  width: 100%;
+  background-color: #2e492e;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* 🔹 Els botons a l’esquerra */
+  padding: 1rem 1.5rem;
+  position: relative; /* 🔹 Necessari per centrar el logo absolutament */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-  .logo {
-    position: static;
-    transform: none;
-  }
+.header-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-start; /* 🔹 Botons enganxats a l’esquerra */
+}
 
-  .header-buttons {
-    margin: 0;
-    justify-content: center;
-  }
+.logo {
+  position: absolute;     /* 🔹 El traiem del flux per centrar-lo */
+  left: 50%;              /* 🔹 Mou-lo al centre horitzontal */
+  transform: translateX(-50%); /* 🔹 Centrat perfecte */
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+
+
 
   .tabs-container {
     width: 90%;
