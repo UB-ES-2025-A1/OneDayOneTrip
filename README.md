@@ -51,19 +51,30 @@ Link donde esta hosteado la api -> (https://onedayonetrip-api.onrender.com)
 
 ## Estructura del proyecto
 
+
+comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv|__pycache__" > estructura.txt
+
 ```
-OneDayOneTrip
-|
+.
 ├── api
 │   ├── app
 │   │   ├── auth
 │   │   │   └── verify_token.py
 │   │   ├── main.py
 │   │   ├── models
+│   │   │   ├── rating_model.py
+│   │   │   └── trip_model.py
 │   │   ├── routers
+│   │   │   ├── __pycache__
+│   │   │   │   └── trips.cpython-310.pyc
+│   │   │   ├── ratings.py
+│   │   │   ├── trips.py
 │   │   │   └── users.py
 │   │   └── services
-│   │       └── firebase_service.py
+│   │       ├── firebase_service.py
+│   │       ├── mongo_service.py
+│   │       └── __pycache__
+│   │           └── mongo_service.cpython-310.pyc
 │   ├── .env
 │   └── requirements.txt
 ├── estructura.txt
@@ -81,11 +92,14 @@ OneDayOneTrip
 │   ├── public
 │   │   ├── images
 │   │   │   ├── bcn.png
+│   │   │   ├── ema.png
+│   │   │   ├── lockk.png
 │   │   │   ├── logo_OneDayOneTrip.png
 │   │   │   ├── londres.png
 │   │   │   ├── madrid.jpg
 │   │   │   ├── pantalla_principal1.png
-│   │   │   └── paris.png
+│   │   │   ├── paris.png
+│   │   │   └── person.png
 │   │   ├── index.html
 │   │   └── vite.svg
 │   ├── README.md
@@ -128,7 +142,11 @@ OneDayOneTrip
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
 ├── .gitignore
+├── README_Branching.md
 └── README.md
+
+18 directories, 70 files
+
 ```
 
 

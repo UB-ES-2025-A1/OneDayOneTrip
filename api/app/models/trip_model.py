@@ -7,6 +7,7 @@ class TripPoint(BaseModel):
     title: str
     description: Optional[str] = None
     coordinates: Optional[dict] = None
+    location_name : str
     image: Optional[str] = None
 
 
