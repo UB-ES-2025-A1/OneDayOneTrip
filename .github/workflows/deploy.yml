@@ -10,21 +10,31 @@ on:
 
 jobs:
   deploy:
+    name: Deploy to Render & Netlify
     runs-on: ubuntu-latest
+    environment: production   # 👈 usa el environment 'production' de GitHub (si lo tienes creado)
     steps:
-      # 1️⃣ Clona el repositorio
+      # 1️⃣ Clonar el repositorio
       - name: 🧩 Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Despliega el BACKEND en Render
+      # 2️⃣ Desplegar BACKEND en Render
       - name: 🔁 Trigger Render deploy
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
           echo "📡 Lanzando despliegue de FastAPI en Render..."
-          curl -X POST "$RENDER_DEPLOY_HOOK"
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "❌ ERROR: Falta el secret RENDER_DEPLOY_HOOK"
+            exit 1
+          fi
+          curl -fsSL -X POST "$RENDER_DEPLOY_HOOK" || {
+            echo "❌ Falló el deploy en Render"
+            exit 1
+          }
+          echo "✅ Render deploy trigger enviado correctamente."
 
-      # 3️⃣ Instala Node y construye el FRONTEND (Netlify)
+      # 3️⃣ Configurar Node.js y construir el FRONTEND
       - name: ⚙️ Install Node.js
         uses: actions/setup-node@v4
         with:
@@ -38,7 +48,7 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
-      # 4️⃣ Despliega el FRONTEND en Netlify
+      # 4️⃣ Desplegar FRONTEND en Netlify
       - name: 🚀 Deploy to Netlify
         uses: nwtgck/actions-netlify@v2
         with:
