@@ -3,22 +3,20 @@ name: 🚀 Deploy API (Render) & Frontend (Netlify)
 on:
   push:
     branches:
-      - production
-  pull_request:
-    branches:
-      - production
+      - production   # 👈 solo al hacer merge o push real a production
 
 jobs:
   deploy:
     name: Deploy to Render & Netlify
     runs-on: ubuntu-latest
-    environment: production   # 👈 usa el environment 'production' de GitHub (si lo tienes creado)
+    environment: production   # 👈 usa el entorno 'production' para los secrets
+
     steps:
-      # 1️⃣ Clonar el repositorio
+      # 1️⃣ Clona el repositorio
       - name: 🧩 Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Desplegar BACKEND en Render
+      # 2️⃣ Despliega el BACKEND en Render
       - name: 🔁 Trigger Render deploy
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
@@ -29,12 +27,12 @@ jobs:
             exit 1
           fi
           curl -fsSL -X POST "$RENDER_DEPLOY_HOOK" || {
-            echo "❌ Falló el deploy en Render"
+            echo "❌ Error al lanzar el deploy en Render"
             exit 1
           }
           echo "✅ Render deploy trigger enviado correctamente."
 
-      # 3️⃣ Configurar Node.js y construir el FRONTEND
+      # 3️⃣ Instala Node y construye el FRONTEND
       - name: ⚙️ Install Node.js
         uses: actions/setup-node@v4
         with:
@@ -48,14 +46,15 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
-      # 4️⃣ Desplegar FRONTEND en Netlify
+      # 4️⃣ Despliega el FRONTEND en Netlify
       - name: 🚀 Deploy to Netlify
         uses: nwtgck/actions-netlify@v2
         with:
           publish-dir: ./frontend/dist
           production-deploy: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "🚀 Deploy automático desde GitHub Actions (production)"
+          deploy-message: "🚀 Deploy automático desde GitHub Actions (merge a production)"
+          enable-commit-comment: false   # 👈 evita el error 403 de permisos en GitHub
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
