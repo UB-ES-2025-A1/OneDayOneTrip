@@ -5,8 +5,9 @@ import '../styles/EtapesList.css';
 interface Etapa {
   id: number;
   titol: string;
-  descripcio: string;
-  ubicacio: string;
+  descripcio?: string;
+  ubicacio?: string;
+  imatge?: string;
 }
 
 interface EtapesListProps {
@@ -28,12 +29,27 @@ const EtapesList: React.FC<EtapesListProps> = ({ etapes }) => {
           <div className="etapa-numero">{etapa.id + 1}</div>
           <div className="etapa-contingut">
             <h3 className="etapa-titol">{etapa.titol}</h3>
-            <p className="etapa-descripcio">{etapa.descripcio}</p>
+            {etapa.descripcio && (
+              <p className="etapa-descripcio">{etapa.descripcio}</p>
+            )}
             <div className="etapa-ubicacio">
-              <img src="/images/ubi.png" alt="Ubicació" className="etapa-ubi-icon" />
-              <span>{etapa.ubicacio}</span>
+              <img
+                src="/images/ubi.png"
+                alt="Ubicació"
+                className="etapa-ubi-icon"
+              />
+              <span>{etapa.ubicacio || 'Ubicació desconeguda'}</span>
             </div>
           </div>
+
+          {/* 🔹 Imagen movida fuera del bloque de texto */}
+          {etapa.imatge && (
+            <img
+              src={etapa.imatge}
+              alt={etapa.titol}
+              className="etapa-imagen"
+            />
+          )}
         </motion.div>
       ))}
     </div>

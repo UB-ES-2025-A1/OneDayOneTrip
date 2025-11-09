@@ -7,6 +7,10 @@ import { UserCircle } from "lucide-react";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
 import { getTripById, getAllTrips, type Trip } from "../api/trips";
+import { getTripComments, type Comment } from "../api/trips";
+import dayjs from "dayjs";
+import "dayjs/locale/ca";
+
 
 const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
 const isNumericIndex = (s: string) => /^\d+$/.test(s || "");
@@ -92,9 +96,28 @@ export default function RutaDetall() {
 
     fetchTrip();
   }, [id, navigate]);
-
+  
   const [zoomImage, setZoomImage] = useState<string | null>(null);
   const [zoomGallery, setZoomGallery] = useState<string[] | null>(null);
+  // 💬 Comentaris
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(true);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (!tripData?._id) return;
+      try {
+        setLoadingComments(true);
+        const data = await getTripComments(tripData._id);
+        setComments(data);
+      } catch (err) {
+        console.error("Error carregant comentaris:", err);
+      } finally {
+        setLoadingComments(false);
+      }
+    };
+    fetchComments();
+  }, [tripData]);
 
   if (loading) {
     return <div className="loading">Carregant ruta...</div>;
@@ -176,6 +199,24 @@ export default function RutaDetall() {
       <div className="ruta-detall">
         <div className="ruta-header">
           <h1>{tripData.title}</h1>
+            {/* VALORACIÓN */}
+            <div className="valoracio">
+              {tripData.avgRating && tripData.avgRating > 0 ? (
+                <div className="stars">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={i < Math.round(tripData.avgRating ?? 0) ? "star filled" : "star"}
+                    >
+                      ★
+                    </span>
+                  ))}
+                  <span className="rating-value">{(tripData.avgRating ?? 0).toFixed(1)}</span>
+                </div>
+              ) : (
+                <span className="rating-value">Sense valoració</span>
+              )}
+            </div>
 
         {/* UBICACIÓ */}
           <div className="ubicacio">
@@ -189,10 +230,23 @@ export default function RutaDetall() {
 
           <div className="autor">
             <div className="autor-icon">
-              <img src="/images/person.png" alt="Autor" className="author-icon" />
+              {tripData.author.profilePic ? (
+                <img
+                  src={tripData.author.profilePic}
+                  alt={tripData.author.name}
+                  className="autor-foto"
+                />
+              ) : (
+                <img
+                  src="/images/person.png"
+                  alt="Autor"
+                  className="author-icon"
+                />
+              )}
             </div>
             <span className="autor-nom">{tripData.author.name}</span>
           </div>
+
         </div>
 
         <div className="ruta-info-extra">
@@ -231,10 +285,11 @@ export default function RutaDetall() {
               id: i,
               titol: p.title,
               descripcio: p.description,
-              ubicacio: `${p.coordinates.lat}, ${p.coordinates.lng}`,
+              ubicacio: p.location_name ? p.location_name : `${p.coordinates?.lat}, ${p.coordinates?.lng}`,
               imatge: p.image,
             }))}
           />
+
         </div>
       </div>
 
@@ -261,6 +316,30 @@ export default function RutaDetall() {
           </div>
         </div>
       )}
+      {/* 💬 SECCIÓ DE COMENTARIS */}
+      <div className="ruta-comentaris">
+        <h2>Comentaris</h2>
+
+        {loadingComments ? (
+          <p className="comentaris-loading">Carregant comentaris...</p>
+        ) : comments.length === 0 ? (
+          <p className="comentaris-buits">Encara no hi ha comentaris.</p>
+        ) : (
+          <ul className="comentaris-llista">
+            {comments.map((c) => (
+              <li key={c._id} className="comentari-item">
+                <div className="comentari-header">
+                  <span className="comentari-autor">{c.userName}</span>
+                  <span className="comentari-data">
+                    {dayjs(c.createdAt).locale("ca").format("DD MMM YYYY")}
+                  </span>
+                </div>
+                <p className="comentari-contingut">{c.content}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <Footer />
     </div>

@@ -8,6 +8,7 @@ export interface TripPoint {
   description: string;
   coordinates: Coordinates;
   image?: string;
+  location_name?: string;
 }
 
 export interface Author {
@@ -33,12 +34,22 @@ export interface Trip {
   difficulty?: string;
   recommendedSeason?: string;
   coverImage?: string;
-  gallery: string[]; 
+  gallery: string[];
   avgRating?: number;
   numRatings?: number;
 }
 
-const RAW_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+/* ✅ NUEVO: Interfaz para comentarios */
+export interface Comment {
+  _id: string;
+  tripId: string;
+  userId: string;
+  userName: string;
+  content: string;
+  createdAt: string; // ISO string (puedes formatearlo en frontend)
+}
+
+const RAW_BASE_URL = "http://localhost:8000"; // "https://onedayonetrip-api.onrender.com"
 const BASE_URL = RAW_BASE_URL.replace(/\/+$/, "");
 
 /**
@@ -64,6 +75,21 @@ export async function getTripById(tripId: string): Promise<Trip> {
     throw new Error(`Ruta no trobada o id invàlid: ${tripId}. ${text}`);
   }
   return await res.json();
+}
+
+/**
+ * ✅ Obté tots els comentaris d’una ruta per ID.
+ * @param tripId ID de la ruta (24 caràcters hex)
+ */
+export async function getTripComments(tripId: string, limit: number = 20, skip: number = 0): Promise<Comment[]> {
+  const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments?limit=${limit}&skip=${skip}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Error carregant comentaris de la ruta: ${tripId}. ${text}`);
+  }
+  const data = await res.json();
+  return data.comments || [];
 }
 
 /**
