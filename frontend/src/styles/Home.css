@@ -99,7 +99,7 @@ html, body, #root {
   left: 0;
   width: 50%;
   height: 100%;
-  background: linear-gradient(135deg, #3a6b3a, #56a856);
+  background: linear-gradient(135deg, #2e492e, #56a856);
   border-radius: 30px;
   transition: transform 0.3s ease;
   z-index: 1;
