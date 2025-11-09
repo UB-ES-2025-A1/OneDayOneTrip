@@ -15,6 +15,8 @@
 │   │   │   ├── ratings.py
 │   │   │   ├── trips.py
 │   │   │   └── users.py
+│   │   ├── scripts
+│   │   │   └── auto_trip_loader.py
 │   │   └── services
 │   │       ├── firebase_service.py
 │   │       ├── image_service.py
@@ -37,19 +39,23 @@
 │   │   ├── images
 │   │   │   ├── bcn.png
 │   │   │   ├── ema.png
+│   │   │   ├── flecha.png
 │   │   │   ├── lockk.png
 │   │   │   ├── logo_OneDayOneTrip.png
 │   │   │   ├── londres.png
 │   │   │   ├── madrid.jpg
 │   │   │   ├── pantalla_principal1.png
 │   │   │   ├── paris.png
-│   │   │   └── person.png
+│   │   │   ├── person.png
+│   │   │   ├── reloj.png
+│   │   │   └── ubi.png
 │   │   ├── index.html
 │   │   └── vite.svg
 │   ├── README.md
 │   ├── src
 │   │   ├── api
-│   │   │   └── client.ts
+│   │   │   ├── client.ts
+│   │   │   └── trips.ts
 │   │   ├── App.css
 │   │   ├── App.tsx
 │   │   ├── assets
@@ -58,6 +64,7 @@
 │   │   │   ├── AnimatedText1.tsx
 │   │   │   ├── AuthLayout.tsx
 │   │   │   ├── Carousel.tsx
+│   │   │   ├── EtapesList.tsx
 │   │   │   ├── Footer.tsx
 │   │   │   ├── ImageCarousel.tsx
 │   │   │   ├── LoginModal.tsx
@@ -71,13 +78,16 @@
 │   │   ├── main.tsx
 │   │   ├── pages
 │   │   │   ├── Dashboard.tsx
-│   │   │   └── Home.tsx
+│   │   │   ├── Home.tsx
+│   │   │   └── RutaDetall.tsx
 │   │   └── styles
 │   │       ├── Carousel.css
+│   │       ├── EtapesList.css
 │   │       ├── Home.css
 │   │       ├── index.css
 │   │       ├── LoginReg.css
 │   │       ├── MasonryGrid.css
+│   │       ├── RutaDetalls.css
 │   │       └── styles.css
 │   ├── stylelint.config.cjs
 │   ├── tailwind.config.cjs
@@ -89,4 +99,4 @@
 ├── README_Branching.md
 └── README.md
 
-16 directories, 73 files
+17 directories, 82 files

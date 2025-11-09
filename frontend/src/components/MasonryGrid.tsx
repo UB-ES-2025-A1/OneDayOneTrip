@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import "../styles/MasonryGrid.css";
+import { type User } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 interface MasonryItem {
   id: string;
@@ -10,57 +12,124 @@ interface MasonryItem {
   rating: number;
   temps: string;
   dificultat: string;
+  authorPic?: string;
+  city?: string;
+  country?: string;
 }
 
 interface MasonryGridProps {
   items: MasonryItem[];
   openRegister: () => void;
+  currentUser: User | null;
 }
 
-export default function MasonryGrid({ items, openRegister }: MasonryGridProps) {
+export default function MasonryGrid({
+  items,
+  openRegister,
+  currentUser,
+}: MasonryGridProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const boxes = gsap.utils.toArray<HTMLElement>(".masonry-item");
     gsap.fromTo(
       boxes,
-      { opacity: 0, y: 100, filter: "blur(10px)" },
+      { opacity: 0, y: 80, filter: "blur(10px)" },
       {
         opacity: 1,
         y: 0,
-        filter: "blur(0px)",
-        duration: 0.8,
+        filter: "blur(0)",
+        duration: 0.7,
         ease: "power3.out",
         stagger: 0.1,
       }
     );
   }, [items]);
-  const handleClick = () => {
-    openRegister(); 
+
+  const handleClick = (itemId: string) => {
+    if (!currentUser) {
+      openRegister();
+    } else {
+      navigate(`/ruta/${itemId}`);
+    }
   };
 
   return (
     <div ref={containerRef} className="masonry-container">
-        {items.map((item) => (
-        <div key={item.id} className="masonry-item" onClick={handleClick}>
-            <div
+      {items.map((item) => (
+        <div
+          key={item.id}
+          className="masonry-item"
+          onClick={() => handleClick(item.id)}
+        >
+          <div
             className="masonry-image"
             style={{ backgroundImage: `url(${item.img})` }}
-            ></div>
-            <div className="masonry-info">
-            <h3>{item.title}</h3>
-            <div className="masonry-footer">
-                <p>👤 {item.user}</p>
-                <div className="masonry-meta">
-                <span>⏱ {item.temps}</span>
-                <span className="difficulty">{item.dificultat}</span>
-                </div>
-            </div>
-            <p className="rating">⭐ {item.rating}</p>
-            </div>
-        </div>
-        ))}
-    </div>
-);
+          >
+            <div className="overlay">
+              <h3 className="masonry-title">{item.title}</h3>
 
+              {/* ⭐ Bloque de valoración */}
+              <div className="stars-block">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`star ${
+                      i < Math.round(item.rating ?? 0) ? "filled" : ""
+                    }`}
+                  >
+                    ★
+                  </span>
+                ))}
+                <span className="rating-value">
+                  {item.rating > 0 ? item.rating.toFixed(1) : "—"}
+                </span>
+              </div>
+
+            </div>
+          </div>
+
+          <div className="masonry-info">
+            <div className="meta">
+              <div className="meta-author">
+                {item.authorPic ? (
+                  <img
+                    src={item.authorPic}
+                    alt={item.user}
+                    className="meta-avatar"
+                  />
+                ) : (
+                  <img
+                    src="/images/person.png"
+                    alt="Autor"
+                    className="meta-avatar default"
+                  />
+                )}
+                <span>{item.user}</span>
+              </div>
+
+              <div className="meta-location">
+                <img
+                  src="/images/ubi.png"
+                  alt="Ubicació"
+                  className="meta-icon"
+                />
+                <span>
+                  {item.city
+                    ? `${item.city}${item.country ? `, ${item.country}` : ""}`
+                    : ""}
+                </span>
+              </div>
+            </div>
+
+            <div className="masonry-footer">
+              <span>⏱ {item.temps}</span>
+              <span className="difficulty">{item.dificultat}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
