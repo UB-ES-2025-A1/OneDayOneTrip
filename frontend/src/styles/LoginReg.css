@@ -104,13 +104,24 @@
 
 .input-wrapper .auth-input {
   width: 100%;
-  padding: 0.75rem 0.75rem 0.75rem 3rem;
-  border-radius: 8px;
+  padding: 0.75rem 2.5rem 0.75rem 4.5rem; /* padding-left = icona, padding-right = ull */
   border: 1px solid #ccc;
   font-size: 1rem;
   height: 40px;
   box-sizing: border-box;
+  text-align: left; /* això ja alinea el text a l’esquerra */
+  vertical-align: middle; /* opcional, per seguretat */
 }
+
+
+
+.input-wrapper.relative .auth-input {
+  height: 40px;
+  line-height: 1.2;
+  padding: 0.75rem 2.5rem 0.75rem 3rem; /* espai extra per l’ull */
+  text-align: left;
+}
+
 
 .input-icon {
   position: absolute;
@@ -297,8 +308,10 @@
   }
 
   .auth-input {
-    font-size: 1rem;
-  }
+  text-align: left;
+  vertical-align: top;
+  line-height: normal;
+}
 
   .login-form .auth-button {
     font-size: 1rem;
