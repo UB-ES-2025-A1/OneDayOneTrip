@@ -28,7 +28,6 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
       const user = await Auth.login(email, password);
       console.log("Usuario logueado:", user);
 
-      alert("Login exitos! ");
       onClose(); // Cerramos modal
       navigate("/"); // Redirigimos al dashboard
 
@@ -69,15 +68,24 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
           <div className="login-form">
             <h2 className="login-title">Iniciar sessió</h2>
             <form onSubmit={handleLogin} className="auth-form">
-              <input
-                type="email"
-                placeholder="Correu electrònic"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="auth-input"
-              />
+              <div className="input-wrapper">
+                <div className="input-icon">
+                  <img src="/images/person.png" alt="Persona" />
+                </div>
+                <input
+                  type="email"
+                  placeholder="Correu electrònic"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="auth-input"
+                />
+              </div>
 
+            <div className="input-wrapper">
+              <div className="input-icon">
+                <img src="/images/lockk.png" alt="Contrasenya" />
+              </div>
               <input
                 type="password"
                 placeholder="Contrasenya"
@@ -86,6 +94,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
                 required
                 className="auth-input"
               />
+            </div>
 
               <button type="submit" className="auth-button" disabled={loading}>
                 {loading ? "Iniciant sessió..." : "Iniciar Sessió"}              
