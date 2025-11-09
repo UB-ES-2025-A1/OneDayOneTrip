@@ -49,7 +49,7 @@ export interface Comment {
   createdAt: string; // ISO string (puedes formatearlo en frontend)
 }
 
-const RAW_BASE_URL = "http://localhost:8000"; // "https://onedayonetrip-api.onrender.com"
+const RAW_BASE_URL = "http://localhost:8000"; // "https://onedayonetrip-api.onrender.com" 
 const BASE_URL = RAW_BASE_URL.replace(/\/+$/, "");
 
 /**
