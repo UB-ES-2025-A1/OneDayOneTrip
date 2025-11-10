@@ -250,7 +250,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   justify-content: flex-start; /* 🔹 Els botons a l’esquerra */
-  padding: 1rem 1.5rem;
+  padding: 1.5rem 1.5rem;
   position: relative; /* 🔹 Necessari per centrar el logo absolutament */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -270,8 +270,6 @@ html, body, #root {
   text-align: center;
   cursor: pointer;
 }
-
-
 
   .tabs-container {
     width: 90%;
@@ -294,6 +292,7 @@ html, body, #root {
     flex-direction: column;
     text-align: center;
     padding: 1rem;
+    
   }
 
   .trip-image {
