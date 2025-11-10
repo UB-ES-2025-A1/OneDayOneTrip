@@ -7,19 +7,19 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 2rem;
-  position: relative;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  text-align: center;
+  flex: 1;
   cursor: pointer;
+  width: 100%;
 }
+
 
 .back-btn-header {
   background: none;
@@ -29,10 +29,21 @@
   cursor: pointer;
   transition: opacity 0.2s;
   font-weight: bold;
+  flex: 0 0 auto;
+  text-align: left;
+  width: 100%;
 }
 
 .back-btn-header:hover {
   opacity: 0.8;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  gap: 0.8rem;
 }
 
 /* ---------- CONTENEDOR GENERAL ---------- */
@@ -441,6 +452,32 @@
 
 /* Tablets (≤ 992px) */
 @media (max-width: 992px) {
+  .home-header {
+    flex-direction: row; /* deixa el row */
+    align-items: center;
+    justify-content: space-between; /* logo al centre, back i botons als costats */
+  }
+
+  .back-btn-header,
+  .logo,
+  .header-buttons {
+    width: 100%; /* no ocupen tot el width */
+  }
+
+  .logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .back-btn-header {
+    text-align: left;
+  }
+
+  .header-buttons {
+    justify-content: flex-end;
+
+  }
   .ruta-galeria-principal {
     flex-direction: column;
     align-items: center;
@@ -476,14 +513,32 @@
 /* Móviles (≤ 600px) */
 @media (max-width: 600px) {
   .home-header {
-    flex-direction: column;
-    gap: 0.75rem;
-    text-align: center;
+    flex-direction: row; /* deixa el row */
+    align-items: center;
+    justify-content: space-between; /* logo al centre, back i botons als costats */
+  }
+
+  .back-btn-header,
+  .logo,
+  .header-buttons {
+    width: auto; /* no ocupen tot el width */
   }
 
   .logo {
-    position: static;
-    transform: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    visibility: hidden;
+  }
+
+  .back-btn-header {
+    text-align: left;
+  }
+
+  .header-buttons {
+    justify-content: flex-end;
+    margin-right: 30px;
+
   }
 
   .ruta-galeria-principal {
@@ -551,5 +606,3 @@
     width: 90%;
   }
 }
-
-
