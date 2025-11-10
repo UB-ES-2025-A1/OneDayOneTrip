@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
 from app.services.firebase_service import db
 from app.auth.verify_token import verify_token
+from datetime import datetime
+
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -17,11 +19,20 @@ async def register_user(data: dict, user=Depends(verify_token)):
 
     user_data = {
         "uid": uid,
-        "fullname": data.get("fullname"),
-        "username": data.get("username"),
+        "data_creacio": datetime.utcnow().isoformat(),
+        "nom_i_cognoms": data.get("fullname"),
         "mail": data.get("mail"),
         "role": "user",
+        "username": data.get("username"),
+        "seguidors": 0,
+        "seguits": 0,
+        "publicacions": [],
+        "guardades": [],
+        "url_foto_perfil": "",
+        "url_foto_panell": "",
+        "premium": False,
     }
+
 
     db.collection("users").document(uid).set(user_data)
     return {"message": "Usuario registrado correctamente", "user": user_data}
@@ -43,6 +54,13 @@ async def get_current_user(user=Depends(verify_token)):
     """
     uid = user.get("uid")
     doc = db.collection("users").document(uid).get()
+    if not doc.exists:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return doc.to_dict()
+
+@router.get("/{user_id}")
+async def get_current_user_by_id(user_id: str):
+    doc = db.collection("users").document(user_id).get()
     if not doc.exists:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return doc.to_dict()
