@@ -111,7 +111,7 @@ export default function UserProfile() {
             </button>
           </div>
           <div className="right-button">
-            <button onClick={handleLogout} className="header-btn">
+            <button onClick={() => { handleLogout();navigate("/");}} className="header-btn">
               Cerrar sesión
             </button>
           </div>
