@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import RutaDetall from "./pages/RutaDetall";
 
 import './styles/styles.css';
 
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <Route path="/" element={<Home />} />
         <Route path="/userprofile" element={<UserProfile />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/ruta/:id" element={<RutaDetall />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

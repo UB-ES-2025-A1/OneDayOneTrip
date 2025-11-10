@@ -1,0 +1,149 @@
+.etapes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 50px;
+  margin-top: 30px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ---- Card general ---- */
+.etapa-card {
+  display: flex;
+  align-items: flex-start;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px 25px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 20px;
+}
+
+.etapa-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ---- Número ---- */
+.etapa-numero {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #2e492e;
+  margin-right: 10px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ---- Contenido ---- */
+.etapa-contingut {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ---- Título y texto ---- */
+.etapa-titol {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2e492e;
+  margin: 0;
+}
+
+.etapa-descripcio {
+  font-size: 1.05rem;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.etapa-ubicacio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  color: #2e492e;
+}
+
+.etapa-ubi-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+/* ---- Imagen ---- */
+.etapa-imagen {
+  width: 100%;
+  max-width: 600px;
+  height: 280px;              /* 🔹 Altura fija uniforme */
+  border-radius: 10px;
+  object-fit: cover;          /* 🔹 Ajuste visual */
+  margin-top: 12px;
+  align-self: flex-start;
+  transition: transform 0.3s ease;
+}
+
+.etapa-imagen:hover {
+  transform: scale(1.02);
+}
+
+/* =========================================================
+   📱 RESPONSIVE DESIGN
+   ========================================================= */
+
+/* Tablets (≤ 992px) */
+@media (max-width: 992px) {
+  .etapes-container {
+    margin: 30px;
+  }
+
+  .etapa-imagen {
+    max-width: 100%;
+    height: 240px;
+  }
+
+  .etapa-titol {
+    font-size: 1.2rem;
+  }
+
+  .etapa-descripcio {
+    font-size: 1rem;
+  }
+}
+
+/* Móviles (≤ 600px) */
+@media (max-width: 600px) {
+  .etapa-card {
+    flex-direction: column;       /* 🔹 Imagen y texto en columna */
+    align-items: flex-start;
+    padding: 15px 18px;
+    gap: 10px;
+  }
+
+  .etapa-numero {
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+  }
+
+  .etapa-imagen {
+    width: 100%;
+    height: 200px;                /* 🔹 Más pequeña para móvil */
+    margin-top: 10px;
+  }
+
+  .etapa-titol {
+    font-size: 1.15rem;
+  }
+
+  .etapa-descripcio {
+    font-size: 0.95rem;
+  }
+
+  .etapa-ubicacio {
+    font-size: 0.9rem;
+  }
+
+  .etapes-container {
+    margin: 20px;
+  }
+}
