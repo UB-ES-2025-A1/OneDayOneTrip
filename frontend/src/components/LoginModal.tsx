@@ -28,7 +28,6 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
       const user = await Auth.login(email, password);
       console.log("Usuario logueado:", user);
 
-      alert("Login exitos! ");
       onClose(); // Cerramos modal
       navigate("/"); // Redirigimos al dashboard
 

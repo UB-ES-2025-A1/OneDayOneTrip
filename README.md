@@ -41,6 +41,8 @@ Aquí dejo las instrucciones para runear el código en local.
 
 ```
 
+ Link para ver plataforma de hosteo del backend API: https://dashboard.render.com/web/srv-d3v213uuk2gs73e878s0/deploys/dep-d3v4ke6uk2gs73eab0lg
+
 
 ## Hosteo
 
@@ -48,20 +50,37 @@ Por el momento ya se realiza el hosteo de nuestra api que se aprovecha de que nu
 Lo realizamos mediante render, donde la tenemos levantada, solo hace falta cambiar en el client.ts la url para que apunte a la api levantada.
 Cambiando esta url pasamos a un entorno local poniendo el link (http://127.0.0.1:8000).
 
+Link donde esta hosteado la api -> (https://onedayonetrip-api.onrender.com)
+
+
+Link para ver la plataforma de hosteo del frontend: https://app.netlify.com/projects/onedayonetrip/configuration/deploys#continuous-deployment
+
 ## Estructura del proyecto
 
-OneDayOneTrip
-|
+
+comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv|__pycache__" > estructura.txt
+
+```
+.
 ├── api
 │   ├── app
 │   │   ├── auth
 │   │   │   └── verify_token.py
 │   │   ├── main.py
 │   │   ├── models
+│   │   │   ├── rating_model.py
+│   │   │   └── trip_model.py
 │   │   ├── routers
+│   │   │   ├── __pycache__
+│   │   │   │   └── trips.cpython-310.pyc
+│   │   │   ├── ratings.py
+│   │   │   ├── trips.py
 │   │   │   └── users.py
 │   │   └── services
-│   │       └── firebase_service.py
+│   │       ├── firebase_service.py
+│   │       ├── mongo_service.py
+│   │       └── __pycache__
+│   │           └── mongo_service.cpython-310.pyc
 │   ├── .env
 │   └── requirements.txt
 ├── estructura.txt
@@ -79,11 +98,14 @@ OneDayOneTrip
 │   ├── public
 │   │   ├── images
 │   │   │   ├── bcn.png
+│   │   │   ├── ema.png
+│   │   │   ├── lockk.png
 │   │   │   ├── logo_OneDayOneTrip.png
 │   │   │   ├── londres.png
 │   │   │   ├── madrid.jpg
 │   │   │   ├── pantalla_principal1.png
-│   │   │   └── paris.png
+│   │   │   ├── paris.png
+│   │   │   └── person.png
 │   │   ├── index.html
 │   │   └── vite.svg
 │   ├── README.md
@@ -126,7 +148,13 @@ OneDayOneTrip
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
 ├── .gitignore
+├── README_Branching.md
 └── README.md
+
+18 directories, 70 files
+
+```
+
 
 
 
