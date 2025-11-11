@@ -70,6 +70,7 @@ export default function ResetPasswordModal({ onClose, openLogin }: ResetPassword
           </form>
 
           {error && <p className="text-red-500 mt-2 mb-4">{error}</p>}
+          {message && <p className="text-green-600 mt-2 mb-4">{message}</p>}
 
           <button
             type="button"
