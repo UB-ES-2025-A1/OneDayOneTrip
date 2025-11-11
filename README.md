@@ -134,7 +134,8 @@ comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv|__pycache__
 │   │   │   ├── Layout.tsx
 │   │   │   ├── LoginModal.tsx
 │   │   │   ├── MasonryGrid.tsx
-│   │   │   └── RegisterModal.tsx
+│   │   │   ├── RegisterModal.tsx
+│   │   │   └── ResetPasswordModal.tsx
 │   │   ├── firebase
 │   │   │   ├── auth.ts
 │   │   │   ├── config.ts
@@ -170,7 +171,7 @@ comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv|__pycache__
 ├── README_Branching.md
 └── README.md
 
-19 directories, 88 files
+19 directories, 89 files
 
 
 
