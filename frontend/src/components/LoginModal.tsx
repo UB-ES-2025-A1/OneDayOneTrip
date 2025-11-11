@@ -4,6 +4,7 @@ import { Auth } from "../firebase/auth";
 import "../styles/LoginReg.css";
 import ImageCarousel from "../components/ImageCarousel";
 import "../styles/LoginReg.css";
+import ResetPasswordModal from "./ResetPasswordModal";
 
 interface LoginProps {
   onClose: () => void;
@@ -15,6 +16,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -44,6 +46,15 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
       setLoading(false);
     }
   };
+
+  if (showResetPassword) {
+    return (
+      <ResetPasswordModal
+        onClose={() => setShowResetPassword(false)}
+        openLogin={() => setShowResetPassword(false)}
+      />
+    );
+  }
 
   return (
     <div className="modal-backdrop">
@@ -102,6 +113,15 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
             </form>
 
             {error && <p className="text-red-500 mt-4">{error}</p>}
+            
+            <button
+              type="button"
+              onClick={() => setShowResetPassword(true)}
+              className="auth-link"
+              style={{ marginTop: "16px" }}
+            >
+              Has oblidat la contrasenya?
+            </button>
 
             <p className="auth-footer">
               No tens compte?{" "}
