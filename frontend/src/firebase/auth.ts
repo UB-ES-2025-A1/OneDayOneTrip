@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { app } from "./config";
 import { apiPost } from "../api/client";
+import { sendPasswordResetEmail } from "firebase/auth";
 
 const auth = getAuth(app);
 
@@ -39,6 +40,19 @@ class AuthService {
 
   getCurrentUser(): User | null {
     return auth.currentUser;
+  }
+
+  
+  async resetPassword(email: string) {
+    if (!email) throw new Error("El email és obligatori");
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return true;
+    } catch (error: any) {
+      console.error("Error al enviar correu de reset:", error);
+      throw new Error(error.message || "No s'ha pogut enviar l'enllaç de recuperació.");
+    }
   }
 }
 
