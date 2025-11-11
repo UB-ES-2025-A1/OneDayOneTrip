@@ -1,0 +1,286 @@
+/* =========================================================
+   PERFIL DE USUARIO — OneDayOneTrip
+   ========================================================= */
+
+/* ---------- CONTENEDOR PRINCIPAL ---------- */
+.user-profile {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap; /* ✅ asegura que se adapte en móvil */
+  padding: 3rem 2rem;
+  gap: 2rem;
+  min-height: 220px;
+  border-radius: 12px;
+  color: white;
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.55)
+    ),
+    url("/images/ny.jpg") center/cover no-repeat;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  margin-top: 1rem;
+}
+
+/* ---------- FOTO DEL USUARIO ---------- */
+.user-photo img {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+}
+
+/* ---------- DETALLES DEL USUARIO ---------- */
+.user-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 250px;
+}
+
+/* ---------- INFO DE NOMBRE / EMAIL ---------- */
+.user-info h2 {
+  font-size: 2rem;
+  margin: 0 0 0.3rem 0;
+  font-weight: 700;
+}
+
+.user-info h3 {
+  font-size: 1rem;
+  color: #e8e8e8;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ---------- ESTADÍSTICAS ---------- */
+.user-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.user-stats .stat {
+  background-color: rgba(26, 25, 25, 0.65);
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 100px;
+  backdrop-filter: blur(3px);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.user-stats .stat:hover {
+  transform: translateY(-3px);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.user-stats .number {
+  font-weight: 700;
+  font-size: 1.25rem;
+  display: block;
+  color: #fff;
+}
+
+.user-stats .label {
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+/* ---------- TABS ---------- */
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 2rem auto;
+  width: 320px;
+  height: 45px;
+  background-color: #e6f3e6;
+  border-radius: 30px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.tab-btn {
+  flex: 1;
+  z-index: 2;
+  border: none;
+  background: none;
+  color: #2e492e;
+  font-weight: 600;
+  cursor: pointer;
+  height: 100%;
+  transition: color 0.3s ease;
+  font-size: 1rem;
+}
+
+.tab-btn.active {
+  color: white;
+}
+
+.tabs-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(135deg, #2e492e, #56a856);
+  border-radius: 30px;
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+/* Movimiento del highlight */
+.tabs-container[data-active="guardat"]::before {
+  transform: translateX(100%);
+}
+
+/* ---------- GRID DE PUBLICACIONES ---------- */
+.trip-list {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- ESTADOS (loading / error) ---------- */
+.loading-state,
+.error-state {
+  text-align: center;
+  margin: 2rem 0;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.error-state {
+  color: #c62828;
+}
+/* ---------- ESTADO VACÍO (sin publicaciones/guardadas) ---------- */
+.empty-state {
+  text-align: center;
+  margin: 4rem 1rem;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  opacity: 0.9;
+}
+
+.empty-state .empty-icon {
+  color: #a8a8a8;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2e492e;
+  margin: 0;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+/* =========================================================
+   📱 RESPONSIVE
+   ========================================================= */
+   
+/* Versión responsive */
+@media (max-width: 600px) {
+  .empty-state {
+    margin: 3rem 0;
+    gap: 0.6rem;
+  }
+
+  .empty-state .empty-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .empty-state h3 {
+    font-size: 1.1rem;
+  }
+
+  .empty-state p {
+    font-size: 0.9rem;
+  }
+}
+
+
+/* Tablets (≤ 992px) */
+@media (max-width: 992px) {
+  .user-profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .user-photo img {
+    width: 160px;
+    height: 160px;
+  }
+
+  .user-info h2 {
+    font-size: 1.8rem;
+  }
+
+  .user-stats {
+    justify-content: center;
+  }
+
+  .user-stats .stat {
+    min-width: 90px;
+  }
+}
+
+/* Móviles (≤ 600px) */
+@media (max-width: 600px) {
+  .user-profile {
+    padding: 2rem 1rem;
+    border-radius: 0;
+    box-shadow: none;
+    background-position: center;
+  }
+
+  .user-photo img {
+    width: 130px;
+    height: 130px;
+  }
+
+  .user-info h2 {
+    font-size: 1.5rem;
+  }
+
+  .user-info h3 {
+    font-size: 0.9rem;
+  }
+
+  .user-stats {
+    gap: 1rem;
+  }
+
+  .user-stats .stat {
+    padding: 0.6rem 1rem;
+    min-width: 80px;
+  }
+
+  .tabs-container {
+    width: 90%;
+    height: 40px;
+  }
+
+  .tab-btn {
+    font-size: 0.9rem;
+  }
+}

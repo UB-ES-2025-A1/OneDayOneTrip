@@ -4,7 +4,7 @@
   height: 70vh;
   max-height: 700px; /* evita overflow */
   overflow: hidden;
-  border-radius: 0 0 40px 40px;
+  border-radius: 15px 15px 15px 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   margin-bottom: 2rem;
 }
