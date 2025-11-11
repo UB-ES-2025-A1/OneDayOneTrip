@@ -4,6 +4,8 @@ import { Auth } from "../firebase/auth";
 import "../styles/LoginReg.css";
 import ImageCarousel from "../components/ImageCarousel";
 import "../styles/LoginReg.css";
+import ForgotPassword from "../components/ForgotPassword";
+
 
 interface LoginProps {
   onClose: () => void;
@@ -15,6 +17,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showReset, setShowReset] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -117,6 +120,19 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
                 Registra't
               </button>
             </p>
+            <p className="auth-footer">
+              Has oblidat la contrasenya?{" "}
+              <button
+                type="button"
+                onClick={() => setShowReset(true)}
+                className="auth-link"
+              >
+                Restablir
+              </button>
+            </p>
+
+            {showReset && <ForgotPassword onClose={() => setShowReset(false)} />}
+
           </div>
         </div>
       </div>
