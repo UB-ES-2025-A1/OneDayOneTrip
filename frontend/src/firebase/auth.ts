@@ -8,7 +8,7 @@ import {
   type User,
 } from "firebase/auth";
 import { app } from "./config";
-import { apiPost } from "../api/client";
+import { registerUser } from "../api/client";
 import { sendPasswordResetEmail } from "firebase/auth";
 
 const auth = getAuth(app);

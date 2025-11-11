@@ -136,19 +136,6 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
                 Registra't
               </button>
             </p>
-            <p className="auth-footer">
-              Has oblidat la contrasenya?{" "}
-              <button
-                type="button"
-                onClick={() => setShowReset(true)}
-                className="auth-link"
-              >
-                Restablir
-              </button>
-            </p>
-
-            {showReset && <ForgotPassword onClose={() => setShowReset(false)} />}
-
           </div>
         </div>
       </div>
