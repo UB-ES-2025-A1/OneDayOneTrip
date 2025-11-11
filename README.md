@@ -31,7 +31,7 @@ Aquí dejo las instrucciones para runear el código en local.
 
  source venv/bin/activate
 
- pip install requirements.txt
+ pip install -r requirements.txt
 
  uvicorn app.main:app --reload
 
