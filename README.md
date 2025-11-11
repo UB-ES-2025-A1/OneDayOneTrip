@@ -41,6 +41,8 @@ Aquí dejo las instrucciones para runear el código en local.
 
 ```
 
+ Link para ver plataforma de hosteo del backend API: https://dashboard.render.com/web/srv-d3v213uuk2gs73e878s0/deploys/dep-d3v4ke6uk2gs73eab0lg
+
 
 ## Hosteo
 
@@ -48,20 +50,41 @@ Por el momento ya se realiza el hosteo de nuestra api que se aprovecha de que nu
 Lo realizamos mediante render, donde la tenemos levantada, solo hace falta cambiar en el client.ts la url para que apunte a la api levantada.
 Cambiando esta url pasamos a un entorno local poniendo el link (http://127.0.0.1:8000).
 
+Link donde esta hosteado la api -> (https://onedayonetrip-api.onrender.com)
+
+
+Link para ver la plataforma de hosteo del frontend: https://app.netlify.com/projects/onedayonetrip/configuration/deploys#continuous-deployment
+
 ## Estructura del proyecto
 
-OneDayOneTrip
-|
+
+comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv|__pycache__" > estructura.txt
+
+```
+.
 ├── api
 │   ├── app
 │   │   ├── auth
 │   │   │   └── verify_token.py
 │   │   ├── main.py
 │   │   ├── models
+│   │   │   ├── comment_model.py
+│   │   │   ├── rating_model.py
+│   │   │   ├── trip_create_in.py
+│   │   │   └── trip_model.py
 │   │   ├── routers
+│   │   │   ├── comments.py
+│   │   │   ├── images.py
+│   │   │   ├── ratings.py
+│   │   │   ├── trips.py
 │   │   │   └── users.py
+│   │   ├── scripts
+│   │   │   ├── auto_trip_loader.py
+│   │   │   └── random_comments_and_ratings.py
 │   │   └── services
-│   │       └── firebase_service.py
+│   │       ├── firebase_service.py
+│   │       ├── image_service.py
+│   │       └── mongo_service.py
 │   ├── .env
 │   └── requirements.txt
 ├── estructura.txt
@@ -79,27 +102,36 @@ OneDayOneTrip
 │   ├── public
 │   │   ├── images
 │   │   │   ├── bcn.png
+│   │   │   ├── ema.png
+│   │   │   ├── flecha.png
+│   │   │   ├── lockk.png
 │   │   │   ├── logo_OneDayOneTrip.png
 │   │   │   ├── londres.png
 │   │   │   ├── madrid.jpg
 │   │   │   ├── pantalla_principal1.png
-│   │   │   └── paris.png
+│   │   │   ├── paris.png
+│   │   │   ├── person.png
+│   │   │   ├── reloj.png
+│   │   │   └── ubi.png
 │   │   ├── index.html
 │   │   └── vite.svg
 │   ├── README.md
 │   ├── src
 │   │   ├── api
-│   │   │   └── client.ts
+│   │   │   ├── client.ts
+│   │   │   └── trips.ts
 │   │   ├── App.css
-│   │   ├── App.tsx
 │   │   ├── assets
 │   │   │   └── react.svg
 │   │   ├── components
 │   │   │   ├── AnimatedText1.tsx
 │   │   │   ├── AuthLayout.tsx
 │   │   │   ├── Carousel.tsx
+│   │   │   ├── EtapesList.tsx
 │   │   │   ├── Footer.tsx
+│   │   │   ├── Header.tsx
 │   │   │   ├── ImageCarousel.tsx
+│   │   │   ├── Layout.tsx
 │   │   │   ├── LoginModal.tsx
 │   │   │   ├── MasonryGrid.tsx
 │   │   │   └── RegisterModal.tsx
@@ -110,23 +142,41 @@ OneDayOneTrip
 │   │   ├── firebase.ts
 │   │   ├── main.tsx
 │   │   ├── pages
-│   │   │   ├── Dashboard.tsx
-│   │   │   └── Home.tsx
+│   │   │   ├── Home.tsx
+│   │   │   ├── RutaDetall.tsx
+│   │   │   └── UserProfile.tsx
 │   │   └── styles
 │   │       ├── Carousel.css
+│   │       ├── EtapesList.css
+│   │       ├── Header.css
 │   │       ├── Home.css
 │   │       ├── index.css
+│   │       ├── Layout.css
 │   │       ├── LoginReg.css
 │   │       ├── MasonryGrid.css
-│   │       └── styles.css
+│   │       ├── RutaDetalls.css
+│   │       ├── styles.css
+│   │       └── UserProfile.css
 │   ├── stylelint.config.cjs
 │   ├── tailwind.config.cjs
 │   ├── tsconfig.app.json
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
+├── .github
+│   └── workflows
+│       └── deploy.yml
 ├── .gitignore
+├── README_Branching.md
 └── README.md
+
+19 directories, 88 files
+
+
+
+
+```
+
 
 
 

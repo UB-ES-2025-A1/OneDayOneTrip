@@ -14,49 +14,6 @@ html, body, #root {
   padding: 0;
 }
 
-
-.home-header {
-  width: 100%;
-  background-color: #2e492e;
-  color: white;
-  display: flex;
-  align-items: center;
-  padding: 1rem 2rem;
-  position: relative; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%); 
-}
-
-.header-buttons {
-    margin-left: auto;
-    margin-right: 3rem;
-    display: flex;
-    gap: 0.75rem;
-}
-
-.header-btn {
-  background-color: transparent;
-  border: 1px solid white;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-  white-space: nowrap;
-}
-
-.header-btn:hover {
-  background-color: white;
-  color: #2e492e;
-}
-
 /* ---------- TABS SECTION ---------- */
 .tabs-container {
   display: flex;
@@ -66,13 +23,12 @@ html, body, #root {
   margin: 2rem auto;
   width: 320px;
   height: 45px;
-  background-color: #e6f3e6; /* verde muy claro */
+  background-color: #e6f3e6;
   border-radius: 30px;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
-/* Botones dentro del contenedor */
 .tab-btn {
   flex: 1;
   z-index: 2;
@@ -83,7 +39,6 @@ html, body, #root {
   cursor: pointer;
   height: 100%;
   transition: color 0.3s ease;
-  position: relative;
   font-size: 1rem;
 }
 
@@ -91,55 +46,81 @@ html, body, #root {
   color: white;
 }
 
-/* Elemento deslizante (highlight) */
 .tabs-container::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
-  width: 50%; /* ocupa la mitad */
+  width: 50%;
   height: 100%;
-  background: linear-gradient(135deg, #3a6b3a, #56a856);
+  background: linear-gradient(135deg, #2e492e, #56a856);
   border-radius: 30px;
   transition: transform 0.3s ease;
   z-index: 1;
 }
 
-/* Cuando el tab seleccionado es “recomendados” */
 .tabs-container[data-active="recomendados"]::before {
   transform: translateX(100%);
 }
 
-
-.animated-text {
-  font-size: 5rem;       /* tamaño grande */
-  white-space: pre;      /* respeta espacios */
-  line-height: 1.1;
+/* ---------- INTRO TEXT ---------- */
+.intro-text {
+  margin-top: 3rem;
+  padding: 0 1rem;
+  text-align: center;
 }
 
-.animated-text span {
-  display: inline-block;
-  font-size: 5rem;       /* fuerza el tamaño en los spans */
-  white-space: pre;      /* respeta espacios */
+.intro-text p:first-of-type {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.5rem;
+  max-width: 900px;
+  margin-inline: auto;
 }
 
-.hero-text {
+.intro-text p:last-of-type {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: #555;
+  line-height: 1.4;
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+/* ---------- Messages no TRIP LIST ---------- */
+
+.no-trips-pretty {
+  text-align: center;
+  margin-top: 3rem;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.no-trips-icon {
+  opacity: 0.8;
+}
+
+.no-trips-text {
   font-size: 1.1rem;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
-
+/* ---------- TRIP LIST ---------- */
 .trip-list {
   display: flex;
   flex-direction: column;
-  align-items: center; /* 🔹 centra horitzontalment */
+  align-items: center;
   gap: 1rem;
   margin-top: 1rem;
 }
 
 .trip-card {
   width: 90%;
-  max-width: 800px; /* 🔹 límit d’amplada */
+  max-width: 800px;
   display: flex;
   align-items: center;
   background-color: #fff;
@@ -148,6 +129,7 @@ html, body, #root {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   justify-content: space-between;
   transition: transform 0.2s ease;
+  cursor: pointer;
 }
 
 .trip-card:hover {
@@ -155,9 +137,10 @@ html, body, #root {
 }
 
 .trip-image {
-  width: 100px;
-  height: 100px;
-  object-fit: contain;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
   margin-right: 1rem;
 }
 
@@ -184,6 +167,7 @@ html, body, #root {
   align-items: center;
   font-size: 0.9rem;
   color: #666;
+  flex-wrap: wrap;
 }
 
 .trip-difficulty {
@@ -202,32 +186,121 @@ html, body, #root {
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
+  margin-left: 1rem;
 }
 
 .trip-button:hover {
   background-color: #3c6b2b;
 }
 
-.intro-text {
-    margin-top: 3rem; /* Espai extra sobre el text */
+/* =========================================================
+   MENSAJE DE LISTA VACÍA (SIN RUTAS)
+   ========================================================= */
+.no-trips-message {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  max-width: 700px;
+  margin: 2rem auto;
+  animation: fadeIn 0.6s ease;
 }
 
-.intro-text p:first-of-type {
+.no-trips-icon {
+  width: 110px;
+  height: 110px;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.no-trips-message p {
+  font-size: 1.1rem;
+  color: #444;
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+/* ---------- RESPONSIVE DESIGN ---------- */
+
+/* 📱 Mobile (≤ 600px) */
+@media (max-width: 600px) {
+  .tabs-container {
+    width: 90%;
+    height: 40px;
+  }
+
+  .tab-btn {
+    font-size: 0.9rem;
+  }
+
+  .intro-text p:first-of-type {
+    font-size: 1.5rem;
+  }
+
+  .intro-text p:last-of-type {
+    font-size: 1rem;
+  }
+
+  .trip-card {
+    flex-direction: column;
     text-align: center;
-    font-size: 2rem;      /* Més gran per la primera línia */
-    font-weight: 700;     /* Negreta */
-    color: #222;
-    margin: 0 auto 0.5rem auto; /* Espai petit sota per apropar la segona línia */
-    max-width: 900px;
+    padding: 1rem;
+  }
+
+  .trip-image {
+    width: 100%;
+    height: 200px;
+    margin-right: 0;
+    margin-bottom: 0.75rem;
+  }
+
+  .trip-details {
+    justify-content: center;
+  }
+
+  .trip-button {
+    width: 100%;
+    margin-top: 0.75rem;
+  }
 }
 
-.intro-text p:last-of-type {
-    text-align: center;
-    font-size: 1.25rem;  /* Més petita per la segona línia */
-    font-weight: 400;     /* Lletra més fina */
-    color: #555;
-    margin: 0 auto;       /* Sense marge superior per apropar-la a la primera línia */
-    max-width: 900px;
-    line-height: 1.4;
+/* 💻 Tablets (601px–992px) */
+@media (max-width: 992px) and (min-width: 601px) {
+  .trip-card {
+    max-width: 600px;
+  }
+
+  .trip-image {
+    width: 150px;
+    height: 150px;
+  }
+
+  .intro-text p:first-of-type {
+    font-size: 1.75rem;
+  }
 }
 
+/* 🖥️ Large screens (≥ 1200px) */
+@media (min-width: 1200px) {
+  .trip-card {
+    max-width: 1000px;
+  }
+}

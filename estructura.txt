@@ -5,10 +5,23 @@
 │   │   │   └── verify_token.py
 │   │   ├── main.py
 │   │   ├── models
+│   │   │   ├── comment_model.py
+│   │   │   ├── rating_model.py
+│   │   │   ├── trip_create_in.py
+│   │   │   └── trip_model.py
 │   │   ├── routers
+│   │   │   ├── comments.py
+│   │   │   ├── images.py
+│   │   │   ├── ratings.py
+│   │   │   ├── trips.py
 │   │   │   └── users.py
+│   │   ├── scripts
+│   │   │   ├── auto_trip_loader.py
+│   │   │   └── random_comments_and_ratings.py
 │   │   └── services
-│   │       └── firebase_service.py
+│   │       ├── firebase_service.py
+│   │       ├── image_service.py
+│   │       └── mongo_service.py
 │   ├── .env
 │   └── requirements.txt
 ├── estructura.txt
@@ -26,27 +39,36 @@
 │   ├── public
 │   │   ├── images
 │   │   │   ├── bcn.png
+│   │   │   ├── ema.png
+│   │   │   ├── flecha.png
+│   │   │   ├── lockk.png
 │   │   │   ├── logo_OneDayOneTrip.png
 │   │   │   ├── londres.png
 │   │   │   ├── madrid.jpg
 │   │   │   ├── pantalla_principal1.png
-│   │   │   └── paris.png
+│   │   │   ├── paris.png
+│   │   │   ├── person.png
+│   │   │   ├── reloj.png
+│   │   │   └── ubi.png
 │   │   ├── index.html
 │   │   └── vite.svg
 │   ├── README.md
 │   ├── src
 │   │   ├── api
-│   │   │   └── client.ts
+│   │   │   ├── client.ts
+│   │   │   └── trips.ts
 │   │   ├── App.css
-│   │   ├── App.tsx
 │   │   ├── assets
 │   │   │   └── react.svg
 │   │   ├── components
 │   │   │   ├── AnimatedText1.tsx
 │   │   │   ├── AuthLayout.tsx
 │   │   │   ├── Carousel.tsx
+│   │   │   ├── EtapesList.tsx
 │   │   │   ├── Footer.tsx
+│   │   │   ├── Header.tsx
 │   │   │   ├── ImageCarousel.tsx
+│   │   │   ├── Layout.tsx
 │   │   │   ├── LoginModal.tsx
 │   │   │   ├── MasonryGrid.tsx
 │   │   │   └── RegisterModal.tsx
@@ -57,22 +79,32 @@
 │   │   ├── firebase.ts
 │   │   ├── main.tsx
 │   │   ├── pages
-│   │   │   ├── Dashboard.tsx
-│   │   │   └── Home.tsx
+│   │   │   ├── Home.tsx
+│   │   │   ├── RutaDetall.tsx
+│   │   │   └── UserProfile.tsx
 │   │   └── styles
 │   │       ├── Carousel.css
+│   │       ├── EtapesList.css
+│   │       ├── Header.css
 │   │       ├── Home.css
 │   │       ├── index.css
+│   │       ├── Layout.css
 │   │       ├── LoginReg.css
 │   │       ├── MasonryGrid.css
-│   │       └── styles.css
+│   │       ├── RutaDetalls.css
+│   │       ├── styles.css
+│   │       └── UserProfile.css
 │   ├── stylelint.config.cjs
 │   ├── tailwind.config.cjs
 │   ├── tsconfig.app.json
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
+├── .github
+│   └── workflows
+│       └── deploy.yml
 ├── .gitignore
+├── README_Branching.md
 └── README.md
 
-16 directories, 59 files
+19 directories, 88 files
