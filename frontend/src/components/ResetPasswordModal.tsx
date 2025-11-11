@@ -28,6 +28,7 @@ export default function ResetPasswordModal({ onClose, openLogin }: ResetPassword
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simula temps de càrrega
       
       //await Auth.resetPassword(email); // La funció encara no està implementada (separant funcionalitats en branques i tal)
+      // cosa per commit
       setMessage("S'ha enviat un correu amb l'enllaç de recuperació.");
     } catch (err: any) {
       console.error("Error al recuperar contrasenya:", err);
