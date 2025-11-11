@@ -1,50 +1,7 @@
-/* ---------- HEADER ---------- */
-.home-header {
-  width: 100%;
-  background-color: #2e492e;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex-wrap: nowrap;
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-align: center;
-  flex: 1;
-  cursor: pointer;
-  width: 100%;
-}
-
-
-.back-btn-header {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  font-weight: bold;
-  flex: 0 0 auto;
-  text-align: left;
-  width: 100%;
-}
-
-.back-btn-header:hover {
-  opacity: 0.8;
-}
-
-.header-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex: 0 0 auto;
-  gap: 0.8rem;
-}
+/* =========================================================
+   RUTA DETALL — OneDayOneTrip
+   (Compat con Header nuevo; sin reglas de header aquí)
+   ========================================================= */
 
 /* ---------- CONTENEDOR GENERAL ---------- */
 .ruta-detall-page {
@@ -62,7 +19,7 @@
   background: white;
   gap: 10px;
   box-sizing: border-box;
-  flex-wrap: wrap; /* 🔹 para que se apile en móvil */
+  flex-wrap: wrap; /* 🔹 apila en móvil */
 }
 
 .imatge-gran {
@@ -130,8 +87,7 @@
   transform: scale(1.05);
 }
 
-
-/* ---------- valoracio ---------- */
+/* ---------- VALORACIÓ ---------- */
 .valoracio {
   margin-top: 8px;
   display: flex;
@@ -158,119 +114,6 @@
   font-weight: 600;
   margin-left: 6px;
   color: #333;
-}
-
-
-/* -----------------💬 Comentaris---------------------- */
-.ruta-comentaris {
-  margin-top: 3rem;
-  background: #fafafa;
-  padding: 1.5rem 2rem;
-  border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-}
-
-.ruta-comentaris h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #222;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 0.5rem;
-}
-
-.comentaris-loading,
-.comentaris-buits {
-  color: #666;
-  font-style: italic;
-  padding: 0.5rem 0;
-}
-
-.comentaris-llista {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.comentari-item {
-  background: white;
-  padding: 1rem 1.2rem;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  transition: box-shadow 0.2s ease;
-}
-
-.comentari-item:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.comentari-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.4rem;
-}
-
-.comentari-autor {
-  font-weight: 600;
-  color: #333;
-}
-
-.comentari-data {
-  font-size: 0.9rem;
-  color: #888;
-}
-
-.comentari-contingut {
-  margin: 0;
-  color: #444;
-  line-height: 1.5;
-  white-space: pre-wrap;
-}
-
-
-/* ---------- ZOOM ---------- */
-.zoom-gallery {
-  display: flex;
-  flex-direction: row;
-  gap: 15px;
-  padding: 20px;
-  max-width: 90%;
-  overflow-x: auto;
-  background: #000;
-  border-radius: 12px;
-  position: relative;
-}
-
-.zoom-gallery img {
-  height: 400px;
-  border-radius: 10px;
-  object-fit: cover;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.zoom-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.close-zoom {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 2rem;
-  cursor: pointer;
 }
 
 /* ---------- CONTENIDO PRINCIPAL ---------- */
@@ -323,45 +166,73 @@
   border-radius: 15px;
 }
 
+/* ---------- CONTENEDOR autor ---------- */
 .autor {
   display: flex;
   align-items: center;
   gap: 10px;
-  border: 1.5px solid #d3d3d3;
-  background-color: #fff;
-  padding: 15px 15px;
-  border-radius: 10px;
+  background: #ffffff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   width: fit-content;
+  transition: all 0.25s ease;
+  cursor: pointer;
   margin-top: 20px;
 }
 
-/* Contenedor circular del autor */
+.autor:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
 .autor-icon {
-  width: 65px;                /* 🔹 más grande (antes 45px) */
-  height: 65px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  overflow: hidden;           /* 🔹 asegura que la imagen no se salga del círculo */
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #2e492e;  /* color base de fondo */
-  flex-shrink: 0;             /* evita que se deforme en layouts flex */
+  background: #2e492e;
+  flex-shrink: 0;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px #2e492e;
 }
 
-/* Imagen del autor dentro del círculo */
 .autor-foto {
-  width: 100%;                /* 🔹 ocupa todo el círculo */
+  width: 100%;
   height: 100%;
-  object-fit: cover;          /* 🔹 mantiene proporción, recorta suavemente */
+  object-fit: cover;
   border-radius: 50%;
 }
 
-/* Icono por defecto (cuando no hay foto) */
 .author-icon {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   filter: brightness(0) invert(1);
+  opacity: 0.9;
 }
+
+.autor-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.autor-nombre {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2e492e;
+  line-height: 1.2;
+}
+
+.autor-sub {
+  font-size: 0.8rem;
+  color: #7b7b7b;
+}
+
 
 
 /* ---------- INFO EXTRA ---------- */
@@ -370,7 +241,7 @@
   gap: 120px;
   margin-top: 40px;
   margin-left: 50px;
-  flex-wrap: wrap; /* ✅ para que se apilen */
+  flex-wrap: wrap;
 }
 
 .info-card {
@@ -446,38 +317,166 @@
   margin-bottom: 20px;
 }
 
+/* -----------------💬 COMENTARIS---------------------- */
+.ruta-comentaris {
+  margin-top: 3rem;
+  background: #fafafa;
+  padding: 1.5rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.ruta-comentaris h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #2e492e;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.comentaris-loading,
+.comentaris-buits {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.comentaris-llista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* ---------- TARJETA DEL COMENTARIO ---------- */
+.comentari-item {
+  background: white;
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+  border: 1px solid #e6e6e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.comentari-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- CABECERA DEL COMENTARIO ---------- */
+.comentari-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.6rem;
+}
+
+.comentari-autor-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- AVATAR ---------- */
+.comentari-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #2e492e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.comentari-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* ---------- TEXTO ---------- */
+.comentari-autor {
+  font-weight: 600;
+  color: #2e492e;
+  display: block;
+  font-size: 0.95rem;
+}
+
+.comentari-data {
+  font-size: 0.8rem;
+  color: #888;
+  display: block;
+  margin-top: 2px;
+}
+
+.comentari-contingut {
+  margin: 0;
+  color: #333;
+  line-height: 1.5;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  background: #f9fafb;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+
+/* ---------- ZOOM ---------- */
+.zoom-gallery {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  padding: 20px;
+  max-width: 90%;
+  overflow-x: auto;
+  background: #000;
+  border-radius: 12px;
+  position: relative;
+}
+
+.zoom-gallery img {
+  height: 400px;
+  border-radius: 10px;
+  object-fit: cover;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.close-zoom {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
 /* =========================================================
    📱 RESPONSIVE DESIGN
    ========================================================= */
 
 /* Tablets (≤ 992px) */
 @media (max-width: 992px) {
-  .home-header {
-    flex-direction: row; /* deixa el row */
-    align-items: center;
-    justify-content: space-between; /* logo al centre, back i botons als costats */
-  }
-
-  .back-btn-header,
-  .logo,
-  .header-buttons {
-    width: 100%; /* no ocupen tot el width */
-  }
-
-  .logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .back-btn-header {
-    text-align: left;
-  }
-
-  .header-buttons {
-    justify-content: flex-end;
-
-  }
   .ruta-galeria-principal {
     flex-direction: column;
     align-items: center;
@@ -512,35 +511,6 @@
 
 /* Móviles (≤ 600px) */
 @media (max-width: 600px) {
-  .home-header {
-    flex-direction: row; /* deixa el row */
-    align-items: center;
-    justify-content: space-between; /* logo al centre, back i botons als costats */
-  }
-
-  .back-btn-header,
-  .logo,
-  .header-buttons {
-    width: auto; /* no ocupen tot el width */
-  }
-
-  .logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    visibility: hidden;
-  }
-
-  .back-btn-header {
-    text-align: left;
-  }
-
-  .header-buttons {
-    justify-content: flex-end;
-    margin-right: 30px;
-
-  }
-
   .ruta-galeria-principal {
     flex-direction: column;
     align-items: center;

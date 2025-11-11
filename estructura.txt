@@ -16,7 +16,8 @@
 │   │   │   ├── trips.py
 │   │   │   └── users.py
 │   │   ├── scripts
-│   │   │   └── auto_trip_loader.py
+│   │   │   ├── auto_trip_loader.py
+│   │   │   └── random_comments_and_ratings.py
 │   │   └── services
 │   │       ├── firebase_service.py
 │   │       ├── image_service.py
@@ -57,7 +58,6 @@
 │   │   │   ├── client.ts
 │   │   │   └── trips.ts
 │   │   ├── App.css
-│   │   ├── App.tsx
 │   │   ├── assets
 │   │   │   └── react.svg
 │   │   ├── components
@@ -66,7 +66,9 @@
 │   │   │   ├── Carousel.tsx
 │   │   │   ├── EtapesList.tsx
 │   │   │   ├── Footer.tsx
+│   │   │   ├── Header.tsx
 │   │   │   ├── ImageCarousel.tsx
+│   │   │   ├── Layout.tsx
 │   │   │   ├── LoginModal.tsx
 │   │   │   ├── MasonryGrid.tsx
 │   │   │   └── RegisterModal.tsx
@@ -77,26 +79,32 @@
 │   │   ├── firebase.ts
 │   │   ├── main.tsx
 │   │   ├── pages
-│   │   │   ├── Dashboard.tsx
 │   │   │   ├── Home.tsx
-│   │   │   └── RutaDetall.tsx
+│   │   │   ├── RutaDetall.tsx
+│   │   │   └── UserProfile.tsx
 │   │   └── styles
 │   │       ├── Carousel.css
 │   │       ├── EtapesList.css
+│   │       ├── Header.css
 │   │       ├── Home.css
 │   │       ├── index.css
+│   │       ├── Layout.css
 │   │       ├── LoginReg.css
 │   │       ├── MasonryGrid.css
 │   │       ├── RutaDetalls.css
-│   │       └── styles.css
+│   │       ├── styles.css
+│   │       └── UserProfile.css
 │   ├── stylelint.config.cjs
 │   ├── tailwind.config.cjs
 │   ├── tsconfig.app.json
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
+├── .github
+│   └── workflows
+│       └── deploy.yml
 ├── .gitignore
 ├── README_Branching.md
 └── README.md
 
-17 directories, 82 files
+19 directories, 88 files

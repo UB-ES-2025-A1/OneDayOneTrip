@@ -1,7 +1,10 @@
 import { getAuth } from "firebase/auth";
 
-const API_URL = "https://onedayonetrip-api.onrender.com";  //; http://127.0.0.1:8000
+const API_URL = "https://onedayonetrip-api.onrender.com"; // o http://127.0.0.1:8000 para local
 
+// ------------------------------
+// 🔹 Funciones base genéricas
+// ------------------------------
 export async function apiGet(path: string) {
   const user = getAuth().currentUser;
   const token = user ? await user.getIdToken() : null;
@@ -29,4 +32,32 @@ export async function apiPost(path: string, body: object) {
 
   if (!res.ok) throw new Error(`API Error ${res.status}`);
   return res.json();
+}
+
+// ------------------------------
+// 👤 Endpoints de usuarios
+// ------------------------------
+
+// 📌 Registrar usuario (nuevo endpoint FastAPI)
+export async function registerUser(data: {
+  fullname: string;
+  username: string;
+  mail: string;
+}) {
+  return apiPost("/users/register", data);
+}
+
+// 📌 Obtener el usuario autenticado
+export async function getCurrentUser() {
+  return apiGet("/users/me");
+}
+
+// 📌 Obtener un usuario por su ID (público o autenticado)
+export async function getUserById(userId: string) {
+  return apiGet(`/users/${userId}`);
+}
+
+// 📌 Obtener todos los usuarios (solo si autenticado)
+export async function getAllUsers() {
+  return apiGet("/users");
 }
