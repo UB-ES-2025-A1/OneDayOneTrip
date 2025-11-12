@@ -42,5 +42,6 @@ class AuthService {
   }
 }
 
+
 export const Auth = new AuthService();
 export { auth };

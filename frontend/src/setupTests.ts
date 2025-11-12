@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom/vitest";
+import "whatwg-fetch";
 import { setupServer } from "msw/node";
 import { rest } from "msw";
 import { beforeAll, afterAll, afterEach, vi } from "vitest";
