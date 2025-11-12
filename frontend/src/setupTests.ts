@@ -1,47 +1,57 @@
-import "@testing-library/jest-dom/vitest";
-import "whatwg-fetch";
-import { setupServer } from "msw/node";
-import { rest } from "msw";
-import { beforeAll, afterAll, afterEach, vi } from "vitest";
+import '@testing-library/jest-dom/vitest';
+import 'whatwg-fetch';
 
-// ...handlers y ciclo de vida como te pasé antes...
+import { setupServer } from 'msw/node';
+import { http, HttpResponse } from 'msw';
+import { beforeAll, afterAll, afterEach } from 'vitest';
 
-
-// Datos dummy y handlers
+// ─────────────────────────────────────────────
+// Datos dummy
+// ─────────────────────────────────────────────
 const dummyTrips = [
   {
-    id: "trip-1",
-    title: "Paris en 3 días",
-    description: "Un viaje de prueba a París",
-    city: "Paris",
-    author: { userId: "u1", name: "Usuario Test" },
+    id: 'trip-1',
+    title: 'Paris en 3 días',
+    description: 'Un viaje de prueba a París',
+    city: 'Paris',
+    author: { userId: 'u1', name: 'Usuario Test' },
   },
 ];
 
-// Handlers
+// ─────────────────────────────────────────────
+// Handlers (MSW v2)
+// ─────────────────────────────────────────────
 const server = setupServer(
   // GET /trips
-  rest.get("*/trips", (_req, res, ctx) => {
-    return res(ctx.json(dummyTrips));
+  http.get('*/trips', () => {
+    return HttpResponse.json(dummyTrips);
   }),
+
   // POST /trips
-  rest.post("*/trips", (_req, res, ctx) => {
-    return res(ctx.status(201), ctx.json({ id: "new-trip-id" }));
+  http.post('*/trips', async () => {
+    // Si necesitas leer el body:
+    // const body = await request.json();
+    return HttpResponse.json({ id: 'new-trip-id' }, { status: 201 });
   }),
+
   // POST /users/register
-  rest.post("*/users/register", (_req, res, ctx) => {
-    return res(ctx.status(201));
+  http.post('*/users/register', async () => {
+    return new HttpResponse(null, { status: 201 });
   }),
+
   // POST /users/login
-  rest.post("*/users/login", (_req, res, ctx) => {
-    return res(ctx.status(200), ctx.json({ token: "fake-jwt-token" }));
+  http.post('*/users/login', async () => {
+    return HttpResponse.json({ token: 'fake-jwt-token' }, { status: 200 });
   })
 );
 
+// ─────────────────────────────────────────────
 // Ciclo de vida
-beforeAll(() => server.listen({ onUnhandledRequest: "warn" }));
+// ─────────────────────────────────────────────
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-// Exponer para sobreescribir handlers en tests específicos
-Object.assign(globalThis, { mswServer: server, mswRest: rest });
+// Opcional: exponer para tests que quieran sobreescribir handlers
+// (añade un .d.ts si quieres tipos)
+Object.assign(globalThis, { mswServer: server, mswHttp: http, mswHttpResponse: HttpResponse });
