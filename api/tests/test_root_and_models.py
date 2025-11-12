@@ -1,5 +1,6 @@
 # test_root_and_models.py
 from pydantic import ValidationError
+import pytest
 from app.models.trip_create_in import TripCreateIn
 from app.models.rating_model import RatingModel
 

@@ -2,6 +2,7 @@
 from fastapi.testclient import TestClient
 from app.main import app
 
+
 def test_docs_alive():
     with TestClient(app) as client:
         r = client.get("/docs")
