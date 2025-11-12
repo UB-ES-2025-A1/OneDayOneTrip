@@ -10,15 +10,21 @@ load_dotenv()
 IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
 
 def upload_image_to_imgbb(file: UploadFile):
-    url = "https://api.imgbb.com/1/upload"
-    image_data = base64.b64encode(file.file.read())
-    payload = {
-        "key": IMGBB_API_KEY,
-        "image": image_data
-    }
-    response = requests.post(url, data=payload)
-    response.raise_for_status()
-    return response.json()["data"]["url"]
+    """Sube una imagen a ImgBB o devuelve una URL mock si no hay API key."""
+    if not IMGBB_API_KEY:
+        print("[WARN] ⚠️ IMGBB_API_KEY no definido, devolviendo URL mock.")
+        return f"https://fake.imgbb.com/{file.filename or 'mock_image.jpg'}"
 
-
-#Microservicio imgBB
+    try:
+        url = "https://api.imgbb.com/1/upload"
+        image_data = base64.b64encode(file.file.read())
+        payload = {
+            "key": IMGBB_API_KEY,
+            "image": image_data
+        }
+        response = requests.post(url, data=payload)
+        response.raise_for_status()
+        return response.json()["data"]["url"]
+    except Exception as e:
+        print(f"[ERROR] ❌ Error subiendo imagen a ImgBB: {e}")
+        return f"https://fake.imgbb.com/error_{file.filename or 'unknown'}.jpg"
