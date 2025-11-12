@@ -31,7 +31,7 @@ Aquí dejo las instrucciones para runear el código en local.
 
  source venv/bin/activate
 
- pip install requirements.txt
+ pip install -r requirements.txt
 
  uvicorn app.main:app --reload
 
@@ -68,19 +68,23 @@ comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv|__pycache__
 │   │   │   └── verify_token.py
 │   │   ├── main.py
 │   │   ├── models
+│   │   │   ├── comment_model.py
 │   │   │   ├── rating_model.py
+│   │   │   ├── trip_create_in.py
 │   │   │   └── trip_model.py
 │   │   ├── routers
-│   │   │   ├── __pycache__
-│   │   │   │   └── trips.cpython-310.pyc
+│   │   │   ├── comments.py
+│   │   │   ├── images.py
 │   │   │   ├── ratings.py
 │   │   │   ├── trips.py
 │   │   │   └── users.py
+│   │   ├── scripts
+│   │   │   ├── auto_trip_loader.py
+│   │   │   └── random_comments_and_ratings.py
 │   │   └── services
 │   │       ├── firebase_service.py
-│   │       ├── mongo_service.py
-│   │       └── __pycache__
-│   │           └── mongo_service.cpython-310.pyc
+│   │       ├── image_service.py
+│   │       └── mongo_service.py
 │   ├── .env
 │   └── requirements.txt
 ├── estructura.txt
@@ -99,32 +103,39 @@ comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv|__pycache__
 │   │   ├── images
 │   │   │   ├── bcn.png
 │   │   │   ├── ema.png
+│   │   │   ├── flecha.png
 │   │   │   ├── lockk.png
 │   │   │   ├── logo_OneDayOneTrip.png
 │   │   │   ├── londres.png
 │   │   │   ├── madrid.jpg
 │   │   │   ├── pantalla_principal1.png
 │   │   │   ├── paris.png
-│   │   │   └── person.png
+│   │   │   ├── person.png
+│   │   │   ├── reloj.png
+│   │   │   └── ubi.png
 │   │   ├── index.html
 │   │   └── vite.svg
 │   ├── README.md
 │   ├── src
 │   │   ├── api
-│   │   │   └── client.ts
+│   │   │   ├── client.ts
+│   │   │   └── trips.ts
 │   │   ├── App.css
-│   │   ├── App.tsx
 │   │   ├── assets
 │   │   │   └── react.svg
 │   │   ├── components
 │   │   │   ├── AnimatedText1.tsx
 │   │   │   ├── AuthLayout.tsx
 │   │   │   ├── Carousel.tsx
+│   │   │   ├── EtapesList.tsx
 │   │   │   ├── Footer.tsx
+│   │   │   ├── Header.tsx
 │   │   │   ├── ImageCarousel.tsx
+│   │   │   ├── Layout.tsx
 │   │   │   ├── LoginModal.tsx
 │   │   │   ├── MasonryGrid.tsx
-│   │   │   └── RegisterModal.tsx
+│   │   │   ├── RegisterModal.tsx
+│   │   │   └── ResetPasswordModal.tsx
 │   │   ├── firebase
 │   │   │   ├── auth.ts
 │   │   │   ├── config.ts
@@ -132,26 +143,38 @@ comando para actualizarla:   tree -a -I "node_modules|.git|dist|venv|__pycache__
 │   │   ├── firebase.ts
 │   │   ├── main.tsx
 │   │   ├── pages
-│   │   │   ├── Dashboard.tsx
-│   │   │   └── Home.tsx
+│   │   │   ├── Home.tsx
+│   │   │   ├── RutaDetall.tsx
+│   │   │   └── UserProfile.tsx
 │   │   └── styles
 │   │       ├── Carousel.css
+│   │       ├── EtapesList.css
+│   │       ├── Header.css
 │   │       ├── Home.css
 │   │       ├── index.css
+│   │       ├── Layout.css
 │   │       ├── LoginReg.css
 │   │       ├── MasonryGrid.css
-│   │       └── styles.css
+│   │       ├── RutaDetalls.css
+│   │       ├── styles.css
+│   │       └── UserProfile.css
 │   ├── stylelint.config.cjs
 │   ├── tailwind.config.cjs
 │   ├── tsconfig.app.json
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
+├── .github
+│   └── workflows
+│       └── deploy.yml
 ├── .gitignore
 ├── README_Branching.md
 └── README.md
 
-18 directories, 70 files
+19 directories, 89 files
+
+
+
 
 ```
 
