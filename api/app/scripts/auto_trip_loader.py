@@ -102,55 +102,55 @@ if __name__ == "__main__":
     uploader = TripUploader(api_url="http://localhost:8000")
 
     trips = [
-        {
-            "title": "Un dia per València: CAC i Centre Històric",
-            "description": "Ruta que combina la Ciutat de les Arts i les Ciències amb icones del centre històric de València.",
-            "category": "Cultural, arquitectura",
-            "tags": ["València", "arquitectura", "història", "CAC"],
-            "author": {
-                "userId": "uid_000",
-                "name": "OneDayOneTrip",
-                "profilePic": "https://i.ibb.co/3YTRDy4h/f23488394ee0.jpg"
-            },
-            "city": "València",
-            "region": "Comunitat Valenciana",
-            "country": "España",
-            "trip_points": [
-                {
-                    "title": "L'Hemisfèric",
-                    "description": "L’icònic ‘ull’ de la Ciutat de les Arts i les Ciències.",
-                    "coordinates": {"lat": 39.4575, "lng": -0.3540},
-                    "image": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Hemispheric_-_Valencia%2C_Spain_-_Jan_2007.jpg"
+            {
+                "title": "Descobrint Roma en un dia",
+                "description": "Ruta que combina els principals monuments de Roma amb activitats culturals i gastronòmiques en un dia.",
+                "category": "Cultural, Història, Gastronomia",
+                "tags": ["Roma", "Itàlia", "història", "monuments"],
+                "author": {
+                    "userId": "uid_000",
+                    "name": "OneDayOneTrip",
+                    "profilePic": "https://i.ibb.co/v6XYGkyM/3f1fc17a6277.jpg"
                 },
-                {
-                    "title": "L’Oceanogràfic",
-                    "description": "El major aquari d’Europa; arquitectura de Candela.",
-                    "coordinates": {"lat": 39.4549, "lng": -0.3512},
-                    "image": "https://upload.wikimedia.org/wikipedia/commons/d/d4/L%27Oceanografic_%28Valencia%2C_Spain%29_01.jpg"
-                },
-                {
-                    "title": "Torres de Serrans",
-                    "description": "Porta medieval de la ciutat, perfectament conservada.",
-                    "coordinates": {"lat": 39.4791, "lng": -0.3769},
-                    "image": "https://upload.wikimedia.org/wikipedia/commons/5/59/Torres_de_Serranos_%28Valencia%29.jpg"
-                },
-                {
-                    "title": "La Llotja de la Seda",
-                    "description": "Joia gòtica civil Patrimoni de la Humanitat.",
-                    "coordinates": {"lat": 39.4742, "lng": -0.3786},
-                    "image": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Spain_Valencia_-_Lonja_de_la_Seda.jpg"
-                }
-            ],
-            "distance": 8,
-            "duration": "4 hores",
-            "difficulty": "Fàcil",
-            "recommendedSeason": "Primavera",
-            "coverImage": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Panor%C3%A0mica_Ciutat_de_les_Arts_i_les_Ci%C3%A8ncies.jpg",
-            "gallery": [
-                "https://upload.wikimedia.org/wikipedia/commons/8/81/Mercado_Central_Valencia.JPG",
-                "https://upload.wikimedia.org/wikipedia/commons/8/8a/Valencia_-_Plaza_de_la_Virgen_01.jpg"
-            ]
-        }
+                "city": "Roma",
+                "region": "Lazio",
+                "country": "Itàlia",
+                "trip_points": [
+                    {
+                        "title": "Coliseu",
+                        "description": "L’emblemàtic amfiteatre romà, símbol de la grandesa de l’Antiga Roma.",
+                        "coordinates": {"lat": 41.8902, "lng": 12.4922},
+                        "image": "https://slevomat.sgcdn.cz/images/t/2000/16/63/16638432-d4d82e.jpg"
+                    },
+                    {
+                        "title": "Fòrum Romà i Palatí",
+                        "description": "Centre polític i religiós de la Roma antiga; passeig entre ruïnes mil·lenàries.",
+                        "coordinates": {"lat": 41.8925, "lng": 12.4853},
+                        "image": "https://karanlathia.com/wp-content/uploads/2022/07/Roman-Forum-1-768x432.jpg"
+                    },
+                    {
+                        "title": "Fontana di Trevi",
+                        "description": "Una de les fonts més famoses del món; llença una moneda per tornar a Roma.",
+                        "coordinates": {"lat": 41.9009, "lng": 12.4833},
+                        "image": "https://www.romando.org/wp-content/uploads/sites/14/2023/07/fontana-di-trevi-nocturno.jpg?width=632"
+                    },
+                    {
+                        "title": "Panteó de Roma",
+                        "description": "Temple romà reconvertit en església, amb la cúpula més gran del món antic.",
+                        "coordinates": {"lat": 41.8986, "lng": 12.4768},
+                        "image": "https://www.101viajes.com/sites/default/files/panteon-roma-exterior.jpg"
+                    }
+                ],
+                "distance": 10,
+                "duration": "8 hores",
+                "difficulty": "Fàcil",
+                "recommendedSeason": "Estiu",
+                "coverImage": "https://para-viajar.com/wp-content/uploads/2010/09/El-Coliseo-Romano.jpg",
+                "gallery": [
+                    "https://www.loleta.es/wp-content/uploads/2019/09/web-ROMA-IG1-5120282-copia-1080x675.jpg",
+                    "https://ik.imagekit.io/f8xal2viyc0/content/Untitled-5_DtTa2icdg.jpeg"
+                ]
+            }
     ]
 
     uploader.upload_trips(trips)
