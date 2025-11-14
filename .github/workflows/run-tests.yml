@@ -1,9 +1,9 @@
-name: 🧪 Run FastAPI Tests
+name: 🧪 CI – Backend & Frontend Tests
 
 on:
   pull_request:
     branches:
-      - "**"  # Ejecuta los tests en PR hacia cualquier rama
+      - "**"
 
 jobs:
   test:
@@ -36,3 +36,22 @@ jobs:
             IMGBB_API_KEY: ""
         run: |
           pytest -v tests
+
+  frontend-tests:
+    name: Run frontend tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: 🧪 Run frontend tests
+        env:
+          CI: "true"
+        run: npm run test:cov -- --reporter=dot
