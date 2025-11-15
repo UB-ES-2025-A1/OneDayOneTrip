@@ -74,3 +74,17 @@ async def get_current_user_by_id(user_id: str):
     if not doc.exists:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return doc.to_dict()
+
+@router.post("/follow/{target_id}")
+async def follow_user(target_id: str, user=Depends(verify_token)):
+    uid = user.get("uid")
+    if uid == target_id:
+        raise HTTPException(status_code=400, detail="No puedes seguirte a ti mismo")
+
+    # añade target_id a lista_seguidos del usuario actual
+    db.collection("users").document(uid).update({
+        "lista_seguidos": firestore.ArrayUnion([target_id])
+    })
+
+    return {"message": "Usuario seguido"}
+
