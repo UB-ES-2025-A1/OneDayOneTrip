@@ -88,3 +88,13 @@ async def follow_user(target_id: str, user=Depends(verify_token)):
 
     return {"message": "Usuario seguido"}
 
+@router.post("/add-follower/{target_id}")
+async def add_follower(target_id: str, user=Depends(verify_token)):
+    uid = user.get("uid")
+
+    # añade uid a lista_seguidores del usuario destino
+    db.collection("users").document(target_id).update({
+        "lista_seguidores": firestore.ArrayUnion([uid])
+    })
+
+    return {"message": "Seguidor añadido"}
