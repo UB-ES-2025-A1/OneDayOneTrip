@@ -17,7 +17,7 @@ type BackendUser = {
   username?: string;
   seguidors?: number;
   seguits?: number;
-  publicacions?: string[]; // ✅ IDs de trips
+  publicacions?: string[]; 
   guardades?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;

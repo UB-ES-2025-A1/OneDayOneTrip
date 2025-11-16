@@ -4,7 +4,6 @@ import "../styles/CreateTripForm.css";
 import "leaflet/dist/leaflet.css";
 import MapSelector from "../components/MapSelector";
 
-
 import {
   createTripMultipart,
   type TripCreatePayload,
@@ -31,11 +30,21 @@ interface CreateTripFormProps {
   backendUser: BackendUser;
 }
 
+const STEPS = [
+  "Detalls bàsics",
+  "Ubicació i dades",
+  "Imatges i punts",
+];
+
 export default function CreateTripForm({
   onClose,
   currentUser,
   backendUser,
 }: CreateTripFormProps) {
+  // ---------- stepper ----------
+  const [step, setStep] = useState(1);
+  const totalSteps = STEPS.length;
+
   // ---------- campos básicos ----------
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -100,6 +109,14 @@ export default function CreateTripForm({
 
   const handleCoverChange = (file: File | null) => setCover(file);
 
+  const goNext = () => {
+    if (step < totalSteps) setStep((s) => s + 1);
+  };
+
+  const goBack = () => {
+    if (step > 1) setStep((s) => s - 1);
+  };
+
   // =============================================================
   // 🚀 Submit: llama a createTripMultipart()
   // =============================================================
@@ -108,6 +125,12 @@ export default function CreateTripForm({
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    // només fem submit si estem a l’últim pas
+    if (step !== totalSteps) {
+      goNext();
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -151,11 +174,9 @@ export default function CreateTripForm({
         recommendedSeason,
       };
 
-      // llamada a la API centralizada
       await createTripMultipart(payload, cover, gallery, pointImages);
 
       setSuccess("Ruta creada correctament 🎉");
-      // Si quieres cerrar automáticamente:
       // onClose();
     } catch (err: any) {
       console.error("Error creant trip:", err);
@@ -183,216 +204,299 @@ export default function CreateTripForm({
           </button>
         </div>
 
+        {/* STEP INDICATOR */}
+        <div className="create-trip-stepper">
+          {STEPS.map((label, index) => {
+            const stepNumber = index + 1;
+            const isActive = stepNumber === step;
+            const isCompleted = stepNumber < step;
+
+            return (
+              <div
+                key={label}
+                className={`stepper-step ${
+                  isCompleted ? "completed" : isActive ? "active" : ""
+                }`}
+              >
+                <div className="stepper-circle">{stepNumber}</div>
+                <div className="stepper-label">{label}</div>
+              </div>
+            );
+          })}
+        </div>
+
         <form className="create-trip-form" onSubmit={handleSubmit}>
           {/* mensajes */}
           {error && <div className="form-error">{error}</div>}
           {success && <div className="form-success">{success}</div>}
 
-          {/* --- datos básicos --- */}
-          <div className="form-grid">
-            <label>
-              Títol
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
-            </label>
+          {/* =========================
+              PAS 1: DETALLS BÀSICS
+              ========================= */}
+          {step === 1 && (
+            <div className="step-content">
+              <div className="form-grid">
+                <label>
+                  Títol
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                  />
+                </label>
 
-            <label>
-              Categoria
-              <input
-                type="text"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              />
-            </label>
+                <label>
+                  Categoria
+                  <input
+                    type="text"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                  />
+                </label>
 
-            <label>
-              Tags (separats per comes)
-              <input
-                type="text"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-              />
-            </label>
+                <label>
+                  Tags (separats per comes)
+                  <input
+                    type="text"
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
+                  />
+                </label>
 
-            <label className="full-width">
-              Descripció
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-              />
-            </label>
-
-            <label>
-              Ciutat
-              <input value={city} onChange={(e) => setCity(e.target.value)} />
-            </label>
-            <label>
-              Regió
-              <input
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-              />
-            </label>
-            <label>
-              País
-              <input
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-              />
-            </label>
-
-            <label>
-              Distància (km)
-              <input
-                value={distance}
-                onChange={(e) => setDistance(e.target.value)}
-              />
-            </label>
-
-            <label>
-              Durada
-              <input
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-              />
-            </label>
-
-            <label>
-              Dificultat
-              <input
-                value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value)}
-              />
-            </label>
-
-            <label>
-              Temporada recomanada
-              <input
-                value={recommendedSeason}
-                onChange={(e) => setRecommendedSeason(e.target.value)}
-              />
-            </label>
-          </div>
-
-          {/* --- imágenes principales --- */}
-          <div className="form-section">
-            <h3>Imatges</h3>
-
-            <div className="form-grid">
-              <label>
-                Imatge de portada
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleCoverChange(e.target.files?.[0] ?? null)
-                  }
-                />
-              </label>
-
-              <label>
-                Galeria (múltiples)
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={(e) => handleGalleryChange(e.target.files)}
-                />
-              </label>
+                <label className="full-width">
+                  Descripció
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={4}
+                  />
+                </label>
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* --- puntos de la ruta --- */}
-          <div className="form-section">
-            <div className="section-header">
-              <h3>Punts de la ruta</h3>
-              <button type="button" onClick={handleAddPoint}>
-                + Afegir punt de ruta
-              </button>
+          {/* =========================
+              PAS 2: UBICACIÓ + DADES
+              ========================= */}
+          {step === 2 && (
+            <div className="step-content">
+              <div className="form-grid">
+                <label>
+                  Ciutat
+                  <input
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+                </label>
+                <label>
+                  Regió
+                  <input
+                    value={region}
+                    onChange={(e) => setRegion(e.target.value)}
+                  />
+                </label>
+                <label>
+                  País
+                  <input
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                  />
+                </label>
+
+                <label>
+                  Distància (km)
+                  <input
+                    value={distance}
+                    onChange={(e) => setDistance(e.target.value)}
+                  />
+                </label>
+
+                <label>
+                  Durada
+                  <input
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                  />
+                </label>
+
+                <label>
+                  Dificultat
+                  <input
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value)}
+                  />
+                </label>
+
+                <label>
+                  Temporada recomanada
+                  <input
+                    value={recommendedSeason}
+                    onChange={(e) =>
+                      setRecommendedSeason(e.target.value)
+                    }
+                  />
+                </label>
+              </div>
             </div>
+          )}
 
-            {tripPoints.map((p, index) => (
-              <div key={index} className="trip-point">
-                <div className="trip-point-header">
-                  <h4>Punt #{index + 1}</h4>
-                  {tripPoints.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemovePoint(index)}
-                    >
-                      Eliminar
-                    </button>
-                  )}
+          {/* =========================
+              PAS 3: IMATGES + PUNTS
+              ========================= */}
+          {step === 3 && (
+            <div className="step-content">
+              {/* --- imatges principals --- */}
+              <div className="form-section">
+                <h3>Imatges principals</h3>
+                <div className="form-grid">
+                  <label>
+                    Imatge de portada
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleCoverChange(e.target.files?.[0] ?? null)
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    Galeria (múltiples)
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleGalleryChange(e.target.files)
+                      }
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* --- punts de la ruta --- */}
+              <div className="form-section">
+                <div className="section-header">
+                  <h3>Punts de la ruta</h3>
+                  <button type="button" onClick={handleAddPoint}>
+                    + Afegir punt de ruta
+                  </button>
                 </div>
 
-                <div className="form-grid">
-                    <label>
-                        Títol
-                        <input
-                        type="text"
-                        value={p.title}
-                        onChange={(e) =>
-                            updatePointField(index, "title", e.target.value)
-                        }
-                        required
-                        />
-                    </label>
-
-                    <label className="full-width">
-                        Descripció
-                        <textarea
-                        value={p.description}
-                        onChange={(e) =>
-                            updatePointField(index, "description", e.target.value)
-                        }
-                        rows={3}
-                        />
-                    </label>
-
-                    {/* 🔥 Aquí va el mapa */}
-                    <label className="full-width">
-                        Ubicació del punt:
-                        <MapSelector
-                        lat={p.lat}
-                        lng={p.lng}
-                        onSelect={(lat, lng) => {
-                            updatePointField(index, "lat", lat);
-                            updatePointField(index, "lng", lng);
-                        }}
-                        />
-                    </label>
-
-                    <label>
-                        Imatge del punt
-                        <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) =>
-                            handlePointImageChange(
-                            index,
-                            e.target.files?.[0] ?? null
-                            )
-                        }
-                        />
-                    </label>
+                {tripPoints.map((p, index) => (
+                  <div key={index} className="trip-point">
+                    <div className="trip-point-header">
+                      <h4>Punt #{index + 1}</h4>
+                      {tripPoints.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemovePoint(index)}
+                        >
+                          Eliminar
+                        </button>
+                      )}
                     </div>
 
-              </div>
-            ))}
-          </div>
+                    <div className="form-grid">
+                      <label>
+                        Títol
+                        <input
+                          type="text"
+                          value={p.title}
+                          onChange={(e) =>
+                            updatePointField(
+                              index,
+                              "title",
+                              e.target.value
+                            )
+                          }
+                          required
+                        />
+                      </label>
 
-          <div className="form-actions">
-            <button type="button" onClick={onClose}>
-              Cancel·lar
-            </button>
-            <button type="submit" disabled={submitting}>
-              {submitting ? "Creant ruta..." : "Crear ruta"}
-            </button>
+                      <label className="full-width">
+                        Descripció
+                        <textarea
+                          value={p.description}
+                          onChange={(e) =>
+                            updatePointField(
+                              index,
+                              "description",
+                              e.target.value
+                            )
+                          }
+                          rows={3}
+                        />
+                      </label>
+
+                      <label className="full-width">
+                        Ubicació del punt:
+                        <MapSelector
+                          lat={p.lat}
+                          lng={p.lng}
+                          onSelect={(lat, lng) => {
+                            updatePointField(index, "lat", lat);
+                            updatePointField(index, "lng", lng);
+                          }}
+                        />
+                      </label>
+
+                      <label>
+                        Imatge del punt
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) =>
+                            handlePointImageChange(
+                              index,
+                              e.target.files?.[0] ?? null
+                            )
+                          }
+                        />
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ---------- BOTONS FOOTER (BACK/NEXT/SUBMIT) ---------- */}
+          <div className="form-actions wizard-actions">
+            {/* PAS 1 -> Cancel·lar + Següent */}
+            {step === 1 && (
+              <>
+                <button type="button" onClick={onClose}>
+                  Cancel·lar
+                </button>
+
+                <button type="submit" disabled={submitting}>
+                  Següent
+                </button>
+              </>
+            )}
+
+            {/* PAS 2 i 3 -> Enrere + Següent / Crear ruta */}
+            {step > 1 && (
+              <>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={goBack}
+                >
+                  Enrere
+                </button>
+
+                <button type="submit" disabled={submitting}>
+                  {step === totalSteps
+                    ? submitting
+                      ? "Creant ruta..."
+                      : "Crear ruta"
+                    : "Següent"}
+                </button>
+              </>
+            )}
           </div>
         </form>
       </div>
