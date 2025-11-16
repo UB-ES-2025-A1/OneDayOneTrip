@@ -8,6 +8,7 @@ import "../styles/UserProfile.css";
 import { ImageOff } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
+import CreateTripForm from "../components/CreateTripForm"
 
 type BackendUser = {
   uid: string;
@@ -42,6 +43,9 @@ export default function UserProfile() {
   const [selectedTab, setSelectedTab] = useState<"publicacions" | "guardat">("publicacions");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
+
+
 
   const navigate = useNavigate();
 
@@ -173,9 +177,15 @@ export default function UserProfile() {
           </div>
 
           <section className="trip-list">
-            {gridItems.length > 0 ? (
-              <MasonryGrid items={gridItems} openRegister={openRegister} currentUser={currentUser} />
-            ) : (
+            <MasonryGrid
+              items={gridItems}
+              openRegister={openRegister}
+              currentUser={currentUser}
+              showCreateButton={selectedTab === "publicacions"}
+              onCreateTripClick={() => setModalOpen("createTrip")}
+            />
+
+            {gridItems.length === 0 && (
               <div className="empty-state">
                 <ImageOff className="empty-icon" size={60} />
                 {selectedTab === "publicacions" ? (
@@ -191,7 +201,19 @@ export default function UserProfile() {
                 )}
               </div>
             )}
+
+            {/* 🔥 Modal de crear trip, igual estilo que login/register */}
+            {modalOpen === "createTrip" && currentUser && profile && (
+              <CreateTripForm
+                onClose={() => setModalOpen(null)}
+                currentUser={currentUser}
+                backendUser={profile}
+              />
+            )}
           </section>
+
+
+
         </>
       )}
     </Layout>

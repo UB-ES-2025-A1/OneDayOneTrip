@@ -3,6 +3,8 @@ import { gsap } from "gsap";
 import "../styles/MasonryGrid.css";
 import { type User } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import ButtonNewTrip from "./ButtonNewTrip";
+
 
 interface MasonryItem {
   id: string;
@@ -21,12 +23,19 @@ interface MasonryGridProps {
   items: MasonryItem[];
   openRegister: () => void;
   currentUser: User | null;
+  showCreateButton?: boolean;
+  onCreateTripClick?: () => void;  
 }
+
+
+
 
 export default function MasonryGrid({
   items,
   openRegister,
   currentUser,
+  showCreateButton,
+  onCreateTripClick,
 }: MasonryGridProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
@@ -57,6 +66,17 @@ export default function MasonryGrid({
 
   return (
     <div ref={containerRef} className="masonry-container">
+        {showCreateButton && (
+          <ButtonNewTrip
+            onClick={() => {
+              if (!currentUser) {
+                openRegister();
+              } else if (onCreateTripClick) {
+                onCreateTripClick();
+              }
+            }}
+          />
+        )}
       {items.map((item) => (
         <div
           key={item.id}
