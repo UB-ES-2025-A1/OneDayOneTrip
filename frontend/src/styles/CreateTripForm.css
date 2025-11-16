@@ -297,7 +297,6 @@
   background: #7c0000;
 }
 
-/* ---------- BOTONES FINALES ---------- */
 .form-actions {
   margin-top: 1.5rem;
   display: flex;
@@ -315,14 +314,17 @@
 }
 
 .form-actions button:first-child {
-  background: #b30000;   /* vermell */
-  color: white;          /* lletra blanca */
+  background: transparent;
+  color: #b30000;
+  border: 1px solid #e0a0a0;
   font-weight: 500;
 }
+
 .form-actions button:first-child:hover {
-  background: #8a0000;
-  transform: scale(1.03);
+  background: #ffe5e5;
+  transform: translateY(-1px);
 }
+
 
 .form-actions button:last-child {
   background: #356a36;

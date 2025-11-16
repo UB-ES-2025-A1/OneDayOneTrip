@@ -39,3 +39,30 @@
   line-height: 0;
 }
 
+/* ============================ */
+/*   EFECTE DEL + (Uiverse.io)  */
+/* ============================ */
+
+/* estat base */
+.animated-plus {
+  stroke: #2e492e;
+  transition: 
+    transform 0.3s ease,
+    stroke 0.3s ease,
+    fill 0.3s ease;
+}
+
+/* quan fem hover a la card → igual que Uiverse */
+.create-card:hover .animated-plus {
+  transform: rotate(90deg);
+  stroke: #1d7a31;   /* verd més intens */
+  fill: #1d7a31;     /* com a l'Uiverse */
+}
+
+/* quan fem click → animació immediata */
+.create-card:active .animated-plus {
+  stroke: #a3f5b2;
+  fill: #1c8c3b;
+  transform: rotate(90deg) scale(1.15);
+  transition-duration: 0s;
+}
