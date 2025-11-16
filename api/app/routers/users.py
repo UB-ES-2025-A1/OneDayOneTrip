@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from datetime import datetime
+from google.cloud import firestore
+
 
 from app.services.firebase_service import db
 from app.auth.verify_token import verify_token
@@ -75,26 +77,31 @@ async def get_current_user_by_id(user_id: str):
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return doc.to_dict()
 
-@router.post("/follow/{target_id}")
-async def follow_user(target_id: str, user=Depends(verify_token)):
-    uid = user.get("uid")
-    if uid == target_id:
-        raise HTTPException(status_code=400, detail="No puedes seguirte a ti mismo")
 
-    # añade target_id a lista_seguidos del usuario actual
-    db.collection("users").document(uid).update({
-        "lista_seguidos": firestore.ArrayUnion([target_id])
+@router.post("/follow/{user_id}/{target_id}")
+async def follow_user(user_id: str, target_id: str):
+    """
+    Afegeix el target_id a la llista 'following' del user_id,
+    i afegeix el user_id a la llista 'followers' del target_id.
+    """
+    if user_id == target_id:
+        raise HTTPException(status_code=400, detail="No et pots seguir a tu mateix")
+
+    user_ref = db.collection("users").document(user_id)
+    target_ref = db.collection("users").document(target_id)
+
+    # Comprovació que el client existeix
+    if not target_ref.get().exists:
+        raise HTTPException(status_code=404, detail="L'usuari que vols seguir no existeix")
+
+    # Afegir a la llista del usuari
+    user_ref.update({
+        "following": firestore.ArrayUnion([target_id])
     })
 
-    return {"message": "Usuario seguido"}
-
-@router.post("/add-follower/{target_id}")
-async def add_follower(target_id: str, user=Depends(verify_token)):
-    uid = user.get("uid")
-
-    # añade uid a lista_seguidores del usuario destino
-    db.collection("users").document(target_id).update({
-        "lista_seguidores": firestore.ArrayUnion([uid])
+    # Afegir a la llista del seguit
+    target_ref.update({
+        "followers": firestore.ArrayUnion([user_id])
     })
 
-    return {"message": "Seguidor añadido"}
+    return {"message": "Usuari seguit correctament"}
