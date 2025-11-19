@@ -80,9 +80,9 @@ async def get_current_user_by_id(user_id: str):
 class UserEditableFields(BaseModel):
     nom_i_cognoms: Optional[str] = None
     username: Optional[str] = None
-    mail: Optional[str] = None
-    url_foto_perfil: Optional[str] = None
-    url_foto_panell: Optional[str] = None
+    # Falta fer-ho com Martin (Image DB)
+    #url_foto_perfil: Optional[str] = None
+    #url_foto_panell: Optional[str] = None
 
 
 # (PATCH = modificació parcial)
