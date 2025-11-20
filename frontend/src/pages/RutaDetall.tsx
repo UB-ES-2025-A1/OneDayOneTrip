@@ -84,10 +84,10 @@ export default function RutaDetall() {
       try {
         const author = await getUserById(tripData.author.userId); // GET /users/{userId}
 
-        // intentem agafar "seguidors"; si no hi és, fem servir la longitud d'una possible llista
-        const seguidorsNumber =
-          author.seguidors ??
-          (author.llista_seguidors ? author.llista_seguidors.length : 0);
+        const seguidorsNumber = author.llista_seguidors
+          ? author.llista_seguidors.length
+          : (typeof author.seguidors === "number" ? author.seguidors : 0);
+
 
         setFollowersCount(seguidorsNumber);
 
@@ -238,9 +238,6 @@ export default function RutaDetall() {
             <span className="autor-nombre">
               {tripData.author?.name || "Autor desconegut"}
             </span>
-            <span className="autor-sub">Creador de la ruta</span>
-
-            {/* 🔢 comptador de seguidors */}
             {followersCount !== null && (
               <span className="autor-seguidors">
                 {followersCount} seguidor{followersCount === 1 ? "" : "s"}
