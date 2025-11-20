@@ -96,12 +96,12 @@ async def follow_user(user_id: str, target_id: str):
 
     # Afegir a la llista del usuari
     user_ref.update({
-        "following": firestore.ArrayUnion([target_id])
+        "llista_seguits": firestore.ArrayUnion([target_id])
     })
 
     # Afegir a la llista del seguit
     target_ref.update({
-        "followers": firestore.ArrayUnion([user_id])
+        "llista_seguidors": firestore.ArrayUnion([user_id])
     })
 
     return {"message": "Usuari seguit correctament"}
