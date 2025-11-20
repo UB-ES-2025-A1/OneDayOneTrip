@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Form, File, UploadFile
 from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
+from app.services.image_service import upload_image_to_imgbb
+
 
 from app.services.firebase_service import db
 from app.auth.verify_token import verify_token
@@ -77,34 +79,57 @@ async def get_current_user_by_id(user_id: str):
 
 
 # Model amb  els camps que poden ser editats del perfil
-class UserEditableFields(BaseModel):
+class UserEditIn(BaseModel):
     nom_i_cognoms: Optional[str] = None
     username: Optional[str] = None
-    # Falta fer-ho com Martin (Image DB)
-    #url_foto_perfil: Optional[str] = None
-    #url_foto_panell: Optional[str] = None
+    url_foto_perfil: Optional[str] = None
+    url_foto_panell: Optional[str] = None
 
 
 # (PATCH = modificació parcial)
 @router.patch("/update/{user_id}")
-async def update_user(user_id: str, data: UserEditableFields):
+async def update_user_multipart(
+        user_id: str,
+        user_json: str = Form(...),
+        foto_perfil: Optional[UploadFile] = File(None),
+        foto_panell: Optional[UploadFile] = File(None)
+):
+    # Validació del JSON enviat com a text
+    try:
+        data = UserEditIn.model_validate_json(user_json)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="JSON invàlid")
+
     ref = db.collection("users").document(user_id)
     doc = ref.get()
-
-    # Comprovem que l'usuari existeix
     if not doc.exists:
         raise HTTPException(status_code=404, detail="L'usuari no existeix")
 
-    # Convertim a dict només els camps enviats
+    # Pujar nova foto de perfil si existeix
+    perfil_url = None
+    if foto_perfil:
+        perfil_url = upload_image_to_imgbb(foto_perfil)
+
+    # Pujar nova foto de panell si existeix
+    panell_url = None
+    if foto_panell:
+        panell_url = upload_image_to_imgbb(foto_panell)
+
+    # Construir dades a actualitzar
     update_data = {k: v for k, v in data.dict().items() if v is not None}
 
-    if not update_data:
-        raise HTTPException(status_code=400, detail="No s'ha enviat cap camp per actualitzar")
+    if perfil_url:
+        update_data["url_foto_perfil"] = perfil_url
 
-    # Actualització parcial de l'usuari
+    if panell_url:
+        update_data["url_foto_panell"] = panell_url
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No s'ha enviat cap dada per actualitzar")
+
     ref.update(update_data)
 
     return {
         "message": "Perfil actualitzat correctament",
-        "updated_fields": update_data
+        "updated": update_data
     }
