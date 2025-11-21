@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { gsap } from "gsap";
 import { getUserById } from "../api/client";
 import "../styles/SeguidoresModal.css";
 
@@ -19,28 +20,24 @@ interface Props {
 export default function LlistaSeguitsModal({ open, onClose, seguits, goToProfile }: Props) {
   const [users, setUsers] = useState<BackendUser[]>([]);
   const [loading, setLoading] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!open) return; // solo cargar si el modal está abierto
+    if (!open) return;
 
     const fetchUsers = async () => {
       setLoading(true);
       try {
         if (!seguits || seguits.length === 0) {
           setUsers([]);
-          console.log("No hi ha usuaris a mostrar");
           return;
         }
 
         const fetchedUsers = await Promise.all(
-          seguits.map(async (uid) => {
-            const user = await getUserById(uid);
-            console.log("Fetched user for UID", uid, user);
-            return user;
-          })
+          seguits.map(async (uid) => await getUserById(uid))
         );
 
-        setUsers(fetchedUsers.filter(Boolean) as BackendUser[]); // filtramos posibles null/undefined
+        setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
       } catch (err) {
         console.error("Error carregant seguits:", err);
         setUsers([]);
@@ -52,11 +49,22 @@ export default function LlistaSeguitsModal({ open, onClose, seguits, goToProfile
     fetchUsers();
   }, [open, seguits]);
 
+  // Animación GSAP al mostrar usuarios
+  useEffect(() => {
+    if (!users || users.length === 0) return;
+    const items = gsap.utils.toArray<HTMLElement>(".seguidor-item");
+    gsap.fromTo(
+      items,
+      { opacity: 0, y: 20, filter: "blur(5px)" },
+      { opacity: 1, y: 0, filter: "blur(0)", duration: 0.5, stagger: 0.1, ease: "power2.out" }
+    );
+  }, [users]);
+
   if (!open) return null;
 
   return (
     <div className="modal-backdrop">
-      <div className="seguidores-card">
+      <div className="seguidores-card" ref={containerRef}>
         <button className="close-btn" onClick={onClose}>×</button>
         <h2 className="seguidores-title">Seguits</h2>
 

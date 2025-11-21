@@ -1,18 +1,12 @@
-/* Fondo oscuro del modal */
 .modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display: flex; justify-content: center; align-items: center;
   z-index: 999;
 }
 
-/* Tarjeta del modal */
 .seguidores-card {
   background: #fff;
   border-radius: 12px;
@@ -21,86 +15,58 @@
   overflow-y: auto;
   padding: 20px;
   position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-/* Botón cerrar */
 .close-btn {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  border: none;
-  background: none;
-  cursor: pointer;
+  position: absolute; top: 10px; right: 15px;
+  font-size: 24px; border: none; background: none; cursor: pointer;
 }
 
-/* Título del modal */
 .seguidores-title {
-  text-align: center;
-  margin-bottom: 15px;
-  font-size: 22px;
-  font-weight: bold;
+  text-align: center; margin-bottom: 15px;
+  font-size: 22px; font-weight: bold;
 }
 
-/* Mensajes de estado (vacío o cargando) */
 .seguidores-empty {
-  text-align: center;
-  color: #888;
-  margin-top: 20px;
-  font-size: 14px;
+  text-align: center; color: #888; margin-top: 20px; font-size: 14px;
 }
 
-/* Lista de usuarios */
 .seguidores-list {
-  display: flex;
-  flex-direction: column;
+  display: flex; flex-direction: column;
 }
 
-/* Cada usuario */
 .seguidor-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 0;
+  display: flex; align-items: center;
+  padding: 6px 0;
   cursor: pointer;
   transition: background 0.2s;
-  border-bottom: 1px solid #e0e0e0; /* Línea fina de separación */
+  border-bottom: 1px solid #eee; /* línea fina elegante */
 }
 
 .seguidor-item:last-child {
-  border-bottom: none; /* No poner línea en el último elemento */
+  border-bottom: none;
 }
 
 .seguidor-item:hover {
-  background: #f9f9f9; /* Hover muy sutil */
+  background: #f9f9f9;
 }
 
-/* Foto de perfil del usuario */
 .seguidor-foto {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 12px;
+  width: 50px; height: 50px;
+  border-radius: 50%; object-fit: cover;
+  margin-right: 10px;
 }
 
-/* Contenedor del nombre y username */
 .seguidor-info {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2; /* Menos espacio entre líneas */
+  display: flex; flex-direction: column;
+  line-height: 1.2;
 }
 
-/* Nombre del usuario */
 .seguidor-nom {
-  font-weight: 600;
-  font-size: 15px;
-  margin: 0;
+  font-weight: 600; font-size: 14px; margin: 0;
 }
 
-/* Username */
 .seguidor-username {
-  color: #666;
-  font-size: 13px;
-  margin: 0;
+  color: #666; font-size: 13px; margin: 0;
 }
