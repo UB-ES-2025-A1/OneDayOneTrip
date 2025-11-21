@@ -169,16 +169,15 @@
 /* ---------- CONTENEDOR autor ---------- */
 .autor {
   display: flex;
-  align-items: center;
+  align-items: center;      
   gap: 10px;
   background: #ffffff;
   padding: 10px 14px;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  width: fit-content;
-  transition: all 0.25s ease;
-  cursor: pointer;
+  width: 100%;
+  width: 100%;
   margin-top: 20px;
 }
 
@@ -219,11 +218,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex: 1;                 
 }
 
 .autor-nombre {
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 700;
+  font-size: 1.2rem;
   color: #2e492e;
   line-height: 1.2;
 }
@@ -232,7 +232,11 @@
   font-size: 0.8rem;
   color: #7b7b7b;
 }
-
+.autor-seguidors {
+  font-size: 0.9rem;     
+  color: #6b6b6b;       
+  margin-top: 2px;
+}
 
 
 /* ---------- INFO EXTRA ---------- */
@@ -470,6 +474,31 @@
   font-size: 2rem;
   cursor: pointer;
 }
+.follow-button {
+  margin-left: auto;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 1.0rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid #2e492e; /* Verd fosc estil natura */
+  background-color: #2e492e; /* Fons verd */
+  color: white; /* Lletra blanca */
+  transition: all 0.25s ease-in-out;
+}
+
+/* Estat quan pulsas "Seguir" i passa a "Seguint" */
+.follow-button.following {
+  background-color: white !important; /* Fons blanc */
+  color: #2e7d32 !important; /* Text verd */
+  border-color: #2e7d32;
+}
+
+/* Loading (opcional) */
+.follow-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
 
 /* =========================================================
    📱 RESPONSIVE DESIGN
@@ -574,5 +603,8 @@
     flex-direction: row;
     justify-content: flex-start;
     width: 90%;
+  }
+  .follow-button {
+    margin-left: auto;
   }
 }

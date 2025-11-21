@@ -12,6 +12,12 @@ backend/__pycache__/
 *.py[cod]
 *$py.class
 
+# -------------------------------------------
+# Pytest
+#----------------------------------------
+
+.pytest_cache/
+
 # -----------------------------------
 #  Entornos virtuales y dependencias
 # -----------------------------------
@@ -36,7 +42,6 @@ poetry.lock
 #  Herramientas y caches
 # -----------------------------------
 .cache/
-.pytest_cache/
 .mypy_cache/
 __pypackages__/
 .coverage

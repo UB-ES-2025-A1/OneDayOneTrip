@@ -8,6 +8,7 @@ import "../styles/UserProfile.css";
 import { ImageOff } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
+import CreateTripForm from "../components/CreateTripForm"
 
 type BackendUser = {
   uid: string;
@@ -16,7 +17,9 @@ type BackendUser = {
   username?: string;
   seguidors?: number;
   seguits?: number;
-  publicacions?: string[]; // ✅ IDs de trips
+  llista_seguidors?: string[]; 
+  llista_seguits?: string[];
+  publicacions?: string[]; 
   guardades?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
@@ -42,6 +45,9 @@ export default function UserProfile() {
   const [selectedTab, setSelectedTab] = useState<"publicacions" | "guardat">("publicacions");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
+
+
 
   const navigate = useNavigate();
 
@@ -115,10 +121,17 @@ export default function UserProfile() {
   const photoUrl = profile?.url_foto_perfil || "/images/person.png";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
-  const seguidors = profile?.seguidors ?? 0;
-  const seguits = profile?.seguits ?? 0;
+  const seguidors = profile?.llista_seguidors
+    ? profile.llista_seguidors.length
+    : profile?.seguidors ?? 0;
 
-  // 🔹 Separar por pestaña
+  const seguits = profile?.llista_seguits
+    ? profile.llista_seguits.length
+    : profile?.seguits ?? 0;
+
+
+
+    // 🔹 Separar por pestaña
   const publicacionsItems = useMemo(() => {
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return toGridItems(trips.filter((t) => pubIds.has(String(t._id))));
@@ -173,9 +186,15 @@ export default function UserProfile() {
           </div>
 
           <section className="trip-list">
-            {gridItems.length > 0 ? (
-              <MasonryGrid items={gridItems} openRegister={openRegister} currentUser={currentUser} />
-            ) : (
+            <MasonryGrid
+              items={gridItems}
+              openRegister={openRegister}
+              currentUser={currentUser}
+              showCreateButton={selectedTab === "publicacions"}
+              onCreateTripClick={() => setModalOpen("createTrip")}
+            />
+
+            {gridItems.length === 0 && (
               <div className="empty-state">
                 <ImageOff className="empty-icon" size={60} />
                 {selectedTab === "publicacions" ? (
@@ -191,7 +210,19 @@ export default function UserProfile() {
                 )}
               </div>
             )}
+
+            {/* 🔥 Modal de crear trip, igual estilo que login/register */}
+            {modalOpen === "createTrip" && currentUser && profile && (
+              <CreateTripForm
+                onClose={() => setModalOpen(null)}
+                currentUser={currentUser}
+                backendUser={profile}
+              />
+            )}
           </section>
+
+
+
         </>
       )}
     </Layout>
