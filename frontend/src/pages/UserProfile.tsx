@@ -8,8 +8,9 @@ import "../styles/UserProfile.css";
 import { ImageOff, Pencil } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
+import EditarPerfil from "../components/EditarPerfilModal"
 
-type BackendUser = {
+export type BackendUser = {
   uid: string;
   nom_i_cognoms?: string;
   mail?: string;
@@ -42,6 +43,7 @@ export default function UserProfile() {
   const [selectedTab, setSelectedTab] = useState<"publicacions" | "guardat">("publicacions");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [openEdit, setOpenEdit] = useState(false);
 
   const navigate = useNavigate();
 
@@ -151,7 +153,7 @@ export default function UserProfile() {
               position:"relative",
             }}
             >
-            <button className="edit-profile-btn" onClick={() => navigate("/edit-profile")}> <Pencil size={22} /></button>
+            <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}> <Pencil size={22} /></button>
           
             <div className="user-photo">
               <img src={photoUrl} alt="Foto de perfil" />
@@ -196,6 +198,13 @@ export default function UserProfile() {
             )}
           </section>
         </>
+        
+      )}
+      {openEdit && profile && (
+        <EditarPerfil 
+          profile={profile} 
+          onClose={() => setOpenEdit(false)}
+        />
       )}
     </Layout>
   );

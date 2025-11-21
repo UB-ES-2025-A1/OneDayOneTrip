@@ -1,143 +1,111 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Auth } from "../firebase/auth";
-import "../styles/LoginReg.css";
-import ImageCarousel from "./ImageCarousel";
-import "../styles/LoginReg.css";
-import ResetPasswordModal from "./ResetPasswordModal";
+import type { BackendUser } from "../pages/UserProfile";
+import "../styles/EditarPerfil.css";
 
-interface LoginProps {
+interface EditarPerfilProps {
+  profile: BackendUser;
   onClose: () => void;
-  openRegister: () => void;
+  onSave?: (updatedProfile: BackendUser) => void; // opcional callback al guardar
 }
 
-export default function LoginModal({ onClose, openRegister }: LoginProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilProps) {
+  const [nom, setNom] = useState(profile.nom_i_cognoms || "");
+  const [username, setUsername] = useState(profile.username || "");
+  const [email, setEmail] = useState(profile.mail || "");
+  const [fotoPerfil, setFotoPerfil] = useState(profile.url_foto_perfil || "");
+  const [fotoPanell, setFotoPanell] = useState(profile.url_foto_panell || "");
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showResetPassword, setShowResetPassword] = useState(false);
-  const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async () => {
+    setSaving(true);
     setError("");
 
     try {
-      setLoading(true);
+      const updatedProfile: BackendUser = {
+        ...profile,
+        nom_i_cognoms: nom,
+        username,
+        mail: email,
+        url_foto_perfil: fotoPerfil,
+        url_foto_panell: fotoPanell,
+      };
 
-      // Autenticación con Firebase
-      const user = await Auth.login(email, password);
-      console.log("Usuario logueado:", user);
+      // Aquí puedes llamar tu API para actualizar el usuario
+      // await updateUser(updatedProfile);
 
-      onClose(); // Cerramos modal
-      navigate("/"); // Redirigimos al dashboard
-
-    } catch (err: any) {
-      console.error("Error en login:", err);
-      if (err.code === "auth/user-not-found") {
-        setError("No s'ha trobat cap compte amb aquest correu");
-      } else if (err.code === "auth/wrong-password") {
-        setError("Contrasenya incorrecta");
-      } else {
-        setError("Error: " + err.message);
-      }
+      if (onSave) onSave(updatedProfile);
+      onClose();
+    } catch (e: any) {
+      console.error("Error al guardar perfil:", e);
+      setError(e?.message || "No s'ha pogut guardar el perfil.");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  if (showResetPassword) {
-    return (
-      <ResetPasswordModal
-        onClose={() => setShowResetPassword(false)}
-        openLogin={() => setShowResetPassword(false)}
-      />
-    );
-  }
-
   return (
     <div className="modal-backdrop">
-      <div className="login-card">
-        <button className="close-btn-login" onClick={onClose}>
+      <div className="editar-perfil-card">
+        <button className="close-btn" onClick={onClose}>
           &times;
         </button>
+        <h2>Editar Perfil</h2>
 
-        <div className="login-content">
-          <div className="login-gallery">
-            <ImageCarousel
-              images={[
-                "images/bcn.png",
-                "images/madrid.jpg",
-                "images/paris.png",
-                "images/londres.png",
-              ]}
-              interval={3000}
-            />
-          </div>
+        {error && <p className="text-red">{error}</p>}
 
-          <div className="login-form">
-            <h2 className="login-title">Iniciar sessió</h2>
-            <form onSubmit={handleLogin} className="auth-form">
-              <div className="input-wrapper">
-                <div className="input-icon">
-                  <img src="/images/person.png" alt="Persona" />
-                </div>
-                <input
-                  type="email"
-                  placeholder="Correu electrònic"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="auth-input"
-                />
-              </div>
-
-            <div className="input-wrapper">
-              <div className="input-icon">
-                <img src="/images/lockk.png" alt="Contrasenya" />
-              </div>
-              <input
-                type="password"
-                placeholder="Contrasenya"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="auth-input"
-              />
-            </div>
-
-              <button type="submit" className="auth-button" disabled={loading}>
-                {loading ? "Iniciant sessió..." : "Iniciar Sessió"}              
-              </button>
-            </form>
-
-            {error && <p className="text-red-500 mt-4">{error}</p>}
-            
-            <button
-              type="button"
-              onClick={() => setShowResetPassword(true)}
-              className="auth-link"
-              style={{ marginTop: "16px" }}
-            >
-              Has oblidat la contrasenya?
-            </button>
-
-            <p className="auth-footer">
-              No tens compte?{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  openRegister();
-                }}
-                className="auth-link"
-              >
-                Registra't
-              </button>
-            </p>
-          </div>
+        <div className="form-group">
+          <label>Nom complet</label>
+          <input
+            type="text"
+            value={nom}
+            onChange={(e) => setNom(e.target.value)}
+          />
         </div>
+
+        <div className="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Correu electrònic</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Foto de perfil (URL)</label>
+          <input
+            type="text"
+            value={fotoPerfil}
+            onChange={(e) => setFotoPerfil(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Foto de portada (URL)</label>
+          <input
+            type="text"
+            value={fotoPanell}
+            onChange={(e) => setFotoPanell(e.target.value)}
+          />
+        </div>
+
+        <button
+          className="save-btn"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? "Guardant..." : "Guardar Canvis"}
+        </button>
       </div>
     </div>
   );
