@@ -61,3 +61,7 @@ export async function getUserById(userId: string) {
 export async function getAllUsers() {
   return apiGet("/users");
 }
+// 📌 Seguir un usuario
+export async function followUser(userId: string, targetId: string) {
+  return apiPost(`/users/follow/${userId}/${targetId}`, {});
+}
