@@ -190,6 +190,35 @@
   margin: 0;
 }
 
+/* Botón de editar perfil (icono redondo arriba derecha) */
+.edit-profile-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.edit-profile-btn svg {
+  color: #333;
+}
+
+.edit-profile-btn:hover {
+  background: #ffffff;
+  transform: scale(1.08);
+}
+
 /* =========================================================
    📱 RESPONSIVE
    ========================================================= */
@@ -283,4 +312,5 @@
   .tab-btn {
     font-size: 0.9rem;
   }
+
 }
