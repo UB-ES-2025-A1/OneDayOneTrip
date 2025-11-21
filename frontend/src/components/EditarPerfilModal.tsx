@@ -1,21 +1,33 @@
 import { useState } from "react";
+import type { ChangeEvent } from "react";
 import type { BackendUser } from "../pages/UserProfile";
 import "../styles/EditarPerfil.css";
 
 interface EditarPerfilProps {
   profile: BackendUser;
   onClose: () => void;
-  onSave?: (updatedProfile: BackendUser) => void; // opcional callback al guardar
+  onSave?: (updatedProfile: BackendUser) => void; // callback opcional
 }
 
 export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilProps) {
   const [nom, setNom] = useState(profile.nom_i_cognoms || "");
   const [username, setUsername] = useState(profile.username || "");
   const [email, setEmail] = useState(profile.mail || "");
-  const [fotoPerfil, setFotoPerfil] = useState(profile.url_foto_perfil || "");
-  const [fotoPanell, setFotoPanell] = useState(profile.url_foto_panell || "");
+  const [fotoPerfil, setFotoPerfil] = useState<File | null>(null);
+  const [fotoPerfilPreview, setFotoPerfilPreview] = useState(profile.url_foto_perfil || "");
+  const [fotoPanell, setFotoPanell] = useState<File | null>(null);
+  const [fotoPanellPreview, setFotoPanellPreview] = useState(profile.url_foto_panell || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  // Manejar selección de archivo
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>, setFile: any, setPreview: any) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setFile(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -27,12 +39,12 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
         nom_i_cognoms: nom,
         username,
         mail: email,
-        url_foto_perfil: fotoPerfil,
-        url_foto_panell: fotoPanell,
+        url_foto_perfil: fotoPerfilPreview, // Aquí guardamos la URL de vista previa
+        url_foto_panell: fotoPanellPreview,
       };
 
-      // Aquí puedes llamar tu API para actualizar el usuario
-      // await updateUser(updatedProfile);
+      // Si quieres, aquí podrías subir los archivos a tu servidor o API
+      // y actualizar updatedProfile con la URL final
 
       if (onSave) onSave(updatedProfile);
       onClose();
@@ -56,54 +68,52 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
 
         <div className="form-group">
           <label>Nom complet</label>
-          <input
-            type="text"
-            value={nom}
-            onChange={(e) => setNom(e.target.value)}
-          />
+          <input type="text" value={nom} onChange={(e) => setNom(e.target.value)} />
         </div>
 
         <div className="form-group">
           <label>Username</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
         </div>
 
         <div className="form-group">
           <label>Correu electrònic</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
 
         <div className="form-group">
-          <label>Foto de perfil (URL)</label>
+          <label>Foto de perfil</label>
           <input
-            type="text"
-            value={fotoPerfil}
-            onChange={(e) => setFotoPerfil(e.target.value)}
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleFileChange(e, setFotoPerfil, setFotoPerfilPreview)}
           />
+          {fotoPerfilPreview && (
+            <img
+              src={fotoPerfilPreview}
+              alt="Vista previa foto perfil"
+              className="preview-img"
+            />
+          )}
         </div>
 
         <div className="form-group">
-          <label>Foto de portada (URL)</label>
+          <label>Foto de portada</label>
           <input
-            type="text"
-            value={fotoPanell}
-            onChange={(e) => setFotoPanell(e.target.value)}
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleFileChange(e, setFotoPanell, setFotoPanellPreview)}
           />
+          {fotoPanellPreview && (
+            <img
+              src={fotoPanellPreview}
+              alt="Vista previa foto portada"
+              className="preview-img"
+            />
+          )}
         </div>
 
-        <button
-          className="save-btn"
-          onClick={handleSave}
-          disabled={saving}
-        >
+        <button className="save-btn" onClick={handleSave} disabled={saving}>
           {saving ? "Guardant..." : "Guardar Canvis"}
         </button>
       </div>

@@ -15,15 +15,15 @@
 /* Tarjeta del formulario */
 .editar-perfil-card {
   background: #fff;
-  border-radius: 12px;
-  width: 400px;
-  max-width: 90%;
-  padding: 24px 32px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  border-radius: 16px;
+  width: 500px; /* más ancho */
+  max-width: 95%;
+  padding: 32px 40px; /* más padding */
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px; /* más separación entre elementos */
   animation: fadeIn 0.3s ease-out;
 }
 
@@ -36,11 +36,11 @@
 /* Botón cerrar */
 .close-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 16px;
+  right: 16px;
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 28px; /* más grande */
   cursor: pointer;
   color: #666;
   transition: color 0.2s;
@@ -53,16 +53,16 @@
 /* Título del modal */
 .editar-perfil-card h2 {
   text-align: center;
-  font-size: 22px;
+  font-size: 26px; /* más grande */
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   color: #333;
 }
 
 /* Mensaje de error */
 .text-red {
   color: #e74c3c;
-  font-size: 14px;
+  font-size: 16px; /* más grande */
   text-align: center;
 }
 
@@ -70,22 +70,22 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px; /* más espacio */
 }
 
 /* Etiqueta */
 .form-group label {
-  font-size: 14px;
+  font-size: 16px; /* más grande */
   font-weight: 500;
   color: #555;
 }
 
 /* Inputs */
 .form-group input {
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 14px 16px; /* más grande */
+  border-radius: 10px;
   border: 1px solid #ccc;
-  font-size: 14px;
+  font-size: 16px; /* más grande */
   transition: border 0.2s, box-shadow 0.2s;
 }
 
@@ -93,18 +93,18 @@
 .save-btn {
   background-color: #356a36;
   color: white;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 15px;
+  padding: 14px 20px; /* más grande */
+  border-radius: 10px;
+  font-size: 17px; /* más grande */
   font-weight: 500;
   border: none;
   cursor: pointer;
   transition: background 0.2s;
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .save-btn:hover {
-  background-color: #356a36;
+  background-color: #2c5630;
 }
 
 .save-btn:disabled {
