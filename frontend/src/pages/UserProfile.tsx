@@ -17,7 +17,9 @@ type BackendUser = {
   username?: string;
   seguidors?: number;
   seguits?: number;
-  publicacions?: string[]; // ✅ IDs de trips
+  llista_seguidors?: string[]; 
+  llista_seguits?: string[];
+  publicacions?: string[]; 
   guardades?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
@@ -119,10 +121,17 @@ export default function UserProfile() {
   const photoUrl = profile?.url_foto_perfil || "/images/person.png";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
-  const seguidors = profile?.seguidors ?? 0;
-  const seguits = profile?.seguits ?? 0;
+  const seguidors = profile?.llista_seguidors
+    ? profile.llista_seguidors.length
+    : profile?.seguidors ?? 0;
 
-  // 🔹 Separar por pestaña
+  const seguits = profile?.llista_seguits
+    ? profile.llista_seguits.length
+    : profile?.seguits ?? 0;
+
+
+
+    // 🔹 Separar por pestaña
   const publicacionsItems = useMemo(() => {
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return toGridItems(trips.filter((t) => pubIds.has(String(t._id))));
