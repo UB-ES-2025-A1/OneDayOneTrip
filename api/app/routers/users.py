@@ -27,15 +27,13 @@ async def register_user(data: dict, user=Depends(verify_token)):
         "mail": data.get("mail") or "",
         "role": "user",
         "username": data.get("username") or "",
-        "seguidors": data.get("seguidors", 0),
-        "seguits": data.get("seguits", 0),
         "publicacions": data.get("publicacions", []),
         "guardades": data.get("guardades", []),
+        "llista_seguidors": data.get("lista_seguidores", []),
+        "llista_seguits": data.get("lista_seguidos", []),
         "url_foto_perfil": data.get("url_foto_perfil", ""),
         "url_foto_panell": data.get("url_foto_panell", ""),
         "premium": data.get("premium", False),
-        "llista_seguidors": data.get("lista_seguidores", []),
-        "llista_seguits": data.get("lista_seguidos", []),
     }
 
     print(f"[DEBUG] Creando usuario {uid} con datos: {user_data}")
