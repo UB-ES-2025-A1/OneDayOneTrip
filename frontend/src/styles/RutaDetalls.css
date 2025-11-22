@@ -428,6 +428,96 @@
   border: 1px solid #f0f0f0;
 }
 
+/* ---------- Nou comentari (formulari) ---------- */
+
+.comentari-nou {
+  background: #f4f4f4;
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.comentari-nou-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.comentari-nou-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.comentari-nou-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comentari-nou-input {
+  width: 100%;
+  border: none;
+  resize: vertical;
+  min-height: 60px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: white;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.comentari-nou-input::placeholder {
+  color: #888;                          
+}
+
+.comentari-nou-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.comentari-error {
+  font-size: 0.8rem;
+  color: #b91c1c;
+}
+
+.comentari-submit-btn {
+  padding: 6px 18px;
+  border-radius: 999px;
+  border: none;
+  background: #2e492e;    /* verd */
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.comentari-submit-btn:hover:enabled {
+  background: #096330;
+  transform: translateY(-1px);
+}
+
+.comentari-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Títol Comentaris (X) */
+.comentaris-titol {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #2e492e;
+}
+
 
 /* ---------- ZOOM ---------- */
 .zoom-gallery {

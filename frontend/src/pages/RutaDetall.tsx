@@ -5,7 +5,7 @@ import { auth } from "../firebase";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
-import { getTripById, getAllTrips, getTripComments, type Trip, type Comment } from "../api/trips";
+import { getTripById, getAllTrips, getTripComments,createTripComment, type Trip, type Comment } from "../api/trips";
 import dayjs from "dayjs";
 import "dayjs/locale/ca";
 
@@ -24,6 +24,10 @@ export default function RutaDetall() {
   const [zoomGallery, setZoomGallery] = useState<string[] | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loadingComments, setLoadingComments] = useState(true);
+  const [newComment, setNewComment] = useState("");
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
+
 
   // 🔹 Auth listener
   useEffect(() => {
@@ -95,6 +99,41 @@ export default function RutaDetall() {
         <button onClick={() => navigate(-1)}>← Tornar</button>
       </div>
     );
+
+    const handleSubmitComment = async () => {
+      if (!currentUser) {
+        alert("Has d'iniciar sessió per deixar un comentari.");
+        return;
+      }
+      if (!tripData?._id) return;
+      if (!newComment.trim()) return;
+
+      try {
+        setSubmittingComment(true);
+        setCommentError(null);
+
+        const payload = {
+          userId: currentUser.uid,
+          userName:
+            currentUser.displayName ||
+            currentUser.email?.split("@")[0] ||
+            "Usuari",
+          content: newComment.trim(),
+        };
+
+        const created = await createTripComment(tripData._id, payload);
+
+        // Afegim el comentari nou al principi de la llista
+        setComments((prev) => [created, ...prev]);
+        setNewComment("");
+      } catch (err: any) {
+        console.error("Error creant comentari:", err);
+        setCommentError("No s'ha pogut enviar el comentari.");
+      } finally {
+        setSubmittingComment(false);
+      }
+    };
+
 
   return (
     <Layout
@@ -198,38 +237,84 @@ export default function RutaDetall() {
         />
       </div>
 
-      {/* 💬 Comentaris */}
-      <div className="ruta-comentaris">
-        <h2>Comentaris</h2>
+            {/* 💬 Comentaris */}
+        <div className="ruta-comentaris">
 
-        {loadingComments ? (
-          <p className="comentaris-loading">Carregant comentaris...</p>
-        ) : comments.length === 0 ? (
-          <p className="comentaris-buits">Encara no hi ha comentaris.</p>
-        ) : (
-          <ul className="comentaris-llista">
-            {comments.map((c) => (
-              <li key={c._id} className="comentari-item">
-                <div className="comentari-header">
-                  <div className="comentari-autor-info">
-                    <div className="comentari-avatar">
+          {/* 🔹 Bloc per escriure un nou comentari */}
+          {currentUser ? (
+            <div className="comentari-nou">
+              <div className="comentari-nou-avatar">
+                <img
+                  src={currentUser.photoURL || "/images/person.png"}
+                  alt="Tu"
+                />
+              </div>
+
+              <div className="comentari-nou-main">
+                <textarea
+                  className="comentari-nou-input"
+                  placeholder="Afegeix un comentari..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  rows={3}
+                />
+
+                <div className="comentari-nou-actions">
+                  {commentError && (
+                    <span className="comentari-error">{commentError}</span>
+                  )}
+                  <button
+                    className="comentari-submit-btn"
+                    onClick={handleSubmitComment}
+                    disabled={submittingComment || !newComment.trim()}
+                  >
+                    {submittingComment ? "Enviant..." : "Enviar"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="comentaris-login-hint">
+              Inicia sessió per afegir un comentari.
+            </p>
+          )}
+
+          {/* Títol amb número de comentaris */}
+          <h2 className="comentaris-titol">
+            Comentaris ({comments.length})
+          </h2>
+
+          {loadingComments ? (
+            <p className="comentaris-loading">Carregant comentaris...</p>
+          ) : comments.length === 0 ? (
+            <p className="comentaris-buits">Encara no hi ha comentaris.</p>
+          ) : (
+            <ul className="comentaris-llista">
+              {comments.map((c) => (
+                <li key={c._id} className="comentari-item">
+                  <div className="comentari-header">
+                    <div className="comentari-autor-info">
+                      <div className="comentari-avatar">
                         <img src="/images/person.png" alt="Usuari" />
-                    </div>
-                    <div>
-                      <span className="comentari-autor">{c.userName}</span>
-                      <span className="comentari-data">
-                        {dayjs(c.createdAt).locale("ca").format("DD MMM YYYY")}
-                      </span>
+                      </div>
+                      <div>
+                        <span className="comentari-autor">{c.userName}</span>
+                        <span className="comentari-data">
+                          {dayjs(c.createdAt)
+                            .locale("ca")
+                            .format("DD MMM YYYY")}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <p className="comentari-contingut">{c.content}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                  <p className="comentari-contingut">{c.content}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
 
 
       {/* Zoom imágenes */}
