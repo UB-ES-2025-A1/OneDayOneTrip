@@ -9,6 +9,8 @@ import { getTripById, getAllTrips, getTripComments, type Trip, type Comment } fr
 import dayjs from "dayjs";
 import "dayjs/locale/ca";
 import { getUserById, followUser } from "../api/client";
+import Valorar from "../components/Valorar";
+
 
 
 const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
@@ -29,6 +31,7 @@ export default function RutaDetall() {
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
 
 
   // 🔹 Auth listener
@@ -195,33 +198,13 @@ export default function RutaDetall() {
           <button
             type="button"
             className="valorar-button"
-            onClick={() => {
-              if (!tripData?._id) return;
-              navigate(`/valorar/${tripData._id}`);
-            }}
+            onClick={() => setShowRatingModal(true)}
           >
             <span className="valorar-icon">★</span>
             Valorar
           </button>
         </div>
 
-
-        <div className="valoracio">
-          {tripData.avgRating ? (
-            <>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} 
-                className={i < Math.round(tripData.avgRating ?? 0) ? "star filled" : "star"}>
-                
-                  ★
-                </span>
-              ))}
-              <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
-            </>
-          ) : (
-            <span className="rating-value">Sense valoració</span>
-          )}
-        </div>
 
         <div className="ubicacio">
           <img src="/images/ubi.png" alt="Ubicació" className="ubi-icon" />
@@ -259,6 +242,8 @@ export default function RutaDetall() {
               </span>
             )}
           </div>
+
+
 
           {/* 🔘 botó Seguir / Seguint */}
           {currentUser && currentUser.uid !== tripData.author.userId && (
@@ -328,7 +313,22 @@ export default function RutaDetall() {
         )}
       </div>
 
-
+      {showRatingModal && (
+      <div
+        className="valorar-overlay"
+        onClick={() => setShowRatingModal(false)}
+      >
+        <div
+          className="valorar-modal"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Valorar
+            tripId={tripData._id!}
+            onClose={() => setShowRatingModal(false)}
+          />
+        </div>
+      </div>
+    )}
       {/* Zoom imágenes */}
       {zoomImage && (
         <div className="zoom-overlay" onClick={() => setZoomImage(null)}>

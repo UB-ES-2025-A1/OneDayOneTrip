@@ -1,0 +1,74 @@
+.valorar-container {
+  padding: 40px;
+  max-width: 600px;
+  margin: auto;
+  text-align: center;
+}
+
+.valorar-title {
+  color: #2e492e;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.valorar-estrelles {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.estrella {
+  font-size: 3rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.2s ease;
+}
+
+.estrella:hover {
+  transform: scale(1.2);
+}
+
+.estrella.active {
+  color: gold;
+}
+
+.valorar-submit {
+  padding: 10px 22px;
+  border-radius: 20px;
+  border: none;
+  background: #2e492e;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.valorar-submit:disabled {
+  background: #999;
+  cursor: default;
+}
+
+.valorar-submit:hover:enabled {
+  background: #093b22;
+}
+.valorar-overlay {
+  position: fixed;
+  inset: 0;                          /* top:0, right:0, bottom:0, left:0 */
+  background: rgba(0, 0, 0, 0.45);   /* fons fosc translúcid */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;                      /* per sobre de la resta */
+}
+
+.valorar-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 28px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  position: relative;
+}
