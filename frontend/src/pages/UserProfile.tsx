@@ -9,7 +9,7 @@ import { ImageOff } from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import CreateTripForm from "../components/CreateTripForm";
-import LlistaSeguidorsModal from "../components/LlistaSeguitsModal";
+import LlistaSeguits from "../components/LlistaSeguitsModal";
 
 type BackendUser = {
   uid: string;
@@ -227,7 +227,7 @@ export default function UserProfile() {
 
           {/* Modal de seguits */}
           {seguitsModalOpen && profile && (
-            <LlistaSeguidorsModal
+            <LlistaSeguits
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}

@@ -71,7 +71,7 @@ export default function LlistaSeguitsModal({ open, onClose, seguits, goToProfile
         {loading ? (
           <p className="seguidores-empty">Carregant...</p>
         ) : users.length === 0 ? (
-          <p className="seguidores-empty">No segueixes ningú.</p>
+          <p className="seguidores-empty">No segueixes a ningú.</p>
         ) : (
           <div className="seguidores-list">
             {users.map((u) => (
