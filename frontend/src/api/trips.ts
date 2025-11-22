@@ -108,6 +108,38 @@ export async function getTripComments(
 }
 
 // ==========================================================
+// Crear un comentari per una trip
+// ==========================================================
+
+export async function createTripComment(
+  tripId: string,
+  data: {
+    userId: string;
+    userName: string;
+    content: string;
+  }
+): Promise<Comment> {
+  const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Error creant comentari: ${tripId}. ${text}`);
+  }
+
+  // Suposo que el backend retorna el comentari creat
+  return await res.json();
+}
+
+
+// ==========================================================
 // ✨ NUEVO: Payload para crear trips (TripCreateIn)
 // ==========================================================
 
