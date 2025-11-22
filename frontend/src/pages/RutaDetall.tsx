@@ -189,7 +189,22 @@ export default function RutaDetall() {
 
       {/* Dades ruta */}
       <div className="ruta-detall">
-        <h1>{tripData.title}</h1>
+        <div className="ruta-header-line">
+          <h1 className="ruta-titol">{tripData.title}</h1>
+
+          <button
+            type="button"
+            className="valorar-button"
+            onClick={() => {
+              if (!tripData?._id) return;
+              navigate(`/valorar/${tripData._id}`);
+            }}
+          >
+            <span className="valorar-icon">★</span>
+            Valorar
+          </button>
+        </div>
+
 
         <div className="valoracio">
           {tripData.avgRating ? (
