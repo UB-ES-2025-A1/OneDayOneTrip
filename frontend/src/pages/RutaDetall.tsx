@@ -237,83 +237,85 @@ export default function RutaDetall() {
         />
       </div>
 
-            {/* 💬 Comentaris */}
-        <div className="ruta-comentaris">
+            {/* Comentaris */}
+      <div className="ruta-comentaris">
 
-          {/* 🔹 Bloc per escriure un nou comentari */}
-          {currentUser ? (
-            <div className="comentari-nou">
-              <div className="comentari-nou-avatar">
-                <img
-                  src={currentUser.photoURL || "/images/person.png"}
-                  alt="Tu"
-                />
-              </div>
+        {/* Títol amb número de comentaris */}
+        <h2 className="comentaris-titol">
+          Comentaris ({comments.length})
+        </h2>
 
-              <div className="comentari-nou-main">
-                <textarea
-                  className="comentari-nou-input"
-                  placeholder="Afegeix un comentari..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  rows={3}
-                />
+        {/* 🔹 Bloc per escriure un nou comentari */}
+        {currentUser ? (
+          <div className="comentari-nou">
+            <div className="comentari-nou-avatar">
+              <img
+                src={currentUser.photoURL || "/images/person.png"}
+                alt="Tu"
+              />
+            </div>
 
-                <div className="comentari-nou-actions">
-                  {commentError && (
-                    <span className="comentari-error">{commentError}</span>
-                  )}
-                  <button
-                    className="comentari-submit-btn"
-                    onClick={handleSubmitComment}
-                    disabled={submittingComment || !newComment.trim()}
-                  >
-                    {submittingComment ? "Enviant..." : "Enviar"}
-                  </button>
-                </div>
+            <div className="comentari-nou-main">
+              <textarea
+                className="comentari-nou-input"
+                placeholder="Afegeix un comentari..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                rows={3}
+              />
+
+              <div className="comentari-nou-actions">
+                {commentError && (
+                  <span className="comentari-error">{commentError}</span>
+                )}
+                <button
+                  className="comentari-submit-btn"
+                  onClick={handleSubmitComment}
+                  disabled={submittingComment || !newComment.trim()}
+                >
+                  {submittingComment ? "Enviant..." : "Enviar"}
+                </button>
               </div>
             </div>
-          ) : (
-            <p className="comentaris-login-hint">
-              Inicia sessió per afegir un comentari.
-            </p>
-          )}
+          </div>
+        ) : (
+          <p className="comentaris-login-hint">
+            Inicia sessió per afegir un comentari.
+          </p>
+        )}
 
-          {/* Títol amb número de comentaris */}
-          <h2 className="comentaris-titol">
-            Comentaris ({comments.length})
-          </h2>
-
-          {loadingComments ? (
-            <p className="comentaris-loading">Carregant comentaris...</p>
-          ) : comments.length === 0 ? (
-            <p className="comentaris-buits">Encara no hi ha comentaris.</p>
-          ) : (
-            <ul className="comentaris-llista">
-              {comments.map((c) => (
-                <li key={c._id} className="comentari-item">
-                  <div className="comentari-header">
-                    <div className="comentari-autor-info">
-                      <div className="comentari-avatar">
-                        <img src="/images/person.png" alt="Usuari" />
-                      </div>
-                      <div>
-                        <span className="comentari-autor">{c.userName}</span>
-                        <span className="comentari-data">
-                          {dayjs(c.createdAt)
-                            .locale("ca")
-                            .format("DD MMM YYYY")}
-                        </span>
-                      </div>
+        {/* Llista de comentaris */}
+        {loadingComments ? (
+          <p className="comentaris-loading">Carregant comentaris...</p>
+        ) : comments.length === 0 ? (
+          <p className="comentaris-buits">Encara no hi ha comentaris.</p>
+        ) : (
+          <ul className="comentaris-llista">
+            {comments.map((c) => (
+              <li key={c._id} className="comentari-item">
+                <div className="comentari-header">
+                  <div className="comentari-autor-info">
+                    <div className="comentari-avatar">
+                      <img src="/images/person.png" alt="Usuari" />
+                    </div>
+                    <div>
+                      <span className="comentari-autor">{c.userName}</span>
+                      <span className="comentari-data">
+                        {dayjs(c.createdAt)
+                          .locale("ca")
+                          .format("DD MMM YYYY")}
+                      </span>
                     </div>
                   </div>
+                </div>
 
-                  <p className="comentari-contingut">{c.content}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                <p className="comentari-contingut">{c.content}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
 
 
 
