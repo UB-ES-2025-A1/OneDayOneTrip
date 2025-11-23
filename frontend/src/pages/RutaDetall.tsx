@@ -5,12 +5,18 @@ import { auth } from "../firebase";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
-import { getTripById, getAllTrips, getTripComments, type Trip, type Comment } from "../api/trips";
+import {
+  getTripById,
+  getAllTrips,
+  getTripComments,
+  type Trip,
+  type Comment,
+  rateTrip,          
+} from "../api/trips";
+
 import dayjs from "dayjs";
 import "dayjs/locale/ca";
-import { getUserById, followUser } from "../api/client";
 import Valorar from "../components/Valorar";
-
 import { getUserById, followUser, unfollowUser } from "../api/client";
 
 
@@ -136,6 +142,39 @@ export default function RutaDetall() {
       setFollowLoading(false);
     }
   };
+
+  // dentro de RutaDetall()
+
+const handleSubmitRating = async (value: number) => {
+  if (!currentUser) {
+    alert("Has d'iniciar sessió per valorar la ruta.");
+    return;
+  }
+  if (!tripData?._id) return;
+
+  try {
+    const stats = await rateTrip(tripData._id, {
+      userId: currentUser.uid,
+      rating: value,
+    });
+
+    // Actualizamos las stats en el estado de la ruta
+    setTripData((prev) =>
+      prev
+        ? {
+            ...prev,
+            avgRating: stats.avgRating,
+            numRatings: stats.numRatings,
+          }
+        : prev
+    );
+
+    setShowRatingModal(false);
+  } catch (err) {
+    console.error("Error valorant la ruta:", err);
+    alert("No s'ha pogut enviar la valoració. Torna-ho a intentar més tard.");
+  }
+};
 
 
 
@@ -321,21 +360,17 @@ export default function RutaDetall() {
       </div>
 
       {showRatingModal && (
-      <div
-        className="valorar-overlay"
-        onClick={() => setShowRatingModal(false)}
-      >
-        <div
-          className="valorar-modal"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Valorar
-            tripId={tripData._id!}
-            onClose={() => setShowRatingModal(false)}
-          />
+        <div className="valorar-overlay" onClick={() => setShowRatingModal(false)}>
+          <div className="valorar-modal" onClick={(e) => e.stopPropagation()}>
+            <Valorar
+              tripId={tripData._id!}
+              onClose={() => setShowRatingModal(false)}
+              onSubmit={handleSubmitRating}  
+            />
+          </div>
         </div>
-      </div>
-    )}
+      )}
+
       {/* Zoom imágenes */}
       {zoomImage && (
         <div className="zoom-overlay" onClick={() => setZoomImage(null)}>

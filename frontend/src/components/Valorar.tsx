@@ -4,16 +4,17 @@ import { useState, type JSX } from "react";
 interface ValorarProps {
   tripId: string;
   onClose: () => void;
+  onSubmit: (rating: number) => void;   // Nueva prop
 }
 
-export default function Valorar({ tripId, onClose }: ValorarProps) {
+export default function Valorar({ onClose, onSubmit }: ValorarProps) {
   const [rating, setRating] = useState(0);
 
   const handleSubmit = () => {
-    onClose();
+    onSubmit(rating);  // 👈 llamamos al padre
+    onClose();         // 👈 cerramos modal
   };
 
-  // Generem inputs + labels com a fills directes de .rating
   const starElements: JSX.Element[] = [];
   for (let n = 5; n >= 1; n--) {
     starElements.push(
@@ -28,10 +29,7 @@ export default function Valorar({ tripId, onClose }: ValorarProps) {
       />
     );
     starElements.push(
-      <label
-        key={`label-${n}`}
-        htmlFor={`estrella-${n}`}
-      />
+      <label key={`label-${n}`} htmlFor={`estrella-${n}`} />
     );
   }
 

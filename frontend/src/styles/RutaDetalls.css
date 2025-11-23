@@ -101,7 +101,7 @@
 }
 
 .star {
-  color: #ccc;
+  color: #888888;
   font-size: 1.2rem;
   margin-right: 2px;
 }
@@ -113,7 +113,7 @@
 .rating-value {
   font-weight: 600;
   margin-left: 6px;
-  color: #333;
+  color: #f7f7f7;
 }
 
 /* ---------- CONTENIDO PRINCIPAL ---------- */
@@ -549,6 +549,44 @@
   opacity: 0.6;
   cursor: default;
 }
+
+
+/* ------------------------------------------------------ */
+/* ⭐ BOTÓN VALORAR                                        */
+/* ------------------------------------------------------ */
+
+.valorar-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: linear-gradient(135deg, #ffd95a, #ffb400);
+  color: #3a2a00;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 10px;
+
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease, box-shadow 0.2s ease,
+              background 0.2s ease;
+}
+
+.valorar-button:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Icono estrella */
+.valorar-icon {
+  font-size: 18px;
+  color: #8a5b00;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.6));
+}
+
 
 /* =========================================================
    📱 RESPONSIVE DESIGN
