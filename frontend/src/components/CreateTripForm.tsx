@@ -553,7 +553,6 @@ export default function CreateTripForm({
                         }
                       }}
                     >
-                      <h4>Tags disponibles</h4>
                       <div className="tag-pills">
                         {ALL_TAGS.filter(
                           (tag) => !selectedTags.includes(tag)
@@ -901,20 +900,41 @@ export default function CreateTripForm({
                         />
                       </label>
 
-                      <label>
-                        Imatge del punt
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) =>
-                            handlePointImageChange(
-                              index,
-                              e.target.files?.[0] ?? null
-                            )
-                          }
-                          required
-                        />
-                      </label>
+                      <div className="image-point-wrapper">
+                          <span className="image-point-label-text">Imatge del punt</span>
+
+                          {/* input ocult (nadiu) */}
+                          <input
+                            id={`point-image-${index}`}
+                            type="file"
+                            accept="image/*"
+                            className="image-point-input"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0] ?? null;
+                              handlePointImageChange(index, file);
+                            }}
+                            required
+                          />
+
+                          <div className="image-point-controls">
+                            {/* botó maco que obre el selector */}
+                            <label
+                              htmlFor={`point-image-${index}`}
+                              className="image-input-button image-point-button"
+                            >
+                              Selecciona imatge del punt
+                            </label>
+
+                            {/* text amb el nom del fitxer escollit */}
+                            <span className="image-point-filename">
+                              {pointImages[index]?.name
+                                ? pointImages[index]!.name
+                                : "Cap fitxer seleccionat"}
+                            </span>
+                          </div>
+                        </div>
+
+
                     </div>
                   </div>
                 ))}

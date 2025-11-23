@@ -385,14 +385,18 @@
 }
 
 .tags-label {
+  font-weight: 600;
+  color: #333333;
+  display: block;
   font-weight: 500;
-  color: #333;
 }
 
+
 .tags-helper {
-  margin: 0;
-  font-size: 0.8rem;
-  color: #777;
+  margin: -2px 0 0 0;      
+  font-size: 0.78rem;     
+  color: #777777;        
+  font-weight: 400;       
 }
 
 .tag-columns {
@@ -404,7 +408,8 @@
 .tag-column h4 {
   margin: 0 0 0.4rem 0;
   font-size: 0.9rem;
-  color: #2e492e;
+  color: #333;
+  font-weight: 500;
 }
 
 .tag-pills {
@@ -535,7 +540,7 @@
   border-radius: 999px;
   padding: 0.5rem 1.1rem;
   background: #356a36;
-  color: #ffffff;
+  color: #ffffff !important;;
   font-size: 0.9rem;
   cursor: pointer;
   border: none;
@@ -580,4 +585,45 @@
   padding: 1rem;
   margin-top: 1rem;
   border: 1px solid #dcdcdc;
+}
+
+/* ---------- Input "Imatge del punt" custom ---------- */
+
+.image-point-wrapper {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #333;
+}
+
+.image-point-label-text {
+  margin-bottom: 0.4rem;
+}
+
+/* amaguem el input nadiu */
+.image-point-input {
+  display: none;
+}
+
+/* fila botó + nom del fitxer */
+.image-point-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* reutilitzem estil del botó verd general */
+.image-point-button {
+  /* ja hereta de .image-input-button */
+}
+
+/* nom del fitxer seleccionat */
+.image-point-filename {
+  font-size: 0.8rem;
+  color: #555;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
