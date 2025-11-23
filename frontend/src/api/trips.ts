@@ -1,3 +1,7 @@
+// ==========================================================
+// 📌 Interfaces base (Trip, TripPoint, Comment…)
+// ==========================================================
+
 export interface Coordinates {
   lat: number;
   lng: number;
@@ -39,35 +43,40 @@ export interface Trip {
   numRatings?: number;
 }
 
-/* ✅ NUEVO: Interfaz para comentarios */
+// Comentarios
 export interface Comment {
   _id: string;
   tripId: string;
   userId: string;
   userName: string;
   content: string;
-  createdAt: string; // ISO string (puedes formatearlo en frontend)
+  createdAt: string; // ISO string
 }
 
-const RAW_BASE_URL = "https://onedayonetrip-api.onrender.com"; //  "http://localhost:8000"  "https://onedayonetrip-api.onrender.com"
+// ==========================================================
+// 🌍 Base URL
+// ==========================================================
+
+//  "http://localhost:8000"  
+//  "https://onedayonetrip-api.onrender.com"
+
+const RAW_BASE_URL = "http://127.0.0.1:8000";
 const BASE_URL = RAW_BASE_URL.replace(/\/+$/, "");
 
-/**
- * Obté totes les rutes disponibles.
- * @param includeStats Si és true, inclou estadístiques (avgRating, numRatings)
- */
+// ==========================================================
+// 🔍 Obtener todas las trips
+// ==========================================================
+
 export async function getAllTrips(includeStats: boolean = false): Promise<Trip[]> {
   const res = await fetch(`${BASE_URL}/trips?include_stats=${includeStats}`);
-  if (!res.ok) {
-    throw new Error(`Error carregant les rutes: ${res.status}`);
-  }
+  if (!res.ok) throw new Error(`Error carregant les rutes: ${res.status}`);
   return await res.json();
 }
 
-/**
- * Obté una ruta concreta pel seu ID (ObjectId de Mongo).
- * @param tripId ID de la ruta (24 caràcters hex)
- */
+// ==========================================================
+// 🔍 Obtener trip por ID
+// ==========================================================
+
 export async function getTripById(tripId: string): Promise<Trip> {
   const res = await fetch(`${BASE_URL}/trips/${encodeURIComponent(tripId)}`);
   if (!res.ok) {
@@ -77,40 +86,90 @@ export async function getTripById(tripId: string): Promise<Trip> {
   return await res.json();
 }
 
-/**
- * ✅ Obté tots els comentaris d’una ruta per ID.
- * @param tripId ID de la ruta (24 caràcters hex)
- */
-export async function getTripComments(tripId: string, limit: number = 20, skip: number = 0): Promise<Comment[]> {
+// ==========================================================
+// 🔍 Obtener comentarios de una trip
+// ==========================================================
+
+export async function getTripComments(
+  tripId: string,
+  limit: number = 20,
+  skip: number = 0
+): Promise<Comment[]> {
   const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments?limit=${limit}&skip=${skip}`;
   const res = await fetch(url);
+
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(`Error carregant comentaris de la ruta: ${tripId}. ${text}`);
   }
+
   const data = await res.json();
   return data.comments || [];
 }
 
-/**
- * Crea una nova ruta amb dades i imatges (multipart/form-data)
- * @param tripData Dades principals del viatge
- * @param cover Imatge de portada
- * @param gallery Galeria d’imatges
- * @param pointImages Imatges dels punts de la ruta
- */
-export async function createTrip(
-  tripData: Trip,
-  cover?: File | null,
-  gallery?: File[],
-  pointImages?: File[]
-): Promise<any> {
-  const formData = new FormData();
-  formData.append("trip_json", JSON.stringify(tripData));
+// ==========================================================
+// ✨ NUEVO: Payload para crear trips (TripCreateIn)
+// ==========================================================
 
-  if (cover) formData.append("cover", cover);
-  if (gallery) gallery.forEach((img) => formData.append("gallery", img));
-  if (pointImages) pointImages.forEach((img) => formData.append("point_images", img));
+export interface TripCreatePayload {
+  title: string;
+  description: string;
+  category?: string;
+  tags: string[];
+
+  author: {
+    uid: string;
+    name: string | null | undefined;
+    email: string | null | undefined;
+    profilePic: string | null | undefined;
+  };
+
+  city: string;
+  region?: string;
+  country?: string;
+  routeMap?: string;
+
+  trip_points: {
+    title: string;
+    description: string;
+    coordinates: { lat: number | null; lng: number | null };
+  }[];
+
+  distance?: string;
+  duration?: string;
+  difficulty?: string;
+  recommendedSeason?: string;
+}
+
+// ==========================================================
+// 🚀 Crear trip (multipart/form-data)
+// ==========================================================
+
+export async function createTripMultipart(
+  tripPayload: TripCreatePayload,
+  cover: File | null,
+  gallery: File[],
+  pointImages: (File | null)[]
+) {
+  const formData = new FormData();
+
+  // JSON requerido por FastAPI
+  formData.append("trip_json", JSON.stringify(tripPayload));
+
+  // portada
+  if (cover) {
+    formData.append("cover", cover);
+  }
+
+  // galería
+  gallery.forEach((file) => {
+    formData.append("gallery", file);
+  });
+
+  // imágenes por cada punto (en el mismo orden)
+  pointImages.forEach((file) => {
+    if (file) formData.append("point_images", file);
+  });
 
   const res = await fetch(`${BASE_URL}/trips/`, {
     method: "POST",
@@ -118,8 +177,8 @@ export async function createTrip(
   });
 
   if (!res.ok) {
-    const errorText = await res.text().catch(() => "");
-    throw new Error(`Error creant la ruta: ${errorText || res.status}`);
+    const errMsg = await res.text().catch(() => "");
+    throw new Error(errMsg || "Error creant la ruta");
   }
 
   return await res.json();

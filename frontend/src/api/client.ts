@@ -1,6 +1,6 @@
 import { getAuth } from "firebase/auth";
 
-const API_URL = "https://onedayonetrip-api.onrender.com"; // o http://127.0.0.1:8000 para local
+const API_URL = "http://127.0.0.1:8000"; // o http://127.0.0.1:8000 para local
 
 // ------------------------------
 // Funciones base genéricas
@@ -61,4 +61,11 @@ export async function getUserById(userId: string) {
 export async function getAllUsers() {
   return apiGet("/users");
 }
-
+// Seguir un usuario
+export async function followUser(userId: string, targetId: string) {
+  return apiPost(`/users/follow/${userId}/${targetId}`, {});
+}
+// Deixar de seguir un usuari
+export async function unfollowUser(userId: string, targetId: string) {
+  return apiPost(`/users/unfollow/${userId}/${targetId}`, {});
+}
