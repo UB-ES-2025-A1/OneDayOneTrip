@@ -10,6 +10,7 @@ import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import EditarPerfil from "../components/EditarPerfilModal"
 import CreateTripForm from "../components/CreateTripForm"
+import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
 
 export type BackendUser = {
   uid: string;
@@ -48,6 +49,7 @@ export default function UserProfile() {
   const [error, setError] = useState<string>("");
   const [openEdit, setOpenEdit] = useState(false);
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
+  const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -96,6 +98,8 @@ export default function UserProfile() {
   };
 
   const openRegister = () => alert("Has d'iniciar sessió per continuar.");
+  const openSeguidoresModal = () => setSeguidoresModalOpen(true);
+
 
   // Conversion de Trip → GridItem
   const toGridItems = (trips: Trip[]): GridItem[] =>
@@ -129,9 +133,7 @@ export default function UserProfile() {
     ? profile.llista_seguits.length
     : profile?.seguits ?? 0;
 
-
-
-  // Separar por pestaña
+    // Separar por pestaña
   const publicacionsItems = useMemo(() => {
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return toGridItems(trips.filter((t) => pubIds.has(String(t._id))));
@@ -175,7 +177,10 @@ export default function UserProfile() {
                 <h3>{displayMail}</h3>
               </div>
               <div className="user-stats">
-                <div className="stat"><span className="number">{seguidors}</span><span className="label">Seguidors</span></div>
+                <div className="stat" onClick={openSeguidoresModal}>
+                  <span className="number">{seguidors}</span>
+                  <span className="label">Seguidors</span>
+                </div>
                 <div className="stat"><span className="number">{seguits}</span><span className="label">Seguits</span></div>
                 <div className="stat"><span className="number">{publicacionsItems.length}</span><span className="label">Publicacions</span></div>
                 <div className="stat"><span className="number">{guardadesItems.length}</span><span className="label">Guardades</span></div>
@@ -223,12 +228,15 @@ export default function UserProfile() {
               />
             )}
           </section>
-
-
-
         </>
         
       )}
+      {seguidoresModalOpen && profile && (
+        <LlistaSeguidors
+          open={seguidoresModalOpen}
+          onClose={() => setSeguidoresModalOpen(false)}
+          seguidors={profile.llista_seguidors || []}
+          
       {openEdit && profile && (
         <EditarPerfil 
           profile={profile} 
