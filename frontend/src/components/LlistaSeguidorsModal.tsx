@@ -14,7 +14,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   seguidors: string[];
-  goToProfile?: (uid: string) => void;
+  goToProfile?: (uid: string) => void; // función opcional
 }
 
 export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToProfile }: Props) {
@@ -34,12 +34,12 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
         }
 
         const fetchedUsers = await Promise.all(
-          seguidors.map(async (uid) => await getUserById(uid))
+          seguidors.map((uid) => getUserById(uid))
         );
 
         setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
       } catch (err) {
-        console.error("Error carregant seguidors:", err);
+        console.error("Error cargando seguidores:", err);
         setUsers([]);
       } finally {
         setLoading(false);
@@ -49,7 +49,6 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
     fetchUsers();
   }, [open, seguidors]);
 
-  // Animación GSAP al mostrar usuarios
   useEffect(() => {
     if (!users || users.length === 0) return;
     const items = gsap.utils.toArray<HTMLElement>(".seguidor-item");
@@ -78,7 +77,7 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
               <div
                 key={u.uid}
                 className="seguidor-item"
-                onClick={() => goToProfile?.(u.uid)}
+                onClick={() => goToProfile ? goToProfile(u.uid) : null}
               >
                 <img
                   src={u.url_foto_perfil || "/images/default-profile.png"}
