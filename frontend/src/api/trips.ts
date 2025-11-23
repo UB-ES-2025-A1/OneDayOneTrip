@@ -49,9 +49,11 @@ export interface Comment {
   tripId: string;
   userId: string;
   userName: string;
-  content: string;
-  createdAt: string; // ISO string
+  userProfilePicture: string;   
+  text: string;                
+  createdAt: string;
 }
+
 
 // ==========================================================
 // 🌍 Base URL
@@ -106,6 +108,50 @@ export async function getTripComments(
   const data = await res.json();
   return data.comments || [];
 }
+
+// ==========================================================
+// Crear un comentari per una trip
+// ==========================================================
+export async function createTripComment(
+  tripId: string,
+  data: {
+    userId: string;
+    userName: string;
+    userProfilePicture: string;  
+    text: string;                 
+  }
+): Promise<Comment> {
+  const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments`;
+  
+  const payload = {
+    tripId,
+    userId: data.userId,
+    userName: data.userName,
+    userProfilePicture: data.userProfilePicture,
+    text: data.text,
+    createdAt: new Date().toISOString(),
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Error creant comentari (${tripId}): ${text}`);
+  }
+
+  // El backend devuelve:
+  // { message: "...", comment: { ... } }
+  const dataRes = await res.json();
+  return dataRes.comment;
+}
+
+
 
 // ==========================================================
 // ✨ NUEVO: Payload para crear trips (TripCreateIn)
