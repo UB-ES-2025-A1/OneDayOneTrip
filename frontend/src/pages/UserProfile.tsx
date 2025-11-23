@@ -10,7 +10,6 @@ import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal"
-import CreateTripForm from "../components/CreateTripForm"
 import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
 
 export type BackendUser = {
@@ -249,30 +248,30 @@ export default function UserProfile() {
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
+              currentUserId={currentUser.uid}
             />
           )}
         </>
         
       )}
       {seguidoresModalOpen && profile && (
-        <LlistaSeguidors
-          open={seguidoresModalOpen}
-          onClose={() => setSeguidoresModalOpen(false)}
-          seguidors={profile.llista_seguidors || []}
-        />
-      )}
+      <LlistaSeguidors
+        open={seguidoresModalOpen}
+        onClose={() => setSeguidoresModalOpen(false)}
+        seguidors={profile.llista_seguidors || []}
+      />
+    )}
 
-      {openEdit && profile && (
-        <EditarPerfil 
-          profile={profile} 
-          onClose={() => setOpenEdit(false)}
-          onSave={(updated) => {
-            setProfile(updated);
-            setOpenEdit(false);
-          }}
-        />
-      )}
-
+    {openEdit && profile && (
+      <EditarPerfil 
+        profile={profile} 
+        onClose={() => setOpenEdit(false)}
+        onSave={(updated) => {
+          setProfile(updated);     
+          setOpenEdit(false);       
+        }}
+      />
+    )}
     </Layout>
   );
 }
