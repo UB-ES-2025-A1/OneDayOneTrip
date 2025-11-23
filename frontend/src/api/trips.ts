@@ -49,9 +49,11 @@ export interface Comment {
   tripId: string;
   userId: string;
   userName: string;
-  content: string;
-  createdAt: string; // ISO string
+  userProfilePicture: string;   
+  text: string;                
+  createdAt: string;
 }
+
 
 // ==========================================================
 // 🌍 Base URL
@@ -110,33 +112,45 @@ export async function getTripComments(
 // ==========================================================
 // Crear un comentari per una trip
 // ==========================================================
-
 export async function createTripComment(
   tripId: string,
   data: {
     userId: string;
     userName: string;
-    content: string;
+    userProfilePicture: string;  
+    text: string;                 
   }
 ): Promise<Comment> {
   const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments`;
+  
+  const payload = {
+    tripId,
+    userId: data.userId,
+    userName: data.userName,
+    userProfilePicture: data.userProfilePicture,
+    text: data.text,
+    createdAt: new Date().toISOString(),
+  };
 
   const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Error creant comentari: ${tripId}. ${text}`);
+    throw new Error(`Error creant comentari (${tripId}): ${text}`);
   }
 
-  // Suposo que el backend retorna el comentari creat
-  return await res.json();
+  // El backend devuelve:
+  // { message: "...", comment: { ... } }
+  const dataRes = await res.json();
+  return dataRes.comment;
 }
+
 
 
 // ==========================================================
@@ -214,4 +228,48 @@ export async function createTripMultipart(
   }
 
   return await res.json();
+}
+
+
+// ==========================================================
+// ⭐ Valorar una trip
+// ==========================================================
+
+export interface TripRatingStats {
+  tripId: string;
+  avgRating: number;
+  numRatings: number;
+}
+
+export interface RateTripPayload {
+  userId: string;
+  rating: number;      // por ejemplo 1-5
+  date?: string;       // ISO string opcional
+}
+
+export async function rateTrip(
+  tripId: string,
+  payload: RateTripPayload
+): Promise<TripRatingStats> {
+  const res = await fetch(`${BASE_URL}/ratings/trip/${encodeURIComponent(tripId)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      userId: payload.userId,
+      rating: payload.rating,
+      // si no viene date, mandamos la fecha actual
+      date: payload.date ?? new Date().toISOString(),
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Error valorant la ruta: ${res.status}. ${text}`);
+  }
+
+  // 👇 aquí el backend devuelve lo que saque get_trip_rating_stats(trip_id)
+  const data = await res.json();
+  return data as TripRatingStats;
 }

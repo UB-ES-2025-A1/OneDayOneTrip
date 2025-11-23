@@ -16,16 +16,12 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        {/* 🏠 Página principal */}
         <Route path="/" element={<Home />} />
 
-        {/* 🗺️ Detalle de ruta */}
         <Route path="/ruta/:id" element={<RutaDetall />} />
 
-        {/* 👤 Perfil */}
         <Route path="/perfil" element={<UserProfile />} />
 
-        {/* 🔁 Redirección para rutas no válidas */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
