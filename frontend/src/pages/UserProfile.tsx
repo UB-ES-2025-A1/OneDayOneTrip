@@ -5,13 +5,14 @@ import { auth } from "../firebase";
 import { getUserById } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
-import { ImageOff } from "lucide-react"; 
+import { ImageOff, Pencil } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
+import EditarPerfil from "../components/EditarPerfilModal"
 import CreateTripForm from "../components/CreateTripForm"
 import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
 
-type BackendUser = {
+export type BackendUser = {
   uid: string;
   nom_i_cognoms?: string;
   mail?: string;
@@ -46,6 +47,7 @@ export default function UserProfile() {
   const [selectedTab, setSelectedTab] = useState<"publicacions" | "guardat">("publicacions");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [openEdit, setOpenEdit] = useState(false);
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
 
@@ -80,7 +82,7 @@ export default function UserProfile() {
 
         setTrips(userTrips);
       } catch (e: any) {
-        console.error("❌ Error carregant perfil:", e);
+        console.error("Error carregant perfil:", e);
         setError(e?.message || "No s'ha pogut carregar el perfil.");
       } finally {
         setLoading(false);
@@ -161,8 +163,11 @@ export default function UserProfile() {
             className="user-profile"
             style={{
               background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${panelUrl}) center/cover no-repeat`,
+              position:"relative",
             }}
-          >
+            >
+            <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}> <Pencil size={22} /></button>
+          
             <div className="user-photo">
               <img src={photoUrl} alt="Foto de perfil" />
             </div>
@@ -231,6 +236,15 @@ export default function UserProfile() {
           open={seguidoresModalOpen}
           onClose={() => setSeguidoresModalOpen(false)}
           seguidors={profile.llista_seguidors || []}
+          
+      {openEdit && profile && (
+        <EditarPerfil 
+          profile={profile} 
+          onClose={() => setOpenEdit(false)}
+          onSave={(updated) => {
+            setProfile(updated);     
+            setOpenEdit(false);       
+          }}
         />
       )}
     </Layout>
