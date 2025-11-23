@@ -12,7 +12,6 @@ interface EditarPerfilProps {
 export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilProps) {
   const [nom, setNom] = useState(profile.nom_i_cognoms || "");
   const [username, setUsername] = useState(profile.username || "");
-  const [email, setEmail] = useState(profile.mail || "");
 
   const [fotoPerfil, setFotoPerfil] = useState<File | null>(null);
   const [fotoPerfilPreview, setFotoPerfilPreview] = useState(profile.url_foto_perfil || "");
@@ -47,7 +46,6 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
       const jsonData = {
         nom_i_cognoms: nom || null,
         username: username || null,
-        mail: email || null,
       };
 
       // FastAPI requiere user_json como string
@@ -71,7 +69,6 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
 
       const result = await response.json();
 
-      // result.updated contiene los valores exactos actualizados por el backend
       const updatedUser: BackendUser = {
         ...profile,
         ...result.updated,
@@ -94,7 +91,6 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
   return (
     <div className="modal-backdrop">
       <div className="editar-perfil-card">
-
         <button className="close-btn" onClick={onClose}>
           &times;
         </button>
@@ -114,12 +110,6 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
             <label>Username</label>
             <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
-        </div>
-
-        {/* Email */}
-        <div className="form-group">
-          <label>Correu electrònic</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
 
         {/* Foto perfil + Foto portada */}
