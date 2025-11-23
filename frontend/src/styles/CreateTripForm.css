@@ -371,3 +371,213 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =========================================================
+   TAGS — pills + drag & drop
+   ========================================================= */
+
+.tags-section {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tags-label {
+  font-weight: 500;
+  color: #333;
+}
+
+.tags-helper {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.tag-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.tag-column h4 {
+  margin: 0 0 0.4rem 0;
+  font-size: 0.9rem;
+  color: #2e492e;
+}
+
+.tag-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border-radius: 10px;
+  background: #f7f8f7;
+  border: 1px dashed #d0d0d0;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+.tag-dropzone.empty {
+  justify-content: center;
+}
+
+.tag-pill {
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: #e5f2e5;
+  color: #2e492e;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.tag-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tag-pill.selected {
+  background: #356a36;
+  color: #ffffff;
+}
+
+.tag-pill.dragging {
+  opacity: 0.7;
+  transform: scale(0.97);
+}
+
+.tag-empty {
+  font-size: 0.8rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* Responsive tags */
+@media (max-width: 768px) {
+  .tag-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   IMATGES — targetes + galeria
+   ========================================================= */
+
+.image-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.2rem;
+  margin-top: 0.8rem;
+}
+
+.image-card {
+  background: #f7f8f7;
+  border-radius: 12px;
+  border: 1px solid #dcdcdc;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.image-card-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #2e492e;
+}
+
+.image-card-subtitle {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.image-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.image-preview {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  background: #ffffff;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-preview.placeholder {
+  color: #888;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.image-input-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  background: #356a36;
+  color: #ffffff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  width: fit-content;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.image-input-button:hover {
+  background: #2e492e;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ocultar input por defecto dentro del label */
+.image-input-button input[type="file"] {
+  display: none;
+}
+
+.gallery-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.5rem;
+}
+
+.gallery-preview-item {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  height: 80px;
+}
+
+.gallery-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Ajuste ligero trip-point para convivir con nuevas cards */
+.trip-point {
+  background: #f7f8f7;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: 1px solid #dcdcdc;
+}

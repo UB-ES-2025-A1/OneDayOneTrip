@@ -61,3 +61,8 @@ export async function getUserById(userId: string) {
 export async function getAllUsers() {
   return apiGet("/users");
 }
+
+// 📌 Añadir una publicación al usuario
+export async function addPublicationToUser(userId: string, tripId: string) {
+  return apiPost(`/users/${userId}/publicacions/${tripId}`, {});
+}

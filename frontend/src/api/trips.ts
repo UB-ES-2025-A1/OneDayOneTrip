@@ -31,7 +31,7 @@ export interface Trip {
   city: string;
   region?: string;
   country?: string;
-  routeMap?: string;
+  routeMap: Coordinates[];        // <-- siempre array
   trip_points: TripPoint[];
   distance?: number;
   duration?: string;
@@ -56,9 +56,6 @@ export interface Comment {
 // ==========================================================
 // 🌍 Base URL
 // ==========================================================
-
-//  "http://localhost:8000"  
-//  "https://onedayonetrip-api.onrender.com"
 
 const RAW_BASE_URL = "http://127.0.0.1:8000";
 const BASE_URL = RAW_BASE_URL.replace(/\/+$/, "");
@@ -108,7 +105,7 @@ export async function getTripComments(
 }
 
 // ==========================================================
-// ✨ NUEVO: Payload para crear trips (TripCreateIn)
+// ✨ Payload para crear trips (TripCreateIn)
 // ==========================================================
 
 export interface TripCreatePayload {
@@ -118,24 +115,24 @@ export interface TripCreatePayload {
   tags: string[];
 
   author: {
-    uid: string;
+    userId: string;                     // <-- corregido
     name: string | null | undefined;
-    email: string | null | undefined;
-    profilePic: string | null | undefined;
+    profilePic?: string | null | undefined;
   };
 
   city: string;
   region?: string;
   country?: string;
-  routeMap?: string;
+
+  routeMap: Coordinates[];             // <-- DEBE ser array
 
   trip_points: {
     title: string;
     description: string;
-    coordinates: { lat: number | null; lng: number | null };
+    coordinates: { lat: number; lng: number };
   }[];
 
-  distance?: string;
+  distance?: number;                   // <-- corregido (número)
   duration?: string;
   difficulty?: string;
   recommendedSeason?: string;
@@ -166,7 +163,7 @@ export async function createTripMultipart(
     formData.append("gallery", file);
   });
 
-  // imágenes por cada punto (en el mismo orden)
+  // imágenes de cada punto
   pointImages.forEach((file) => {
     if (file) formData.append("point_images", file);
   });

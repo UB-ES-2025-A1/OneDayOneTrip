@@ -72,3 +72,35 @@ async def get_current_user_by_id(user_id: str):
     if not doc.exists:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return doc.to_dict()
+
+
+@router.post("/{user_id}/publicacions/{trip_id}")
+async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token)):
+    """
+    Añade el ID de una ruta a la lista de publicaciones del usuario.
+    Solo el propietario puede modificar sus publicaciones.
+    """
+
+    # 🔐 Solo el propio usuario puede modificar su perfil
+    if user.get("uid") != user_id:
+      raise HTTPException(status_code=403, detail="No tens permís per modificar aquest usuari.")
+
+    doc_ref = db.collection("users").document(user_id)
+    snapshot = doc_ref.get()
+
+    if not snapshot.exists:
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
+
+    data = snapshot.to_dict()
+    publicacions = set(data.get("publicacions", []))
+
+    # 🔹 Añadir la nueva publicación (sin duplicados)
+    publicacions.add(str(trip_id))
+
+    # 🔹 Guardar actualización
+    doc_ref.update({"publicacions": list(publicacions)})
+
+    return {
+        "message": "Publicació afegida correctament",
+        "publicacions": list(publicacions)
+    }
