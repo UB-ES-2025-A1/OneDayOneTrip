@@ -5,9 +5,18 @@ import { auth } from "../firebase";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
-import { getTripById, getAllTrips, getTripComments, type Trip, type Comment } from "../api/trips";
+import {
+  getTripById,
+  getAllTrips,
+  getTripComments,
+  type Trip,
+  type Comment,
+  rateTrip,          
+} from "../api/trips";
+
 import dayjs from "dayjs";
 import "dayjs/locale/ca";
+import Valorar from "../components/Valorar";
 import { getUserById, followUser, unfollowUser } from "../api/client";
 
 
@@ -30,6 +39,7 @@ export default function RutaDetall() {
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
 
 
   // 🔹 Auth listener
@@ -133,6 +143,39 @@ export default function RutaDetall() {
     }
   };
 
+  // dentro de RutaDetall()
+
+const handleSubmitRating = async (value: number) => {
+  if (!currentUser) {
+    alert("Has d'iniciar sessió per valorar la ruta.");
+    return;
+  }
+  if (!tripData?._id) return;
+
+  try {
+    const stats = await rateTrip(tripData._id, {
+      userId: currentUser.uid,
+      rating: value,
+    });
+
+    // Actualizamos las stats en el estado de la ruta
+    setTripData((prev) =>
+      prev
+        ? {
+            ...prev,
+            avgRating: stats.avgRating,
+            numRatings: stats.numRatings,
+          }
+        : prev
+    );
+
+    setShowRatingModal(false);
+  } catch (err) {
+    console.error("Error valorant la ruta:", err);
+    alert("No s'ha pogut enviar la valoració. Torna-ho a intentar més tard.");
+  }
+};
+
 
 
 
@@ -195,24 +238,30 @@ export default function RutaDetall() {
 
       {/* Dades ruta */}
       <div className="ruta-detall">
-        <h1>{tripData.title}</h1>
+        <div className="ruta-header-line">
+          <h1 className="ruta-titol">{tripData.title}</h1>
 
-        <div className="valoracio">
-          {tripData.avgRating ? (
-            <>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} 
-                className={i < Math.round(tripData.avgRating ?? 0) ? "star filled" : "star"}>
-                
-                  ★
-                </span>
-              ))}
+          {tripData.avgRating != null && (
+            <div className="rating-summary">
+              <span className="rating-star">★</span>
               <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
-            </>
-          ) : (
-            <span className="rating-value">Sense valoració</span>
+              {tripData.numRatings != null && (
+                <span className="rating-count">({tripData.numRatings})</span>
+              )}
+            </div>
           )}
+
+          <button
+            type="button"
+            className="valorar-button"
+            onClick={() => setShowRatingModal(true)}
+          >
+            <span className="valorar-icon">★</span>
+            Valorar
+          </button>
         </div>
+
+
 
         <div className="ubicacio">
           <img src="/images/ubi.png" alt="Ubicació" className="ubi-icon" />
@@ -250,6 +299,8 @@ export default function RutaDetall() {
               </span>
             )}
           </div>
+
+
 
           {/* 🔘 botó Seguir / Seguint */}
           {currentUser && currentUser.uid !== tripData.author.userId && (
@@ -319,6 +370,17 @@ export default function RutaDetall() {
         )}
       </div>
 
+      {showRatingModal && (
+        <div className="valorar-overlay" onClick={() => setShowRatingModal(false)}>
+          <div className="valorar-modal" onClick={(e) => e.stopPropagation()}>
+            <Valorar
+              tripId={tripData._id!}
+              onClose={() => setShowRatingModal(false)}
+              onSubmit={handleSubmitRating}  
+            />
+          </div>
+        </div>
+      )}
 
       {/* Zoom imágenes */}
       {zoomImage && (
