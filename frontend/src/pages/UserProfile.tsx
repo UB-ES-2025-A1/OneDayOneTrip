@@ -8,6 +8,8 @@ import "../styles/UserProfile.css";
 import { ImageOff, Pencil } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
+import CreateTripForm from "../components/CreateTripForm";
+import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal"
 import CreateTripForm from "../components/CreateTripForm"
 import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
@@ -19,9 +21,9 @@ export type BackendUser = {
   username?: string;
   seguidors?: number;
   seguits?: number;
-  llista_seguidors?: string[]; 
+  llista_seguidors?: string[];
   llista_seguits?: string[];
-  publicacions?: string[]; 
+  publicacions?: string[];
   guardades?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
@@ -49,11 +51,12 @@ export default function UserProfile() {
   const [error, setError] = useState<string>("");
   const [openEdit, setOpenEdit] = useState(false);
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
+  const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
-  // Cargar usuario y sus trips
+  // Cargar usuario y trips
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       setCurrentUser(fbUser);
@@ -79,7 +82,6 @@ export default function UserProfile() {
         const userTrips = allTrips.filter(
           (t) => pubIds.has(String(t._id)) || guardIds.has(String(t._id))
         );
-
         setTrips(userTrips);
       } catch (e: any) {
         console.error("Error carregant perfil:", e);
@@ -125,15 +127,10 @@ export default function UserProfile() {
   const photoUrl = profile?.url_foto_perfil || "/images/person.png";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
-  const seguidors = profile?.llista_seguidors
-    ? profile.llista_seguidors.length
-    : profile?.seguidors ?? 0;
+  const seguidors = profile?.llista_seguidors?.length ?? profile?.seguidors ?? 0;
+  const seguits = profile?.llista_seguits?.length ?? profile?.seguits ?? 0;
 
-  const seguits = profile?.llista_seguits
-    ? profile.llista_seguits.length
-    : profile?.seguits ?? 0;
-
-    // Separar por pestaña
+  // Separar por pestaña
   const publicacionsItems = useMemo(() => {
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return toGridItems(trips.filter((t) => pubIds.has(String(t._id))));
@@ -145,6 +142,21 @@ export default function UserProfile() {
   }, [trips, profile?.guardades]);
 
   const gridItems = selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
+
+  // Abrir modal de seguits y recargar perfil
+  const openSeguitsModal = async () => {
+    if (!profile) return;
+
+    try {
+      const updatedProfile = await getUserById(profile.uid);
+      console.log("Updated profile:", updatedProfile);
+      setProfile(updatedProfile as BackendUser);
+      setSeguitsModalOpen(true);
+
+    } catch (err) {
+      console.error("Error recargando seguits:", err);
+    }
+  };
 
   return (
     <Layout
@@ -181,7 +193,10 @@ export default function UserProfile() {
                   <span className="number">{seguidors}</span>
                   <span className="label">Seguidors</span>
                 </div>
-                <div className="stat"><span className="number">{seguits}</span><span className="label">Seguits</span></div>
+                <div className="stat" onClick={openSeguitsModal}>
+                  <span className="number">{seguits}</span>
+                  <span className="label">Seguits</span>
+                </div>
                 <div className="stat"><span className="number">{publicacionsItems.length}</span><span className="label">Publicacions</span></div>
                 <div className="stat"><span className="number">{guardadesItems.length}</span><span className="label">Guardades</span></div>
               </div>
@@ -228,6 +243,15 @@ export default function UserProfile() {
               />
             )}
           </section>
+
+          {/* Modal de seguits */}
+          {seguitsModalOpen && profile && (
+            <LlistaSeguits
+              open={seguitsModalOpen}
+              onClose={() => setSeguitsModalOpen(false)}
+              seguits={profile.llista_seguits || []}
+            />
+          )}
         </>
         
       )}
