@@ -43,16 +43,16 @@ export interface Trip {
   numRatings?: number;
 }
 
-// Comentarios
 export interface Comment {
   _id: string;
   tripId: string;
   userId: string;
   userName: string;
-  userProfilePicture: string;   
-  text: string;                
-  createdAt: string;
+  userProfilePicture?: string | null;  // opcional / puede ser null
+  text: string;
+  createdAt: string;                   // ISO string desde el backend
 }
+
 
 
 // ==========================================================
@@ -88,6 +88,7 @@ export async function getTripById(tripId: string): Promise<Trip> {
   return await res.json();
 }
 
+
 // ==========================================================
 // 🔍 Obtener comentarios de una trip
 // ==========================================================
@@ -102,34 +103,41 @@ export async function getTripComments(
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Error carregant comentaris de la ruta: ${tripId}. ${text}`);
+    throw new Error(
+      `Error carregant comentaris de la ruta: ${tripId}. ${text}`
+    );
   }
 
   const data = await res.json();
-  return data.comments || [];
+
+  // Backend: { comments: [...] }
+  const comments = (data?.comments ?? []) as Comment[];
+
+  return comments;
 }
 
+
 // ==========================================================
-// Crear un comentari per una trip
+// 📝 Crear un comentari per una trip
 // ==========================================================
 export async function createTripComment(
   tripId: string,
   data: {
     userId: string;
     userName: string;
-    userProfilePicture: string;  
-    text: string;                 
+    userProfilePicture?: string;
+    text: string;
   }
 ): Promise<Comment> {
   const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments`;
-  
+
   const payload = {
-    tripId,
+    tripId,                    // coincide con CommentModel.tripId
     userId: data.userId,
     userName: data.userName,
-    userProfilePicture: data.userProfilePicture,
+    userProfilePicture: data.userProfilePicture ?? "",
     text: data.text,
-    createdAt: new Date().toISOString(),
+    // ❌ ya no mandamos createdAt: lo genera el backend
   };
 
   const res = await fetch(url, {
@@ -146,10 +154,11 @@ export async function createTripComment(
   }
 
   // El backend devuelve:
-  // { message: "...", comment: { ... } }
+  // { "comment": { ... } }
   const dataRes = await res.json();
-  return dataRes.comment;
+  return dataRes.comment as Comment;
 }
+
 
 
 
