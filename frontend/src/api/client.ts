@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 const API_URL = "http://127.0.0.1:8000"; // o http://127.0.0.1:8000 para local
 
 // ------------------------------
-// 🔹 Funciones base genéricas
+// Funciones base genéricas
 // ------------------------------
 export async function apiGet(path: string) {
   const user = getAuth().currentUser;
