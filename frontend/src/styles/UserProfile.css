@@ -1,6 +1,3 @@
-/* =========================================================
-   PERFIL DE USUARIO — OneDayOneTrip
-   ========================================================= */
 
 /* ---------- CONTENEDOR PRINCIPAL ---------- */
 .user-profile {
@@ -76,6 +73,7 @@
 .user-stats .stat:hover {
   transform: translateY(-3px);
   background-color: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
 }
 
 .user-stats .number {

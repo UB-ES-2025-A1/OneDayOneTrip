@@ -9,6 +9,7 @@ import { ImageOff } from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import CreateTripForm from "../components/CreateTripForm"
+import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
 
 type BackendUser = {
   uid: string;
@@ -46,12 +47,11 @@ export default function UserProfile() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
-
-
+  const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
-  // 🔹 Cargar usuario y sus trips
+  // Cargar usuario y sus trips
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       setCurrentUser(fbUser);
@@ -67,10 +67,10 @@ export default function UserProfile() {
         const backendUser = await getUserById(fbUser.uid);
         setProfile(backendUser as BackendUser);
 
-        // 🔹 Obtener todas las trips
+        // Obtener todas las trips
         const allTrips = await getAllTrips(true);
 
-        // 🔹 Filtrar solo las del usuario
+        // Filtrar solo las del usuario
         const pubIds = new Set((backendUser.publicacions || []).map(String));
         const guardIds = new Set((backendUser.guardades || []).map(String));
 
@@ -96,8 +96,10 @@ export default function UserProfile() {
   };
 
   const openRegister = () => alert("Has d'iniciar sessió per continuar.");
+  const openSeguidoresModal = () => setSeguidoresModalOpen(true);
 
-  // 🔹 Conversion de Trip → GridItem
+
+  // Conversion de Trip → GridItem
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((t) => ({
       id: String(t._id),
@@ -115,7 +117,7 @@ export default function UserProfile() {
       country: t.country || "",
     }));
 
-  // 🔹 Derivados visuales
+  // Derivados visuales
   const displayName = profile?.nom_i_cognoms || currentUser?.displayName || profile?.username || "Usuari";
   const displayMail = profile?.mail || currentUser?.email || "";
   const photoUrl = profile?.url_foto_perfil || "/images/person.png";
@@ -129,9 +131,7 @@ export default function UserProfile() {
     ? profile.llista_seguits.length
     : profile?.seguits ?? 0;
 
-
-
-    // 🔹 Separar por pestaña
+    // Separar por pestaña
   const publicacionsItems = useMemo(() => {
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return toGridItems(trips.filter((t) => pubIds.has(String(t._id))));
@@ -172,7 +172,10 @@ export default function UserProfile() {
                 <h3>{displayMail}</h3>
               </div>
               <div className="user-stats">
-                <div className="stat"><span className="number">{seguidors}</span><span className="label">Seguidors</span></div>
+                <div className="stat" onClick={openSeguidoresModal}>
+                  <span className="number">{seguidors}</span>
+                  <span className="label">Seguidors</span>
+                </div>
                 <div className="stat"><span className="number">{seguits}</span><span className="label">Seguits</span></div>
                 <div className="stat"><span className="number">{publicacionsItems.length}</span><span className="label">Publicacions</span></div>
                 <div className="stat"><span className="number">{guardadesItems.length}</span><span className="label">Guardades</span></div>
@@ -211,7 +214,7 @@ export default function UserProfile() {
               </div>
             )}
 
-            {/* 🔥 Modal de crear trip, igual estilo que login/register */}
+            {/* Modal de crear trip, igual estilo que login/register */}
             {modalOpen === "createTrip" && currentUser && profile && (
               <CreateTripForm
                 onClose={() => setModalOpen(null)}
@@ -220,10 +223,15 @@ export default function UserProfile() {
               />
             )}
           </section>
-
-
-
         </>
+        
+      )}
+      {seguidoresModalOpen && profile && (
+        <LlistaSeguidors
+          open={seguidoresModalOpen}
+          onClose={() => setSeguidoresModalOpen(false)}
+          seguidors={profile.llista_seguidors || []}
+        />
       )}
     </Layout>
   );
