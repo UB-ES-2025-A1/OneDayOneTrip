@@ -139,6 +139,56 @@
   font-weight: 700;
 }
 
+/* línia títol + botó valorar */
+.ruta-header-line {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ruta-titol {
+  margin: 0;
+  font-size: 2.4rem;
+  color: #2e492e;
+  font-weight: 700;
+}
+
+/* Botó "Valorar" (sense recuadre, lletra verda) */
+.valorar-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  color: #2e492e;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: auto;         
+  margin-right: 80px;         
+  line-height: 1;    
+}
+
+.valorar-icon {
+  font-size: 1rem;            
+  display: inline-block;
+  position: relative;
+  top: -1px;                  
+}
+
+
+.valorar-button:hover {
+  background: rgba(46, 73, 46, 0.10); 
+  border-radius: 15px;                 
+  padding: 6px 10px;                 
+  transition: background 0.2s ease;
+}
+
+
+
 /* ---------- UBICACIÓN Y AUTOR ---------- */
 .ubicacio {
   display: flex;
