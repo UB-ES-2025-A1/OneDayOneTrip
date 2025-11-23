@@ -8,6 +8,9 @@ import Layout from "../components/Layout";
 import { getTripById, getAllTrips, getTripComments, type Trip, type Comment } from "../api/trips";
 import dayjs from "dayjs";
 import "dayjs/locale/ca";
+import { getUserById, followUser, unfollowUser } from "../api/client";
+
+
 
 const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
 const isNumericIndex = (s: string) => /^\d+$/.test(s || "");
@@ -24,12 +27,17 @@ export default function RutaDetall() {
   const [zoomGallery, setZoomGallery] = useState<string[] | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loadingComments, setLoadingComments] = useState(true);
+  const [followersCount, setFollowersCount] = useState<number | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+
 
   // 🔹 Auth listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, setCurrentUser);
     return () => unsubscribe();
   }, []);
+
 
   // 🔹 Logout
   const handleLogout = async () => {
@@ -69,6 +77,64 @@ export default function RutaDetall() {
     };
     fetchTrip();
   }, [id, navigate]);
+
+  useEffect(() => {
+    const loadAuthorData = async () => {
+      if (!tripData?.author?.userId) return;
+
+      try {
+        const author = await getUserById(tripData.author.userId); // GET /users/{userId}
+
+        const seguidorsNumber = author.llista_seguidors
+          ? author.llista_seguidors.length
+          : (typeof author.seguidors === "number" ? author.seguidors : 0);
+
+
+        setFollowersCount(seguidorsNumber);
+
+        if (currentUser) {
+          const followersList: string[] = author.llista_seguidors || [];
+          setIsFollowing(followersList.includes(currentUser.uid));
+        }
+      } catch (err) {
+        console.error("Error carregant dades de l'autor:", err);
+      }
+    };
+
+    loadAuthorData();
+  }, [tripData, currentUser]);
+
+  const handleFollow = async () => {
+    if (!currentUser || !tripData?.author?.userId) return;
+
+    const userId = currentUser.uid;
+    const targetId = tripData.author.userId;
+
+    if (userId === targetId) return; // per si de cas, no pots seguir-te tu mateix
+
+    try {
+      setFollowLoading(true);
+
+      if (!isFollowing) {
+        await followUser(userId, targetId);
+        setIsFollowing(true);
+        setFollowersCount((prev) => (prev == null ? 1 : prev + 1));
+      } else {
+        await unfollowUser(userId, targetId);
+        setIsFollowing(false);
+        setFollowersCount((prev) =>
+          prev == null || prev <= 0 ? 0 : prev - 1
+        );
+      }
+    } catch (err) {
+      console.error("Error canviant estat de seguir/seguir:", err);
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
+
+
 
   // 🔹 Comentaris
   useEffect(() => {
@@ -175,10 +241,32 @@ export default function RutaDetall() {
           </div>
 
           <div className="autor-info">
-            <span className="autor-nombre">{tripData.author?.name || "Autor desconocido"}</span>
-            <span className="autor-sub">Creador de la ruta</span>
+            <span className="autor-nombre">
+              {tripData.author?.name || "Autor desconegut"}
+            </span>
+            {followersCount !== null && (
+              <span className="autor-seguidors">
+                {followersCount} seguidor{followersCount === 1 ? "" : "s"}
+              </span>
+            )}
           </div>
+
+          {/* 🔘 botó Seguir / Seguint */}
+          {currentUser && currentUser.uid !== tripData.author.userId && (
+            <button
+              className={`follow-button ${isFollowing ? "following" : ""}`}
+              onClick={handleFollow}
+              disabled={followLoading}
+            >
+              {isFollowing
+                ? "Seguint"
+                : followLoading
+                ? "Seguint..."
+                : "Seguir"}
+            </button>
+          )}
         </div>
+
 
 
         <div className="ruta-descripcio">
