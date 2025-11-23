@@ -11,6 +11,8 @@ import "dayjs/locale/ca";
 import { getUserById, followUser } from "../api/client";
 import Valorar from "../components/Valorar";
 
+import { getUserById, followUser, unfollowUser } from "../api/client";
+
 
 
 const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
@@ -108,28 +110,33 @@ export default function RutaDetall() {
 
   const handleFollow = async () => {
     if (!currentUser || !tripData?.author?.userId) return;
-    if (isFollowing) return; // ja el seguim
 
     const userId = currentUser.uid;
     const targetId = tripData.author.userId;
 
-    if (userId === targetId) return; // per si de cas no et segueixis a tu mateix
+    if (userId === targetId) return; // per si de cas, no pots seguir-te tu mateix
 
     try {
       setFollowLoading(true);
 
-      // 🔥 crida real al backend (NO toquem backend)
-      await followUser(userId, targetId);
-
-      // actualitzem estat del front
-      setIsFollowing(true);
-      setFollowersCount((prev) => (prev == null ? 1 : prev + 1));
+      if (!isFollowing) {
+        await followUser(userId, targetId);
+        setIsFollowing(true);
+        setFollowersCount((prev) => (prev == null ? 1 : prev + 1));
+      } else {
+        await unfollowUser(userId, targetId);
+        setIsFollowing(false);
+        setFollowersCount((prev) =>
+          prev == null || prev <= 0 ? 0 : prev - 1
+        );
+      }
     } catch (err) {
-      console.error("Error seguint l'autor:", err);
+      console.error("Error canviant estat de seguir/seguir:", err);
     } finally {
       setFollowLoading(false);
     }
   };
+
 
 
 
@@ -250,7 +257,7 @@ export default function RutaDetall() {
             <button
               className={`follow-button ${isFollowing ? "following" : ""}`}
               onClick={handleFollow}
-              disabled={followLoading || isFollowing}
+              disabled={followLoading}
             >
               {isFollowing
                 ? "Seguint"
