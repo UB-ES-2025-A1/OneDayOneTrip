@@ -11,10 +11,10 @@ import {
   getTripComments,
   type Trip,
   type Comment,
-  rateTrip,          
+  rateTrip,   
+  createTripComment,       
 } from "../api/trips";
 
-import { getTripById, getAllTrips, getTripComments,createTripComment, type Trip, type Comment } from "../api/trips";
 import dayjs from "dayjs";
 import "dayjs/locale/ca";
 import Valorar from "../components/Valorar";
