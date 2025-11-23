@@ -93,7 +93,7 @@ export default function UserProfile() {
 
   const openRegister = () => alert("Has d'iniciar sessió per continuar.");
 
-  // 🔹 Conversion de Trip → GridItem
+  // Conversion de Trip → GridItem
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((t) => ({
       id: String(t._id),
@@ -204,6 +204,10 @@ export default function UserProfile() {
         <EditarPerfil 
           profile={profile} 
           onClose={() => setOpenEdit(false)}
+          onSave={(updated) => {
+            setProfile(updated);     
+            setOpenEdit(false);       
+          }}
         />
       )}
     </Layout>
