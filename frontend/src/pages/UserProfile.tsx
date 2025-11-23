@@ -5,13 +5,14 @@ import { auth } from "../firebase";
 import { getUserById } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
-import { ImageOff } from "lucide-react"; 
+import { ImageOff, Pencil } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import CreateTripForm from "../components/CreateTripForm";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
+import EditarPerfil from "../components/EditarPerfilModal"
 
-type BackendUser = {
+export type BackendUser = {
   uid: string;
   nom_i_cognoms?: string;
   mail?: string;
@@ -46,6 +47,7 @@ export default function UserProfile() {
   const [selectedTab, setSelectedTab] = useState<"publicacions" | "guardat">("publicacions");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [openEdit, setOpenEdit] = useState(false);
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
 
@@ -67,7 +69,10 @@ export default function UserProfile() {
         const backendUser = await getUserById(fbUser.uid);
         setProfile(backendUser as BackendUser);
 
+        // Obtener todas las trips
         const allTrips = await getAllTrips(true);
+
+        // Filtrar solo las del usuario
         const pubIds = new Set((backendUser.publicacions || []).map(String));
         const guardIds = new Set((backendUser.guardades || []).map(String));
 
@@ -76,7 +81,7 @@ export default function UserProfile() {
         );
         setTrips(userTrips);
       } catch (e: any) {
-        console.error("❌ Error carregant perfil:", e);
+        console.error("Error carregant perfil:", e);
         setError(e?.message || "No s'ha pogut carregar el perfil.");
       } finally {
         setLoading(false);
@@ -93,6 +98,7 @@ export default function UserProfile() {
 
   const openRegister = () => alert("Has d'iniciar sessió per continuar.");
 
+  // Conversion de Trip → GridItem
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((t) => ({
       id: String(t._id),
@@ -119,6 +125,7 @@ export default function UserProfile() {
   const seguidors = profile?.llista_seguidors?.length ?? profile?.seguidors ?? 0;
   const seguits = profile?.llista_seguits?.length ?? profile?.seguits ?? 0;
 
+  // Separar por pestaña
   const publicacionsItems = useMemo(() => {
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return toGridItems(trips.filter((t) => pubIds.has(String(t._id))));
@@ -163,8 +170,11 @@ export default function UserProfile() {
             className="user-profile"
             style={{
               background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${panelUrl}) center/cover no-repeat`,
+              position:"relative",
             }}
-          >
+            >
+            <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}> <Pencil size={22} /></button>
+          
             <div className="user-photo">
               <img src={photoUrl} alt="Foto de perfil" />
             </div>
@@ -216,6 +226,7 @@ export default function UserProfile() {
               </div>
             )}
 
+            {/* Modal de crear trip, igual estilo que login/register */}
             {modalOpen === "createTrip" && currentUser && profile && (
               <CreateTripForm
                 onClose={() => setModalOpen(null)}
@@ -234,6 +245,17 @@ export default function UserProfile() {
             />
           )}
         </>
+        
+      )}
+      {openEdit && profile && (
+        <EditarPerfil 
+          profile={profile} 
+          onClose={() => setOpenEdit(false)}
+          onSave={(updated) => {
+            setProfile(updated);     
+            setOpenEdit(false);       
+          }}
+        />
       )}
     </Layout>
   );
