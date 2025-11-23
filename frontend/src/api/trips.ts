@@ -215,3 +215,47 @@ export async function createTripMultipart(
 
   return await res.json();
 }
+
+
+// ==========================================================
+// ⭐ Valorar una trip
+// ==========================================================
+
+export interface TripRatingStats {
+  tripId: string;
+  avgRating: number;
+  numRatings: number;
+}
+
+export interface RateTripPayload {
+  userId: string;
+  rating: number;      // por ejemplo 1-5
+  date?: string;       // ISO string opcional
+}
+
+export async function rateTrip(
+  tripId: string,
+  payload: RateTripPayload
+): Promise<TripRatingStats> {
+  const res = await fetch(`${BASE_URL}/ratings/trip/${encodeURIComponent(tripId)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      userId: payload.userId,
+      rating: payload.rating,
+      // si no viene date, mandamos la fecha actual
+      date: payload.date ?? new Date().toISOString(),
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Error valorant la ruta: ${res.status}. ${text}`);
+  }
+
+  // 👇 aquí el backend devuelve lo que saque get_trip_rating_stats(trip_id)
+  const data = await res.json();
+  return data as TripRatingStats;
+}
