@@ -183,33 +183,8 @@ async def create_trip_multipart(
 
 
 from datetime import datetime
-from app.services.mongo_service import add_comment, upsert_rating
+from app.services.mongo_service import upsert_rating
 from fastapi import Body
-
-# ============================================================
-# 💬 Añadir comentario a una trip
-# ============================================================
-@router.post("/{trip_id}/comment")
-def add_trip_comment(
-    trip_id: str,
-    userId: str = Body(...),
-    userName: str = Body(...),
-    content: str = Body(...),
-):
-    """
-    Añade un comentario a una trip.
-    """
-    print(f"\n[DEBUG] 💬 add_trip_comment() -> trip_id={trip_id}, userId={userId}")
-    doc = {
-        "tripId": trip_id,
-        "userId": userId,
-        "userName": userName,
-        "content": content,
-        "createdAt": datetime.utcnow(),
-    }
-    inserted_id = add_comment(doc)
-    print(f"[DEBUG] ✅ Comentario guardado con ID: {inserted_id}")
-    return {"message": "Comentario añadido", "comment_id": inserted_id}
 
 
 # ============================================================
@@ -231,21 +206,4 @@ def add_trip_rating(
 
 
 
-# ============================================================
-# 💬 Obtener comentarios de una trip
-# ============================================================
-@router.get("/{trip_id}/comments")
-def get_trip_comments(trip_id: str, limit: int = 20, skip: int = 0):
-    """
-    Devuelve los comentarios asociados a una trip concreta.
-    """
-    print(f"\n[DEBUG] 💬 get_trip_comments() -> trip_id={trip_id}, limit={limit}, skip={skip}")
-    from app.services.mongo_service import list_comments
 
-    try:
-        comments = list_comments(trip_id, limit=limit, skip=skip)
-        print(f"[DEBUG] ✅ {len(comments)} comentarios recuperados para trip_id={trip_id}")
-        return {"trip_id": trip_id, "comments": comments, "count": len(comments)}
-    except Exception as e:
-        print(f"[ERROR] ❌ Error al obtener comentarios: {e}")
-        raise HTTPException(status_code=500, detail=str(e))

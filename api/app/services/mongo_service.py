@@ -1,5 +1,5 @@
 # api/app/services/mongo_service.py
-from pymongo import MongoClient, ASCENDING
+from pymongo import MongoClient, ASCENDING, DESCENDING
 from bson import ObjectId
 from dotenv import load_dotenv
 import os
@@ -24,7 +24,12 @@ try:
     ratings_collection = db["ratings"]
 
     # Índices recomendados
-    comments_collection.create_index([("tripId", ASCENDING), ("createdAt", ASCENDING)])
+    # Índices recomendados
+    comments_collection.create_index([
+        ("tripId", ASCENDING), 
+        ("createdAt", ASCENDING)
+    ])
+
     ratings_collection.create_index([("tripId", ASCENDING)])
     ratings_collection.create_index(
         [("tripId", ASCENDING), ("userId", ASCENDING)], unique=True
@@ -142,18 +147,6 @@ def upsert_rating(trip_id: str, user_id: str, rating: int, date):
 # ============================================================
 # 💬 COMMENTS
 # ============================================================
-
-def add_comment(doc: dict) -> str:
-    """Añade un nuevo comentario vinculado a una trip."""
-    try:
-        doc_db = {**doc, "tripId": ObjectId(doc["tripId"])}
-        res = comments_collection.insert_one(doc_db)
-        return str(res.inserted_id)
-    except Exception:
-        print("[MOCK] add_comment() ejecutado sin Mongo real.")
-        return "mock_comment_id"
-
-
 def list_comments(trip_id: str, limit: int = 20, skip: int = 0):
     """Obtiene comentarios paginados de una trip."""
     try:
@@ -163,12 +156,16 @@ def list_comments(trip_id: str, limit: int = 20, skip: int = 0):
             .skip(skip)
             .limit(limit)
         )
+
         out = []
         for c in cursor:
             c["_id"] = str(c["_id"])
-            c["tripId"] = str(c["tripId"])
+            c["tripId"] = str(c["tripId"])  # convertir ObjectId → string
             out.append(c)
+
         return out
+
     except Exception:
         print("[MOCK] list_comments() ejecutado sin Mongo real.")
         return []
+
