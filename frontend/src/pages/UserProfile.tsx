@@ -11,7 +11,6 @@ import Layout from "../components/Layout";
 import CreateTripForm from "../components/CreateTripForm";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal"
-import CreateTripForm from "../components/CreateTripForm"
 import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
 
 export type BackendUser = {
@@ -256,21 +255,23 @@ export default function UserProfile() {
         
       )}
       {seguidoresModalOpen && profile && (
-        <LlistaSeguidors
-          open={seguidoresModalOpen}
-          onClose={() => setSeguidoresModalOpen(false)}
-          seguidors={profile.llista_seguidors || []}
-          
-      {openEdit && profile && (
-        <EditarPerfil 
-          profile={profile} 
-          onClose={() => setOpenEdit(false)}
-          onSave={(updated) => {
-            setProfile(updated);     
-            setOpenEdit(false);       
-          }}
-        />
-      )}
+      <LlistaSeguidors
+        open={seguidoresModalOpen}
+        onClose={() => setSeguidoresModalOpen(false)}
+        seguidors={profile.llista_seguidors || []}
+      />
+    )}
+
+    {openEdit && profile && (
+      <EditarPerfil 
+        profile={profile} 
+        onClose={() => setOpenEdit(false)}
+        onSave={(updated) => {
+          setProfile(updated);     
+          setOpenEdit(false);       
+        }}
+      />
+    )}
     </Layout>
   );
 }
