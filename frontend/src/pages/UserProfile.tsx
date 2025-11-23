@@ -11,6 +11,8 @@ import Layout from "../components/Layout";
 import CreateTripForm from "../components/CreateTripForm";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal"
+import CreateTripForm from "../components/CreateTripForm"
+import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
 
 export type BackendUser = {
   uid: string;
@@ -50,6 +52,7 @@ export default function UserProfile() {
   const [openEdit, setOpenEdit] = useState(false);
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
+  const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -97,6 +100,8 @@ export default function UserProfile() {
   };
 
   const openRegister = () => alert("Has d'iniciar sessió per continuar.");
+  const openSeguidoresModal = () => setSeguidoresModalOpen(true);
+
 
   // Conversion de Trip → GridItem
   const toGridItems = (trips: Trip[]): GridItem[] =>
@@ -184,7 +189,10 @@ export default function UserProfile() {
                 <h3>{displayMail}</h3>
               </div>
               <div className="user-stats">
-                <div className="stat"><span className="number">{seguidors}</span><span className="label">Seguidors</span></div>
+                <div className="stat" onClick={openSeguidoresModal}>
+                  <span className="number">{seguidors}</span>
+                  <span className="label">Seguidors</span>
+                </div>
                 <div className="stat" onClick={openSeguitsModal}>
                   <span className="number">{seguits}</span>
                   <span className="label">Seguits</span>
@@ -247,6 +255,12 @@ export default function UserProfile() {
         </>
         
       )}
+      {seguidoresModalOpen && profile && (
+        <LlistaSeguidors
+          open={seguidoresModalOpen}
+          onClose={() => setSeguidoresModalOpen(false)}
+          seguidors={profile.llista_seguidors || []}
+          
       {openEdit && profile && (
         <EditarPerfil 
           profile={profile} 
