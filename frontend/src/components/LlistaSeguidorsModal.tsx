@@ -14,7 +14,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   seguidors: string[];
-  goToProfile?: (uid: string) => void; // función opcional
+  goToProfile?: (uid: string) => void;
 }
 
 export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToProfile }: Props) {
@@ -33,10 +33,14 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
           return;
         }
 
+        console.log("Seguidors a cargar:", seguidors);
         const fetchedUsers = await Promise.all(
-          seguidors.map((uid) => getUserById(uid))
+          seguidors.map(async (uid) => {
+            const u = await getUserById(uid);
+            return u ? { ...u } : null;
+          })
         );
-
+        console.log("Usuarios fetched:", fetchedUsers);
         setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
       } catch (err) {
         console.error("Error cargando seguidores:", err);

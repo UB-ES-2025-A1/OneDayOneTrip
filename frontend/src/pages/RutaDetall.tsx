@@ -10,8 +10,6 @@ import dayjs from "dayjs";
 import "dayjs/locale/ca";
 import { getUserById, followUser, unfollowUser } from "../api/client";
 
-
-
 const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
 const isNumericIndex = (s: string) => /^\d+$/.test(s || "");
 
@@ -31,13 +29,11 @@ export default function RutaDetall() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
-
   // 🔹 Auth listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, setCurrentUser);
     return () => unsubscribe();
   }, []);
-
 
   // 🔹 Logout
   const handleLogout = async () => {
@@ -78,17 +74,16 @@ export default function RutaDetall() {
     fetchTrip();
   }, [id, navigate]);
 
+  // 🔹 Cargar datos del autor
   useEffect(() => {
     const loadAuthorData = async () => {
       if (!tripData?.author?.userId) return;
 
       try {
-        const author = await getUserById(tripData.author.userId); // GET /users/{userId}
-
+        const author = await getUserById(tripData.author.userId);
         const seguidorsNumber = author.llista_seguidors
           ? author.llista_seguidors.length
           : (typeof author.seguidors === "number" ? author.seguidors : 0);
-
 
         setFollowersCount(seguidorsNumber);
 
@@ -104,13 +99,14 @@ export default function RutaDetall() {
     loadAuthorData();
   }, [tripData, currentUser]);
 
+  // 🔹 Seguir / Dejar de seguir
   const handleFollow = async () => {
     if (!currentUser || !tripData?.author?.userId) return;
 
     const userId = currentUser.uid;
     const targetId = tripData.author.userId;
 
-    if (userId === targetId) return; // per si de cas, no pots seguir-te tu mateix
+    if (userId === targetId) return;
 
     try {
       setFollowLoading(true);
@@ -133,10 +129,7 @@ export default function RutaDetall() {
     }
   };
 
-
-
-
-  // 🔹 Comentaris
+  // 🔹 Cargar comentarios
   useEffect(() => {
     const fetchComments = async () => {
       if (!tripData?._id) return;
@@ -201,9 +194,7 @@ export default function RutaDetall() {
           {tripData.avgRating ? (
             <>
               {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} 
-                className={i < Math.round(tripData.avgRating ?? 0) ? "star filled" : "star"}>
-                
+                <span key={i} className={i < Math.round(tripData.avgRating ?? 0) ? "star filled" : "star"}>
                   ★
                 </span>
               ))}
@@ -223,8 +214,13 @@ export default function RutaDetall() {
           {tripData.category && <span className="tipus">{tripData.category}</span>}
         </div>
 
+        {/* Autor */}
         <div className="autor">
-          <div className="autor-icon">
+          <div
+            className="autor-icon"
+            onClick={() => tripData?.author?.userId && navigate(`/user/${tripData.author.userId}`)}
+            style={{ cursor: "pointer" }}
+          >
             {tripData.author?.profilePic ? (
               <img
                 src={tripData.author.profilePic}
@@ -240,7 +236,11 @@ export default function RutaDetall() {
             )}
           </div>
 
-          <div className="autor-info">
+          <div
+            className="autor-info"
+            onClick={() => tripData?.author?.userId && navigate(`/user/${tripData.author.userId}`)}
+            style={{ cursor: "pointer" }}
+          >
             <span className="autor-nombre">
               {tripData.author?.name || "Autor desconegut"}
             </span>
@@ -251,7 +251,6 @@ export default function RutaDetall() {
             )}
           </div>
 
-          {/* 🔘 botó Seguir / Seguint */}
           {currentUser && currentUser.uid !== tripData.author.userId && (
             <button
               className={`follow-button ${isFollowing ? "following" : ""}`}
@@ -266,8 +265,6 @@ export default function RutaDetall() {
             </button>
           )}
         </div>
-
-
 
         <div className="ruta-descripcio">
           <h2>Descripció</h2>
@@ -286,10 +283,9 @@ export default function RutaDetall() {
         />
       </div>
 
-      {/* 💬 Comentaris */}
+      {/* Comentarios */}
       <div className="ruta-comentaris">
         <h2>Comentaris</h2>
-
         {loadingComments ? (
           <p className="comentaris-loading">Carregant comentaris...</p>
         ) : comments.length === 0 ? (
@@ -301,7 +297,7 @@ export default function RutaDetall() {
                 <div className="comentari-header">
                   <div className="comentari-autor-info">
                     <div className="comentari-avatar">
-                        <img src="/images/person.png" alt="Usuari" />
+                      <img src="/images/person.png" alt="Usuari" />
                     </div>
                     <div>
                       <span className="comentari-autor">{c.userName}</span>
@@ -311,7 +307,6 @@ export default function RutaDetall() {
                     </div>
                   </div>
                 </div>
-
                 <p className="comentari-contingut">{c.content}</p>
               </li>
             ))}
@@ -319,14 +314,11 @@ export default function RutaDetall() {
         )}
       </div>
 
-
       {/* Zoom imágenes */}
       {zoomImage && (
         <div className="zoom-overlay" onClick={() => setZoomImage(null)}>
           <div className="zoom-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-zoom" onClick={() => setZoomImage(null)}>
-              ✕
-            </button>
+            <button className="close-zoom" onClick={() => setZoomImage(null)}>✕</button>
             <img src={zoomImage} alt="Zoom" />
           </div>
         </div>
@@ -338,9 +330,7 @@ export default function RutaDetall() {
             {zoomGallery.map((img, i) => (
               <img key={i} src={img} alt={`Foto ${i + 1}`} />
             ))}
-            <button className="close-zoom" onClick={() => setZoomGallery(null)}>
-              ✕
-            </button>
+            <button className="close-zoom" onClick={() => setZoomGallery(null)}>✕</button>
           </div>
         </div>
       )}

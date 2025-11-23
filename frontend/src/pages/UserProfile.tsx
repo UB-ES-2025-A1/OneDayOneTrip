@@ -8,10 +8,10 @@ import "../styles/UserProfile.css";
 import { ImageOff, Pencil } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
-import LlistaSeguits from "../components/LlistaSeguitsModal";
+import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
+import LlistaSeguidorsModal from "../components/LlistaSeguidorsModal";
 import EditarPerfil from "../components/EditarPerfilModal";
 import CreateTripForm from "../components/CreateTripForm";
-import LlistaSeguidors from "../components/LlistaSeguidorsModal"; 
 
 export type BackendUser = {
   uid: string;
@@ -71,16 +71,18 @@ export default function UserProfile() {
       try {
         setLoading(true);
         const backendUser = await getUserById(fbUser.uid);
+        // Aseguramos que siempre sean arrays
+        backendUser.llista_seguidors = backendUser.llista_seguidors || [];
+        backendUser.llista_seguits = backendUser.llista_seguits || [];
+        backendUser.publicacions = backendUser.publicacions || [];
+        backendUser.guardades = backendUser.guardades || [];
+
         setProfile(backendUser as BackendUser);
 
         const allTrips = await getAllTrips(true);
-
-        const pubIds = new Set((backendUser.publicacions || []).map(String));
-        const guardIds = new Set((backendUser.guardades || []).map(String));
-
-        const userTrips = allTrips.filter(
-          (t) => pubIds.has(String(t._id)) || guardIds.has(String(t._id))
-        );
+        const pubIds = new Set(backendUser.publicacions.map(String));
+        const guardIds = new Set(backendUser.guardades.map(String));
+        const userTrips = allTrips.filter(t => pubIds.has(String(t._id)) || guardIds.has(String(t._id)));
         setTrips(userTrips);
       } catch (e: any) {
         console.error("Error carregant perfil:", e);
@@ -103,12 +105,23 @@ export default function UserProfile() {
 
   const openRegister = () => alert("Has d'iniciar sessió per continuar.");
 
-  const openSeguidoresModal = () => setSeguidoresModalOpen(true);
+  const openSeguidorsModal = async () => {
+    if (!profile) return;
+    try {
+      const updatedProfile = await getUserById(profile.uid);
+      updatedProfile.llista_seguidors = updatedProfile.llista_seguidors || [];
+      setProfile(updatedProfile as BackendUser);
+      setSeguidoresModalOpen(true);
+    } catch (err) {
+      console.error("Error recargando seguidors:", err);
+    }
+  };
 
   const openSeguitsModal = async () => {
     if (!profile) return;
     try {
       const updatedProfile = await getUserById(profile.uid);
+      updatedProfile.llista_seguits = updatedProfile.llista_seguits || [];
       setProfile(updatedProfile as BackendUser);
       setSeguitsModalOpen(true);
     } catch (err) {
@@ -116,16 +129,12 @@ export default function UserProfile() {
     }
   };
 
-  // Función para navegar al perfil de otro usuario
   const goToProfile = (uid: string) => {
     navigate(`/user/${uid}`);
     setSeguidoresModalOpen(false);
     setSeguitsModalOpen(false);
   };
 
-  // ---------------------------
-  // Conversión Trip → GridItem
-  // ---------------------------
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((t) => ({
       id: String(t._id),
@@ -198,7 +207,7 @@ export default function UserProfile() {
                 <h3>{displayMail}</h3>
               </div>
               <div className="user-stats">
-                <div className="stat" onClick={openSeguidoresModal}>
+                <div className="stat" onClick={openSeguidorsModal}>
                   <span className="number">{seguidors}</span>
                   <span className="label">Seguidors</span>
                 </div>
@@ -260,7 +269,7 @@ export default function UserProfile() {
 
           {/* MODALES */}
           {seguitsModalOpen && profile && (
-            <LlistaSeguits
+            <LlistaSeguitsModal
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
@@ -269,7 +278,7 @@ export default function UserProfile() {
           )}
 
           {seguidoresModalOpen && profile && (
-            <LlistaSeguidors
+            <LlistaSeguidorsModal
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
               seguidors={profile.llista_seguidors || []}
