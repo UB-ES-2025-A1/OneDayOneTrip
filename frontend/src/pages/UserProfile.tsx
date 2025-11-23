@@ -11,6 +11,7 @@ import Layout from "../components/Layout";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal"
 import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
+import CreateTripForm from "../components/CreateTripForm";
 
 export type BackendUser = {
   uid: string;
