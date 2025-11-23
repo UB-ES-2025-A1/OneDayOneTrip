@@ -21,7 +21,7 @@ async def register_user(data: dict, user=Depends(verify_token)):
     if not uid:
         raise HTTPException(status_code=400, detail="Token inválido, falta UID")
 
-    # 🔹 Defaults con valores seguros
+    # Defaults con valores seguros
     user_data = {
         "uid": uid,
         "data_creacio": datetime.utcnow().isoformat(),
