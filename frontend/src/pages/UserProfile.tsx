@@ -8,10 +8,10 @@ import "../styles/UserProfile.css";
 import { ImageOff, Pencil } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
-import CreateTripForm from "../components/CreateTripForm";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal"
 import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
+import CreateTripForm from "../components/CreateTripForm";
 
 export type BackendUser = {
   uid: string;
