@@ -249,6 +249,7 @@ export default function UserProfile() {
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
+              currentUserId={currentUser.uid}
             />
           )}
         </>

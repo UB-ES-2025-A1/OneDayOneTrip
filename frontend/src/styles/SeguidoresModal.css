@@ -70,3 +70,32 @@
 .seguidor-username {
   color: #666; font-size: 13px; margin: 0;
 }
+
+.seguidor-toggle-btn {
+  margin-left: auto;             
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid #2e492e;     
+  background-color: white;        
+  color: #2e492e;
+  transition: all 0.25s ease-in-out;
+}
+
+.seguidor-toggle-btn:hover {
+  background-color: #2e492e;
+  color: white;
+}
+
+.seguidor-toggle-btn.following {
+  background-color: #ffffff;
+  color: #c62828;                 
+  border-color: #c62828;
+}
+
+.seguidor-toggle-btn.following:hover {
+  background-color: #c62828;
+  color: white;
+}
