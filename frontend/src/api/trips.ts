@@ -49,9 +49,11 @@ export interface Comment {
   tripId: string;
   userId: string;
   userName: string;
-  content: string;
-  createdAt: string; // ISO string
+  userProfilePicture: string;   
+  text: string;                
+  createdAt: string;
 }
+
 
 // ==========================================================
 // 🌍 Base URL
@@ -110,33 +112,45 @@ export async function getTripComments(
 // ==========================================================
 // Crear un comentari per una trip
 // ==========================================================
-
 export async function createTripComment(
   tripId: string,
   data: {
     userId: string;
     userName: string;
-    content: string;
+    userProfilePicture: string;  
+    text: string;                 
   }
 ): Promise<Comment> {
   const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments`;
+  
+  const payload = {
+    tripId,
+    userId: data.userId,
+    userName: data.userName,
+    userProfilePicture: data.userProfilePicture,
+    text: data.text,
+    createdAt: new Date().toISOString(),
+  };
 
   const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Error creant comentari: ${tripId}. ${text}`);
+    throw new Error(`Error creant comentari (${tripId}): ${text}`);
   }
 
-  // Suposo que el backend retorna el comentari creat
-  return await res.json();
+  // El backend devuelve:
+  // { message: "...", comment: { ... } }
+  const dataRes = await res.json();
+  return dataRes.comment;
 }
+
 
 
 // ==========================================================
