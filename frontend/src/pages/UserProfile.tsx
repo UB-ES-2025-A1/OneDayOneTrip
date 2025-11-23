@@ -8,7 +8,6 @@ import "../styles/UserProfile.css";
 import { ImageOff, Pencil } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
-import CreateTripForm from "../components/CreateTripForm";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal"
 import CreateTripForm from "../components/CreateTripForm"
@@ -260,17 +259,20 @@ export default function UserProfile() {
           open={seguidoresModalOpen}
           onClose={() => setSeguidoresModalOpen(false)}
           seguidors={profile.llista_seguidors || []}
-          
+        />
+      )}
+
       {openEdit && profile && (
         <EditarPerfil 
           profile={profile} 
           onClose={() => setOpenEdit(false)}
           onSave={(updated) => {
-            setProfile(updated);     
-            setOpenEdit(false);       
+            setProfile(updated);
+            setOpenEdit(false);
           }}
         />
       )}
+
     </Layout>
   );
 }
