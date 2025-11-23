@@ -5,11 +5,19 @@ import { auth } from "../firebase";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
-import { getTripById, getAllTrips, getTripComments, type Trip, type Comment } from "../api/trips";
+import {
+  getTripById,
+  getAllTrips,
+  getTripComments,
+  type Trip,
+  type Comment,
+  rateTrip,          
+} from "../api/trips";
+
 import dayjs from "dayjs";
 import "dayjs/locale/ca";
-import { getUserById, followUser } from "../api/client";
 import Valorar from "../components/Valorar";
+import { getUserById, followUser, unfollowUser } from "../api/client";
 
 
 
@@ -108,28 +116,66 @@ export default function RutaDetall() {
 
   const handleFollow = async () => {
     if (!currentUser || !tripData?.author?.userId) return;
-    if (isFollowing) return; // ja el seguim
 
     const userId = currentUser.uid;
     const targetId = tripData.author.userId;
 
-    if (userId === targetId) return; // per si de cas no et segueixis a tu mateix
+    if (userId === targetId) return; // per si de cas, no pots seguir-te tu mateix
 
     try {
       setFollowLoading(true);
 
-      // 🔥 crida real al backend (NO toquem backend)
-      await followUser(userId, targetId);
-
-      // actualitzem estat del front
-      setIsFollowing(true);
-      setFollowersCount((prev) => (prev == null ? 1 : prev + 1));
+      if (!isFollowing) {
+        await followUser(userId, targetId);
+        setIsFollowing(true);
+        setFollowersCount((prev) => (prev == null ? 1 : prev + 1));
+      } else {
+        await unfollowUser(userId, targetId);
+        setIsFollowing(false);
+        setFollowersCount((prev) =>
+          prev == null || prev <= 0 ? 0 : prev - 1
+        );
+      }
     } catch (err) {
-      console.error("Error seguint l'autor:", err);
+      console.error("Error canviant estat de seguir/seguir:", err);
     } finally {
       setFollowLoading(false);
     }
   };
+
+  // dentro de RutaDetall()
+
+const handleSubmitRating = async (value: number) => {
+  if (!currentUser) {
+    alert("Has d'iniciar sessió per valorar la ruta.");
+    return;
+  }
+  if (!tripData?._id) return;
+
+  try {
+    const stats = await rateTrip(tripData._id, {
+      userId: currentUser.uid,
+      rating: value,
+    });
+
+    // Actualizamos las stats en el estado de la ruta
+    setTripData((prev) =>
+      prev
+        ? {
+            ...prev,
+            avgRating: stats.avgRating,
+            numRatings: stats.numRatings,
+          }
+        : prev
+    );
+
+    setShowRatingModal(false);
+  } catch (err) {
+    console.error("Error valorant la ruta:", err);
+    alert("No s'ha pogut enviar la valoració. Torna-ho a intentar més tard.");
+  }
+};
+
 
 
 
@@ -195,6 +241,16 @@ export default function RutaDetall() {
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
 
+          {tripData.avgRating != null && (
+            <div className="rating-summary">
+              <span className="rating-star">★</span>
+              <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
+              {tripData.numRatings != null && (
+                <span className="rating-count">({tripData.numRatings})</span>
+              )}
+            </div>
+          )}
+
           <button
             type="button"
             className="valorar-button"
@@ -204,6 +260,7 @@ export default function RutaDetall() {
             Valorar
           </button>
         </div>
+
 
 
         <div className="ubicacio">
@@ -250,7 +307,7 @@ export default function RutaDetall() {
             <button
               className={`follow-button ${isFollowing ? "following" : ""}`}
               onClick={handleFollow}
-              disabled={followLoading || isFollowing}
+              disabled={followLoading}
             >
               {isFollowing
                 ? "Seguint"
@@ -314,21 +371,17 @@ export default function RutaDetall() {
       </div>
 
       {showRatingModal && (
-      <div
-        className="valorar-overlay"
-        onClick={() => setShowRatingModal(false)}
-      >
-        <div
-          className="valorar-modal"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Valorar
-            tripId={tripData._id!}
-            onClose={() => setShowRatingModal(false)}
-          />
+        <div className="valorar-overlay" onClick={() => setShowRatingModal(false)}>
+          <div className="valorar-modal" onClick={(e) => e.stopPropagation()}>
+            <Valorar
+              tripId={tripData._id!}
+              onClose={() => setShowRatingModal(false)}
+              onSubmit={handleSubmitRating}  
+            />
+          </div>
         </div>
-      </div>
-    )}
+      )}
+
       {/* Zoom imágenes */}
       {zoomImage && (
         <div className="zoom-overlay" onClick={() => setZoomImage(null)}>
