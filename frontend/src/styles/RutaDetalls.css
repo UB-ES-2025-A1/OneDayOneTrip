@@ -587,6 +587,39 @@
   filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.6));
 }
 
+/* ------------------------------------------------------ */
+/* ⭐ Valoración actual de la ruta                        */
+/* ------------------------------------------------------ */
+
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff7d7;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #5a4500;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-right: 10px;
+  height: fit-content;
+}
+
+.rating-summary .rating-star {
+  font-size: 18px;
+  color: #e6ae00;
+}
+
+.rating-summary .rating-value {
+  font-size: 16px;
+}
+
+.rating-summary .rating-count {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
 
 /* =========================================================
    📱 RESPONSIVE DESIGN

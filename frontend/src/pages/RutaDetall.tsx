@@ -241,6 +241,16 @@ const handleSubmitRating = async (value: number) => {
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
 
+          {tripData.avgRating != null && (
+            <div className="rating-summary">
+              <span className="rating-star">★</span>
+              <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
+              {tripData.numRatings != null && (
+                <span className="rating-count">({tripData.numRatings})</span>
+              )}
+            </div>
+          )}
+
           <button
             type="button"
             className="valorar-button"
@@ -250,6 +260,7 @@ const handleSubmitRating = async (value: number) => {
             Valorar
           </button>
         </div>
+
 
 
         <div className="ubicacio">
