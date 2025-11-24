@@ -5,8 +5,12 @@ from datetime import datetime
 class CommentModel(BaseModel):
     tripId: str
     userId: str
-    userProfilePicture: str
-    userName: str   # <-- corregido
+    userName: str
+    userProfilePicture: Optional[str] = None
     text: str
-    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    createdAt: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }

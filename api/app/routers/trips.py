@@ -183,7 +183,7 @@ async def create_trip_multipart(
 
 
 from datetime import datetime
-from app.services.mongo_service import upsert_rating
+from app.services.mongo_service import  upsert_rating
 from fastapi import Body
 
 
@@ -203,7 +203,5 @@ def add_trip_rating(
     upsert_rating(trip_id, userId, rating, datetime.utcnow())
     print(f"[DEBUG] ✅ Rating guardado o actualizado correctamente")
     return {"message": "Rating añadido o actualizado"}
-
-
 
 

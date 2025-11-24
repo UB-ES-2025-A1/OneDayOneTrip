@@ -2,6 +2,7 @@
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from bson import ObjectId
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 
 load_dotenv()
@@ -147,12 +148,13 @@ def upsert_rating(trip_id: str, user_id: str, rating: int, date):
 # ============================================================
 # 💬 COMMENTS
 # ============================================================
+
 def list_comments(trip_id: str, limit: int = 20, skip: int = 0):
-    """Obtiene comentarios paginados de una trip."""
+    """Obtiene comentarios ordenados (más nuevos primero)."""
     try:
         cursor = (
             comments_collection.find({"tripId": ObjectId(trip_id)})
-            .sort("createdAt", ASCENDING)
+            .sort("createdAt", DESCENDING)
             .skip(skip)
             .limit(limit)
         )
@@ -160,7 +162,12 @@ def list_comments(trip_id: str, limit: int = 20, skip: int = 0):
         out = []
         for c in cursor:
             c["_id"] = str(c["_id"])
-            c["tripId"] = str(c["tripId"])  # convertir ObjectId → string
+            c["tripId"] = str(c["tripId"])
+
+            # Convert datetime → string ISO para frontend
+            if isinstance(c["createdAt"], datetime):
+                c["createdAt"] = c["createdAt"].isoformat()
+
             out.append(c)
 
         return out

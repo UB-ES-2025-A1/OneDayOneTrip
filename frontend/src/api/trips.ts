@@ -43,15 +43,17 @@ export interface Trip {
   numRatings?: number;
 }
 
-// Comentarios
 export interface Comment {
   _id: string;
   tripId: string;
   userId: string;
   userName: string;
-  content: string;
-  createdAt: string; // ISO string
+  userProfilePicture?: string | null;  // opcional / puede ser null
+  text: string;
+  createdAt: string;                   // ISO string desde el backend
 }
+
+
 
 // ==========================================================
 // 🌍 Base URL
@@ -83,6 +85,7 @@ export async function getTripById(tripId: string): Promise<Trip> {
   return await res.json();
 }
 
+
 // ==========================================================
 // 🔍 Obtener comentarios de una trip
 // ==========================================================
@@ -97,12 +100,64 @@ export async function getTripComments(
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Error carregant comentaris de la ruta: ${tripId}. ${text}`);
+    throw new Error(
+      `Error carregant comentaris de la ruta: ${tripId}. ${text}`
+    );
   }
 
   const data = await res.json();
-  return data.comments || [];
+
+  // Backend: { comments: [...] }
+  const comments = (data?.comments ?? []) as Comment[];
+
+  return comments;
 }
+
+
+// ==========================================================
+// 📝 Crear un comentari per una trip
+// ==========================================================
+export async function createTripComment(
+  tripId: string,
+  data: {
+    userId: string;
+    userName: string;
+    userProfilePicture?: string;
+    text: string;
+  }
+): Promise<Comment> {
+  const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments`;
+
+  const payload = {
+    tripId,                    // coincide con CommentModel.tripId
+    userId: data.userId,
+    userName: data.userName,
+    userProfilePicture: data.userProfilePicture ?? "",
+    text: data.text,
+    // ❌ ya no mandamos createdAt: lo genera el backend
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Error creant comentari (${tripId}): ${text}`);
+  }
+
+  // El backend devuelve:
+  // { "comment": { ... } }
+  const dataRes = await res.json();
+  return dataRes.comment as Comment;
+}
+
+
+
 
 // ==========================================================
 // ✨ Payload para crear trips (TripCreateIn)
