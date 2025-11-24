@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
-import { getUserById } from "../api/client";
+import { getUserById, followUser, unfollowUser } from "../api/client";
 import "../styles/SeguidoresModal.css";
 
 interface BackendUser {
@@ -14,27 +14,41 @@ interface Props {
   open: boolean;
   onClose: () => void;
   seguits: string[];
+  currentUserId: string;
   goToProfile?: (uid: string) => void;
 }
 
-export default function LlistaSeguitsModal({ open, onClose, seguits, goToProfile }: Props) {
+export default function LlistaSeguitsModal({
+  open,
+  onClose,
+  seguits,
+  currentUserId,
+  goToProfile
+}: Props) {
   const [users, setUsers] = useState<BackendUser[]>([]);
   const [loading, setLoading] = useState(false);
+  const [localSeguits, setLocalSeguits] = useState<string[]>(seguits);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // 🔄 Actualitzar llista local quan canviïn els seguits del backend
+  useEffect(() => {
+    setLocalSeguits(seguits);
+  }, [seguits]);
+
+  // 🔍 Carregar informació dels usuaris seguits
   useEffect(() => {
     if (!open) return;
 
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        if (!seguits || seguits.length === 0) {
+        if (!localSeguits || localSeguits.length === 0) {
           setUsers([]);
           return;
         }
 
         const fetchedUsers = await Promise.all(
-          seguits.map(async (uid) => await getUserById(uid))
+          localSeguits.map(async (uid) => await getUserById(uid))
         );
 
         setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
@@ -47,16 +61,16 @@ export default function LlistaSeguitsModal({ open, onClose, seguits, goToProfile
     };
 
     fetchUsers();
-  }, [open, seguits]);
+  }, [open, localSeguits]);
 
-  // Animación GSAP al mostrar usuarios
+  // ✨ Animació al mostrar resultats
   useEffect(() => {
     if (!users || users.length === 0) return;
     const items = gsap.utils.toArray<HTMLElement>(".seguidor-item");
     gsap.fromTo(
       items,
-      { opacity: 0, y: 20, filter: "blur(5px)" },
-      { opacity: 1, y: 0, filter: "blur(0)", duration: 0.5, stagger: 0.1, ease: "power2.out" }
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 }
     );
   }, [users]);
 
@@ -65,7 +79,10 @@ export default function LlistaSeguitsModal({ open, onClose, seguits, goToProfile
   return (
     <div className="modal-backdrop">
       <div className="seguidores-card" ref={containerRef}>
-        <button className="close-btn" onClick={onClose}>×</button>
+        <button className="close-btn" onClick={onClose}>
+          ×
+        </button>
+
         <h2 className="seguidores-title">Seguits</h2>
 
         {loading ? (
@@ -74,23 +91,58 @@ export default function LlistaSeguitsModal({ open, onClose, seguits, goToProfile
           <p className="seguidores-empty">No segueixes a ningú.</p>
         ) : (
           <div className="seguidores-list">
-            {users.map((u) => (
-              <div
-                key={u.uid}
-                className="seguidor-item"
-                onClick={() => goToProfile?.(u.uid)}
-              >
-                <img
-                  src={u.url_foto_perfil || "/images/default-profile.png"}
-                  className="seguidor-foto"
-                  alt={u.username || "usuari"}
-                />
-                <div className="seguidor-info">
-                  <p className="seguidor-nom">{u.nom_i_cognoms || "Usuari"}</p>
-                  <p className="seguidor-username">@{u.username || "unknown"}</p>
+            {users.map((u) => {
+              const isFollowing = localSeguits.includes(u.uid);
+
+              const handleToggleFollow = async (e: React.MouseEvent) => {
+                e.stopPropagation(); // Evitar navegar al perfil
+
+                try {
+                  if (isFollowing) {
+                    await unfollowUser(currentUserId, u.uid);
+                    setLocalSeguits((prev) => prev.filter((id) => id !== u.uid));
+                  } else {
+                    await followUser(currentUserId, u.uid);
+                    setLocalSeguits((prev) =>
+                      prev.includes(u.uid) ? prev : [...prev, u.uid]
+                    );
+                  }
+                } catch (err) {
+                  console.error("Error canviant estat de seguir:", err);
+                }
+              };
+
+              return (
+                <div
+                  key={u.uid}
+                  className="seguidor-item"
+                  onClick={() => goToProfile?.(u.uid)}
+                >
+                  <img
+                    src={u.url_foto_perfil || "/images/default-profile.png"}
+                    className="seguidor-foto"
+                    alt={u.username || "usuari"}
+                  />
+
+                  <div className="seguidor-info">
+                    <p className="seguidor-nom">{u.nom_i_cognoms || "Usuari"}</p>
+                    <p className="seguidor-username">@{u.username || "unknown"}</p>
+                  </div>
+
+                  {/* 🔘 BOTÓ SEGUIR/DEIXAR DE SEGUIR */}
+                  <button
+                    className={
+                      isFollowing
+                        ? "seguidor-toggle-btn following"
+                        : "seguidor-toggle-btn"
+                    }
+                    onClick={handleToggleFollow}
+                  >
+                    {isFollowing ? "Deixar de seguir" : "Seguir"}
+                  </button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

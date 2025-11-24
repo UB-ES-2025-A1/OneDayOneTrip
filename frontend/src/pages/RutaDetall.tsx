@@ -5,9 +5,15 @@ import { auth } from "../firebase";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
-import { getTripById, getAllTrips, getTripComments, type Trip, type Comment } from "../api/trips";
-import dayjs from "dayjs";
-import "dayjs/locale/ca";
+import {
+  getTripById,
+  getAllTrips,
+  rateTrip,
+  type Trip,
+} from "../api/trips";
+
+import Valorar from "../components/Valorar";
+import Comments from "../components/Comments";
 import { getUserById, followUser, unfollowUser } from "../api/client";
 
 const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
@@ -16,33 +22,47 @@ const isNumericIndex = (s: string) => /^\d+$/.test(s || "");
 export default function RutaDetall() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [backendUser, setBackendUser] = useState<any | null>(null);
   const [tripData, setTripData] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [mainImage, setMainImage] = useState<string>("");
-  const [zoomImage, setZoomImage] = useState<string | null>(null);
-  const [zoomGallery, setZoomGallery] = useState<string[] | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loadingComments, setLoadingComments] = useState(true);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
-  // 🔹 Auth listener
+  // Cargar usuario Firebase + backendUser
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, setCurrentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      setCurrentUser(fbUser);
+
+      if (fbUser) {
+        try {
+          const dbUser = await getUserById(fbUser.uid);
+          setBackendUser(dbUser);
+        } catch (err) {
+          console.error("Error carregant backendUser:", err);
+        }
+      } else {
+        setBackendUser(null);
+      }
+    });
+
     return () => unsubscribe();
   }, []);
 
-  // 🔹 Logout
   const handleLogout = async () => {
     await signOut(auth);
     setCurrentUser(null);
     navigate("/");
   };
 
-  // 🔹 Cargar ruta
+  // Cargar ruta
   useEffect(() => {
     const fetchTrip = async () => {
       if (!id) {
@@ -53,6 +73,7 @@ export default function RutaDetall() {
 
       try {
         setLoading(true);
+
         if (isMongoObjectId(id)) {
           const data = await getTripById(id);
           setTripData(data);
@@ -60,8 +81,10 @@ export default function RutaDetall() {
         } else if (isNumericIndex(id)) {
           const trips = await getAllTrips(false);
           const idx = parseInt(id) - 1;
+
           const tripAtIndex = trips[idx];
-          if (tripAtIndex?._id) navigate(`/ruta/${tripAtIndex._id}`, { replace: true });
+          if (tripAtIndex?._id)
+            navigate(`/ruta/${tripAtIndex._id}`, { replace: true });
         } else {
           setError("ID invàlid.");
         }
@@ -74,11 +97,10 @@ export default function RutaDetall() {
     fetchTrip();
   }, [id, navigate]);
 
-  // 🔹 Cargar datos del autor
+  // Cargar datos del autor
   useEffect(() => {
-    const loadAuthorData = async () => {
+    const loadAuthor = async () => {
       if (!tripData?.author?.userId) return;
-
       try {
         const author = await getUserById(tripData.author.userId);
         const seguidorsNumber = author.llista_seguidors
@@ -88,15 +110,15 @@ export default function RutaDetall() {
         setFollowersCount(seguidorsNumber);
 
         if (currentUser) {
-          const followersList: string[] = author.llista_seguidors || [];
-          setIsFollowing(followersList.includes(currentUser.uid));
+          const followers: string[] = author.llista_seguidors || [];
+          setIsFollowing(followers.includes(currentUser.uid));
         }
-      } catch (err) {
-        console.error("Error carregant dades de l'autor:", err);
+      } catch (e) {
+        console.error("Error carregant dades de l'autor", e);
       }
     };
 
-    loadAuthorData();
+    loadAuthor();
   }, [tripData, currentUser]);
 
   // 🔹 Seguir / Dejar de seguir
@@ -114,16 +136,14 @@ export default function RutaDetall() {
       if (!isFollowing) {
         await followUser(userId, targetId);
         setIsFollowing(true);
-        setFollowersCount((prev) => (prev == null ? 1 : prev + 1));
+        setFollowersCount((v) => (v ?? 0) + 1);
       } else {
         await unfollowUser(userId, targetId);
         setIsFollowing(false);
-        setFollowersCount((prev) =>
-          prev == null || prev <= 0 ? 0 : prev - 1
-        );
+        setFollowersCount((v) => Math.max(0, (v ?? 0) - 1));
       }
     } catch (err) {
-      console.error("Error canviant estat de seguir/seguir:", err);
+      console.error("Error seguint/seguixent:", err);
     } finally {
       setFollowLoading(false);
     }
@@ -145,6 +165,35 @@ export default function RutaDetall() {
     };
     fetchComments();
   }, [tripData]);
+  // 🔹 Valorar ruta
+  const handleSubmitRating = async (value: number) => {
+    if (!currentUser) {
+      alert("Has d'iniciar sessió per valorar.");
+      return;
+    }
+    if (!tripData?._id) return;
+
+    try {
+      const stats = await rateTrip(tripData._id, {
+        userId: currentUser.uid,
+        rating: value,
+      });
+
+      setTripData((prev) =>
+        prev
+          ? {
+              ...prev,
+              avgRating: stats.avgRating,
+              numRatings: stats.numRatings,
+            }
+          : prev
+      );
+
+      setShowRatingModal(false);
+    } catch (err) {
+      alert("No s'ha pogut enviar la valoració.");
+    }
+  };
 
   if (loading) return <div className="loading">Carregant ruta...</div>;
   if (error || !tripData)
@@ -165,28 +214,24 @@ export default function RutaDetall() {
       onBack={() => navigate(-1)}
       variant="ruta"
     >
-      {/* Galeria principal */}
+      {/* Galería */}
       <div className="ruta-galeria-principal">
         <div className="imatge-gran">
           {mainImage ? (
-            <img src={mainImage} alt="Imatge principal" onClick={() => setZoomImage(mainImage)} />
+            <img src={mainImage} alt="Imatge principal" />
           ) : (
             <div className="no-image">Sense imatge</div>
           )}
         </div>
+
         <div className="miniatures">
-          {tripData.gallery?.slice(0, 2).map((img, i) => (
-            <img key={i} src={img} onClick={() => setZoomGallery([img])} />
+          {tripData.gallery?.slice(0, 3).map((img, i) => (
+            <img key={i} src={img} />
           ))}
-          {tripData.gallery && tripData.gallery.length > 2 && (
-            <div className="mes-fotos" onClick={() => setZoomGallery(tripData.gallery.slice(2))}>
-              <span>+{tripData.gallery.length - 2} fotos</span>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Dades ruta */}
+      {/* Datos */}
       <div className="ruta-detall">
         <h1>{tripData.title}</h1>
 
@@ -198,20 +243,30 @@ export default function RutaDetall() {
                   ★
                 </span>
               ))}
+        <div className="ruta-header-line">
+          <h1 className="ruta-titol">{tripData.title}</h1>
+
+          {tripData.avgRating != null && (
+            <div className="rating-summary">
+              <span className="rating-star">★</span>
               <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
-            </>
-          ) : (
-            <span className="rating-value">Sense valoració</span>
+              <span className="rating-count">({tripData.numRatings})</span>
+            </div>
           )}
+
+          <button
+            className="valorar-button"
+            onClick={() => setShowRatingModal(true)}
+          >
+            <span className="valorar-icon">★</span>
+            Valorar
+          </button>
         </div>
 
         <div className="ubicacio">
-          <img src="/images/ubi.png" alt="Ubicació" className="ubi-icon" />
-          <span>
-            {tripData.city}
-            {tripData.region ? `, ${tripData.region}` : ""}
-          </span>
-          {tripData.category && <span className="tipus">{tripData.category}</span>}
+          <img src="/images/ubi.png" className="ubi-icon" />
+          <span>{tripData.city}</span>
+          {tripData.region && <span>, {tripData.region}</span>}
         </div>
 
         {/* Autor */}
@@ -254,23 +309,21 @@ export default function RutaDetall() {
           {currentUser && currentUser.uid !== tripData.author.userId && (
             <button
               className={`follow-button ${isFollowing ? "following" : ""}`}
-              onClick={handleFollow}
               disabled={followLoading}
+              onClick={handleFollow}
             >
-              {isFollowing
-                ? "Seguint"
-                : followLoading
-                ? "Seguint..."
-                : "Seguir"}
+              {isFollowing ? "Seguint" : "Seguir"}
             </button>
           )}
         </div>
 
+        {/* Descripción */}
         <div className="ruta-descripcio">
           <h2>Descripció</h2>
           <p>{tripData.description}</p>
         </div>
 
+        {/* Etapas */}
         <h2>Etapes de la Ruta</h2>
         <EtapesList
           etapes={tripData.trip_points.map((p, i) => ({

@@ -1,0 +1,113 @@
+/* ============================
+   MODAL OVERLAY + CONTAINER
+============================ */
+.valorar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.valorar-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px 32px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  position: relative;
+  animation: fadeInScale 0.25s ease-out;
+}
+
+/* Animació */
+@keyframes fadeInScale {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+
+.valorar-header {
+  position: relative;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.valorar-title {
+  font-size: 1.4rem;
+  color: #2e492e;
+  font-weight: 700;
+  margin: 0 auto;
+}
+
+.valorar-close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: none;
+  background: transparent;
+  font-size: 1.7rem;
+  cursor: pointer;
+  color: #555;
+}
+
+
+.rating {
+  display: flex;
+  justify-content: center;
+  direction: rtl;
+  unicode-bidi: bidi-override;
+  margin-bottom: 25px;
+}
+
+.rating:not(:checked) > input {
+  position: absolute;
+  appearance: none;
+}
+
+.rating:not(:checked) > label {
+  cursor: pointer;
+  font-size: 38px;    /* ⭐️ Més gran */
+  color: #666;
+  padding: 0 4px;
+}
+
+.rating:not(:checked) > label:before {
+  content: '★';
+}
+
+.rating:not(:checked) > label:hover,
+.rating:not(:checked) > label:hover ~ label {
+  color: #ff9e0b;
+}
+
+.rating > input:checked ~ label {
+  color: #ffa723;
+}
+
+
+.valorar-submit {
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: none;
+  background: #2e492e;
+  color: white;
+  font-size: 0.95rem;  /* 🔹 més petit */
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: block;
+  margin: 0 auto;      /* centrat */
+  margin-top: 10px;
+}
+
+.valorar-submit:disabled {
+  background: #999;
+  cursor: default;
+}
+
+.valorar-submit:hover:enabled {
+  background: #093b22;
+}

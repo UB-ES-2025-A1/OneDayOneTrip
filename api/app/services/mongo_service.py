@@ -1,7 +1,8 @@
 # api/app/services/mongo_service.py
-from pymongo import MongoClient, ASCENDING
+from pymongo import MongoClient, ASCENDING, DESCENDING
 from bson import ObjectId
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 
 load_dotenv()
@@ -143,32 +144,29 @@ def upsert_rating(trip_id: str, user_id: str, rating: int, date):
 # 💬 COMMENTS
 # ============================================================
 
-def add_comment(doc: dict) -> str:
-    """Añade un nuevo comentario vinculado a una trip."""
-    try:
-        doc_db = {**doc, "tripId": ObjectId(doc["tripId"])}
-        res = comments_collection.insert_one(doc_db)
-        return str(res.inserted_id)
-    except Exception:
-        print("[MOCK] add_comment() ejecutado sin Mongo real.")
-        return "mock_comment_id"
-
-
 def list_comments(trip_id: str, limit: int = 20, skip: int = 0):
-    """Obtiene comentarios paginados de una trip."""
+    """Obtiene comentarios ordenados (más nuevos primero)."""
     try:
         cursor = (
             comments_collection.find({"tripId": ObjectId(trip_id)})
-            .sort("createdAt", ASCENDING)
+            .sort("createdAt", DESCENDING)
             .skip(skip)
             .limit(limit)
         )
+
         out = []
         for c in cursor:
             c["_id"] = str(c["_id"])
             c["tripId"] = str(c["tripId"])
+
+            # Convert datetime → string ISO para frontend
+            if isinstance(c["createdAt"], datetime):
+                c["createdAt"] = c["createdAt"].isoformat()
+
             out.append(c)
+
         return out
+
     except Exception:
         print("[MOCK] list_comments() ejecutado sin Mongo real.")
         return []

@@ -9,8 +9,8 @@ import { ImageOff, Pencil } from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
-import LlistaSeguidorsModal from "../components/LlistaSeguidorsModal";
-import EditarPerfil from "../components/EditarPerfilModal";
+import EditarPerfil from "../components/EditarPerfilModal"
+import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
 import CreateTripForm from "../components/CreateTripForm";
 
 export type BackendUser = {
@@ -273,31 +273,30 @@ export default function UserProfile() {
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
-              goToProfile={goToProfile}
-            />
-          )}
-
-          {seguidoresModalOpen && profile && (
-            <LlistaSeguidorsModal
-              open={seguidoresModalOpen}
-              onClose={() => setSeguidoresModalOpen(false)}
-              seguidors={profile.llista_seguidors || []}
-              goToProfile={goToProfile}
-            />
-          )}
-
-          {openEdit && profile && (
-            <EditarPerfil 
-              profile={profile} 
-              onClose={() => setOpenEdit(false)}
-              onSave={(updated) => {
-                setProfile(updated);     
-                setOpenEdit(false);       
-              }}
+              currentUserId={currentUser.uid}
             />
           )}
         </>
+        
       )}
+      {seguidoresModalOpen && profile && (
+      <LlistaSeguidors
+        open={seguidoresModalOpen}
+        onClose={() => setSeguidoresModalOpen(false)}
+        seguidors={profile.llista_seguidors || []}
+      />
+    )}
+
+    {openEdit && profile && (
+      <EditarPerfil 
+        profile={profile} 
+        onClose={() => setOpenEdit(false)}
+        onSave={(updated) => {
+          setProfile(updated);     
+          setOpenEdit(false);       
+        }}
+      />
+    )}
     </Layout>
   );
 }
