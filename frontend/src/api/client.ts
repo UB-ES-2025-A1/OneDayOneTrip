@@ -1,9 +1,9 @@
 import { getAuth } from "firebase/auth";
 
-const API_URL = "https://onedayonetrip-api.onrender.com"; // o http://127.0.0.1:8000 para local
+const API_URL = "http://127.0.0.1:8000"; // o http://127.0.0.1:8000 para local
 
 // ------------------------------
-// 🔹 Funciones base genéricas
+// Funciones base genéricas
 // ------------------------------
 export async function apiGet(path: string) {
   const user = getAuth().currentUser;
@@ -35,10 +35,10 @@ export async function apiPost(path: string, body: object) {
 }
 
 // ------------------------------
-// 👤 Endpoints de usuarios
+// Endpoints de usuarios
 // ------------------------------
 
-// 📌 Registrar usuario (nuevo endpoint FastAPI)
+// Registrar usuario (nuevo endpoint FastAPI)
 export async function registerUser(data: {
   fullname: string;
   username: string;
@@ -47,17 +47,25 @@ export async function registerUser(data: {
   return apiPost("/users/register", data);
 }
 
-// 📌 Obtener el usuario autenticado
+// Obtener el usuario autenticado
 export async function getCurrentUser() {
   return apiGet("/users/me");
 }
 
-// 📌 Obtener un usuario por su ID (público o autenticado)
+// Obtener un usuario por su ID (público o autenticado)
 export async function getUserById(userId: string) {
   return apiGet(`/users/${userId}`);
 }
 
-// 📌 Obtener todos los usuarios (solo si autenticado)
+// Obtener todos los usuarios (solo si autenticado)
 export async function getAllUsers() {
   return apiGet("/users");
+}
+// Seguir un usuario
+export async function followUser(userId: string, targetId: string) {
+  return apiPost(`/users/follow/${userId}/${targetId}`, {});
+}
+// Deixar de seguir un usuari
+export async function unfollowUser(userId: string, targetId: string) {
+  return apiPost(`/users/unfollow/${userId}/${targetId}`, {});
 }
