@@ -36,7 +36,7 @@ export default function RutaDetall() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
-  // 🔹 Cargar usuario Firebase + backendUser
+  // Cargar usuario Firebase + backendUser
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setCurrentUser(fbUser);
@@ -62,7 +62,7 @@ export default function RutaDetall() {
     navigate("/");
   };
 
-  // 🔹 Cargar ruta
+  // Cargar ruta
   useEffect(() => {
     const fetchTrip = async () => {
       if (!id) {
@@ -97,20 +97,17 @@ export default function RutaDetall() {
     fetchTrip();
   }, [id, navigate]);
 
-  // 🔹 Datos del autor
+  // Cargar datos del autor
   useEffect(() => {
     const loadAuthor = async () => {
       if (!tripData?.author?.userId) return;
       try {
         const author = await getUserById(tripData.author.userId);
-
-        const count = author.llista_seguidors
+        const seguidorsNumber = author.llista_seguidors
           ? author.llista_seguidors.length
-          : typeof author.seguidors === "number"
-          ? author.seguidors
-          : 0;
+          : (typeof author.seguidors === "number" ? author.seguidors : 0);
 
-        setFollowersCount(count);
+        setFollowersCount(seguidorsNumber);
 
         if (currentUser) {
           const followers: string[] = author.llista_seguidors || [];
@@ -131,6 +128,8 @@ export default function RutaDetall() {
     const userId = currentUser.uid;
     const targetId = tripData.author.userId;
 
+    if (userId === targetId) return;
+
     try {
       setFollowLoading(true);
 
@@ -150,6 +149,22 @@ export default function RutaDetall() {
     }
   };
 
+  // 🔹 Cargar comentarios
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (!tripData?._id) return;
+      try {
+        setLoadingComments(true);
+        const data = await getTripComments(tripData._id);
+        setComments(data);
+      } catch {
+        console.error("Error carregant comentaris");
+      } finally {
+        setLoadingComments(false);
+      }
+    };
+    fetchComments();
+  }, [tripData]);
   // 🔹 Valorar ruta
   const handleSubmitRating = async (value: number) => {
     if (!currentUser) {
@@ -218,6 +233,16 @@ export default function RutaDetall() {
 
       {/* Datos */}
       <div className="ruta-detall">
+        <h1>{tripData.title}</h1>
+
+        <div className="valoracio">
+          {tripData.avgRating ? (
+            <>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <span key={i} className={i < Math.round(tripData.avgRating ?? 0) ? "star filled" : "star"}>
+                  ★
+                </span>
+              ))}
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
 
@@ -246,16 +271,34 @@ export default function RutaDetall() {
 
         {/* Autor */}
         <div className="autor">
-          <div className="autor-icon">
-            <img
-              src={tripData.author?.profilePic || "/images/person.png"}
-              alt="Autor"
-              className="autor-foto"
-            />
+          <div
+            className="autor-icon"
+            onClick={() => tripData?.author?.userId && navigate(`/user/${tripData.author.userId}`)}
+            style={{ cursor: "pointer" }}
+          >
+            {tripData.author?.profilePic ? (
+              <img
+                src={tripData.author.profilePic}
+                alt={tripData.author.name}
+                className="autor-foto"
+              />
+            ) : (
+              <img
+                src="/images/person.png"
+                alt="Autor"
+                className="author-icon"
+              />
+            )}
           </div>
 
-          <div className="autor-info">
-            <span className="autor-nombre">{tripData.author?.name}</span>
+          <div
+            className="autor-info"
+            onClick={() => tripData?.author?.userId && navigate(`/user/${tripData.author.userId}`)}
+            style={{ cursor: "pointer" }}
+          >
+            <span className="autor-nombre">
+              {tripData.author?.name || "Autor desconegut"}
+            </span>
             {followersCount !== null && (
               <span className="autor-seguidors">
                 {followersCount} seguidor{followersCount === 1 ? "" : "s"}
@@ -293,21 +336,54 @@ export default function RutaDetall() {
         />
       </div>
 
-      {/* 🔥 Component de comentaris */}
-      <Comments 
-        tripId={tripData._id!} 
-        currentUser={currentUser} 
-        backendUser={backendUser}
-      />
+      {/* Comentarios */}
+      <div className="ruta-comentaris">
+        <h2>Comentaris</h2>
+        {loadingComments ? (
+          <p className="comentaris-loading">Carregant comentaris...</p>
+        ) : comments.length === 0 ? (
+          <p className="comentaris-buits">Encara no hi ha comentaris.</p>
+        ) : (
+          <ul className="comentaris-llista">
+            {comments.map((c) => (
+              <li key={c._id} className="comentari-item">
+                <div className="comentari-header">
+                  <div className="comentari-autor-info">
+                    <div className="comentari-avatar">
+                      <img src="/images/person.png" alt="Usuari" />
+                    </div>
+                    <div>
+                      <span className="comentari-autor">{c.userName}</span>
+                      <span className="comentari-data">
+                        {dayjs(c.createdAt).locale("ca").format("DD MMM YYYY")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <p className="comentari-contingut">{c.content}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
-      {showRatingModal && (
-        <div className="valorar-overlay" onClick={() => setShowRatingModal(false)}>
-          <div className="valorar-modal" onClick={(e) => e.stopPropagation()}>
-            <Valorar
-              tripId={tripData._id!}
-              onClose={() => setShowRatingModal(false)}
-              onSubmit={handleSubmitRating}
-            />
+      {/* Zoom imágenes */}
+      {zoomImage && (
+        <div className="zoom-overlay" onClick={() => setZoomImage(null)}>
+          <div className="zoom-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-zoom" onClick={() => setZoomImage(null)}>✕</button>
+            <img src={zoomImage} alt="Zoom" />
+          </div>
+        </div>
+      )}
+
+      {zoomGallery && (
+        <div className="zoom-overlay" onClick={() => setZoomGallery(null)}>
+          <div className="zoom-gallery" onClick={(e) => e.stopPropagation()}>
+            {zoomGallery.map((img, i) => (
+              <img key={i} src={img} alt={`Foto ${i + 1}`} />
+            ))}
+            <button className="close-zoom" onClick={() => setZoomGallery(null)}>✕</button>
           </div>
         </div>
       )}
