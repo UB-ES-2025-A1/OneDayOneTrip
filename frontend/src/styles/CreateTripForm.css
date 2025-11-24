@@ -372,6 +372,22 @@
   }
 }
 
+.remove-image-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #00000088;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 
 /* =========================================================
    TAGS — pills + drag & drop

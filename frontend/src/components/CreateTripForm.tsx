@@ -248,11 +248,15 @@ export default function CreateTripForm({
   // ---------- helpers imágenes ----------
   const handleGalleryChange = (files: FileList | null) => {
     if (!files) return;
-    const arr = Array.from(files);
-    setGallery(arr);
-    const urls = arr.map((file) => URL.createObjectURL(file));
-    setGalleryPreviews(urls);
+
+    const newFiles = Array.from(files);
+
+    setGallery((prev) => [...prev, ...newFiles]);
+
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+    setGalleryPreviews((prev) => [...prev, ...newPreviews]);
   };
+
 
   const handleCoverChange = (file: File | null) => {
     setCover(file);
@@ -805,11 +809,19 @@ export default function CreateTripForm({
                       <div className="gallery-preview-grid">
                         {galleryPreviews.length > 0 ? (
                           galleryPreviews.map((src, idx) => (
-                            <div
-                              key={idx}
-                              className="gallery-preview-item"
-                            >
+                            <div key={idx} className="gallery-preview-item" style={{ position: "relative" }}>
                               <img src={src} alt={`Galeria ${idx + 1}`} />
+
+                              <button
+                                type="button"
+                                className="remove-image-btn"
+                                onClick={() => {
+                                  setGallery((prev) => prev.filter((_, i) => i !== idx));
+                                  setGalleryPreviews((prev) => prev.filter((_, i) => i !== idx));
+                                }}
+                              >
+                                ✕
+                              </button>
                             </div>
                           ))
                         ) : (
@@ -898,6 +910,7 @@ export default function CreateTripForm({
                             updatePointField(index, "lng", lng);
                           }}
                         />
+
                       </label>
 
                       <div className="image-point-wrapper">
