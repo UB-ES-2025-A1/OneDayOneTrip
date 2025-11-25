@@ -1,4 +1,3 @@
-import pytest
 from app.routers import trips
 
 
@@ -52,4 +51,3 @@ def test_get_location_name_handles_error(monkeypatch):
 
     result = trips.get_location_name(0, 0)
     assert result == "Ubicación desconocida"
-

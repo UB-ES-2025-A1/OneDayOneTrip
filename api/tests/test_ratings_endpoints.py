@@ -41,4 +41,3 @@ def test_rate_trip_returns_400_when_upsert_fails(client, monkeypatch):
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert "db down" in response.json()["detail"]
-

@@ -22,4 +22,3 @@ def test_follow_user_cannot_follow_itself():
         assert "No et pots seguir" in excinfo.value.detail
 
     asyncio.run(runner())
-

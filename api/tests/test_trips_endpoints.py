@@ -1,7 +1,9 @@
 # tests/test_trips_endpoints.py
+import json
+
 import pytest
 from fastapi import status
-import json
+
 
 @pytest.mark.usefixtures("client")
 class TestTripsEndpoints:
@@ -49,7 +51,6 @@ class TestTripsEndpoints:
             "recommendedSeason": "summer",
         }
 
-
         response = client.post(
             "/trips/",
             data={"trip_json": json.dumps(trip_json)},
@@ -83,7 +84,7 @@ class TestTripsEndpoints:
 
     def test_add_rating(self, client):
         body = {"userId": "u1", "rating": 5}
-        response = client.post(f"/trips/t1/rating", json=body)
+        response = client.post("/trips/t1/rating", json=body)
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["message"] == "Rating añadido o actualizado"
 

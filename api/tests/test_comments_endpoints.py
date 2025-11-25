@@ -61,4 +61,3 @@ def test_get_comments_uses_list_comments(client, monkeypatch):
     response = client.get("/trips/t1/comments")
     assert response.status_code == 200
     assert response.json()["comments"] == fake_data
-

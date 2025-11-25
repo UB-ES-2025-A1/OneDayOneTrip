@@ -42,4 +42,3 @@ def test_upload_image_success(monkeypatch):
     assert result == "https://imgbb.com/img123.jpg"
     assert "image" in captured["data"]
     assert captured["url"].endswith("/upload")
-

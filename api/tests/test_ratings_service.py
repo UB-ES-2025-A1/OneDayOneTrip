@@ -59,4 +59,3 @@ def test_upsert_rating_uses_object_id(monkeypatch):
     assert captured["filter"]["userId"] == "user-123"
     assert captured["update"]["$set"]["rating"] == 5
     assert captured["upsert"] is True
-
