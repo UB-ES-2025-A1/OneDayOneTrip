@@ -198,9 +198,7 @@ async def save_trip(user_id: str, trip_id: str):
     if not user_doc.exists:
         raise HTTPException(status_code=404, detail="Usuari no trobat")
 
-    user_ref.update({
-        "guardades": firestore.ArrayUnion([trip_id])
-    })
+    user_ref.update({"guardades": firestore.ArrayUnion([trip_id])})
     return {"message": "Ruta guardada correctament"}
 
 
@@ -211,9 +209,7 @@ async def unsave_trip(user_id: str, trip_id: str):
     if not user_doc.exists:
         raise HTTPException(status_code=404, detail="Usuari no trobat")
 
-    user_ref.update({
-        "guardades": firestore.ArrayRemove([trip_id])
-    })
+    user_ref.update({"guardades": firestore.ArrayRemove([trip_id])})
     return {"message": "Ruta eliminada de guardades correctament"}
 
 
