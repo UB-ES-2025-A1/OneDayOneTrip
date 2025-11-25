@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
+
 class CommentModel(BaseModel):
     tripId: str
     userId: str
@@ -11,6 +12,4 @@ class CommentModel(BaseModel):
     createdAt: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
     class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+        json_encoders = {datetime: lambda v: v.isoformat()}

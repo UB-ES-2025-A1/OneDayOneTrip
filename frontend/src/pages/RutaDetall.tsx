@@ -175,7 +175,7 @@ export default function RutaDetall() {
       );
 
       setShowRatingModal(false);
-    } catch (err) {
+    } catch{
       alert("No s'ha pogut enviar la valoració.");
     }
   };

@@ -24,7 +24,7 @@ export type BackendUser = {
   url_foto_perfil?: string;
   url_foto_panell?: string;
 };
-
+/*
 type GridItem = {
   id: string;
   title: string;
@@ -36,7 +36,7 @@ type GridItem = {
   authorPic?: string;
   city?: string;
   country?: string;
-};
+};*/
 
 export default function UserProfilePublic() {
   const { id } = useParams();

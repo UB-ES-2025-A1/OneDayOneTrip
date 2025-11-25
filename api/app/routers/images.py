@@ -4,6 +4,7 @@ from app.services.image_service import upload_image_to_imgbb
 
 router = APIRouter(prefix="/images", tags=["Images"])
 
+
 @router.post("/upload")
 async def upload_image(file: UploadFile = File(...)):
     """

@@ -90,15 +90,15 @@ class UserEditIn(BaseModel):
 # (PATCH = modificació parcial)
 @router.patch("/update/{user_id}")
 async def update_user_multipart(
-        user_id: str,
-        user_json: str = Form(...),
-        foto_perfil: Optional[UploadFile] = File(None),
-        foto_panell: Optional[UploadFile] = File(None)
+    user_id: str,
+    user_json: str = Form(...),
+    foto_perfil: Optional[UploadFile] = File(None),
+    foto_panell: Optional[UploadFile] = File(None),
 ):
     # Validació del JSON enviat com a text
     try:
         data = UserEditIn.model_validate_json(user_json)
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=400, detail="JSON invàlid")
 
     ref = db.collection("users").document(user_id)
@@ -126,15 +126,15 @@ async def update_user_multipart(
         update_data["url_foto_panell"] = panell_url
 
     if not update_data:
-        raise HTTPException(status_code=400, detail="No s'ha enviat cap dada per actualitzar")
+        raise HTTPException(
+            status_code=400, detail="No s'ha enviat cap dada per actualitzar"
+        )
 
     ref.update(update_data)
 
-    return {
-        "message": "Perfil actualitzat correctament",
-        "updated": update_data
-    }
-  
+    return {"message": "Perfil actualitzat correctament", "updated": update_data}
+
+
 @router.post("/unfollow/{user_id}/{target_id}")
 async def unfollow_user(user_id: str, target_id: str):
     user_ref = db.collection("users").document(user_id)
@@ -145,21 +145,21 @@ async def unfollow_user(user_id: str, target_id: str):
 
     # Comprovem que l'usuari existeix
     if not user_doc.exists:
-        raise HTTPException(status_code=404, detail="L'usuari que intenta deixar de seguir no existeix")
+        raise HTTPException(
+            status_code=404, detail="L'usuari que intenta deixar de seguir no existeix"
+        )
 
     # Comprovem que l'usuari a deixar de seguir existeix
     if not target_doc.exists:
-        raise HTTPException(status_code=404, detail="L'usuari que vols deixar de seguir no existeix")
+        raise HTTPException(
+            status_code=404, detail="L'usuari que vols deixar de seguir no existeix"
+        )
 
     # Eliminar de la llista de seguits
-    user_ref.update({
-        "llista_seguits": firestore.ArrayRemove([target_id])
-    })
+    user_ref.update({"llista_seguits": firestore.ArrayRemove([target_id])})
 
     # Eliminar de la llista de seguidors
-    target_ref.update({
-        "llista_seguidors": firestore.ArrayRemove([user_id])
-    })
+    target_ref.update({"llista_seguidors": firestore.ArrayRemove([user_id])})
 
     return {"message": "Has deixat de seguir l'usuari correctament"}
 
@@ -178,21 +178,17 @@ async def follow_user(user_id: str, target_id: str):
 
     # Comprovació que l'usuari a seguir existeix
     if not target_ref.get().exists:
-        raise HTTPException(status_code=404, detail="L'usuari que vols seguir no existeix")
+        raise HTTPException(
+            status_code=404, detail="L'usuari que vols seguir no existeix"
+        )
 
     # Afegir a la llista de seguits
-    user_ref.update({
-        "llista_seguits": firestore.ArrayUnion([target_id])
-    })
+    user_ref.update({"llista_seguits": firestore.ArrayUnion([target_id])})
 
     # Afegir a la llista de seguidors
-    target_ref.update({
-        "llista_seguidors": firestore.ArrayUnion([user_id])
-    })
+    target_ref.update({"llista_seguidors": firestore.ArrayUnion([user_id])})
 
     return {"message": "Usuari seguit correctament"}
-
-
 
 
 @router.post("/{user_id}/publicacions/{trip_id}")
@@ -204,7 +200,9 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
 
     # 🔐 Solo el propio usuario puede modificar su perfil
     if user.get("uid") != user_id:
-      raise HTTPException(status_code=403, detail="No tens permís per modificar aquest usuari.")
+        raise HTTPException(
+            status_code=403, detail="No tens permís per modificar aquest usuari."
+        )
 
     doc_ref = db.collection("users").document(user_id)
     snapshot = doc_ref.get()
@@ -223,5 +221,5 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
 
     return {
         "message": "Publicació afegida correctament",
-        "publicacions": list(publicacions)
+        "publicacions": list(publicacions),
     }
