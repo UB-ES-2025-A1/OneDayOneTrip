@@ -128,12 +128,14 @@ export default function UserProfile() {
       console.error("Error recargando seguits:", err);
     }
   };
-
+/*
   const goToProfile = (uid: string) => {
     navigate(`/user/${uid}`);
     setSeguidoresModalOpen(false);
     setSeguitsModalOpen(false);
   };
+
+ */
 
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((t) => ({

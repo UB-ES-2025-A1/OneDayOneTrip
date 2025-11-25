@@ -24,7 +24,6 @@ export default defineConfig([
                 './tsconfig.json',
                 './tsconfig.app.json',
                 './tsconfig.node.json',
-                './vitest.config.ts',
             ],
         },
     },
