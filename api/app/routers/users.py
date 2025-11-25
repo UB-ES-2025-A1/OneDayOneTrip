@@ -98,7 +98,7 @@ async def update_user_multipart(
     # Validació del JSON enviat com a text
     try:
         data = UserEditIn.model_validate_json(user_json)
-    except Exception as _:
+    except Exception:
         raise HTTPException(status_code=400, detail="JSON invàlid")
 
     ref = db.collection("users").document(user_id)

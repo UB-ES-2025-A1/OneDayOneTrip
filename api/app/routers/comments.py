@@ -23,7 +23,7 @@ async def create_comment(trip_id: str, comment: CommentModel, request: Request):
 
         try:
             trip_obj_id = ObjectId(comment.tripId)
-        except Exception as _:
+        except Exception:
             raise HTTPException(status_code=400, detail="tripId inválido")
 
         new_comment = {

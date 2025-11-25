@@ -199,6 +199,7 @@ async def create_trip_multipart(
         print(f"[ERROR] ❌ Error en create_trip_multipart: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
+
 # ============================================================
 # ⭐ Añadir o actualizar valoración
 # ============================================================
