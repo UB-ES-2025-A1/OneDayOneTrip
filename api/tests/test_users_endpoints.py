@@ -52,6 +52,7 @@ class TestUsersEndpoints:
 
     def test_get_user_by_id_not_found(self, client, monkeypatch):
         """Test GET /users/{user_id} when user doesn't exist"""
+
         class FakeDoc:
             def __init__(self):
                 self.exists = False
@@ -104,7 +105,11 @@ class TestUsersEndpoints:
 
         async def run_test():
             user_data = {"uid": "fake_uid", "email": "test@example.com"}
-            data = {"fullname": "Test User", "username": "testuser", "mail": "test@example.com"}
+            data = {
+                "fullname": "Test User",
+                "username": "testuser",
+                "mail": "test@example.com",
+            }
             result = await users.register_user(data, user=user_data)
 
             assert result["message"] == "Usuario registrado correctamente"
@@ -118,6 +123,7 @@ class TestUsersEndpoints:
 
     def test_register_user_missing_uid(self):
         """Test POST /users/register fails without UID"""
+
         async def run_test():
             with pytest.raises(HTTPException) as excinfo:
                 await users.register_user({}, user={})
@@ -128,6 +134,7 @@ class TestUsersEndpoints:
 
     def test_get_current_user_found(self, monkeypatch):
         """Test GET /users/me returns current user"""
+
         class FakeDoc:
             def __init__(self):
                 self.exists = True
@@ -159,6 +166,7 @@ class TestUsersEndpoints:
 
     def test_get_current_user_not_found(self, monkeypatch):
         """Test GET /users/me returns 404 when user doesn't exist"""
+
         class FakeDoc:
             def __init__(self):
                 self.exists = False
@@ -218,15 +226,20 @@ class TestUsersEndpoints:
                 return FakeCollection()
 
         monkeypatch.setattr("app.routers.users.db", FakeDB())
-        monkeypatch.setattr("app.routers.users.upload_image_to_imgbb", lambda f: "https://fake.url/image.jpg")
+        monkeypatch.setattr(
+            "app.routers.users.upload_image_to_imgbb",
+            lambda f: "https://fake.url/image.jpg",
+        )
 
         async def run_test():
-            user_json = json.dumps({"username": "newusername", "nom_i_cognoms": "New Name"})
+            user_json = json.dumps(
+                {"username": "newusername", "nom_i_cognoms": "New Name"}
+            )
             result = await users.update_user_multipart(
                 user_id="user123",
                 user_json=user_json,
                 foto_perfil=None,
-                foto_panell=None
+                foto_panell=None,
             )
 
             assert result["message"] == "Perfil actualitzat correctament"
@@ -265,7 +278,10 @@ class TestUsersEndpoints:
                 return FakeCollection()
 
         monkeypatch.setattr("app.routers.users.db", FakeDB())
-        monkeypatch.setattr("app.routers.users.upload_image_to_imgbb", lambda f: f"https://fake.url/{f.filename if f else 'no_file'}.jpg")
+        monkeypatch.setattr(
+            "app.routers.users.upload_image_to_imgbb",
+            lambda f: f"https://fake.url/{f.filename if f else 'no_file'}.jpg",
+        )
 
         async def run_test():
             from fastapi import UploadFile
@@ -277,7 +293,7 @@ class TestUsersEndpoints:
                 user_id="user123",
                 user_json=user_json,
                 foto_perfil=fake_file,
-                foto_panell=None
+                foto_panell=None,
             )
 
             assert "url_foto_perfil" in captured_update
@@ -287,9 +303,24 @@ class TestUsersEndpoints:
 
     def test_update_user_multipart_invalid_json(self, monkeypatch):
         """Test PATCH /users/update/{user_id} with invalid JSON"""
+
         class FakeDB:
             def collection(self, name):
-                return type("FakeCollection", (), {"document": lambda self, uid: type("FakeRef", (), {"get": lambda self: type("FakeDoc", (), {"exists": True})()})()})()
+                return type(
+                    "FakeCollection",
+                    (),
+                    {
+                        "document": lambda self, uid: type(
+                            "FakeRef",
+                            (),
+                            {
+                                "get": lambda self: type(
+                                    "FakeDoc", (), {"exists": True}
+                                )()
+                            },
+                        )()
+                    },
+                )()
 
         monkeypatch.setattr("app.routers.users.db", FakeDB())
 
@@ -299,7 +330,7 @@ class TestUsersEndpoints:
                     user_id="user123",
                     user_json="invalid json",
                     foto_perfil=None,
-                    foto_panell=None
+                    foto_panell=None,
                 )
             assert excinfo.value.status_code == 400
 
@@ -307,6 +338,7 @@ class TestUsersEndpoints:
 
     def test_update_user_multipart_user_not_found(self, monkeypatch):
         """Test PATCH /users/update/{user_id} when user doesn't exist"""
+
         class FakeDoc:
             def __init__(self):
                 self.exists = False
@@ -330,13 +362,14 @@ class TestUsersEndpoints:
 
         async def run_test():
             import json
+
             user_json = json.dumps({"username": "test"})
             with pytest.raises(HTTPException) as excinfo:
                 await users.update_user_multipart(
                     user_id="nonexistent",
                     user_json=user_json,
                     foto_perfil=None,
-                    foto_panell=None
+                    foto_panell=None,
                 )
             assert excinfo.value.status_code == 404
 
@@ -344,6 +377,7 @@ class TestUsersEndpoints:
 
     def test_update_user_multipart_no_data(self, monkeypatch):
         """Test PATCH /users/update/{user_id} with no update data"""
+
         class FakeDoc:
             def __init__(self):
                 self.exists = True
@@ -367,13 +401,14 @@ class TestUsersEndpoints:
 
         async def run_test():
             import json
+
             user_json = json.dumps({})
             with pytest.raises(HTTPException) as excinfo:
                 await users.update_user_multipart(
                     user_id="user123",
                     user_json=user_json,
                     foto_perfil=None,
-                    foto_panell=None
+                    foto_panell=None,
                 )
             assert excinfo.value.status_code == 400
 
@@ -417,6 +452,7 @@ class TestUsersEndpoints:
 
     def test_follow_user_self_follow(self):
         """Test POST /users/follow/{user_id}/{target_id} fails when following self"""
+
         async def run_test():
             with pytest.raises(HTTPException) as excinfo:
                 await users.follow_user("user1", "user1")
@@ -427,6 +463,7 @@ class TestUsersEndpoints:
 
     def test_follow_user_target_not_found(self, monkeypatch):
         """Test POST /users/follow/{user_id}/{target_id} fails when target doesn't exist"""
+
         class FakeRef:
             def get(self):
                 return type("FakeDoc", (), {"exists": False})()
@@ -486,6 +523,7 @@ class TestUsersEndpoints:
 
     def test_unfollow_user_user_not_found(self, monkeypatch):
         """Test POST /users/unfollow/{user_id}/{target_id} fails when user doesn't exist"""
+
         class FakeRef:
             def get(self):
                 return type("FakeDoc", (), {"exists": False})()

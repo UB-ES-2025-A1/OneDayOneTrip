@@ -68,6 +68,7 @@ class TestMongoService:
 
     def test_get_trip_by_id_invalid_objectid(self, monkeypatch):
         """Test get_trip_by_id with invalid ObjectId returns None"""
+
         class MockCollection:
             def find_one(self, query):
                 raise Exception("Invalid ObjectId")
@@ -79,6 +80,7 @@ class TestMongoService:
 
     def test_get_trip_by_id_not_found(self, monkeypatch):
         """Test get_trip_by_id when trip doesn't exist"""
+
         class MockCollection:
             def find_one(self, query):
                 return None
@@ -107,6 +109,7 @@ class TestMongoService:
 
     def test_get_trip_rating_stats_no_ratings(self, monkeypatch):
         """Test get_trip_rating_stats when no ratings exist"""
+
         class MockCollection:
             def aggregate(self, pipeline):
                 return iter([])
@@ -121,6 +124,7 @@ class TestMongoService:
 
     def test_get_trip_rating_stats_exception(self, monkeypatch):
         """Test get_trip_rating_stats handles exceptions"""
+
         class MockCollection:
             def aggregate(self, pipeline):
                 raise Exception("DB error")
@@ -176,6 +180,7 @@ class TestMongoService:
 
     def test_upsert_rating_exception(self, monkeypatch):
         """Test upsert_rating handles exceptions gracefully"""
+
         class MockCollection:
             def update_one(self, *args, **kwargs):
                 raise Exception("DB error")
@@ -291,6 +296,7 @@ class TestMongoService:
 
     def test_list_comments_exception(self, monkeypatch):
         """Test list_comments handles exceptions"""
+
         class MockCollection:
             def find(self, query):
                 raise Exception("DB error")

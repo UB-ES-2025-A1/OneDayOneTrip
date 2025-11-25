@@ -69,7 +69,9 @@ class TestTripsEndpoints:
                 captured["doc"] = doc
                 return type("Res", (), {"inserted_id": "c123"})()
 
-        monkeypatch.setattr("app.routers.comments.comments_collection", FakeCollection())
+        monkeypatch.setattr(
+            "app.routers.comments.comments_collection", FakeCollection()
+        )
 
         body = {
             "tripId": "507f1f77bcf86cd799439011",
