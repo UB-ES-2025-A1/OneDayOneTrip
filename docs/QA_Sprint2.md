@@ -20,8 +20,10 @@ Cada historia del Sprint 2 debe registrar su test espejo (mínimo unit + integra
 
 ## 2. Tipos de prueba cubiertos (pág. 6–10)
 
+📊 **Documentación completa de cobertura**: Ver [`docs/TEST_COVERAGE.md`](./TEST_COVERAGE.md)
+
 - **Unit Tests (TDD preferente)**  
-  - Backend: `tests/test_geo_utils.py`, `tests/test_image_service.py`, `tests/test_security_users.py`, `tests/test_ratings_service.py`.  
+  - Backend: `tests/test_geo_utils.py`, `tests/test_image_service.py`, `tests/test_security_users.py`, `tests/test_ratings_service.py`, `tests/test_mongo_service.py`.  
   - Frontend: `src/__tests__/CreateTripForm.test.tsx`, `Comments.test.tsx`, `Valorar.test.tsx`, `rateTrip.test.ts`, `apiClient.test.ts`.  
   - Ejecutar con `pytest -q tests` y `npm run test:cov`.
 
