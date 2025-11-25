@@ -1,9 +1,9 @@
-# tests/conftest.py
+# api/tests/conftest.py
 import sys, os
 import pytest
 
-# Aseguramos que "api" está en el path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../api")))
+# Aseguramos que "api" está en el path (ahora estamos dentro de api/)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # 1️⃣ Importamos aquí el módulo con verify_token
 from app.routers import users, trips

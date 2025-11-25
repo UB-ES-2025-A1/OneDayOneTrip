@@ -35,7 +35,7 @@ def get_backend_coverage():
     os.environ["PYTHONPATH"] = str(PROJECT_ROOT / "api")
     
     # Run pytest with coverage
-    cmd = f"pytest --cov=app --cov-report=json --cov-report=term -q tests"
+    cmd = f"pytest --cov=app --cov-report=json --cov-report=term -q api/tests"
     output = run_command(cmd, cwd=PROJECT_ROOT)
     
     # Try to read JSON coverage report
@@ -124,7 +124,7 @@ def parse_frontend_coverage_terminal(output):
 
 def get_test_files():
     """Get list of test files."""
-    backend_tests = list((PROJECT_ROOT / "tests").glob("test_*.py"))
+    backend_tests = list((PROJECT_ROOT / "api" / "tests").glob("test_*.py"))
     frontend_tests = list((PROJECT_ROOT / "frontend" / "src" / "__tests__").glob("*.test.*"))
     
     return {
@@ -241,7 +241,7 @@ Documentación completa del estado de pruebas en OneDayOneTrip.
 
 ## 📋 Test Files Existentes
 
-### Backend (`tests/`)
+### Backend (`api/tests/`)
 
 """
     
@@ -269,7 +269,7 @@ Documentación completa del estado de pruebas en OneDayOneTrip.
 ```bash
 # Desde el root del proyecto
 $env:PYTHONPATH='api'
-pytest --cov=app --cov-report=term-missing -q tests
+pytest --cov=app --cov-report=term-missing -q api/tests
 ```
 
 ### Frontend
@@ -348,9 +348,9 @@ Resumen rápido del estado de tests. Para detalles completos, ver [`TEST_COVERAG
 ## 🎯 Próximos Tests a Implementar
 
 ### Backend (Prioridad Alta)
-1. `tests/test_auth_verify_token.py` - Auth verification
-2. Extender `tests/test_image_service.py` - Error handling
-3. `tests/test_firebase_service.py` - Firestore init
+1. `api/tests/test_auth_verify_token.py` - Auth verification
+2. Extender `api/tests/test_image_service.py` - Error handling
+3. `api/tests/test_firebase_service.py` - Firestore init
 
 ### Frontend (Prioridad Alta)
 1. `src/__tests__/RutaDetall.test.tsx` - Trip detail page

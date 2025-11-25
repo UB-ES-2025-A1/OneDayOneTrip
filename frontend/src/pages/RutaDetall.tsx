@@ -9,6 +9,7 @@ import {
   getTripById,
   getAllTrips,
   rateTrip,
+  getTripComments,
   type Trip,
 } from "../api/trips";
 
@@ -35,6 +36,10 @@ export default function RutaDetall() {
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [comments, setComments] = useState<any[]>([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [zoomImage, setZoomImage] = useState<string | null>(null);
+  const [zoomGallery, setZoomGallery] = useState<string[] | null>(null);
 
   // Cargar usuario Firebase + backendUser
   useEffect(() => {
@@ -233,16 +238,6 @@ export default function RutaDetall() {
 
       {/* Datos */}
       <div className="ruta-detall">
-        <h1>{tripData.title}</h1>
-
-        <div className="valoracio">
-          {tripData.avgRating ? (
-            <>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} className={i < Math.round(tripData.avgRating ?? 0) ? "star filled" : "star"}>
-                  ★
-                </span>
-              ))}
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
 

@@ -36,7 +36,7 @@ jobs:
             IMGBB_API_KEY: ""
             PYTHONPATH: api
         run: |
-          pytest --cov=app --cov-report=json --cov-report=term -q tests
+          pytest --cov=app --cov-report=json --cov-report=term -q api/tests
 
       # 5️⃣ Upload backend coverage data
       - name: 📤 Upload backend coverage
