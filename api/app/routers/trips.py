@@ -9,7 +9,13 @@ from app.services.mongo_service import (
     get_trip_by_id,
     get_trip_rating_stats,
 )
-import requests, time, json
+import requests
+import time
+import json
+
+from datetime import datetime
+from app.services.mongo_service import upsert_rating
+from fastapi import Body
 
 router = APIRouter(prefix="/trips", tags=["Trips"])
 
@@ -140,12 +146,12 @@ async def create_trip_multipart(
                 print(f"[DEBUG] 🌐 Coordenadas parseadas: lat={lat}, lon={lon}")
 
                 if lat is not None and lon is not None:
-                    print(f"[DEBUG] 🌍 Llamando a get_location_name()...")
+                    print("[DEBUG] 🌍 Llamando a get_location_name()...")
                     location_name = get_location_name(lat, lon)
                     print(f"[DEBUG] 🗺️ Resultado del geocoding: {location_name}")
                     time.sleep(1)  # evita rate limit
                 else:
-                    print(f"[DEBUG] ⚠️ No se encontraron coordenadas válidas.")
+                    print("[DEBUG] ⚠️ No se encontraron coordenadas válidas.")
 
             except Exception as geo_err:
                 print(
@@ -179,7 +185,7 @@ async def create_trip_multipart(
         )
 
         # 5️⃣ Guardar en MongoDB
-        print(f"[DEBUG] 💾 Guardando trip en MongoDB...")
+        print("[DEBUG] 💾 Guardando trip en MongoDB...")
         inserted_id = save_trip(trip_to_store.dict())
         print(f"[DEBUG] ✅ Trip guardada con ID: {inserted_id}")
 
@@ -192,12 +198,6 @@ async def create_trip_multipart(
     except Exception as e:
         print(f"[ERROR] ❌ Error en create_trip_multipart: {e}")
         raise HTTPException(status_code=400, detail=str(e))
-
-
-from datetime import datetime
-from app.services.mongo_service import upsert_rating
-from fastapi import Body
-
 
 # ============================================================
 # ⭐ Añadir o actualizar valoración
@@ -215,5 +215,5 @@ def add_trip_rating(
         f"\n[DEBUG] ⭐ add_trip_rating() -> trip_id={trip_id}, userId={userId}, rating={rating}"
     )
     upsert_rating(trip_id, userId, rating, datetime.utcnow())
-    print(f"[DEBUG] ✅ Rating guardado o actualizado correctamente")
+    print("[DEBUG] ✅ Rating guardado o actualizado correctamente")
     return {"message": "Rating añadido o actualizado"}

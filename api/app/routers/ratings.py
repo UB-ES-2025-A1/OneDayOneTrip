@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException
-from bson import ObjectId
 from app.models.rating_model import RatingModel
 from app.services.mongo_service import upsert_rating, get_trip_rating_stats
 

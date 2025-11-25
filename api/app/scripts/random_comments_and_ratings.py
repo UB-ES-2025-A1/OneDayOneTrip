@@ -1,7 +1,6 @@
 import requests
 import random
 import time
-from datetime import datetime
 
 API_URL = "http://localhost:8000/trips"
 
