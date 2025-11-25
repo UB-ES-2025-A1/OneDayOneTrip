@@ -192,6 +192,7 @@ class TestUsersEndpoints:
         class FakeDoc:
             def __init__(self):
                 self.exists = True
+
             def get(self):
                 return self
 
@@ -220,9 +221,6 @@ class TestUsersEndpoints:
         monkeypatch.setattr("app.routers.users.upload_image_to_imgbb", lambda f: "https://fake.url/image.jpg")
 
         async def run_test():
-            from fastapi import UploadFile
-            import json
-
             user_json = json.dumps({"username": "newusername", "nom_i_cognoms": "New Name"})
             result = await users.update_user_multipart(
                 user_id="user123",
@@ -244,6 +242,7 @@ class TestUsersEndpoints:
         class FakeDoc:
             def __init__(self):
                 self.exists = True
+
             def get(self):
                 return self
 
@@ -347,6 +346,7 @@ class TestUsersEndpoints:
         class FakeDoc:
             def __init__(self):
                 self.exists = True
+
             def get(self):
                 return self
 
@@ -385,14 +385,17 @@ class TestUsersEndpoints:
         class FakeRef:
             def __init__(self, uid):
                 self.uid = uid
+
             def get(self):
                 return type("FakeDoc", (), {"exists": True})()
+
             def update(self, data):
                 captured_updates.append((self.uid, data))
 
         class FakeCollection:
             def __init__(self):
                 self.refs = {}
+
             def document(self, uid):
                 if uid not in self.refs:
                     self.refs[uid] = FakeRef(uid)
@@ -451,14 +454,17 @@ class TestUsersEndpoints:
         class FakeRef:
             def __init__(self, uid):
                 self.uid = uid
+
             def get(self):
                 return type("FakeDoc", (), {"exists": True})()
+
             def update(self, data):
                 captured_updates.append((self.uid, data))
 
         class FakeCollection:
             def __init__(self):
                 self.refs = {}
+
             def document(self, uid):
                 if uid not in self.refs:
                     self.refs[uid] = FakeRef(uid)
@@ -503,6 +509,7 @@ class TestUsersEndpoints:
     def test_unfollow_user_target_not_found(self, monkeypatch):
         """Test POST /users/unfollow/{user_id}/{target_id} fails when target doesn't exist"""
         call_count = 0
+
         class FakeRef:
             def get(self):
                 nonlocal call_count

@@ -5,9 +5,9 @@ import "@testing-library/jest-dom";
 import { MemoryRouter } from "react-router-dom";
 
 // Mocks
-const { mockGetAllTrips, setupDefaultMocks, resetApiMocks, mockTrip } = vi.hoisted(() => {
+const { mockGetAllTrips } = vi.hoisted(() => {
   const mockGetAllTrips = vi.fn();
-  return { mockGetAllTrips, setupDefaultMocks: () => {}, resetApiMocks: () => {}, mockTrip: {} };
+  return { mockGetAllTrips };
 });
 
 vi.mock("../api/trips", () => ({
@@ -175,7 +175,6 @@ describe("Home page", () => {
   });
 
   it("cambia entre tabs recomendados y siguiendo", async () => {
-    const user = userEvent.setup();
     const mockUser = {
       uid: "user-123",
       email: "test@example.com",
