@@ -8,7 +8,7 @@ import Layout from "../components/Layout";
 import { getTripById, getAllTrips, getTripComments, type Trip, type Comment } from "../api/trips";
 import dayjs from "dayjs";
 import "dayjs/locale/ca";
-import { getUserById, followUser, unfollowUser } from "../api/client";
+import { getUserById, followUser, unfollowUser, saveTrip, unsaveTrip } from "../api/client";
 
 
 
@@ -32,6 +32,8 @@ export default function RutaDetall() {
   const [followLoading, setFollowLoading] = useState(false);
 
   const [isSaved, setIsSaved] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+
 
 
   // 🔹 Auth listener
@@ -82,7 +84,7 @@ export default function RutaDetall() {
 
   useEffect(() => {
     const loadAuthorData = async () => {
-      if (!tripData?.author?.userId) return;
+      if (!tripData?.author?.userId || !tripData?._id) return;
 
       try {
         const author = await getUserById(tripData.author.userId); // GET /users/{userId}
@@ -97,6 +99,10 @@ export default function RutaDetall() {
         if (currentUser) {
           const followersList: string[] = author.llista_seguidors || [];
           setIsFollowing(followersList.includes(currentUser.uid));
+
+          const currentUserData = await getUserById(currentUser.uid);
+          const savedTrips: string[] = currentUserData.guardades || [];
+          setIsSaved(savedTrips.includes(tripData._id));
         }
       } catch (err) {
         console.error("Error carregant dades de l'autor:", err);
@@ -135,7 +141,25 @@ export default function RutaDetall() {
     }
   };
 
-
+  const handleSaveTrip = async () => {
+    if (!currentUser || !tripData?._id) return;
+    
+    try {
+      setSaveLoading(true);
+      
+      if (!isSaved) {
+        await saveTrip(currentUser.uid, tripData._id);
+        setIsSaved(true);
+      } else {
+        await unsaveTrip(currentUser.uid, tripData._id);
+        setIsSaved(false);
+      }
+    } catch (err) {
+      console.error("Error canviant estat de guardar/desguardar:", err);
+    } finally {
+      setSaveLoading(false);
+    }
+  };
 
 
   // 🔹 Comentaris
@@ -203,14 +227,10 @@ export default function RutaDetall() {
           <button
             type="button"
             className={`guardar-button ${isSaved ? "saved" : ""}`}
-            onClick={() => setIsSaved(!isSaved)}
+            onClick={handleSaveTrip}
+            disabled={saveLoading}
           >
             <label className="ui-bookmark">
-              <input
-                type="checkbox"
-                checked={isSaved}
-                onChange={() => setIsSaved(!isSaved)}
-              />
               <svg
                 className="bookmark"
                 viewBox="0 0 24 24"
@@ -227,7 +247,7 @@ export default function RutaDetall() {
             </label>
 
             <span className="guardar-text">
-              {isSaved ? "Guardat" : "Guardar"}
+              {isSaved ? "Guardat" : saveLoading ? "Guardant..." : "Guardar"}
             </span>
           </button>
 

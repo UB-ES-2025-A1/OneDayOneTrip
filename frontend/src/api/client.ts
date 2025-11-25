@@ -69,3 +69,13 @@ export async function followUser(userId: string, targetId: string) {
 export async function unfollowUser(userId: string, targetId: string) {
   return apiPost(`/users/unfollow/${userId}/${targetId}`, {});
 }
+
+// Guardar una ruta
+export async function saveTrip(userId: string, tripId: string) {
+  return apiPost(`/users/save/${userId}/${tripId}`, {});
+}
+
+// Treure una ruta guardada
+export async function unsaveTrip(userId: string, tripId: string) {
+  return apiPost(`/users/unsave/${userId}/${tripId}`, {});
+}
