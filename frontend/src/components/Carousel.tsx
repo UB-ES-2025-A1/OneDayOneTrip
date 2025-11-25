@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import "../styles/Carousel.css";
 
 interface Slide {
@@ -32,21 +32,21 @@ export default function Carousel() {
   const slideRef = useRef<HTMLDivElement | null>(null);
   const totalSlides = slides.length;
 
+  const nextSlide = useCallback(() => {
+    setCurrent((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
+  }, [totalSlides]);
+
+  const prevSlide = useCallback(() => {
+    setCurrent((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+  }, [totalSlides]);
+
   // ⏱ Auto-play
   useEffect(() => {
     const interval = setInterval(() => {
       nextSlide();
     }, 8000);
     return () => clearInterval(interval);
-  }, [current]);
-
-  const nextSlide = () => {
-    setCurrent((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
-  };
-
-  const prevSlide = () => {
-    setCurrent((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
-  };
+  }, [nextSlide]);
 
   // 📱 Swipe en dispositivos táctiles
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function Carousel() {
       node.removeEventListener("touchstart", handleTouchStart);
       node.removeEventListener("touchend", handleTouchEnd);
     };
-  }, []);
+  }, [nextSlide, prevSlide]);
 
   return (
     <section className="hero-carousel" ref={slideRef}>

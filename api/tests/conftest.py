@@ -9,7 +9,8 @@ from _pytest.monkeypatch import MonkeyPatch
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # 1️⃣ Importamos aquí el módulo con verify_token
-from app.routers import trips, users
+# E402: Necesitamos modificar sys.path antes de importar
+from app.routers import trips, users  # noqa: E402
 
 
 # 2️⃣ Mockeamos verify_token ANTES de crear la app
@@ -62,8 +63,9 @@ def fake_list_comments(trip_id, limit, skip):
 
 
 # 3️⃣ Ahora sí importamos la app (ya con el mock activo)
-from app.main import app
-from fastapi.testclient import TestClient
+# E402: Necesitamos mockear verify_token antes de importar app
+from app.main import app  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 
 
 @pytest.fixture(scope="module")

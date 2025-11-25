@@ -13,6 +13,8 @@ import {
   type Trip,
 } from "../api/trips";
 
+import dayjs from "dayjs";
+import "dayjs/locale/ca";
 import Valorar from "../components/Valorar";
 import Comments from "../components/Comments";
 import { getUserById, followUser, unfollowUser } from "../api/client";

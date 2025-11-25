@@ -310,6 +310,7 @@ class TestUsersEndpoints:
         class FakeDoc:
             def __init__(self):
                 self.exists = False
+
             def get(self):
                 return self
 
