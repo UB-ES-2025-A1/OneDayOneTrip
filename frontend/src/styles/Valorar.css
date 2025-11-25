@@ -69,7 +69,7 @@
 
 .rating:not(:checked) > label {
   cursor: pointer;
-  font-size: 38px;    /* ⭐️ Més gran */
+  font-size: 38px;    
   color: #666;
   padding: 0 4px;
 }
