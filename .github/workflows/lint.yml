@@ -1,73 +1,57 @@
-name: 🛡️ Validacion de Calidad (CI)
+name: 🛡️ Validacio de Qualitat (CI)
 
-# ----------------------------------------------------
-# 1. CUÁNDO ACTÚA (Triggers)
-# ----------------------------------------------------
 on:
   push:
-    # Actúa cuando se hace un 'push' directo a la rama 'staging'.
-    # NOTA: Esto solo debe ocurrir si el desarrollador omitió un PR.
-    branches: [ staging ]
+    branches: [ staging, setup-linting ]
   pull_request:
-    # Actúa cuando se abre o se actualiza (con un nuevo push) un PR
-    # cuyo destino es la rama 'staging'.
     branches: [ staging ]
 
-# ----------------------------------------------------
-# 2. TRABAJOS A EJECUTAR (Jobs)
-# ----------------------------------------------------
 jobs:
-  # TRABAJO 1: LINTING Y PRUEBAS DEL FRONTEND
+  # TASCA 1: VALIDACIÓ DEL FRONTEND
   frontend_lint:
     name: Frontend (Node/TS)
     runs-on: ubuntu-latest
     steps:
-      - name: ⚙️ Checkout Repositorio
+      - name: ⚙️ Checkout Repositori
         uses: actions/checkout@v4
 
       - name: 🛠️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Ajusta a la versión de Node que uses
+          node-version: '20'
 
-      - name: Instalar Dependencias (Raíz)
-        # Instala las dependencias globales como 'lint-staged'
+      - name: Instal·lar Dependències (Arrel)
         run: npm install
 
-      - name: Instalar Dependencias (Frontend)
+      - name: Instal·lar Dependències (Frontend)
         run: npm install
         working-directory: ./frontend/
 
-      - name: Ejecutar Linting (ESLint)
-        # Ejecuta el script 'lint' definido en el package.json del frontend
+      - name: Executar Linting (ESLint)
+        # El linter d'ESLint (incloent Prettier) revisa errors de codi i estil.
         run: npm run lint
         working-directory: ./frontend/
 
-    # - name: Ejecutar Pruebas
-    #   run: npm test
-    #   working-directory: ./frontend/
-
-  # TRABAJO 2: LINTING DEL BACKEND
+  # TASCA 2: VALIDACIÓ DEL BACKEND
   backend_lint:
     name: Backend (Python)
     runs-on: ubuntu-latest
     steps:
-      - name: ⚙️ Checkout Repositorio
+      - name: ⚙️ Checkout Repositori
         uses: actions/checkout@v4
 
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # Ajusta a la versión de Python que uses
+          python-version: '3.11'
 
-      - name: Instalar Linters
-        # Instala las herramientas de calidad requeridas
+      - name: Instal·lar Linters
+        # Instalació de les eines de qualitat requerides
         run: pip install flake8 black
 
-      - name: Ejecutar Flake8 (Linting)
-        # Flake8 busca errores de estilo y sintaxis
+      - name: Executar Flake8 (Linting)
+        # Flake8 comprova errors de PEP8 i estil
         run: flake8 ./api/
 
-      - name: Ejecutar Black (Comprobar Formato)
-        # Black con --check falla si encuentra código sin formatear
+      - name: Executar Black (Comprovar Format)
         run: black ./api/ --check
