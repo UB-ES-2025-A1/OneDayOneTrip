@@ -20,6 +20,10 @@ vi.mock("firebase/auth", () => ({
     return () => {};
   }),
   signOut: vi.fn(),
+  getAuth: vi.fn(() => ({
+    currentUser: null,
+  })),
+  auth: {},
 }));
 
 vi.mock("../components/MasonryGrid", () => ({

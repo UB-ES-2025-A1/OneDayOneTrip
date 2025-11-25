@@ -34,6 +34,9 @@ vi.mock("react-router-dom", () => ({
 vi.mock("firebase/auth", () => ({
   onAuthStateChanged: mockOnAuthStateChanged,
   signOut: mockSignOut,
+  getAuth: vi.fn(() => ({
+    currentUser: null,
+  })),
   auth: {},
 }));
 

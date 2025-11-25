@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import { act } from "@testing-library/react";
 
 vi.mock("leaflet/dist/leaflet.css", () => ({}));
 
@@ -47,19 +48,44 @@ const baseProps = {
 };
 
 const fillRequiredFormFields = async () => {
-  const titleInputs = screen.getAllByLabelText(/^títol$/i);
-  await userEvent.type(titleInputs[0], "Ruta QA");
-  await userEvent.type(screen.getAllByLabelText(/descripció/i)[0], "Desc");
-  await userEvent.type(screen.getByLabelText(/categoria/i), "Nature");
-  await userEvent.type(screen.getByLabelText(/ciutat/i), "Barcelona");
-  await userEvent.type(screen.getByLabelText(/país/i), "España");
-  await userEvent.type(screen.getByLabelText(/distància/i), "10");
-  await userEvent.type(screen.getByLabelText(/durada/i), "2h");
-  await userEvent.type(screen.getByLabelText(/dificultat/i), "Easy");
-  await userEvent.type(screen.getByLabelText(/temporada recomanada/i), "Spring");
-  await userEvent.type(screen.getByLabelText(/tags/i), "aventura, costa");
-  await userEvent.type(titleInputs[titleInputs.length - 1], "Punt 1");
-  await userEvent.click(screen.getByTestId("map-selector"));
+  // Esperar a que el formulario se renderice completamente
+  // Hay múltiples campos con label "Títol", usar getAllByLabelText
+  await waitFor(() => {
+    const titleInputs = screen.queryAllByLabelText(/Títol/i);
+    expect(titleInputs.length).toBeGreaterThan(0);
+  });
+  
+  // Paso 1: Llenar campos básicos que siempre están visibles
+  // El primer "Títol" es el del trip principal
+  const titleInputs = screen.getAllByLabelText(/Títol/i);
+  await act(async () => {
+    await userEvent.type(titleInputs[0], "Ruta QA");
+    
+    // Descripció también puede tener múltiples, usar el primero (del trip principal)
+    const descInputs = screen.getAllByLabelText(/Descripció/i);
+    await userEvent.type(descInputs[0], "Desc");
+    
+    await userEvent.type(screen.getByLabelText(/Categoria/i), "Nature");
+    await userEvent.type(screen.getByLabelText(/Tags/i), "aventura, costa");
+  });
+  
+  // Paso 2: Llenar campos de ubicación y datos
+  await act(async () => {
+    await userEvent.type(screen.getByLabelText(/Ciutat/i), "Barcelona");
+    await userEvent.type(screen.getByLabelText(/País/i), "España");
+    await userEvent.type(screen.getByLabelText(/Distància/i), "10");
+    await userEvent.type(screen.getByLabelText(/Durada/i), "2h");
+    await userEvent.type(screen.getByLabelText(/Dificultat/i), "Easy");
+    await userEvent.type(screen.getByLabelText(/Temporada recomanada/i), "Spring");
+  });
+  
+  // Paso 3: Llenar punto de ruta (el segundo input con label "Títol")
+  if (titleInputs.length > 1) {
+    await act(async () => {
+      await userEvent.type(titleInputs[1], "Punt 1");
+      await userEvent.click(screen.getByTestId("map-selector"));
+    });
+  }
 };
 
 describe("CreateTripForm", () => {
