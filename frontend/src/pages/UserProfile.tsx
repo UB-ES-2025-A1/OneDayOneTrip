@@ -8,9 +8,9 @@ import "../styles/UserProfile.css";
 import { ImageOff, Pencil } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
-import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
-import EditarPerfil from "../components/EditarPerfilModal"
-import LlistaSeguidors from "../components/LlistaSeguidorsModal" 
+import LlistaSeguits from "../components/LlistaSeguitsModal";
+import EditarPerfil from "../components/EditarPerfilModal";
+import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
 
 export type BackendUser = {
@@ -71,7 +71,6 @@ export default function UserProfile() {
       try {
         setLoading(true);
         const backendUser = await getUserById(fbUser.uid);
-        // Aseguramos que siempre sean arrays
         backendUser.llista_seguidors = backendUser.llista_seguidors || [];
         backendUser.llista_seguits = backendUser.llista_seguits || [];
         backendUser.publicacions = backendUser.publicacions || [];
@@ -128,14 +127,13 @@ export default function UserProfile() {
       console.error("Error recargando seguits:", err);
     }
   };
-/*
+
+  // 🔹 Función para navegar a otro perfil
   const goToProfile = (uid: string) => {
     navigate(`/user/${uid}`);
     setSeguidoresModalOpen(false);
     setSeguitsModalOpen(false);
   };
-
- */
 
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((t) => ({
@@ -268,37 +266,39 @@ export default function UserProfile() {
               />
             )}
           </section>
-
-          {/* MODALES */}
+          
+          {/* ---------------- Modales ---------------- */}
           {seguitsModalOpen && profile && (
-            <LlistaSeguitsModal
+            <LlistaSeguits
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
               currentUserId={currentUser.uid}
+              goToProfile={goToProfile} // ✅ AHORA FUNCIONA NAVEGACIÓN
+            />
+          )}
+
+          {seguidoresModalOpen && profile && (
+            <LlistaSeguidors
+              open={seguidoresModalOpen}
+              onClose={() => setSeguidoresModalOpen(false)}
+              seguidors={profile.llista_seguidors || []}
+              goToProfile={goToProfile} // ✅ Navegación también aquí
+            />
+          )}
+
+          {openEdit && profile && (
+            <EditarPerfil 
+              profile={profile} 
+              onClose={() => setOpenEdit(false)}
+              onSave={(updated) => {
+                setProfile(updated);     
+                setOpenEdit(false);       
+              }}
             />
           )}
         </>
-        
       )}
-      {seguidoresModalOpen && profile && (
-      <LlistaSeguidors
-        open={seguidoresModalOpen}
-        onClose={() => setSeguidoresModalOpen(false)}
-        seguidors={profile.llista_seguidors || []}
-      />
-    )}
-
-    {openEdit && profile && (
-      <EditarPerfil 
-        profile={profile} 
-        onClose={() => setOpenEdit(false)}
-        onSave={(updated) => {
-          setProfile(updated);     
-          setOpenEdit(false);       
-        }}
-      />
-    )}
     </Layout>
   );
 }
