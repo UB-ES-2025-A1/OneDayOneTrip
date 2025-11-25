@@ -5,6 +5,7 @@ import { auth } from "../firebase";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
+
 import {
   getTripById,
   getAllTrips,
@@ -14,7 +15,16 @@ import {
 
 import Valorar from "../components/Valorar";
 import Comments from "../components/Comments";
-import { getUserById, followUser, unfollowUser } from "../api/client";
+
+import {
+  getUserById,
+  followUser,
+  unfollowUser,
+  saveTrip,
+  unsaveTrip,
+} from "../api/client";
+
+import "dayjs/locale/ca";
 
 const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
 const isNumericIndex = (s: string) => /^\d+$/.test(s || "");
@@ -35,6 +45,10 @@ export default function RutaDetall() {
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+
 
   // 🔹 Cargar usuario Firebase + backendUser
   useEffect(() => {
@@ -100,7 +114,7 @@ export default function RutaDetall() {
   // 🔹 Datos del autor
   useEffect(() => {
     const loadAuthor = async () => {
-      if (!tripData?.author?.userId) return;
+      if (!tripData?.author?.userId || !tripData?._id) return;
       try {
         const author = await getUserById(tripData.author.userId);
 
@@ -113,8 +127,12 @@ export default function RutaDetall() {
         setFollowersCount(count);
 
         if (currentUser) {
-          const followers: string[] = author.llista_seguidors || [];
-          setIsFollowing(followers.includes(currentUser.uid));
+          const followersList: string[] = author.llista_seguidors || [];
+          setIsFollowing(followersList.includes(currentUser.uid));
+
+          const currentUserData = await getUserById(currentUser.uid);
+          const savedTrips: string[] = currentUserData.guardades || [];
+          setIsSaved(savedTrips.includes(tripData._id));
         }
       } catch (e) {
         console.error("Error carregant dades de l'autor", e);
@@ -149,6 +167,28 @@ export default function RutaDetall() {
       setFollowLoading(false);
     }
   };
+
+
+  const handleSaveTrip = async () => {
+    if (!currentUser || !tripData?._id) return;
+    
+    try {
+      setSaveLoading(true);
+      
+      if (!isSaved) {
+        await saveTrip(currentUser.uid, tripData._id);
+        setIsSaved(true);
+      } else {
+        await unsaveTrip(currentUser.uid, tripData._id);
+        setIsSaved(false);
+      }
+    } catch (err) {
+      console.error("Error canviant estat de guardar/desguardar:", err);
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
 
   // 🔹 Valorar ruta
   const handleSubmitRating = async (value: number) => {
@@ -220,24 +260,64 @@ export default function RutaDetall() {
       <div className="ruta-detall">
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
-
-          {tripData.avgRating != null && (
-            <div className="rating-summary">
-              <span className="rating-star">★</span>
-              <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
-              <span className="rating-count">({tripData.numRatings})</span>
-            </div>
-          )}
-
-          <button
-            className="valorar-button"
-            onClick={() => setShowRatingModal(true)}
+  
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "10px",
+            }}
           >
-            <span className="valorar-icon">★</span>
-            Valorar
-          </button>
-        </div>
+            {/* Esquerra: Rating + Valorar */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              {tripData.avgRating != null && (
+                <div className="rating-summary">
+                  <span className="rating-star">★</span>
+                  <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
+                  <span className="rating-count">({tripData.numRatings})</span>
+                </div>
+              )}
 
+              <button
+                className="valorar-button"
+                onClick={() => setShowRatingModal(true)}
+              >
+                <span className="valorar-icon">★</span>
+                Valorar
+              </button>
+            </div>
+
+            {/* Dreta: Botó Guardar */}
+            <button
+              type="button"
+              className={`guardar-button ${isSaved ? "saved" : ""}`}
+              onClick={handleSaveTrip}
+              disabled={saveLoading}
+            >
+              <label className="ui-bookmark">
+                <svg
+                  className="bookmark"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 
+                          2 8.5 2 5.42 4.42 3 7.5 3 
+                          c1.74 0 3.41 0.81 4.5 2.09 
+                          C13.09 3.81 14.76 3 16.5 3 
+                          C19.58 3 22 5.42 22 8.5 
+                          c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </label>
+              <span className="guardar-text">
+                {isSaved ? "Guardat" : saveLoading ? "Guardant..." : "Guardar"}
+              </span>
+            </button>
+          </div>
+
+        </div>
+        
         <div className="ubicacio">
           <img src="/images/ubi.png" className="ubi-icon" />
           <span>{tripData.city}</span>

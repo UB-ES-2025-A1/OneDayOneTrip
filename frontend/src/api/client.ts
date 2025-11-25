@@ -70,6 +70,16 @@ export async function unfollowUser(userId: string, targetId: string) {
   return apiPost(`/users/unfollow/${userId}/${targetId}`, {});
 }
 
+// Guardar una ruta
+export async function saveTrip(userId: string, tripId: string) {
+  return apiPost(`/users/save/${userId}/${tripId}`, {});
+}
+
+// Treure una ruta guardada
+export async function unsaveTrip(userId: string, tripId: string) {
+  return apiPost(`/users/unsave/${userId}/${tripId}`, {});
+}
+  
 // 📌 Añadir una publicación al usuario
 export async function addPublicationToUser(userId: string, tripId: string) {
   return apiPost(`/users/${userId}/publicacions/${tripId}`, {});

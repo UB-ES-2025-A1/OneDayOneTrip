@@ -191,6 +191,28 @@ async def follow_user(user_id: str, target_id: str):
     return {"message": "Usuari seguit correctament"}
 
 
+@router.post("/save/{user_id}/{trip_id}")
+async def save_trip(user_id: str, trip_id: str):
+    user_ref = db.collection("users").document(user_id)
+    user_doc = user_ref.get()
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
+
+    user_ref.update({"guardades": firestore.ArrayUnion([trip_id])})
+    return {"message": "Ruta guardada correctament"}
+
+
+@router.post("/unsave/{user_id}/{trip_id}")
+async def unsave_trip(user_id: str, trip_id: str):
+    user_ref = db.collection("users").document(user_id)
+    user_doc = user_ref.get()
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
+
+    user_ref.update({"guardades": firestore.ArrayRemove([trip_id])})
+    return {"message": "Ruta eliminada de guardades correctament"}
+
+
 @router.post("/{user_id}/publicacions/{trip_id}")
 async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token)):
     """
