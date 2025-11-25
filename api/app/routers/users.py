@@ -203,6 +203,7 @@ async def save_trip(user_id: str, trip_id: str):
     })
     return {"message": "Ruta guardada correctament"}
 
+
 @router.post("/unsave/{user_id}/{trip_id}")
 async def unsave_trip(user_id: str, trip_id: str):
     user_ref = db.collection("users").document(user_id)
@@ -248,4 +249,3 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
         "message": "Publicació afegida correctament",
         "publicacions": list(publicacions),
     }
-
