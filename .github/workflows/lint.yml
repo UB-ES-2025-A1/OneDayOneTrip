@@ -20,9 +20,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Instal·lar Dependències (Arrel)
-        run: npm install
-
       - name: Instal·lar Dependències (Frontend)
         run: npm install
         working-directory: ./frontend/
