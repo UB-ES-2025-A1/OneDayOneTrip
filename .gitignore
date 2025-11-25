@@ -110,3 +110,5 @@ frontend/*.local
 # -----------------------------------
 .env
 venv/
+
+node_modules/

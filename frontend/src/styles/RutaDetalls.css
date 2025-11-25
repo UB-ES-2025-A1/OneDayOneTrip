@@ -101,7 +101,7 @@
 }
 
 .star {
-  color: #ccc;
+  color: #888888;
   font-size: 1.2rem;
   margin-right: 2px;
 }
@@ -113,7 +113,7 @@
 .rating-value {
   font-weight: 600;
   margin-left: 6px;
-  color: #333;
+  color: #f7f7f7;
 }
 
 /* ---------- CONTENIDO PRINCIPAL ---------- */
@@ -284,6 +284,56 @@
   40% { opacity: 1; }
   to { transform: scale(0.8); opacity: 0; }
 }
+
+/* línia títol + botó valorar */
+.ruta-header-line {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ruta-titol {
+  margin: 0;
+  font-size: 2.4rem;
+  color: #2e492e;
+  font-weight: 700;
+}
+
+/* Botó "Valorar" (sense recuadre, lletra verda) */
+.valorar-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  color: #2e492e;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: 100px;
+  line-height: 1;
+}
+
+.valorar-icon {
+  font-size: 1rem;            
+  display: inline-block;
+  position: relative;
+  top: -1px;                  
+}
+
+
+.valorar-button:hover {
+  background: rgba(46, 73, 46, 0.10);
+  border-radius: 15px;
+  padding: 6px 10px;
+  transition: background 0.2s ease;
+}
+
+
 
 /* ---------- UBICACIÓN Y AUTOR ---------- */
 .ubicacio {
@@ -467,117 +517,6 @@
   margin-bottom: 20px;
 }
 
-/* -----------------💬 COMENTARIS---------------------- */
-.ruta-comentaris {
-  margin-top: 3rem;
-  background: #fafafa;
-  padding: 1.5rem 2rem;
-  border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-}
-
-.ruta-comentaris h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  color: #2e492e;
-  border-bottom: 2px solid #e0e0e0;
-  padding-bottom: 0.5rem;
-  font-weight: 700;
-}
-
-.comentaris-loading,
-.comentaris-buits {
-  color: #666;
-  font-style: italic;
-  text-align: center;
-  padding: 1rem 0;
-}
-
-.comentaris-llista {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-/* ---------- TARJETA DEL COMENTARIO ---------- */
-.comentari-item {
-  background: white;
-  padding: 1rem 1.2rem;
-  border-radius: 14px;
-  border: 1px solid #e6e6e6;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.comentari-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
-
-/* ---------- CABECERA DEL COMENTARIO ---------- */
-.comentari-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.6rem;
-}
-
-.comentari-autor-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* ---------- AVATAR ---------- */
-.comentari-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: #2e492e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.comentari-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-/* ---------- TEXTO ---------- */
-.comentari-autor {
-  font-weight: 600;
-  color: #2e492e;
-  display: block;
-  font-size: 0.95rem;
-}
-
-.comentari-data {
-  font-size: 0.8rem;
-  color: #888;
-  display: block;
-  margin-top: 2px;
-}
-
-.comentari-contingut {
-  margin: 0;
-  color: #333;
-  line-height: 1.5;
-  font-size: 0.95rem;
-  white-space: pre-wrap;
-  background: #f9fafb;
-  padding: 0.8rem 1rem;
-  border-radius: 8px;
-  border: 1px solid #f0f0f0;
-}
-
 
 /* ---------- ZOOM ---------- */
 .zoom-gallery {
@@ -645,6 +584,37 @@
   opacity: 0.6;
   cursor: default;
 }
+
+
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff7d7;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #5a4500;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-right: 10px;
+  height: fit-content;
+}
+
+.rating-summary .rating-star {
+  font-size: 18px;
+  color: #e6ae00;
+}
+
+.rating-summary .rating-value {
+  font-size: 16px;
+}
+
+.rating-summary .rating-count {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
 
 /* =========================================================
    📱 RESPONSIVE DESIGN
