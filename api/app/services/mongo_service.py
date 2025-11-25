@@ -25,7 +25,12 @@ try:
     ratings_collection = db["ratings"]
 
     # Índices recomendados
-    comments_collection.create_index([("tripId", ASCENDING), ("createdAt", ASCENDING)])
+    # Índices recomendados
+    comments_collection.create_index([
+        ("tripId", ASCENDING), 
+        ("createdAt", ASCENDING)
+    ])
+
     ratings_collection.create_index([("tripId", ASCENDING)])
     ratings_collection.create_index(
         [("tripId", ASCENDING), ("userId", ASCENDING)], unique=True
@@ -170,3 +175,4 @@ def list_comments(trip_id: str, limit: int = 20, skip: int = 0):
     except Exception:
         print("[MOCK] list_comments() ejecutado sin Mongo real.")
         return []
+

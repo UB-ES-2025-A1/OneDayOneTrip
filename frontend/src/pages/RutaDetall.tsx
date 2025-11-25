@@ -246,15 +246,23 @@ export default function RutaDetall() {
 
         {/* Autor */}
         <div className="autor">
-          <div className="autor-icon">
+          <div
+            className="autor-icon"
+            onClick={() => tripData?.author?.userId && navigate(`/user/${tripData.author.userId}`)}
+            style={{ cursor: "pointer" }}
+          >
             <img
               src={tripData.author?.profilePic || "/images/person.png"}
-              alt="Autor"
+              alt={tripData.author?.name || "Autor"}
               className="autor-foto"
             />
           </div>
 
-          <div className="autor-info">
+          <div
+            className="autor-info"
+            onClick={() => tripData?.author?.userId && navigate(`/user/${tripData.author.userId}`)}
+            style={{ cursor: "pointer" }}
+          >
             <span className="autor-nombre">{tripData.author?.name}</span>
             {followersCount !== null && (
               <span className="autor-seguidors">
@@ -273,6 +281,7 @@ export default function RutaDetall() {
             </button>
           )}
         </div>
+
 
         {/* Descripción */}
         <div className="ruta-descripcio">

@@ -33,13 +33,17 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
           return;
         }
 
+        console.log("Seguidors a cargar:", seguidors);
         const fetchedUsers = await Promise.all(
-          seguidors.map(async (uid) => await getUserById(uid))
+          seguidors.map(async (uid) => {
+            const u = await getUserById(uid);
+            return u ? { ...u } : null;
+          })
         );
-
+        console.log("Usuarios fetched:", fetchedUsers);
         setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
       } catch (err) {
-        console.error("Error carregant seguidors:", err);
+        console.error("Error cargando seguidores:", err);
         setUsers([]);
       } finally {
         setLoading(false);
@@ -49,7 +53,6 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
     fetchUsers();
   }, [open, seguidors]);
 
-  // Animación GSAP al mostrar usuarios
   useEffect(() => {
     if (!users || users.length === 0) return;
     const items = gsap.utils.toArray<HTMLElement>(".seguidor-item");
@@ -78,7 +81,7 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
               <div
                 key={u.uid}
                 className="seguidor-item"
-                onClick={() => goToProfile?.(u.uid)}
+                onClick={() => goToProfile ? goToProfile(u.uid) : null}
               >
                 <img
                   src={u.url_foto_perfil || "/images/default-profile.png"}

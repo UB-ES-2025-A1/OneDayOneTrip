@@ -103,6 +103,28 @@
   overflow: hidden;
 }
 
+.tabs-container1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 2rem auto;
+  width: 320px;
+  height: 45px;
+  background-color: #e6f3e6;
+  border-radius: 30px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.trip-list {
+  margin-top: 0rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
 .tab-btn {
   flex: 1;
   z-index: 2;
@@ -215,6 +237,14 @@
 .edit-profile-btn:hover {
   background: #ffffff;
   transform: scale(1.08);
+}
+
+.tab-title {
+  color: #2e492e;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
 }
 
 /* =========================================================

@@ -69,3 +69,8 @@ export async function followUser(userId: string, targetId: string) {
 export async function unfollowUser(userId: string, targetId: string) {
   return apiPost(`/users/unfollow/${userId}/${targetId}`, {});
 }
+
+// 📌 Añadir una publicación al usuario
+export async function addPublicationToUser(userId: string, tripId: string) {
+  return apiPost(`/users/${userId}/publicacions/${tripId}`, {});
+}
