@@ -7,7 +7,7 @@ class TripPoint(BaseModel):
     title: str
     description: Optional[str] = None
     coordinates: Optional[dict] = None
-    location_name : str
+    location_name: str
     image: Optional[str] = None
 
 
@@ -27,7 +27,7 @@ class TripModel(BaseModel):
     region: Optional[str] = None
     country: Optional[str] = "España"
     routeMap: Optional[List[dict]] = []
-    trip_points: Optional[List[TripPoint]] = [] 
+    trip_points: Optional[List[TripPoint]] = []
     distance: Optional[float] = None
     duration: Optional[str] = None
     difficulty: Optional[str] = "Media"

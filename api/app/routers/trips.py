@@ -3,10 +3,22 @@ from typing import List, Optional
 from app.models.trip_model import TripModel
 from app.models.trip_create_in import TripCreateIn
 from app.services.image_service import upload_image_to_imgbb
-from app.services.mongo_service import save_trip, get_all_trips, get_trip_by_id, get_trip_rating_stats
-import requests, time, json
+from app.services.mongo_service import (
+    save_trip,
+    get_all_trips,
+    get_trip_by_id,
+    get_trip_rating_stats,
+)
+import requests
+import time
+import json
+
+from datetime import datetime
+from app.services.mongo_service import upsert_rating
+from fastapi import Body
 
 router = APIRouter(prefix="/trips", tags=["Trips"])
+
 
 # ============================================================
 # 🌍 Geocodificación con Debug
@@ -27,7 +39,9 @@ def get_location_name(lat: float, lon: float) -> str:
 
         resp.raise_for_status()
         data = resp.json()
-        print(f"[DEBUG] 📦 JSON recibido: {json.dumps(data, indent=2, ensure_ascii=False)[:400]}...")
+        print(
+            f"[DEBUG] 📦 JSON recibido: {json.dumps(data, indent=2, ensure_ascii=False)[:400]}..."
+        )
 
         name = (
             data.get("display_name")
@@ -45,6 +59,7 @@ def get_location_name(lat: float, lon: float) -> str:
 # ============================================================
 # 📋 Endpoints
 # ============================================================
+
 
 @router.get("/")
 def list_trips(include_stats: bool = False):
@@ -76,15 +91,16 @@ def get_trip(trip_id: str):
 # ============================================================
 # 🚀 Crear Trip (Multipart + Geocoding)
 # ============================================================
-@router.post("/",
+@router.post(
+    "/",
     summary="Crear una trip (multipart con JSON + imágenes)",
-    description="Sube una trip con imágenes, puntos y geolocalización."
+    description="Sube una trip con imágenes, puntos y geolocalización.",
 )
 async def create_trip_multipart(
     trip_json: str = Form(...),
     cover: Optional[UploadFile] = File(None),
     gallery: Optional[List[UploadFile]] = File(None),
-    point_images: Optional[List[UploadFile]] = File(None)
+    point_images: Optional[List[UploadFile]] = File(None),
 ):
     print("\n[DEBUG] 🚀 create_trip_multipart() llamado")
     print(f"[DEBUG] trip_json recibido: {trip_json[:300]}...")
@@ -107,7 +123,9 @@ async def create_trip_multipart(
             print(f"\n[DEBUG] ➡️ Procesando punto #{i+1}: {p.title}")
             img_url = None
             if point_images and i < len(point_images) and point_images[i] is not None:
-                print(f"[DEBUG] 🖼️ Subiendo imagen del punto: {point_images[i].filename}")
+                print(
+                    f"[DEBUG] 🖼️ Subiendo imagen del punto: {point_images[i].filename}"
+                )
                 img_url = upload_image_to_imgbb(point_images[i])
 
             coords = p.coordinates
@@ -128,22 +146,22 @@ async def create_trip_multipart(
                 print(f"[DEBUG] 🌐 Coordenadas parseadas: lat={lat}, lon={lon}")
 
                 if lat is not None and lon is not None:
-                    print(f"[DEBUG] 🌍 Llamando a get_location_name()...")
+                    print("[DEBUG] 🌍 Llamando a get_location_name()...")
                     location_name = get_location_name(lat, lon)
                     print(f"[DEBUG] 🗺️ Resultado del geocoding: {location_name}")
                     time.sleep(1)  # evita rate limit
                 else:
-                    print(f"[DEBUG] ⚠️ No se encontraron coordenadas válidas.")
+                    print("[DEBUG] ⚠️ No se encontraron coordenadas válidas.")
 
             except Exception as geo_err:
-                print(f"[ERROR] ❌ Error procesando coordenadas del punto {p.title}: {geo_err}")
+                print(
+                    f"[ERROR] ❌ Error procesando coordenadas del punto {p.title}: {geo_err}"
+                )
                 location_name = "Error al geocodificar"
 
-            points_with_images.append({
-                **p.dict(),
-                "image": img_url,
-                "location_name": location_name
-            })
+            points_with_images.append(
+                {**p.dict(), "image": img_url, "location_name": location_name}
+            )
 
         # 4️⃣ Construir objeto TripModel
         print(f"\n[DEBUG] 🏗️ Construyendo objeto TripModel para '{data.title}'")
@@ -167,24 +185,19 @@ async def create_trip_multipart(
         )
 
         # 5️⃣ Guardar en MongoDB
-        print(f"[DEBUG] 💾 Guardando trip en MongoDB...")
+        print("[DEBUG] 💾 Guardando trip en MongoDB...")
         inserted_id = save_trip(trip_to_store.dict())
         print(f"[DEBUG] ✅ Trip guardada con ID: {inserted_id}")
 
         return {
             "message": "Trip creada correctamente",
             "trip_id": inserted_id,
-            "trip": trip_to_store
+            "trip": trip_to_store,
         }
 
     except Exception as e:
         print(f"[ERROR] ❌ Error en create_trip_multipart: {e}")
         raise HTTPException(status_code=400, detail=str(e))
-
-
-from datetime import datetime
-from app.services.mongo_service import  upsert_rating
-from fastapi import Body
 
 
 # ============================================================
@@ -199,9 +212,9 @@ def add_trip_rating(
     """
     Añade o actualiza una valoración (rating) de 1 a 5 para una trip.
     """
-    print(f"\n[DEBUG] ⭐ add_trip_rating() -> trip_id={trip_id}, userId={userId}, rating={rating}")
+    print(
+        f"\n[DEBUG] ⭐ add_trip_rating() -> trip_id={trip_id}, userId={userId}, rating={rating}"
+    )
     upsert_rating(trip_id, userId, rating, datetime.utcnow())
-    print(f"[DEBUG] ✅ Rating guardado o actualizado correctamente")
+    print("[DEBUG] ✅ Rating guardado o actualizado correctamente")
     return {"message": "Rating añadido o actualizado"}
-
-
