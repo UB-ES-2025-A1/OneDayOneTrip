@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../api"
 
 # 1️⃣ Importamos aquí el módulo con verify_token
 from app.routers import users, trips
+from _pytest.monkeypatch import MonkeyPatch
 
 # 2️⃣ Mockeamos verify_token ANTES de crear la app
 def fake_verify_token():
@@ -14,7 +15,6 @@ def fake_verify_token():
 
 users.verify_token = fake_verify_token
 
-# 🔹 Mock de funciones externas en trips
 def fake_upload_image_to_imgbb(file):  # Mock de subida de imágenes
     return f"https://fake.imgbb.com/{file.filename if file else 'no_file'}.jpg"
 
@@ -38,9 +38,6 @@ def fake_get_trip_by_id(trip_id):  # Mock DB read one
 def fake_get_trip_rating_stats(trip_id):  # Mock rating stats
     return {"avgRating": 4.5, "ratingsCount": 10}
 
-def fake_add_comment(doc):  # Mock insert comment
-    return "mock_comment_id"
-
 def fake_upsert_rating(trip_id, userId, rating, date):  # Mock rating save
     return None
 
@@ -51,25 +48,25 @@ def fake_list_comments(trip_id, limit, skip):
         {"tripId": trip_id, "userId": "u2", "content": "Me encantó"},
     ]
 
-
-
-# --- Aplicar los mocks ---
-trips.upload_image_to_imgbb = fake_upload_image_to_imgbb
-trips.get_location_name = fake_get_location_name
-trips.save_trip = fake_save_trip
-trips.get_all_trips = fake_get_all_trips
-trips.get_trip_by_id = fake_get_trip_by_id
-trips.get_trip_rating_stats = fake_get_trip_rating_stats
-trips.add_comment = fake_add_comment
-trips.upsert_rating = fake_upsert_rating
-
 # 3️⃣ Ahora sí importamos la app (ya con el mock activo)
 from app.main import app
 from fastapi.testclient import TestClient
 
 @pytest.fixture(scope="module")
 def client():
-    return TestClient(app)
+    mp = MonkeyPatch()
+    mp.setattr(trips, "upload_image_to_imgbb", fake_upload_image_to_imgbb)
+    mp.setattr(trips, "get_location_name", fake_get_location_name)
+    mp.setattr(trips, "save_trip", fake_save_trip)
+    mp.setattr(trips, "get_all_trips", fake_get_all_trips)
+    mp.setattr(trips, "get_trip_by_id", fake_get_trip_by_id)
+    mp.setattr(trips, "get_trip_rating_stats", fake_get_trip_rating_stats)
+    mp.setattr(trips, "upsert_rating", fake_upsert_rating)
+    mp.setattr("app.routers.comments.list_comments", fake_list_comments)
+
+    client = TestClient(app)
+    yield client
+    mp.undo()
 
 
 @pytest.fixture(autouse=True)

@@ -60,15 +60,26 @@ class TestTripsEndpoints:
         assert "trip_id" in data
         assert data["trip_id"] == "mock_trip_id_123"
 
-    def test_add_comment(self, client):
+    def test_add_comment(self, client, monkeypatch):
+        captured = {}
+
+        class FakeCollection:
+            def insert_one(self, doc):
+                captured["doc"] = doc
+                return type("Res", (), {"inserted_id": "c123"})()
+
+        monkeypatch.setattr("app.routers.comments.comments_collection", FakeCollection())
+
         body = {
+            "tripId": "507f1f77bcf86cd799439011",
             "userId": "u1",
             "userName": "Tester",
-            "content": "Buen viaje!"
+            "text": "Bon viatge!",
         }
-        response = client.post(f"/trips/t1/comment", json=body)
+        response = client.post("/trips/507f1f77bcf86cd799439011/comments", json=body)
         assert response.status_code == status.HTTP_200_OK
-        assert "comment_id" in response.json()
+        assert response.json()["comment"]["_id"] == "c123"
+        assert captured["doc"]["text"] == "Bon viatge!"
 
     def test_add_rating(self, client):
         body = {"userId": "u1", "rating": 5}
