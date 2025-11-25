@@ -1,6 +1,9 @@
 name: 🧪 CI – Backend & Frontend Tests
 
 on:
+  push:
+    branches:
+      - "**"
   pull_request:
     branches:
       - "**"
