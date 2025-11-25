@@ -7,6 +7,7 @@ const mockFetch = vi.fn();
 describe("rateTrip API helper", () => {
   beforeEach(() => {
     mockFetch.mockReset();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).fetch = mockFetch;
   });
 

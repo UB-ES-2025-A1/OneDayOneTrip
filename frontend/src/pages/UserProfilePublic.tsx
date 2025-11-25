@@ -25,6 +25,7 @@ export type BackendUser = {
   url_foto_panell?: string;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type GridItem = {
   id: string;
   title: string;

@@ -69,6 +69,7 @@ class AuthService {
     try {
       await sendPasswordResetEmail(auth, email);
       return true;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error al enviar correu de reset:", error);
       throw new Error(error.message || "No s'ha pogut enviar l'enllaç de recuperació.");

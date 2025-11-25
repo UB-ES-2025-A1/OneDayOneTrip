@@ -80,6 +80,7 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
 
       onClose();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       console.error("Error:", e);
       setError(e?.message || "No s'ha pogut guardar el perfil.");

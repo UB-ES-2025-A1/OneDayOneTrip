@@ -6,7 +6,9 @@ import { createTripComment, getTripComments, type Comment } from "../api/trips";
 
 interface CommentsProps {
   tripId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   currentUser: any | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   backendUser: any | null;
 }
 

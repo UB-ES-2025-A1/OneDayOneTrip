@@ -43,6 +43,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
 
       onClose();
       navigate("/");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message);
     } finally {

@@ -66,6 +66,7 @@ vi.mock("../components/Layout", () => ({
 
 vi.mock("../components/MasonryGrid", () => ({
   __esModule: true,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default: ({ items }: { items: any[] }) => (
     <div data-testid="masonry-grid">{items?.length || 0} items</div>
   ),
@@ -319,6 +320,7 @@ describe("UserProfilePublic page", () => {
     };
 
     mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (callback) callback(mockUser as any);
       return () => {};
     });
@@ -363,6 +365,7 @@ describe("UserProfilePublic page", () => {
     };
 
     mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (callback) callback(mockUser as any);
       return () => {};
     });
@@ -408,6 +411,7 @@ describe("UserProfilePublic page", () => {
     };
 
     mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (callback) callback(mockUser as any);
       return () => {};
     });
@@ -450,6 +454,7 @@ describe("UserProfilePublic page", () => {
     };
 
     mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (callback) callback(mockUser as any);
       return () => {};
     });

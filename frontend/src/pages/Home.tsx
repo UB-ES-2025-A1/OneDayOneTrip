@@ -54,6 +54,7 @@ export default function Home() {
       : authorId !== "uid_000";
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const normalizeId = (id: any) =>
     typeof id === "string" ? id : id?.$oid || String(id || "");
 

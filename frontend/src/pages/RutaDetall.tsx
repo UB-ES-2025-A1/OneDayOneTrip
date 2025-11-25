@@ -15,8 +15,6 @@ import {
 
 import dayjs from "dayjs";
 import "dayjs/locale/ca";
-import Valorar from "../components/Valorar";
-import Comments from "../components/Comments";
 import { getUserById, followUser, unfollowUser } from "../api/client";
 
 const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
@@ -27,17 +25,20 @@ export default function RutaDetall() {
   const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
   const [backendUser, setBackendUser] = useState<any | null>(null);
   const [tripData, setTripData] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [mainImage, setMainImage] = useState<string>("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showRatingModal, setShowRatingModal] = useState(false);
 
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [comments, setComments] = useState<any[]>([]);
   const [loadingComments, setLoadingComments] = useState(false);
   const [zoomImage, setZoomImage] = useState<string | null>(null);
@@ -173,6 +174,7 @@ export default function RutaDetall() {
     fetchComments();
   }, [tripData]);
   // 🔹 Valorar ruta
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmitRating = async (value: number) => {
     if (!currentUser) {
       alert("Has d'iniciar sessió per valorar.");
@@ -197,7 +199,7 @@ export default function RutaDetall() {
       );
 
       setShowRatingModal(false);
-    } catch (err) {
+    } catch {
       alert("No s'ha pogut enviar la valoració.");
     }
   };

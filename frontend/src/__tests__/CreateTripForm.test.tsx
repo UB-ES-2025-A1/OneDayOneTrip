@@ -39,6 +39,7 @@ const baseProps = {
     displayName: "Frontend User",
     email: "front@example.com",
     photoURL: "avatar.png",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any,
   backendUser: {
     uid: "u-1",

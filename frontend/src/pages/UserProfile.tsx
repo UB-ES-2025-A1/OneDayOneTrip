@@ -84,6 +84,7 @@ export default function UserProfile() {
         const guardIds = new Set(backendUser.guardades.map(String));
         const userTrips = allTrips.filter(t => pubIds.has(String(t._id)) || guardIds.has(String(t._id)));
         setTrips(userTrips);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         console.error("Error carregant perfil:", e);
         setError(e?.message || "No s'ha pogut carregar el perfil.");
@@ -129,6 +130,7 @@ export default function UserProfile() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const goToProfile = (uid: string) => {
     navigate(`/user/${uid}`);
     setSeguidoresModalOpen(false);
