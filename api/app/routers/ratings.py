@@ -5,6 +5,7 @@ from app.services.mongo_service import upsert_rating, get_trip_rating_stats
 
 router = APIRouter(prefix="/ratings", tags=["Ratings"])
 
+
 @router.post("/trip/{trip_id}")
 def rate_trip(trip_id: str, rating: RatingModel):
     try:

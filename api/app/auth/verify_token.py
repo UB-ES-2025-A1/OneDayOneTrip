@@ -4,6 +4,7 @@ from firebase_admin import auth
 
 security = HTTPBearer()
 
+
 async def verify_token(request: Request):
     """Verifica el token JWT de Firebase enviado desde el frontend"""
     token = request.headers.get("Authorization")

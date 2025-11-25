@@ -1,0 +1,12 @@
+# api/.flake8
+[flake8]
+# Ignorem E203 (espais abans de :) i W503 (salt de línia binari)
+ignore = E203, W503
+# Fixem el límit de línia a 88 caràcters per ser compatible amb Black
+max-line-length = 88
+# Excloem carpetes d'entorns i de caché
+exclude =
+    .git,
+    __pycache__,
+    venv,
+    alembic
