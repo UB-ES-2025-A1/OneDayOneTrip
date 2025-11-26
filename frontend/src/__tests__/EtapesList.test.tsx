@@ -8,7 +8,8 @@ vi.mock("motion/react", () => ({
     motion: {
       div: ({ children, ...props }: any) => {
         // Filtrar props que React no reconoce
-        const { whileInView: _whileInView, initial: _initial, transition: _transition, viewport: _viewport, ...restProps } = props;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { whileInView, initial, transition, viewport, ...restProps } = props;
         return <div {...restProps}>{children}</div>;
       },
     },
