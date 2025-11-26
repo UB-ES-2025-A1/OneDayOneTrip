@@ -51,22 +51,30 @@ vi.mock("../api/client", () => ({
 // -----------------------------------------------
 // ⭐ FIREBASE MOCK ARREGLADO DEFINITIVO
 // -----------------------------------------------
-vi.mock("firebase/auth", () => {
-  const safeCallback = (callback: any, value: any) => {
-    if (typeof callback === "function") callback(value);
-    else if (callback?.next) callback.next(value);
-  };
+let authCallbackAlreadyCalled = false;
 
+vi.mock("firebase/auth", () => {
   return {
+    __esModule: true,
+
+    getAuth: vi.fn(() => ({ currentUser: null })),
+
     onAuthStateChanged: vi.fn((_auth, callback) => {
-      safeCallback(callback, null);
+      // 🔥 SOLO SE EJECUTA UNA VEZ
+      if (!authCallbackAlreadyCalled) {
+        authCallbackAlreadyCalled = true;
+        if (typeof callback === "function") callback(null);
+        else if (callback?.next) callback.next(null);
+      }
       return () => {};
     }),
-    getAuth: vi.fn(() => ({ currentUser: null })),
+
     signOut: vi.fn(),
+
     auth: {},
   };
 });
+
 
 // -----------------------------------------------
 // ⭐ UI Mocks
