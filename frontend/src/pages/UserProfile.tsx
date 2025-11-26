@@ -5,18 +5,24 @@ import { auth } from "../firebase";
 import { getUserById } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
-import { ImageOff } from "lucide-react"; 
+import { ImageOff, Pencil } from "lucide-react"; 
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
+import LlistaSeguits from "../components/LlistaSeguitsModal";
+import EditarPerfil from "../components/EditarPerfilModal";
+import LlistaSeguidors from "../components/LlistaSeguidorsModal";
+import CreateTripForm from "../components/CreateTripForm";
 
-type BackendUser = {
+export type BackendUser = {
   uid: string;
   nom_i_cognoms?: string;
   mail?: string;
   username?: string;
   seguidors?: number;
   seguits?: number;
-  publicacions?: string[]; // ✅ IDs de trips
+  llista_seguidors?: string[];
+  llista_seguits?: string[];
+  publicacions?: string[];
   guardades?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
@@ -42,10 +48,16 @@ export default function UserProfile() {
   const [selectedTab, setSelectedTab] = useState<"publicacions" | "guardat">("publicacions");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [openEdit, setOpenEdit] = useState(false);
+  const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
+  const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
+  const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
-  // 🔹 Cargar usuario y sus trips
+  // ---------------------------
+  // Cargar usuario y trips
+  // ---------------------------
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       setCurrentUser(fbUser);
@@ -59,22 +71,20 @@ export default function UserProfile() {
       try {
         setLoading(true);
         const backendUser = await getUserById(fbUser.uid);
+        backendUser.llista_seguidors = backendUser.llista_seguidors || [];
+        backendUser.llista_seguits = backendUser.llista_seguits || [];
+        backendUser.publicacions = backendUser.publicacions || [];
+        backendUser.guardades = backendUser.guardades || [];
+
         setProfile(backendUser as BackendUser);
 
-        // 🔹 Obtener todas las trips
         const allTrips = await getAllTrips(true);
-
-        // 🔹 Filtrar solo las del usuario
-        const pubIds = new Set((backendUser.publicacions || []).map(String));
-        const guardIds = new Set((backendUser.guardades || []).map(String));
-
-        const userTrips = allTrips.filter(
-          (t) => pubIds.has(String(t._id)) || guardIds.has(String(t._id))
-        );
-
+        const pubIds = new Set(backendUser.publicacions.map(String));
+        const guardIds = new Set(backendUser.guardades.map(String));
+        const userTrips = allTrips.filter(t => pubIds.has(String(t._id)) || guardIds.has(String(t._id)));
         setTrips(userTrips);
       } catch (e: any) {
-        console.error("❌ Error carregant perfil:", e);
+        console.error("Error carregant perfil:", e);
         setError(e?.message || "No s'ha pogut carregar el perfil.");
       } finally {
         setLoading(false);
@@ -84,6 +94,9 @@ export default function UserProfile() {
     return () => unsub();
   }, []);
 
+  // ---------------------------
+  // Funciones
+  // ---------------------------
   const handleLogout = async () => {
     await signOut(auth);
     navigate("/");
@@ -91,15 +104,42 @@ export default function UserProfile() {
 
   const openRegister = () => alert("Has d'iniciar sessió per continuar.");
 
-  // 🔹 Conversion de Trip → GridItem
+  const openSeguidorsModal = async () => {
+    if (!profile) return;
+    try {
+      const updatedProfile = await getUserById(profile.uid);
+      updatedProfile.llista_seguidors = updatedProfile.llista_seguidors || [];
+      setProfile(updatedProfile as BackendUser);
+      setSeguidoresModalOpen(true);
+    } catch (err) {
+      console.error("Error recargando seguidors:", err);
+    }
+  };
+
+  const openSeguitsModal = async () => {
+    if (!profile) return;
+    try {
+      const updatedProfile = await getUserById(profile.uid);
+      updatedProfile.llista_seguits = updatedProfile.llista_seguits || [];
+      setProfile(updatedProfile as BackendUser);
+      setSeguitsModalOpen(true);
+    } catch (err) {
+      console.error("Error recargando seguits:", err);
+    }
+  };
+
+  // 🔹 Función para navegar a otro perfil
+  const goToProfile = (uid: string) => {
+    navigate(`/user/${uid}`);
+    setSeguidoresModalOpen(false);
+    setSeguitsModalOpen(false);
+  };
+
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((t) => ({
       id: String(t._id),
       title: t.title || "Sense títol",
-      img:
-        t.coverImage ||
-        (t.gallery && t.gallery[0]) ||
-        "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
+      img: t.coverImage || (t.gallery && t.gallery[0]) || "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
       user: t.author?.name || "Anònim",
       rating: typeof t.avgRating === "number" ? t.avgRating : 0,
       temps: t.duration || "—",
@@ -109,16 +149,17 @@ export default function UserProfile() {
       country: t.country || "",
     }));
 
-  // 🔹 Derivados visuales
+  // ---------------------------
+  // Derivados visuales
+  // ---------------------------
   const displayName = profile?.nom_i_cognoms || currentUser?.displayName || profile?.username || "Usuari";
   const displayMail = profile?.mail || currentUser?.email || "";
   const photoUrl = profile?.url_foto_perfil || "/images/person.png";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
-  const seguidors = profile?.seguidors ?? 0;
-  const seguits = profile?.seguits ?? 0;
+  const seguidors = profile?.llista_seguidors?.length ?? profile?.seguidors ?? 0;
+  const seguits = profile?.llista_seguits?.length ?? profile?.seguits ?? 0;
 
-  // 🔹 Separar por pestaña
   const publicacionsItems = useMemo(() => {
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return toGridItems(trips.filter((t) => pubIds.has(String(t._id))));
@@ -131,6 +172,9 @@ export default function UserProfile() {
 
   const gridItems = selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
 
+  // ---------------------------
+  // Render
+  // ---------------------------
   return (
     <Layout
       currentUser={currentUser}
@@ -148,21 +192,37 @@ export default function UserProfile() {
             className="user-profile"
             style={{
               background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${panelUrl}) center/cover no-repeat`,
+              position:"relative",
             }}
           >
+            <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}> <Pencil size={22} /></button>
+          
             <div className="user-photo">
               <img src={photoUrl} alt="Foto de perfil" />
             </div>
+
             <div className="user-details">
               <div className="user-info">
                 <h2>{displayName}</h2>
                 <h3>{displayMail}</h3>
               </div>
               <div className="user-stats">
-                <div className="stat"><span className="number">{seguidors}</span><span className="label">Seguidors</span></div>
-                <div className="stat"><span className="number">{seguits}</span><span className="label">Seguits</span></div>
-                <div className="stat"><span className="number">{publicacionsItems.length}</span><span className="label">Publicacions</span></div>
-                <div className="stat"><span className="number">{guardadesItems.length}</span><span className="label">Guardades</span></div>
+                <div className="stat" onClick={openSeguidorsModal}>
+                  <span className="number">{seguidors}</span>
+                  <span className="label">Seguidors</span>
+                </div>
+                <div className="stat" onClick={openSeguitsModal}>
+                  <span className="number">{seguits}</span>
+                  <span className="label">Seguits</span>
+                </div>
+                <div className="stat">
+                  <span className="number">{publicacionsItems.length}</span>
+                  <span className="label">Publicacions</span>
+                </div>
+                <div className="stat">
+                  <span className="number">{guardadesItems.length}</span>
+                  <span className="label">Guardades</span>
+                </div>
               </div>
             </div>
           </div>
@@ -173,9 +233,15 @@ export default function UserProfile() {
           </div>
 
           <section className="trip-list">
-            {gridItems.length > 0 ? (
-              <MasonryGrid items={gridItems} openRegister={openRegister} currentUser={currentUser} />
-            ) : (
+            <MasonryGrid
+              items={gridItems}
+              openRegister={openRegister}
+              currentUser={currentUser}
+              showCreateButton={selectedTab === "publicacions"}
+              onCreateTripClick={() => setModalOpen("createTrip")}
+            />
+
+            {gridItems.length === 0 && (
               <div className="empty-state">
                 <ImageOff className="empty-icon" size={60} />
                 {selectedTab === "publicacions" ? (
@@ -191,7 +257,46 @@ export default function UserProfile() {
                 )}
               </div>
             )}
+
+            {modalOpen === "createTrip" && currentUser && profile && (
+              <CreateTripForm
+                onClose={() => setModalOpen(null)}
+                currentUser={currentUser}
+                backendUser={profile}
+              />
+            )}
           </section>
+          
+          {/* ---------------- Modales ---------------- */}
+          {seguitsModalOpen && profile && (
+            <LlistaSeguits
+              open={seguitsModalOpen}
+              onClose={() => setSeguitsModalOpen(false)}
+              seguits={profile.llista_seguits || []}
+              currentUserId={currentUser.uid}
+              goToProfile={goToProfile} // ✅ AHORA FUNCIONA NAVEGACIÓN
+            />
+          )}
+
+          {seguidoresModalOpen && profile && (
+            <LlistaSeguidors
+              open={seguidoresModalOpen}
+              onClose={() => setSeguidoresModalOpen(false)}
+              seguidors={profile.llista_seguidors || []}
+              goToProfile={goToProfile} // ✅ Navegación también aquí
+            />
+          )}
+
+          {openEdit && profile && (
+            <EditarPerfil 
+              profile={profile} 
+              onClose={() => setOpenEdit(false)}
+              onSave={(updated) => {
+                setProfile(updated);     
+                setOpenEdit(false);       
+              }}
+            />
+          )}
         </>
       )}
     </Layout>
