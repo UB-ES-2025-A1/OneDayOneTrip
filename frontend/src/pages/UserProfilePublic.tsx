@@ -37,7 +37,7 @@ type GridItem = {
   authorPic?: string;
   city?: string;
   country?: string;
-};*/
+};
 
 export default function UserProfilePublic() {
   const { id } = useParams();

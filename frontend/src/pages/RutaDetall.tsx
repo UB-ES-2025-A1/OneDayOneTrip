@@ -5,6 +5,8 @@ import { auth } from "../firebase";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
+import Comments from "../components/Comments";
+import Valorar from "../components/Valorar";
 
 import {
   getTripById,
