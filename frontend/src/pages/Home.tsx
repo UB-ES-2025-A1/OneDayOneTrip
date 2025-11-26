@@ -11,15 +11,32 @@ import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 
 import { getAllTrips, type Trip } from "../api/trips";
+import { getUserById} from "../api/client";
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [backendUser, setBackendUser] = useState<any | null>(null);
   const [selectedTab, setSelectedTab] = useState<"recomendados" | "siguiendo">("recomendados");
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+
+      if (user) {
+        const backendInfo = await getUserById(user.uid);
+        setBackendUser(backendInfo);
+      } else {
+        setBackendUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => setCurrentUser(user));
@@ -48,10 +65,14 @@ export default function Home() {
   }, []);
 
   const filteredTrips = trips.filter((t) => {
+    if (selectedTab === "recomendados") {
+      return true; // Mostrar TODAS las trips
+    }
+
+    if (!backendUser?.llista_seguits) return false;
+
     const authorId = t.author?.userId || "";
-    return selectedTab === "recomendados"
-      ? authorId === "uid_000"
-      : authorId !== "uid_000";
+    return backendUser.llista_seguits.includes(authorId);
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

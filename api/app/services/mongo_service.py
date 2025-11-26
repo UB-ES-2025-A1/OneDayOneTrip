@@ -25,7 +25,9 @@ try:
     ratings_collection = db["ratings"]
 
     # Índices recomendados
+    # Índices recomendados
     comments_collection.create_index([("tripId", ASCENDING), ("createdAt", ASCENDING)])
+
     ratings_collection.create_index([("tripId", ASCENDING)])
     ratings_collection.create_index(
         [("tripId", ASCENDING), ("userId", ASCENDING)], unique=True
@@ -39,6 +41,7 @@ except Exception as e:
 
     class MockCollection:
         """Simula una colección de MongoDB para entornos de test."""
+
         def insert_one(self, doc):
             print(f"[MOCK] insert_one({doc})")
             return type("MockRes", (), {"inserted_id": "mock_id"})()
@@ -63,9 +66,14 @@ except Exception as e:
             print("[MOCK] create_index() llamado.")
             return None
 
-        def sort(self, *args, **kwargs): return self
-        def skip(self, *args, **kwargs): return self
-        def limit(self, *args, **kwargs): return []
+        def sort(self, *args, **kwargs):
+            return self
+
+        def skip(self, *args, **kwargs):
+            return self
+
+        def limit(self, *args, **kwargs):
+            return []
 
     class MockDB:
         def __getitem__(self, name):
@@ -80,6 +88,7 @@ except Exception as e:
 # ============================================================
 # 🗺️  TRIPS
 # ============================================================
+
 
 def save_trip(trip: dict) -> str:
     """Guarda una nueva trip en Mongo y devuelve su ID."""
@@ -111,12 +120,19 @@ def get_trip_by_id(trip_id: str):
 # ⭐ RATINGS
 # ============================================================
 
+
 def get_trip_rating_stats(trip_id: str):
     """Calcula el promedio y el conteo de ratings de una trip."""
     try:
         pipeline = [
             {"$match": {"tripId": ObjectId(trip_id)}},
-            {"$group": {"_id": "$tripId", "avg": {"$avg": "$rating"}, "count": {"$sum": 1}}},
+            {
+                "$group": {
+                    "_id": "$tripId",
+                    "avg": {"$avg": "$rating"},
+                    "count": {"$sum": 1},
+                }
+            },
         ]
         agg = list(ratings_collection.aggregate(pipeline))
     except Exception:
@@ -143,6 +159,7 @@ def upsert_rating(trip_id: str, user_id: str, rating: int, date):
 # ============================================================
 # 💬 COMMENTS
 # ============================================================
+
 
 def list_comments(trip_id: str, limit: int = 20, skip: int = 0):
     """Obtiene comentarios ordenados (más nuevos primero)."""

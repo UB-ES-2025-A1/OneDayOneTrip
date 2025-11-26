@@ -1,0 +1,10 @@
+# api/.flake8
+[flake8]
+# IGNORA E501 (línia llarga) i E203, W503 (estil)
+ignore = E501, E203, W503
+max-line-length = 88
+exclude =
+    .git,
+    __pycache__,
+    venv,
+    alembic

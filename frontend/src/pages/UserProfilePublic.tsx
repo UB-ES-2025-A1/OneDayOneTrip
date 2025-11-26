@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, type User as FirebaseUser, signOut } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById } from "../api/client";
+import { getUserById, followUser, unfollowUser } from "../api/client"; // 👈 AFEGIT
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { ImageOff } from "lucide-react"; 
@@ -37,7 +37,7 @@ type GridItem = {
   authorPic?: string;
   city?: string;
   country?: string;
-};
+};*/
 
 export default function UserProfilePublic() {
   const { id } = useParams();
@@ -51,6 +51,10 @@ export default function UserProfilePublic() {
 
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
+
+  // 🔹 estat follow
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   // Detectar usuario logueado
   useEffect(() => {
@@ -72,6 +76,10 @@ export default function UserProfilePublic() {
           setTrips([]);
           return;
         }
+        backendUser.llista_seguidors = backendUser.llista_seguidors || [];
+        backendUser.llista_seguits = backendUser.llista_seguits || [];
+        backendUser.publicacions = backendUser.publicacions || [];
+
         setProfile(backendUser as BackendUser);
 
         const allTrips = await getAllTrips(true);
@@ -90,6 +98,65 @@ export default function UserProfilePublic() {
 
     fetchProfile();
   }, [id]);
+
+  // 🔹 Saber si el currentUser segueix aquest perfil
+  useEffect(() => {
+    if (!currentUser || !profile) {
+      setIsFollowing(false);
+      return;
+    }
+    const followers = profile.llista_seguidors || [];
+    setIsFollowing(followers.includes(currentUser.uid));
+  }, [currentUser, profile]);
+
+  // 🔹 Seguir / deixar de seguir (mateixa lògica que RutaDetall)
+  const handleFollow = async () => {
+    if (!currentUser) {
+      alert("Has d'iniciar sessió per seguir usuaris");
+      return;
+    }
+    if (!profile) return;
+
+    const userId = currentUser.uid;
+    const targetId = profile.uid;
+
+    try {
+      setFollowLoading(true);
+
+      if (!isFollowing) {
+        await followUser(userId, targetId);
+        setIsFollowing(true);
+
+        // Actualitzem localment la llista de seguidors
+        setProfile((prev) =>
+          prev
+            ? {
+                ...prev,
+                llista_seguidors: [...(prev.llista_seguidors || []), userId],
+              }
+            : prev
+        );
+      } else {
+        await unfollowUser(userId, targetId);
+        setIsFollowing(false);
+
+        setProfile((prev) =>
+          prev
+            ? {
+                ...prev,
+                llista_seguidors: (prev.llista_seguidors || []).filter(
+                  (uid) => uid !== userId
+                ),
+              }
+            : prev
+        );
+      }
+    } catch (err) {
+      console.error("Error seguint/seguint deixant:", err);
+    } finally {
+      setFollowLoading(false);
+    }
+  };
 
   // Conversión Trip → GridItem
   const publicacionsItems = useMemo(() => {
@@ -157,6 +224,17 @@ export default function UserProfilePublic() {
             <div className="user-details">
               <div className="user-info">
                 <h2>{displayName}</h2>
+
+                {/* 🔹 BOTÓ SEGUIR SOTA EL NOM */}
+                {currentUser && currentUser.uid !== profile.uid && (
+                  <button
+                    className={`follow-button ${isFollowing ? "following" : ""}`}
+                    disabled={followLoading}
+                    onClick={handleFollow}
+                  >
+                    {isFollowing ? "Seguint" : "Seguir"}
+                  </button>
+                )}
               </div>
 
               <div className="user-stats">
@@ -192,7 +270,9 @@ export default function UserProfilePublic() {
             <MasonryGrid
               items={publicacionsItems}
               currentUser={currentUser}
-              openRegister={() => alert("Has de iniciar sessió per interactuar")}
+              openRegister={() =>
+                alert("Has de iniciar sessió per interactuar")
+              }
               showCreateButton={false}
             />
 
@@ -209,8 +289,7 @@ export default function UserProfilePublic() {
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
-              goToProfile={goToProfile}
-            />
+              goToProfile={goToProfile} currentUserId={""}            />
           )}
 
           {seguidoresModalOpen && profile && (

@@ -9,6 +9,7 @@ load_dotenv()
 
 IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
 
+
 def upload_image_to_imgbb(file: UploadFile):
     """Sube una imagen a ImgBB o devuelve una URL mock si no hay API key."""
     if not IMGBB_API_KEY:
@@ -18,10 +19,7 @@ def upload_image_to_imgbb(file: UploadFile):
     try:
         url = "https://api.imgbb.com/1/upload"
         image_data = base64.b64encode(file.file.read())
-        payload = {
-            "key": IMGBB_API_KEY,
-            "image": image_data
-        }
+        payload = {"key": IMGBB_API_KEY, "image": image_data}
         response = requests.post(url, data=payload)
         response.raise_for_status()
         return response.json()["data"]["url"]
