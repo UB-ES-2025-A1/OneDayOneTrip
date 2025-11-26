@@ -155,7 +155,7 @@
 
 .guardar-button {
   display: inline-flex;
-  align-items: center;
+  align-items: right;
   gap: 8px;
   padding: 6px 14px;
   border-radius: 20px;
@@ -166,7 +166,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease-in-out;
-  margin-left: 105%;
+  margin-left: 60%;
 }
 
 
@@ -300,7 +300,7 @@
 /* Botó "Valorar" (sense recuadre, lletra verda) */
 .valorar-button {
   display: inline-flex;
-  align-items: center;
+  align-items: right;
   gap: 6px;
   padding: 6px 10px;
   border: none;
@@ -309,7 +309,7 @@
   font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
-  margin-left: 170%;
+  margin-left: 100%;
   margin-right: 10px;
   line-height: 1;
 }
