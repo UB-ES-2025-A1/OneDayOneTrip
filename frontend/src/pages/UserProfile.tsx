@@ -128,6 +128,7 @@ export default function UserProfile() {
     }
   };
 
+  // 🔹 Función para navegar a otro perfil
   const goToProfile = (uid: string) => {
     navigate(`/user/${uid}`);
     setSeguidoresModalOpen(false);

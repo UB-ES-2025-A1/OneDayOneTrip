@@ -86,9 +86,6 @@ frontend/*.tgz
 frontend/.yarn-integrity
 frontend/.dataconnect
 
-# Coverage documentation (auto-generated)
-docs/TEST_COVERAGE.md
-docs/TEST_COVERAGE_SUMMARY.md
 
 # Compilados y dependencias
 frontend/node_modules

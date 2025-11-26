@@ -75,6 +75,7 @@ export default function Home() {
     return backendUser.llista_seguits.includes(authorId);
   });
 
+
   const normalizeId = (id: any) =>
     typeof id === "string" ? id : id?.$oid || String(id || "");
 

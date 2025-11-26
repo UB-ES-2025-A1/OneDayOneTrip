@@ -46,8 +46,6 @@ async def create_comment(trip_id: str, comment: CommentModel, request: Request):
 
         return {"comment": new_comment}
 
-    except HTTPException:
-        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

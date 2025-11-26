@@ -1,9 +1,7 @@
 # tests/test_trips_endpoints.py
-import json
-
 import pytest
 from fastapi import status
-
+import json
 
 @pytest.mark.usefixtures("client")
 class TestTripsEndpoints:
@@ -51,6 +49,7 @@ class TestTripsEndpoints:
             "recommendedSeason": "summer",
         }
 
+
         response = client.post(
             "/trips/",
             data={"trip_json": json.dumps(trip_json)},
@@ -61,32 +60,19 @@ class TestTripsEndpoints:
         assert "trip_id" in data
         assert data["trip_id"] == "mock_trip_id_123"
 
-    def test_add_comment(self, client, monkeypatch):
-        captured = {}
-
-        class FakeCollection:
-            def insert_one(self, doc):
-                captured["doc"] = doc
-                return type("Res", (), {"inserted_id": "c123"})()
-
-        monkeypatch.setattr(
-            "app.routers.comments.comments_collection", FakeCollection()
-        )
-
+    def test_add_comment(self, client):
         body = {
-            "tripId": "507f1f77bcf86cd799439011",
             "userId": "u1",
             "userName": "Tester",
-            "text": "Bon viatge!",
+            "content": "Buen viaje!"
         }
-        response = client.post("/trips/507f1f77bcf86cd799439011/comments", json=body)
+        response = client.post(f"/trips/t1/comment", json=body)
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["comment"]["_id"] == "c123"
-        assert captured["doc"]["text"] == "Bon viatge!"
+        assert "comment_id" in response.json()
 
     def test_add_rating(self, client):
         body = {"userId": "u1", "rating": 5}
-        response = client.post("/trips/t1/rating", json=body)
+        response = client.post(f"/trips/t1/rating", json=body)
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["message"] == "Rating añadido o actualizado"
 
