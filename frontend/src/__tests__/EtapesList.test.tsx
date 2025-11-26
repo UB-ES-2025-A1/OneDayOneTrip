@@ -5,13 +5,13 @@ import EtapesList from "../components/EtapesList";
 
 // Mock de motion
 vi.mock("motion/react", () => ({
-  motion: {
-    div: ({ children, ...props }: any) => {
-      // Filtrar props que React no reconoce
-      const { whileInView, initial, transition, viewport, ...restProps } = props;
-      return <div {...restProps}>{children}</div>;
+    motion: {
+      div: ({ children, ...props }: any) => {
+        // Filtrar props que React no reconoce
+        const { whileInView: _whileInView, initial: _initial, transition: _transition, viewport: _viewport, ...restProps } = props;
+        return <div {...restProps}>{children}</div>;
+      },
     },
-  },
 }));
 
 describe("EtapesList", () => {
