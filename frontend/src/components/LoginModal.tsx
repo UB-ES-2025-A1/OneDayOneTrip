@@ -33,7 +33,6 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
       onClose(); // Cerramos modal
       navigate("/"); // Redirigimos al dashboard
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error en login:", err);
       if (err.code === "auth/user-not-found") {

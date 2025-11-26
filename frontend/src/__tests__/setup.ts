@@ -18,7 +18,6 @@ global.URL.revokeObjectURL = vi.fn();
 
 // Mock del SDK de Auth que usan los componentes
 vi.mock('firebase/auth', async () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onAuthStateChanged = vi.fn((_auth: any, cb?: (u: any) => void) => {
     // llama una vez al callback con "no usuario"
     if (typeof cb === 'function') cb(null);

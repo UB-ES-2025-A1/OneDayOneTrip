@@ -5,7 +5,6 @@ import React from 'react';
 export const mockMasonryGrid = () => {
   vi.mock('../components/MasonryGrid', () => ({
     __esModule: true,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     default: ({ trips }: { trips: any[] }) => (
       <div data-testid="masonry-grid">
         {trips?.length || 0} trips displayed
@@ -26,7 +25,6 @@ export const mockCarousel = () => {
 export const mockEtapesList = () => {
   vi.mock('../components/EtapesList', () => ({
     __esModule: true,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     default: ({ points }: { points?: any[] }) => (
       <div data-testid="etapes-list">
         {points?.length || 0} points

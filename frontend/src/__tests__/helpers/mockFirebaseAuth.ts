@@ -19,7 +19,6 @@ export const createMockAuth = () => {
   let currentUser: MockUser | null = null;
   const callbacks: Array<(user: MockUser | null) => void> = [];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mockOnAuthStateChanged = vi.fn((_auth: any, callback?: (user: MockUser | null) => void) => {
     if (callback) {
       callbacks.push(callback);

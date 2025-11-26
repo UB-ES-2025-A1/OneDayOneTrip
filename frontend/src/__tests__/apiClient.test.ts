@@ -13,18 +13,15 @@ const mockFetch = vi.fn();
 describe("api client helpers", () => {
   beforeEach(() => {
     mockFetch.mockReset();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).fetch = mockFetch;
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => ({ ok: true }),
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(getAuth).mockReturnValue({ currentUser: null } as any);
   });
 
   it("adjunta el token cuando el usuario está autenticado", async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(getAuth).mockReturnValue({
       currentUser: {
         getIdToken: vi.fn().mockResolvedValue("token-123"),

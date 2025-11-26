@@ -28,7 +28,6 @@ export default function ResetPasswordModal({ onClose, openLogin }: ResetPassword
       
       await Auth.resetPassword(email); 
       setMessage("S'ha enviat un correu amb l'enllaç de recuperació.");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error al recuperar contrasenya:", err);
       setError("Error: " + err.message);

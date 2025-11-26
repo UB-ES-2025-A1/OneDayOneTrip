@@ -457,7 +457,6 @@ export default function CreateTripForm({
       setSuccess("Ruta creada correctament 🎉");
       // Si quieres cerrar automáticamente:
       // onClose();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error creant trip:", err);
       setError(err.message || "Error inesperat creant la ruta");

@@ -78,7 +78,6 @@ vi.mock("../components/Layout", () => ({
 
 vi.mock("../components/EtapesList", () => ({
   __esModule: true,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default: ({ etapes }: { etapes?: any[] }) => (
     <div data-testid="etapes-list">{etapes?.length || 0} etapes</div>
   ),
@@ -246,7 +245,6 @@ describe("RutaDetall page", () => {
     };
 
     mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (callback) callback(mockUser as any);
       return () => {};
     });
@@ -308,7 +306,6 @@ describe("RutaDetall page", () => {
     };
 
     mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (callback) callback(mockUser as any);
       return () => {};
     });
@@ -392,7 +389,6 @@ describe("RutaDetall page", () => {
     };
 
     mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (callback) callback(mockUser as any);
       return () => {};
     });
@@ -440,7 +436,6 @@ describe("RutaDetall page", () => {
     };
 
     mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (callback) callback(mockUser as any);
       return () => {};
     });

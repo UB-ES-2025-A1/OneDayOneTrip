@@ -75,7 +75,6 @@ export default function Home() {
     return backendUser.llista_seguits.includes(authorId);
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const normalizeId = (id: any) =>
     typeof id === "string" ? id : id?.$oid || String(id || "");
 

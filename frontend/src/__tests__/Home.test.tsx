@@ -33,7 +33,6 @@ vi.mock("firebase/auth", () => ({
 
 vi.mock("../components/MasonryGrid", () => ({
   __esModule: true,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default: ({ items }: { items: any[] }) => (
     <div data-testid="masonry-grid">{items?.length || 0} items</div>
   ),
@@ -194,7 +193,6 @@ describe("Home page", () => {
 
     const { onAuthStateChanged } = await import("firebase/auth");
     vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (callback) callback(mockUser as any);
       return () => {};
     });
@@ -349,7 +347,6 @@ describe("Home page", () => {
     };
 
     vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (callback) callback(mockUser as any);
       return () => {};
     });
@@ -361,11 +358,11 @@ describe("Home page", () => {
     mockGetAllTrips.mockResolvedValue(mockTrips);
 
     await act(async () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>
-      );
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>
+    );
     });
 
     await waitFor(() => {
