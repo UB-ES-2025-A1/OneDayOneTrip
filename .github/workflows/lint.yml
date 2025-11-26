@@ -13,7 +13,7 @@ on:
 
 jobs:
   # ==============================
-  # TASCA 1: VALIDACIÓ DEL FRONTEND (Node/TS)
+  # TASCA 1: VALIDACIÓ DEL FRONTEND (Node/TS) #triggen test
   # ==============================
   frontend_lint:
     name: Frontend (Node/TS)
