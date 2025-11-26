@@ -5,13 +5,18 @@ import "@testing-library/jest-dom";
 import { MemoryRouter } from "react-router-dom";
 
 // Mocks
-const { mockGetAllTrips } = vi.hoisted(() => {
+const { mockGetAllTrips, mockGetUserById } = vi.hoisted(() => {
   const mockGetAllTrips = vi.fn();
-  return { mockGetAllTrips };
+  const mockGetUserById = vi.fn();
+  return { mockGetAllTrips, mockGetUserById };
 });
 
 vi.mock("../api/trips", () => ({
   getAllTrips: mockGetAllTrips,
+}));
+
+vi.mock("../api/client", () => ({
+  getUserById: mockGetUserById,
 }));
 
 vi.mock("firebase/auth", () => ({
@@ -65,6 +70,12 @@ describe("Home page", () => {
   beforeEach(() => {
     mockGetAllTrips.mockReset();
     mockGetAllTrips.mockResolvedValue([]);
+    mockGetUserById.mockReset();
+    mockGetUserById.mockResolvedValue({
+      uid: "user-123",
+      username: "testuser",
+      nom_i_cognoms: "Test User",
+    });
   });
 
   it("muestra el título, el hero y el mensaje sin rutas", async () => {

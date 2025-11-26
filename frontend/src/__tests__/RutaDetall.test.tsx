@@ -105,7 +105,12 @@ vi.mock("../components/Valorar", () => ({
 
 vi.mock("../components/Comments", () => ({
   __esModule: true,
-  default: () => <div data-testid="comments">Comments Component</div>,
+  default: () => (
+    <div data-testid="comments">
+      <h2>Comentaris</h2>
+      <p>Comments Component</p>
+    </div>
+  ),
 }));
 
 import RutaDetall from "../pages/RutaDetall";
@@ -367,16 +372,15 @@ describe("RutaDetall page", () => {
       expect(screen.getByText("Test Trip")).toBeInTheDocument();
     }, { timeout: 3000 });
 
-    // El componente renderiza los comentarios directamente con <h2>Comentaris</h2>
+    // El componente usa el componente Comments mockeado que incluye <h2>Comentaris</h2>
     // Verificar que existe la sección de comentarios
     await waitFor(() => {
-      // Buscar el título "Comentaris" o el mensaje de comentarios vacíos
+      // Buscar el título "Comentaris" en el mock de Comments o el componente completo
       const comentarisTitle = screen.queryByText("Comentaris");
-      const emptyMessage = screen.queryByText(/Encara no hi ha comentaris/i);
-      const loadingMessage = screen.queryByText(/Carregant comentaris/i);
+      const commentsComponent = screen.queryByTestId("comments");
       
-      // Verificar que al menos uno está presente
-      expect(comentarisTitle || emptyMessage || loadingMessage).toBeTruthy();
+      // Verificar que el componente Comments está presente con el título
+      expect(comentarisTitle || commentsComponent).toBeTruthy();
     }, { timeout: 3000 });
   });
 
