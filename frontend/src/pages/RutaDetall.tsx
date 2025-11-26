@@ -263,14 +263,15 @@ export default function RutaDetall() {
   
           <div
             style={{
-              display: "flex",
+              display: "grid",
+              gridTemplateColumns: "1fr auto",
               alignItems: "center",
               justifyContent: "space-between",
               gap: "10px",
             }}
           >
             {/* Esquerra: Rating + Valorar */}
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div style={{display: "flex", width: "150%"}}>
               {tripData.avgRating != null && (
                 <div className="rating-summary">
                   <span className="rating-star">★</span>
@@ -278,7 +279,7 @@ export default function RutaDetall() {
                   <span className="rating-count">({tripData.numRatings})</span>
                 </div>
               )}
-
+              <div style={{display: "flex", gap: "10px"}}>
               <button
                 className="valorar-button"
                 onClick={() => setShowRatingModal(true)}
@@ -286,7 +287,6 @@ export default function RutaDetall() {
                 <span className="valorar-icon">★</span>
                 Valorar
               </button>
-            </div>
 
             {/* Dreta: Botó Guardar */}
             <button
@@ -314,8 +314,9 @@ export default function RutaDetall() {
                 {isSaved ? "Guardat" : saveLoading ? "Guardant..." : "Guardar"}
               </span>
             </button>
+            </div>
           </div>
-
+        </div>
         </div>
         
         <div className="ubicacio">

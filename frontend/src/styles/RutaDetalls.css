@@ -141,7 +141,9 @@
 .ruta-header-line {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 8px;
+
 }
 
 .ruta-titol {
@@ -154,8 +156,8 @@
 
 
 .guardar-button {
-  display: inline-flex;
-  align-items: right;
+  display: flex;
+  align-items: center;
   gap: 8px;
   padding: 6px 14px;
   border-radius: 20px;
@@ -166,7 +168,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease-in-out;
-  margin-left: 60%;
 }
 
 
@@ -299,8 +300,8 @@
 
 /* Botó "Valorar" (sense recuadre, lletra verda) */
 .valorar-button {
-  display: inline-flex;
-  align-items: right;
+  display: flex;
+  align-items: center;
   gap: 6px;
   padding: 6px 10px;
   border: none;
@@ -309,8 +310,6 @@
   font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
-  margin-left: 100%;
-  margin-right: 10px;
   line-height: 1;
 }
 
