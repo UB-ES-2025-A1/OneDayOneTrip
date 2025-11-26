@@ -23,7 +23,7 @@ async def create_comment(trip_id: str, comment: CommentModel, request: Request):
 
         try:
             trip_obj_id = ObjectId(comment.tripId)
-        except:
+        except Exception:
             raise HTTPException(status_code=400, detail="tripId inválido")
 
         new_comment = {
@@ -57,9 +57,7 @@ async def create_comment(trip_id: str, comment: CommentModel, request: Request):
 # ============================================================
 @router.get("/{trip_id}/comments")
 def get_comments_for_trip(
-    trip_id: str,
-    limit: int = Query(20, ge=1, le=100),
-    skip: int = Query(0, ge=0)
+    trip_id: str, limit: int = Query(20, ge=1, le=100), skip: int = Query(0, ge=0)
 ):
     try:
         comments = list_comments(trip_id, limit, skip)

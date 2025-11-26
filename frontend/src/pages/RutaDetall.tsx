@@ -5,6 +5,7 @@ import { auth } from "../firebase";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
+
 import {
   getTripById,
   getAllTrips,
@@ -44,7 +45,11 @@ export default function RutaDetall() {
   const [zoomImage, setZoomImage] = useState<string | null>(null);
   const [zoomGallery, setZoomGallery] = useState<string[] | null>(null);
 
-  // Cargar usuario Firebase + backendUser
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+
+
+  // 🔹 Cargar usuario Firebase + backendUser
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setCurrentUser(fbUser);
@@ -70,7 +75,7 @@ export default function RutaDetall() {
     navigate("/");
   };
 
-  // Cargar ruta
+  // 🔹 Cargar ruta
   useEffect(() => {
     const fetchTrip = async () => {
       if (!id) {
@@ -105,21 +110,28 @@ export default function RutaDetall() {
     fetchTrip();
   }, [id, navigate]);
 
-  // Cargar datos del autor
+  // 🔹 Datos del autor
   useEffect(() => {
     const loadAuthor = async () => {
-      if (!tripData?.author?.userId) return;
+      if (!tripData?.author?.userId || !tripData?._id) return;
       try {
         const author = await getUserById(tripData.author.userId);
-        const seguidorsNumber = author.llista_seguidors
-          ? author.llista_seguidors.length
-          : (typeof author.seguidors === "number" ? author.seguidors : 0);
 
-        setFollowersCount(seguidorsNumber);
+        const count = author.llista_seguidors
+          ? author.llista_seguidors.length
+          : typeof author.seguidors === "number"
+          ? author.seguidors
+          : 0;
+
+        setFollowersCount(count);
 
         if (currentUser) {
-          const followers: string[] = author.llista_seguidors || [];
-          setIsFollowing(followers.includes(currentUser.uid));
+          const followersList: string[] = author.llista_seguidors || [];
+          setIsFollowing(followersList.includes(currentUser.uid));
+
+          const currentUserData = await getUserById(currentUser.uid);
+          const savedTrips: string[] = currentUserData.guardades || [];
+          setIsSaved(savedTrips.includes(tripData._id));
         }
       } catch (e) {
         console.error("Error carregant dades de l'autor", e);
@@ -135,8 +147,6 @@ export default function RutaDetall() {
 
     const userId = currentUser.uid;
     const targetId = tripData.author.userId;
-
-    if (userId === targetId) return;
 
     try {
       setFollowLoading(true);
@@ -157,22 +167,28 @@ export default function RutaDetall() {
     }
   };
 
-  // 🔹 Cargar comentarios
-  useEffect(() => {
-    const fetchComments = async () => {
-      if (!tripData?._id) return;
-      try {
-        setLoadingComments(true);
-        const data = await getTripComments(tripData._id);
-        setComments(data);
-      } catch {
-        console.error("Error carregant comentaris");
-      } finally {
-        setLoadingComments(false);
+
+  const handleSaveTrip = async () => {
+    if (!currentUser || !tripData?._id) return;
+    
+    try {
+      setSaveLoading(true);
+      
+      if (!isSaved) {
+        await saveTrip(currentUser.uid, tripData._id);
+        setIsSaved(true);
+      } else {
+        await unsaveTrip(currentUser.uid, tripData._id);
+        setIsSaved(false);
       }
-    };
-    fetchComments();
-  }, [tripData]);
+    } catch (err) {
+      console.error("Error canviant estat de guardar/desguardar:", err);
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+
   // 🔹 Valorar ruta
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmitRating = async (value: number) => {
@@ -244,24 +260,64 @@ export default function RutaDetall() {
       <div className="ruta-detall">
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
-
-          {tripData.avgRating != null && (
-            <div className="rating-summary">
-              <span className="rating-star">★</span>
-              <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
-              <span className="rating-count">({tripData.numRatings})</span>
-            </div>
-          )}
-
-          <button
-            className="valorar-button"
-            onClick={() => setShowRatingModal(true)}
+  
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "10px",
+            }}
           >
-            <span className="valorar-icon">★</span>
-            Valorar
-          </button>
-        </div>
+            {/* Esquerra: Rating + Valorar */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              {tripData.avgRating != null && (
+                <div className="rating-summary">
+                  <span className="rating-star">★</span>
+                  <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
+                  <span className="rating-count">({tripData.numRatings})</span>
+                </div>
+              )}
 
+              <button
+                className="valorar-button"
+                onClick={() => setShowRatingModal(true)}
+              >
+                <span className="valorar-icon">★</span>
+                Valorar
+              </button>
+            </div>
+
+            {/* Dreta: Botó Guardar */}
+            <button
+              type="button"
+              className={`guardar-button ${isSaved ? "saved" : ""}`}
+              onClick={handleSaveTrip}
+              disabled={saveLoading}
+            >
+              <label className="ui-bookmark">
+                <svg
+                  className="bookmark"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 
+                          2 8.5 2 5.42 4.42 3 7.5 3 
+                          c1.74 0 3.41 0.81 4.5 2.09 
+                          C13.09 3.81 14.76 3 16.5 3 
+                          C19.58 3 22 5.42 22 8.5 
+                          c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </label>
+              <span className="guardar-text">
+                {isSaved ? "Guardat" : saveLoading ? "Guardant..." : "Guardar"}
+              </span>
+            </button>
+          </div>
+
+        </div>
+        
         <div className="ubicacio">
           <img src="/images/ubi.png" className="ubi-icon" />
           <span>{tripData.city}</span>
@@ -275,19 +331,11 @@ export default function RutaDetall() {
             onClick={() => tripData?.author?.userId && navigate(`/user/${tripData.author.userId}`)}
             style={{ cursor: "pointer" }}
           >
-            {tripData.author?.profilePic ? (
-              <img
-                src={tripData.author.profilePic}
-                alt={tripData.author.name}
-                className="autor-foto"
-              />
-            ) : (
-              <img
-                src="/images/person.png"
-                alt="Autor"
-                className="author-icon"
-              />
-            )}
+            <img
+              src={tripData.author?.profilePic || "/images/person.png"}
+              alt={tripData.author?.name || "Autor"}
+              className="autor-foto"
+            />
           </div>
 
           <div
@@ -295,9 +343,7 @@ export default function RutaDetall() {
             onClick={() => tripData?.author?.userId && navigate(`/user/${tripData.author.userId}`)}
             style={{ cursor: "pointer" }}
           >
-            <span className="autor-nombre">
-              {tripData.author?.name || "Autor desconegut"}
-            </span>
+            <span className="autor-nombre">{tripData.author?.name}</span>
             {followersCount !== null && (
               <span className="autor-seguidors">
                 {followersCount} seguidor{followersCount === 1 ? "" : "s"}
@@ -315,6 +361,7 @@ export default function RutaDetall() {
             </button>
           )}
         </div>
+
 
         {/* Descripción */}
         <div className="ruta-descripcio">
@@ -335,54 +382,21 @@ export default function RutaDetall() {
         />
       </div>
 
-      {/* Comentarios */}
-      <div className="ruta-comentaris">
-        <h2>Comentaris</h2>
-        {loadingComments ? (
-          <p className="comentaris-loading">Carregant comentaris...</p>
-        ) : comments.length === 0 ? (
-          <p className="comentaris-buits">Encara no hi ha comentaris.</p>
-        ) : (
-          <ul className="comentaris-llista">
-            {comments.map((c) => (
-              <li key={c._id} className="comentari-item">
-                <div className="comentari-header">
-                  <div className="comentari-autor-info">
-                    <div className="comentari-avatar">
-                      <img src="/images/person.png" alt="Usuari" />
-                    </div>
-                    <div>
-                      <span className="comentari-autor">{c.userName}</span>
-                      <span className="comentari-data">
-                        {dayjs(c.createdAt).locale("ca").format("DD MMM YYYY")}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <p className="comentari-contingut">{c.content}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {/* 🔥 Component de comentaris */}
+      <Comments 
+        tripId={tripData._id!} 
+        currentUser={currentUser} 
+        backendUser={backendUser}
+      />
 
-      {/* Zoom imágenes */}
-      {zoomImage && (
-        <div className="zoom-overlay" onClick={() => setZoomImage(null)}>
-          <div className="zoom-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-zoom" onClick={() => setZoomImage(null)}>✕</button>
-            <img src={zoomImage} alt="Zoom" />
-          </div>
-        </div>
-      )}
-
-      {zoomGallery && (
-        <div className="zoom-overlay" onClick={() => setZoomGallery(null)}>
-          <div className="zoom-gallery" onClick={(e) => e.stopPropagation()}>
-            {zoomGallery.map((img, i) => (
-              <img key={i} src={img} alt={`Foto ${i + 1}`} />
-            ))}
-            <button className="close-zoom" onClick={() => setZoomGallery(null)}>✕</button>
+      {showRatingModal && (
+        <div className="valorar-overlay" onClick={() => setShowRatingModal(false)}>
+          <div className="valorar-modal" onClick={(e) => e.stopPropagation()}>
+            <Valorar
+              tripId={tripData._id!}
+              onClose={() => setShowRatingModal(false)}
+              onSubmit={handleSubmitRating}
+            />
           </div>
         </div>
       )}
