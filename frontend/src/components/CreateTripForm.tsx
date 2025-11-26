@@ -455,7 +455,8 @@ export default function CreateTripForm({
       await addPublicationToUser(currentUser.uid, result.trip_id);
 
       setSuccess("Ruta creada correctament 🎉");
-      onClose();
+      // Si quieres cerrar automáticamente:
+      // onClose();
     } catch (err: any) {
       console.error("Error creant trip:", err);
       setError(err.message || "Error inesperat creant la ruta");

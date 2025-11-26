@@ -26,6 +26,7 @@ export default function Valorar({ onClose, onSubmit }: ValorarProps) {
         value={n}
         checked={rating === n}
         onChange={() => setRating(n)}
+        aria-label={`Rating ${n}`}
       />
     );
     starElements.push(

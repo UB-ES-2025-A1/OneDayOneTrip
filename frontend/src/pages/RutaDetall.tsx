@@ -5,6 +5,8 @@ import { auth } from "../firebase";
 import "../styles/RutaDetalls.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
+import Comments from "../components/Comments";
+import Valorar from "../components/Valorar";
 
 import {
   getTripById,
@@ -12,19 +14,7 @@ import {
   rateTrip,
   type Trip,
 } from "../api/trips";
-
-import Valorar from "../components/Valorar";
-import Comments from "../components/Comments";
-
-import {
-  getUserById,
-  followUser,
-  unfollowUser,
-  saveTrip,
-  unsaveTrip,
-} from "../api/client";
-
-import "dayjs/locale/ca";
+import { getUserById, followUser, unfollowUser } from "../api/client";
 
 const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
 const isNumericIndex = (s: string) => /^\d+$/.test(s || "");
@@ -215,7 +205,7 @@ export default function RutaDetall() {
       );
 
       setShowRatingModal(false);
-    } catch{
+    } catch {
       alert("No s'ha pogut enviar la valoració.");
     }
   };

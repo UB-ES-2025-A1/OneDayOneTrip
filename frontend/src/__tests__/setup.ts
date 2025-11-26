@@ -1,5 +1,21 @@
 import { vi } from 'vitest';
 
+// Mock global de fetch para evitar unhandled rejections en tests
+// En lugar de rechazar siempre, devolvemos una respuesta por defecto
+// Los tests individuales pueden sobrescribir esto si necesitan comportamiento específico
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: false,
+    status: 404,
+    json: async () => ({ error: 'Not found' }),
+  } as Response)
+) as typeof fetch;
+
+// Mock de URL.createObjectURL y URL.revokeObjectURL (APIs del navegador)
+// Estas no existen en el entorno de test de JSDOM
+global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+global.URL.revokeObjectURL = vi.fn();
+
 // Mock del SDK de Auth que usan los componentes
 vi.mock('firebase/auth', async () => {
   const onAuthStateChanged = vi.fn((_auth: any, cb?: (u: any) => void) => {
