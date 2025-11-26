@@ -15,7 +15,8 @@ describe("Valorar component", () => {
     const submitButton = screen.getByRole("button", { name: /Enviar valoració/i });
     expect(submitButton).toBeDisabled();
 
-    await userEvent.click(screen.getByLabelText("Rating 3"));
+    const thirdStar = screen.getByDisplayValue("3");
+    await userEvent.click(thirdStar);
     expect(submitButton).toBeEnabled();
 
     await userEvent.click(submitButton);
