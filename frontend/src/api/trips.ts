@@ -59,7 +59,7 @@ export interface Comment {
 // 🌍 Base URL
 // ==========================================================
 
-const RAW_BASE_URL = "https://onedayonetrip-api.onrender.com";
+const RAW_BASE_URL = "https://onedayonetrip.onrender.com";
 const BASE_URL = RAW_BASE_URL.replace(/\/+$/, "");
 
 // ==========================================================
