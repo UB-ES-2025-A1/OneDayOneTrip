@@ -1,6 +1,3 @@
-/* =========================================================
-   PERFIL DE USUARIO — OneDayOneTrip
-   ========================================================= */
 
 /* ---------- CONTENEDOR PRINCIPAL ---------- */
 .user-profile {
@@ -76,6 +73,7 @@
 .user-stats .stat:hover {
   transform: translateY(-3px);
   background-color: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
 }
 
 .user-stats .number {
@@ -104,6 +102,28 @@
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
+
+.tabs-container1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 2rem auto;
+  width: 320px;
+  height: 45px;
+  background-color: #e6f3e6;
+  border-radius: 30px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.trip-list {
+  margin-top: 0rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 
 .tab-btn {
   flex: 1;
@@ -188,6 +208,43 @@
   font-size: 1rem;
   color: #666;
   margin: 0;
+}
+
+/* Botón de editar perfil (icono redondo arriba derecha) */
+.edit-profile-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.edit-profile-btn svg {
+  color: #333;
+}
+
+.edit-profile-btn:hover {
+  background: #ffffff;
+  transform: scale(1.08);
+}
+
+.tab-title {
+  color: #2e492e;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
 }
 
 /* =========================================================
@@ -283,4 +340,5 @@
   .tab-btn {
     font-size: 0.9rem;
   }
+
 }

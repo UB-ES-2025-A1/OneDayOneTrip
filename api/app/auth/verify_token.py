@@ -1,8 +1,9 @@
-from fastapi import Request, HTTPException, Depends
+from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer
 from firebase_admin import auth
 
 security = HTTPBearer()
+
 
 async def verify_token(request: Request):
     """Verifica el token JWT de Firebase enviado desde el frontend"""

@@ -1,7 +1,6 @@
 import requests
 import random
 import time
-from datetime import datetime
 
 API_URL = "http://localhost:8000/trips"
 
@@ -25,11 +24,13 @@ COMMENTS = [
     "Les fotos no fan justícia, molt millor en persona!",
 ]
 
+
 def get_all_trips():
     print("📦 Obtenint totes les trips...")
     resp = requests.get(API_URL)
     resp.raise_for_status()
     return resp.json()
+
 
 def add_random_comment(trip_id, userId, userName):
     comment = random.choice(COMMENTS)
@@ -40,6 +41,7 @@ def add_random_comment(trip_id, userId, userName):
     else:
         print(f"⚠️ Error al añadir comentario: {resp.text}")
 
+
 def add_random_rating(trip_id, userId):
     rating = random.randint(3, 5)
     payload = {"userId": userId, "rating": rating}
@@ -48,6 +50,7 @@ def add_random_rating(trip_id, userId):
         print(f"⭐ Rating {rating} añadido a {trip_id}")
     else:
         print(f"⚠️ Error al añadir rating: {resp.text}")
+
 
 def populate_all_trips():
     trips = get_all_trips()
@@ -59,6 +62,7 @@ def populate_all_trips():
             add_random_comment(trip_id, uid, uname)
             add_random_rating(trip_id, uid)
             time.sleep(0.5)  # pequeña pausa para evitar saturar el servidor
+
 
 if __name__ == "__main__":
     populate_all_trips()

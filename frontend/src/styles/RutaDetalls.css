@@ -101,7 +101,7 @@
 }
 
 .star {
-  color: #ccc;
+  color: #888888;
   font-size: 1.2rem;
   margin-right: 2px;
 }
@@ -113,7 +113,7 @@
 .rating-value {
   font-weight: 600;
   margin-left: 6px;
-  color: #333;
+  color: #f7f7f7;
 }
 
 /* ---------- CONTENIDO PRINCIPAL ---------- */
@@ -138,6 +138,197 @@
   color: #2e492e;
   font-weight: 700;
 }
+.ruta-header-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+
+}
+
+.ruta-titol {
+  margin: 0;
+  font-size: 2.4rem;
+  color: #2e492e;
+  font-weight: 700;
+}
+
+
+
+.guardar-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 2px solid #2e492e; /* Vora verda */
+  background-color: #ffffff; /* Fons blanc */
+  color: #2e492e; /* Text verd */
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+}
+
+
+.guardar-button.saved {
+  background-color: #2e492e; /* Fons verd */
+  color: #ffffff; /* Text blanc */
+  border-color: #ffffff; /* Vora blanca */
+}
+
+.guardar-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.ui-bookmark {
+  --icon-size: 20px;
+  --icon-circle-size: 35px;
+  display: flex;
+  align-items: center;
+}
+
+/* ----------- ESTAT NO GUARDAT ----------- */
+.guardar-button .ui-bookmark {
+  --icon-secondary-color: #ffffff;  /* Cor blanc ple */
+  --icon-primary-color: #2e492e;    /* Verd per animació/burst */
+  --icon-circle-border: 1px solid #2e492e;
+}
+
+/* ----------- ESTAT GUARDAT ----------- */
+.guardar-button.saved .ui-bookmark {
+  --icon-secondary-color: #2e492e;  /* Cor verd ple */
+  --icon-primary-color: #ffffff;    /* Blanc per animació/burst */
+  --icon-circle-border: 1px solid #ffffff;
+}
+
+.ui-bookmark input {
+  display: none;
+}
+
+.ui-bookmark .bookmark {
+  width: var(--icon-size);
+  cursor: pointer;
+  fill: var(--icon-secondary-color);
+  transition: 0.2s;
+  position: relative;
+  /* ✅ contorn per veure el cor encara que sigui blanc */
+  stroke: #2e492e;
+  stroke-width: 1.5px;
+}
+
+/* quan està GUARDAT, contorn blanc sobre botó verd */
+.guardar-button.saved .bookmark {
+  stroke: #ffffff;
+}
+
+/* animació bursts */
+.bookmark::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  box-shadow:
+    0 30px 0 -4px var(--icon-primary-color),
+    30px 0 0 -4px var(--icon-primary-color),
+    0 -30px 0 -4px var(--icon-primary-color),
+    -30px 0 0 -4px var(--icon-primary-color),
+    -22px 22px 0 -4px var(--icon-primary-color),
+    -22px -22px 0 -4px var(--icon-primary-color),
+    22px -22px 0 -4px var(--icon-primary-color),
+    22px 22px 0 -4px var(--icon-primary-color);
+  border-radius: 50%;
+  transform: scale(0);
+}
+
+.bookmark::before {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  border: var(--icon-circle-border);
+  opacity: 0;
+}
+
+/* checked animations (les deixem) */
+.ui-bookmark input:checked + .bookmark {
+  fill: var(--icon-primary-color);
+  animation: bookmark 0.3s forwards;
+}
+
+.ui-bookmark input:checked + .bookmark::before {
+  animation: circle 0.3s forwards;
+}
+
+.ui-bookmark input:checked + .bookmark::after {
+  animation: circles 0.3s forwards;
+}
+
+/* animacions */
+@keyframes bookmark {
+  50% { transform: scaleY(0.6); }
+  100% { transform: scaleY(1); }
+}
+
+@keyframes circle {
+  0% { width: 0; height: 0; opacity: 0; }
+  90% { width: var(--icon-circle-size); height: var(--icon-circle-size); opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes circles {
+  from { transform: scale(0); }
+  40% { opacity: 1; }
+  to { transform: scale(0.8); opacity: 0; }
+}
+
+/* línia títol + botó valorar */
+.ruta-header-line {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ruta-titol {
+  margin: 0;
+  font-size: 2.4rem;
+  color: #2e492e;
+  font-weight: 700;
+}
+
+/* Botó "Valorar" (sense recuadre, lletra verda) */
+.valorar-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  color: #2e492e;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.valorar-icon {
+  font-size: 1rem;            
+  display: inline-block;
+  position: relative;
+  top: -1px;                  
+}
+
+
+.valorar-button:hover {
+  background: rgba(46, 73, 46, 0.10);
+  border-radius: 15px;
+  padding: 6px 10px;
+  transition: background 0.2s ease;
+}
+
+
 
 /* ---------- UBICACIÓN Y AUTOR ---------- */
 .ubicacio {
@@ -169,16 +360,15 @@
 /* ---------- CONTENEDOR autor ---------- */
 .autor {
   display: flex;
-  align-items: center;
+  align-items: center;      
   gap: 10px;
   background: #ffffff;
   padding: 10px 14px;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  width: fit-content;
-  transition: all 0.25s ease;
-  cursor: pointer;
+  width: 100%;
+  width: 100%;
   margin-top: 20px;
 }
 
@@ -219,11 +409,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex: 1;                 
 }
 
 .autor-nombre {
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 700;
+  font-size: 1.2rem;
   color: #2e492e;
   line-height: 1.2;
 }
@@ -232,7 +423,11 @@
   font-size: 0.8rem;
   color: #7b7b7b;
 }
-
+.autor-seguidors {
+  font-size: 0.9rem;     
+  color: #6b6b6b;       
+  margin-top: 2px;
+}
 
 
 /* ---------- INFO EXTRA ---------- */
@@ -317,117 +512,6 @@
   margin-bottom: 20px;
 }
 
-/* -----------------💬 COMENTARIS---------------------- */
-.ruta-comentaris {
-  margin-top: 3rem;
-  background: #fafafa;
-  padding: 1.5rem 2rem;
-  border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-}
-
-.ruta-comentaris h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  color: #2e492e;
-  border-bottom: 2px solid #e0e0e0;
-  padding-bottom: 0.5rem;
-  font-weight: 700;
-}
-
-.comentaris-loading,
-.comentaris-buits {
-  color: #666;
-  font-style: italic;
-  text-align: center;
-  padding: 1rem 0;
-}
-
-.comentaris-llista {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-/* ---------- TARJETA DEL COMENTARIO ---------- */
-.comentari-item {
-  background: white;
-  padding: 1rem 1.2rem;
-  border-radius: 14px;
-  border: 1px solid #e6e6e6;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.comentari-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
-
-/* ---------- CABECERA DEL COMENTARIO ---------- */
-.comentari-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.6rem;
-}
-
-.comentari-autor-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* ---------- AVATAR ---------- */
-.comentari-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: #2e492e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.comentari-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-/* ---------- TEXTO ---------- */
-.comentari-autor {
-  font-weight: 600;
-  color: #2e492e;
-  display: block;
-  font-size: 0.95rem;
-}
-
-.comentari-data {
-  font-size: 0.8rem;
-  color: #888;
-  display: block;
-  margin-top: 2px;
-}
-
-.comentari-contingut {
-  margin: 0;
-  color: #333;
-  line-height: 1.5;
-  font-size: 0.95rem;
-  white-space: pre-wrap;
-  background: #f9fafb;
-  padding: 0.8rem 1rem;
-  border-radius: 8px;
-  border: 1px solid #f0f0f0;
-}
-
 
 /* ---------- ZOOM ---------- */
 .zoom-gallery {
@@ -470,6 +554,62 @@
   font-size: 2rem;
   cursor: pointer;
 }
+.follow-button {
+  margin-left: auto;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 1.0rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid #2e492e; /* Verd fosc estil natura */
+  background-color: #2e492e; /* Fons verd */
+  color: white; /* Lletra blanca */
+  transition: all 0.25s ease-in-out;
+}
+
+/* Estat quan pulsas "Seguir" i passa a "Seguint" */
+.follow-button.following {
+  background-color: white !important; /* Fons blanc */
+  color: #2e7d32 !important; /* Text verd */
+  border-color: #2e7d32;
+}
+
+/* Loading (opcional) */
+.follow-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff7d7;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #5a4500;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-right: 10px;
+  height: fit-content;
+}
+
+.rating-summary .rating-star {
+  font-size: 18px;
+  color: #e6ae00;
+}
+
+.rating-summary .rating-value {
+  font-size: 16px;
+}
+
+.rating-summary .rating-count {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
 
 /* =========================================================
    📱 RESPONSIVE DESIGN
@@ -574,5 +714,8 @@
     flex-direction: row;
     justify-content: flex-start;
     width: 90%;
+  }
+  .follow-button {
+    margin-left: auto;
   }
 }
