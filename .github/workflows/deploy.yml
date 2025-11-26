@@ -31,6 +31,7 @@ jobs:
             exit 1
           }
           echo "✅ Render deploy trigger enviado correctamente."
+      # Trigger test
 
       # 3️⃣ Instala Node y construye el FRONTEND
       - name: ⚙️ Install Node.js
