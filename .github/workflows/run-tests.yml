@@ -108,6 +108,12 @@ jobs:
           name: backend-coverage
           path: .
 
+      - name: 📥 Download frontend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-coverage-summary
+          path: frontend/coverage/
+
       # 6️⃣ Genera documentación de coverage
       - name: 📝 Generate coverage documentation
         env:

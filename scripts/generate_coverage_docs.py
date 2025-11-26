@@ -48,17 +48,26 @@ def get_backend_coverage():
 
 
 def get_frontend_coverage():
-    """Get frontend test coverage using vitest."""
-    # Run vitest with coverage
-    cmd = "npm run test:cov -- --reporter=json --outputFile=coverage.json"
+    """Get frontend test coverage from downloaded artifacts or by running tests."""
+    # Try to read JSON coverage report from downloaded artifacts (CI/CD)
+    coverage_file = PROJECT_ROOT / "frontend" / "coverage" / "coverage-final.json"
+    if coverage_file.exists():
+        with open(coverage_file, "r") as f:
+            data = json.load(f)
+        return data, "Coverage data loaded from artifacts"
+    
+    # If not found, try to run tests to get coverage (local development)
+    print("  Running frontend tests to generate coverage...")
+    cmd = "npm run test:cov"
     output = run_command(cmd, cwd=PROJECT_ROOT / "frontend")
     
-    # Try to read JSON coverage report
-    coverage_file = PROJECT_ROOT / "frontend" / "coverage.json"
+    # Try to read the generated coverage file
     if coverage_file.exists():
         with open(coverage_file, "r") as f:
             data = json.load(f)
         return data, output
+    
+    # Fallback to parsing terminal output
     return None, output
 
 
@@ -140,24 +149,24 @@ def generate_coverage_doc(backend_cov, frontend_cov, test_files):
     backend_total = backend_cov.get("total", 0)
     frontend_total = frontend_cov.get("total", 0)
     
-    doc = f"""# 📊 Test Coverage Documentation
+    doc = f"""# Test Coverage Documentation
 
-Documentación completa del estado de pruebas en OneDayOneTrip. 
+Documentación completa del estado de pruebas en OneDayOneTrip.
 **Generado automáticamente**: {timestamp}
 
 ---
 
-## 📈 Resumen Ejecutivo
+## Resumen Ejecutivo
 
 | Categoría | Cobertura | Estado |
 |-----------|-----------|--------|
-| **Backend Overall** | **{backend_total}%** | {'✅ Excelente' if backend_total >= 70 else '⚠️ En progreso'} |
-| **Frontend Overall** | **{frontend_total}%** | {'✅ Excelente' if frontend_total >= 50 else '⚠️ En progreso'} |
-| **Total Tests** | **{len(test_files['backend']) + len(test_files['frontend'])} test files** | ✅ |
+| **Backend Overall** | **{backend_total}%** | {'Excelente' if backend_total >= 70 else 'En progreso'} |
+| **Frontend Overall** | **{frontend_total}%** | {'Excelente' if frontend_total >= 50 else 'En progreso'} |
+| **Total Tests** | **{len(test_files['backend']) + len(test_files['frontend'])} test files** | Completo |
 
 ---
 
-## 🔧 Backend Tests
+## Backend Tests
 
 ### Routers (API Endpoints)
 
@@ -176,7 +185,7 @@ Documentación completa del estado de pruebas en OneDayOneTrip.
     
     for router, test_file in routers.items():
         cov = backend_cov.get(f"api/app/routers/{router}", 0)
-        status = "✅ Completo" if cov >= 80 else "✅ Bueno" if cov >= 60 else "⚠️ Parcial"
+        status = "Completo" if cov >= 80 else "Bueno" if cov >= 60 else "Parcial"
         doc += f"| **{router}** | **{cov}%** | `{test_file}` | {status} |\n"
     
     doc += f"""
@@ -189,12 +198,12 @@ Documentación completa del estado de pruebas en OneDayOneTrip.
     services = {
         "mongo_service.py": "test_mongo_service.py",
         "image_service.py": "test_image_service.py",
-        "firebase_service.py": "❌ Sin tests"
+        "firebase_service.py": "Sin tests"
     }
-    
+
     for service, test_file in services.items():
         cov = backend_cov.get(f"api/app/services/{service}", 0)
-        status = "✅ Bueno" if cov >= 60 else "⚠️ Necesita tests"
+        status = "Bueno" if cov >= 60 else "Necesita tests"
         doc += f"| **{service}** | **{cov}%** | {test_file} | {status} |\n"
     
     doc += f"""
@@ -202,11 +211,11 @@ Documentación completa del estado de pruebas en OneDayOneTrip.
 
 | Module | Cobertura | Test File | Estado |
 |--------|-----------|-----------|--------|
-| **verify_token.py** | **{backend_cov.get('api/app/auth/verify_token.py', 0)}%** | ❌ Sin tests | ⚠️ Necesita tests |
+| **verify_token.py** | **{backend_cov.get('api/app/auth/verify_token.py', 0)}%** | Sin tests | Necesita tests |
 
 ---
 
-## 🎨 Frontend Tests
+## Frontend Tests
 
 ### Componentes con Tests
 
@@ -214,32 +223,41 @@ Documentación completa del estado de pruebas en OneDayOneTrip.
 |-----------|-----------|-----------|--------|
 """
     
-    # Add frontend components
+    # Add frontend components (only those with actual test files)
     components = {
         "Valorar.tsx": "Valorar.test.tsx",
-        "CreateTripForm.tsx": "CreateTripForm.test.tsx",
         "RegisterModal.tsx": "RegisterModel.test.tsx",
         "Comments.tsx": "Comments.test.tsx",
         "LoginModal.tsx": "LoginModel.test.tsx",
+        "ResetPasswordModal.tsx": "ResetPasswordModal.test.tsx",
+        "EtapesList.tsx": "EtapesList.test.tsx",
+        "MasonryGrid.tsx": "MasonryGrid.test.tsx",
         "ImageCarousel.tsx": "ImageCarrousel.test.tsx",
-        "Home.tsx": "Home.test.tsx, SmokeApp.test.tsx"
+        "Home.tsx": "Home.test.tsx, SmokeApp.test.tsx",
+        "RutaDetall.tsx": "RutaDetall.test.tsx",
+        "UserProfile.tsx": "UserProfile.test.tsx",
+        "UserProfilePublic.tsx": "UserProfilePublic.test.tsx"
     }
     
     for component, test_file in components.items():
         # Try to find coverage for this component
         cov = 0
+        component_name = component.replace(".tsx", "").replace(".ts", "")
         for key in frontend_cov:
-            if component.replace(".tsx", "").lower() in key.lower():
+            # Match component name in path (e.g., "Valorar" in ".../components/Valorar.tsx")
+            if component_name.lower() in key.lower() and ("components" in key.lower() or "pages" in key.lower()):
                 cov = frontend_cov[key]
                 break
         
-        status = "✅ Completo" if cov >= 80 else "✅ Bueno" if cov >= 60 else "⚠️ Parcial"
-        doc += f"| **{component}** | **{cov}%** | `{test_file}` | {status} |\n"
+        # Only show components with actual coverage (> 0%)
+        if cov > 0:
+            status = "Completo" if cov >= 80 else "Bueno" if cov >= 60 else "Parcial"
+            doc += f"| **{component}** | **{cov}%** | `{test_file}` | {status} |\n"
     
     doc += f"""
 ---
 
-## 📋 Test Files Existentes
+## Test Files Existentes
 
 ### Backend (`api/tests/`)
 
@@ -263,7 +281,7 @@ Documentación completa del estado de pruebas en OneDayOneTrip.
 
 ---
 
-## 🔍 Cómo Verificar Cobertura
+## Cómo Verificar Cobertura
 
 ### Backend
 ```bash
@@ -295,7 +313,7 @@ def generate_summary_doc(backend_cov, frontend_cov):
     backend_total = backend_cov.get("total", 0)
     frontend_total = frontend_cov.get("total", 0)
     
-    doc = f"""# 📊 Test Coverage - Quick Reference
+    doc = f"""# Test Coverage - Quick Reference
 
 Resumen rápido del estado de tests. Para detalles completos, ver [`TEST_COVERAGE.md`](./TEST_COVERAGE.md).
 
@@ -303,7 +321,7 @@ Resumen rápido del estado de tests. Para detalles completos, ver [`TEST_COVERAG
 
 ---
 
-## ✅ Backend: {backend_total}% Coverage
+## Backend: {backend_total}% Coverage
 
 | Módulo | Coverage | Estado |
 |--------|----------|--------|
@@ -321,31 +339,91 @@ Resumen rápido del estado de tests. Para detalles completos, ver [`TEST_COVERAG
     
     for name, path in modules:
         cov = backend_cov.get(path, 0)
-        status = "✅" if cov >= 70 else "⚠️"
+        status = "Completo" if cov >= 70 else "En progreso"
         doc += f"| **{name}** | {cov}% | {status} |\n"
     
     doc += f"""
 ---
 
-## ⚠️ Frontend: {frontend_total}% Coverage
+## Frontend: {frontend_total}% Coverage
 
-### ✅ Componentes con Tests
-- `Valorar.tsx` (100%)
-- `CreateTripForm.tsx` (90%+)
-- `RegisterModal.tsx` (93%+)
-- `Comments.tsx` (88%+)
-- `LoginModal.tsx` (84%+)
+### Componentes con Tests
+"""
 
-### ❌ Componentes Sin Tests (Prioridad Alta)
-- `RutaDetall.tsx` (0%)
-- `UserProfile.tsx` (0%)
-- `UserProfilePublic.tsx` (0%)
-- `MapSelector.tsx` (0%)
-- `MasonryGrid.tsx` (0.92%)
+    # Calculate coverage for key components (only those with actual test files)
+    key_components = {
+        "Valorar.tsx": "Valorar.test.tsx",
+        "RegisterModal.tsx": "RegisterModel.test.tsx",
+        "Comments.tsx": "Comments.test.tsx",
+        "LoginModal.tsx": "LoginModel.test.tsx",
+        "ResetPasswordModal.tsx": "ResetPasswordModal.test.tsx",
+        "EtapesList.tsx": "EtapesList.test.tsx",
+        "MasonryGrid.tsx": "MasonryGrid.test.tsx",
+        "Home.tsx": "Home.test.tsx",
+        "RutaDetall.tsx": "RutaDetall.test.tsx",
+        "UserProfile.tsx": "UserProfile.test.tsx",
+        "UserProfilePublic.tsx": "UserProfilePublic.test.tsx"
+    }
 
+    components_with_tests = []
+    for component, test_file in key_components.items():
+        cov = 0
+        # Try to find coverage for this component
+        component_name = component.replace(".tsx", "").replace(".ts", "")
+        for key in frontend_cov:
+            # Match component name in path (e.g., "Valorar" in ".../components/Valorar.tsx")
+            if component_name.lower() in key.lower() and ("components" in key.lower() or "pages" in key.lower()):
+                cov = frontend_cov[key]
+                break
+        
+        # Only include components with actual coverage (> 0%)
+        if cov > 0:
+            components_with_tests.append((component, cov))
+    
+    # Sort by coverage descending
+    components_with_tests.sort(key=lambda x: x[1], reverse=True)
+    
+    for component, cov in components_with_tests:
+        doc += f"- `{component}` ({cov}%)\n"
+    
+    if not components_with_tests:
+        doc += "- No components with test coverage found\n"
+
+    doc += f"""
+
+### Componentes Sin Tests (Prioridad Alta)
+"""
+
+    # Find components without tests (components in key_components but with 0% coverage)
+    components_without_tests = []
+    for component, test_file in key_components.items():
+        cov = 0
+        component_name = component.replace(".tsx", "").replace(".ts", "")
+        for key in frontend_cov:
+            if component_name.lower() in key.lower() and ("components" in key.lower() or "pages" in key.lower()):
+                cov = frontend_cov[key]
+                break
+        
+        # If component has 0% coverage, it doesn't have tests
+        if cov == 0:
+            components_without_tests.append(component)
+    
+    # Also check for common components that might not be in the list
+    common_components_without_tests = ["CreateTripForm.tsx", "MapSelector.tsx"]
+    for component in common_components_without_tests:
+        if component not in key_components:
+            components_without_tests.append(component)
+    
+    if components_without_tests:
+        for component in sorted(components_without_tests):
+            doc += f"- `{component}`\n"
+    else:
+        doc += "- No hay componentes sin tests identificados\n"
+
+    doc += f"""
 ---
 
-## 🎯 Próximos Tests a Implementar
+## Próximos Tests a Implementar
 
 ### Backend (Prioridad Alta)
 1. `api/tests/test_auth_verify_token.py` - Auth verification
@@ -368,62 +446,66 @@ Resumen rápido del estado de tests. Para detalles completos, ver [`TEST_COVERAG
 
 def main():
     """Main function to generate coverage documentation."""
-    print("🔍 Gathering test coverage data...")
-    
+    print("Gathering test coverage data...")
+
     # Get backend coverage
-    print("📊 Getting backend coverage...")
+    print("Getting backend coverage...")
     backend_json, backend_output = get_backend_coverage()
     if backend_json:
         backend_cov = {}
         backend_cov["total"] = int(backend_json["totals"]["percent_covered"])
         for file_path, data in backend_json["files"].items():
-            if "api/app" in file_path:
-                backend_cov[file_path] = int(data["summary"]["percent_covered"])
+            # Normalize path separators for cross-platform compatibility
+            normalized_path = file_path.replace("\\", "/")
+            if "api/app" in normalized_path:
+                backend_cov[normalized_path] = int(data["summary"]["percent_covered"])
     else:
         backend_cov = parse_backend_coverage_terminal(backend_output)
-    
+
     # Get frontend coverage
-    print("📊 Getting frontend coverage...")
+    print("Getting frontend coverage...")
     frontend_json, frontend_output = get_frontend_coverage()
     if frontend_json:
         frontend_cov = {}
-        # Parse vitest coverage format
-        if "coverageMap" in frontend_json:
-            total_cov = 0
-            file_count = 0
-            for file_path, data in frontend_json["coverageMap"].items():
-                if "src" in file_path:
-                    stmts = data.get("s", {})
-                    if stmts:
-                        covered = sum(1 for v in stmts.values() if v > 0)
-                        total = len(stmts)
-                        if total > 0:
-                            cov = int((covered / total) * 100)
-                            frontend_cov[file_path] = cov
-                            total_cov += cov
-                            file_count += 1
-            if file_count > 0:
-                frontend_cov["total"] = int(total_cov / file_count)
+        # Parse vitest coverage-final.json format
+        total_cov = 0
+        file_count = 0
+        for file_path, data in frontend_json.items():
+            # Normalize path separators
+            normalized_path = file_path.replace("\\", "/")
+            # Only process source files
+            if "src" in normalized_path and (".tsx" in normalized_path or ".ts" in normalized_path):
+                stmts = data.get("s", {})
+                if stmts:
+                    covered = sum(1 for v in stmts.values() if v > 0)
+                    total = len(stmts)
+                    if total > 0:
+                        cov = int((covered / total) * 100)
+                        frontend_cov[normalized_path] = cov
+                        total_cov += cov
+                        file_count += 1
+        if file_count > 0:
+            frontend_cov["total"] = int(total_cov / file_count)
     else:
         frontend_cov = parse_frontend_coverage_terminal(frontend_output)
-    
+
     # Get test files
     test_files = get_test_files()
-    
+
     # Generate documentation
-    print("📝 Generating coverage documentation...")
+    print("Generating coverage documentation...")
     coverage_doc = generate_coverage_doc(backend_cov, frontend_cov, test_files)
     summary_doc = generate_summary_doc(backend_cov, frontend_cov)
-    
+
     # Write files
     DOCS_DIR.mkdir(exist_ok=True)
     COVERAGE_DOC.write_text(coverage_doc, encoding="utf-8")
     SUMMARY_DOC.write_text(summary_doc, encoding="utf-8")
-    
-    print(f"✅ Coverage documentation generated!")
+
+    print("Coverage documentation generated!")
     print(f"   - {COVERAGE_DOC}")
     print(f"   - {SUMMARY_DOC}")
-    print(f"\n📊 Backend: {backend_cov.get('total', 0)}% | Frontend: {frontend_cov.get('total', 0)}%")
+    print(f"Backend: {backend_cov.get('total', 0)}% | Frontend: {frontend_cov.get('total', 0)}%")
 
 
 if __name__ == "__main__":
