@@ -8,6 +8,10 @@ from google.cloud import firestore
 
 from app.services.firebase_service import db
 from app.auth.verify_token import verify_token
+from firebase_admin import auth
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+security = HTTPBearer()
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -245,3 +249,37 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
         "message": "Publicació afegida correctament",
         "publicacions": list(publicacions),
     }
+
+@router.delete("/delete/{user_id}")
+def delete_account(
+        user_id: str,
+        credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    # Agafem el token brut
+    token = credentials.credentials
+
+    # Verifiquem el token amb Firebase
+    try:
+        decoded = auth.verify_id_token(token)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token invàlid o caducat")
+
+    uid = decoded.get("uid")
+
+    # Només el propi usuari es pot eliminar
+    if uid != user_id:
+        raise HTTPException(status_code=403, detail="No tens permís per eliminar aquest compte")
+
+    # Eliminar Firestore
+    user_ref = db.collection("users").document(user_id)
+    doc = user_ref.get()
+
+    if not doc.exists:
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
+
+    user_ref.delete()
+
+    # Eliminar Firebase Auth
+    auth.delete_user(uid)
+
+    return {"message": "Compte eliminat correctament"}
