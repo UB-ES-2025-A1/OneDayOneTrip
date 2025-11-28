@@ -2,7 +2,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { auth } from "../firebase";
-import "../styles/RutaDetalls.css";
+import "../styles/RutaDetall.gallery.css";
+import "../styles/RutaDetall.header-actions.css";
+import "../styles/RutaDetall.layout.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
 
