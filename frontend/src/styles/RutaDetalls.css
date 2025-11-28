@@ -141,9 +141,8 @@
 .ruta-header-line {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 8px;
-
 }
 
 .ruta-titol {
@@ -153,6 +152,23 @@
   font-weight: 700;
 }
 
+.ruta-actions {
+  flex: 1;                    
+}
+
+.ruta-actions-left {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ruta-actions-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;        
+}
 
 
 .guardar-button {
