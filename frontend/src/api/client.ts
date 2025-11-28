@@ -1,6 +1,6 @@
 import { getAuth } from "firebase/auth";
 
-const API_URL = "https://onedayonetrip.onrender.com"; // o 
+const API_URL = "http://127.0.0.1:8000";
 
 //url local = http://127.0.0.1:8000 
 

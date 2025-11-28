@@ -37,6 +37,8 @@ async def register_user(data: dict, user=Depends(verify_token)):
         "url_foto_perfil": data.get("url_foto_perfil", ""),
         "url_foto_panell": data.get("url_foto_panell", ""),
         "premium": data.get("premium", False),
+        "llista_bloquejats": data.get("llista_bloquejats", []),
+        "llista_bloquejadors": data.get("llista_bloquejadors", []),
     }
 
     print(f"[DEBUG] Creando usuario {uid} con datos: {user_data}")
