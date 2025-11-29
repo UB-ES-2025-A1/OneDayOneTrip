@@ -215,4 +215,4 @@ def add_trip_rating(
     )
     upsert_rating(trip_id, userId, rating, datetime.utcnow())
     print("[DEBUG] ✅ Rating guardat o actualizat correctament")
-    return {"message": "Rating afegit o actualizat"}
+    return {"message": "Rating afegit o actualitzat"}
