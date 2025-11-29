@@ -75,6 +75,8 @@ export default function UserProfile() {
         backendUser.llista_seguits = backendUser.llista_seguits || [];
         backendUser.publicacions = backendUser.publicacions || [];
         backendUser.guardades = backendUser.guardades || [];
+        backendUser.llista_bloquejats = backendUser.llista_bloquejats || [];
+        backendUser.llista_bloquejadors = backendUser.llista_bloquejadors || [];
 
         setProfile(backendUser as BackendUser);
 

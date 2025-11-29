@@ -1,8 +1,8 @@
 import { getAuth } from "firebase/auth";
 
-const API_URL = "https://onedayonetrip.onrender.com"; // o 
+const API_URL = "http://127.0.0.1:8000";
 
-//url local = http://127.0.0.1:8000 
+// url local = http://127.0.0.1:8000 
 
 // url production = https://onedayonetrip-api.onrender.com
 
@@ -82,11 +82,20 @@ export async function saveTrip(userId: string, tripId: string) {
   return apiPost(`/users/save/${userId}/${tripId}`, {});
 }
 
-// Treure una ruta guardada
+// Deixar de guardar una ruta
 export async function unsaveTrip(userId: string, tripId: string) {
   return apiPost(`/users/unsave/${userId}/${tripId}`, {});
 }
-  
+
+// Bloquejar un usuari
+export async function blockUser(userId: string, targetId: string) {
+  return apiPost(`/users/block/${userId}/${targetId}`, {});
+}
+// Deixar de bloquejar un usuari
+export async function unblockUser(userId: string, targetId: string) {
+  return apiPost(`/users/unblock/${userId}/${targetId}`, {});
+}
+
 // 📌 Añadir una publicación al usuario
 export async function addPublicationToUser(userId: string, tripId: string) {
   return apiPost(`/users/${userId}/publicacions/${tripId}`, {});
