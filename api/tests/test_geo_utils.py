@@ -50,4 +50,4 @@ def test_get_location_name_handles_error(monkeypatch):
     monkeypatch.setattr("app.routers.trips.requests.get", fake_get)
 
     result = trips.get_location_name(0, 0)
-    assert result == "Ubicación desconocida"
+    assert result == "Ubicació desconeguda"

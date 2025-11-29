@@ -73,7 +73,7 @@ class TestUsersEndpoints:
 
         response = client.get("/users/nonexistent")
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert "no encontrado" in response.json()["detail"].lower()
+        assert "usuari no trobat" in response.json()["detail"].lower()
 
     def test_register_user_success(self, monkeypatch):
         """Test POST /users/register creates user with defaults"""
@@ -112,7 +112,7 @@ class TestUsersEndpoints:
             }
             result = await users.register_user(data, user=user_data)
 
-            assert result["message"] == "Usuario registrado correctamente"
+            assert result["message"] == "Usuari registrat correctament"
             assert captured_data["uid"] == "fake_uid"
             assert captured_data["username"] == "testuser"
             assert captured_data["role"] == "user"

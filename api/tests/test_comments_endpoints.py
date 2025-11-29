@@ -41,7 +41,7 @@ def test_create_comment_rejects_invalid_trip_id(client):
     response = client.post("/trips/invalid/comments", json=payload)
 
     assert response.status_code == 400
-    assert response.json()["detail"] == "tripId inválido"
+    assert response.json()["detail"] == "tripId invàlid"
 
 
 def test_get_comments_uses_list_comments(client, monkeypatch):
