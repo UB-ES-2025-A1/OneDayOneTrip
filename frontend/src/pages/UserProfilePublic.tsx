@@ -132,6 +132,12 @@ export default function UserProfilePublic() {
     }
     if (!profile) return;
 
+    // No permetre seguir si aquest usuari està bloquejat pel currentUser
+    if (isBlocked) {
+      alert("No pots seguir un usuari que has bloquejat.");
+      return;
+    }
+
     const userId = currentUser.uid;
     const targetId = profile.uid;
 
@@ -173,7 +179,7 @@ export default function UserProfilePublic() {
     }
   };
 
-// 🔹 Bloquejar / desbloquejar
+  // 🔹 Bloquejar / desbloquejar
   const handleBlock = async () => {
     if (!currentUser) {
       alert("Has d'iniciar sessió per bloquejar usuaris");
@@ -304,8 +310,9 @@ export default function UserProfilePublic() {
                 {currentUser && currentUser.uid !== profile.uid && (
                   <button
                     className={`follow-button ${isFollowing ? "following" : ""}`}
-                    disabled={followLoading}
+                    disabled={followLoading || isBlocked}
                     onClick={handleFollow}
+                    title={isBlocked ? "Has bloquejat aquest usuari" : undefined}
                   >
                     {isFollowing ? "Seguint" : "Seguir"}
                   </button>
@@ -325,23 +332,23 @@ export default function UserProfilePublic() {
 
               <div className="user-stats">
                 <div
-                  className="stat"
-                  onClick={() => setSeguidoresModalOpen(true)}
+                  className={`stat ${isBlocked ? "blocked" : ""}`}
+                  onClick={() => !isBlocked && setSeguidoresModalOpen(true)}
                 >
-                  <span className="number">{seguidors}</span>
+                  <span className="number">{isBlocked ? "?" : seguidors}</span>
                   <span className="label">Seguidors</span>
                 </div>
 
                 <div
-                  className="stat"
-                  onClick={() => setSeguitsModalOpen(true)}
+                  className={`stat ${isBlocked ? "blocked" : ""}`}
+                  onClick={() => !isBlocked && setSeguitsModalOpen(true)}
                 >
-                  <span className="number">{seguits}</span>
+                  <span className="number">{isBlocked ? "?" : seguits}</span>
                   <span className="label">Seguits</span>
                 </div>
 
-                <div className="stat">
-                  <span className="number">{publicacionsItems.length}</span>
+                <div className={`stat ${isBlocked ? "blocked" : ""}`}>
+                  <span className="number">{isBlocked ? "?" : publicacionsItems.length}</span>
                   <span className="label">Publicacions</span>
                 </div>
               </div>
@@ -353,24 +360,32 @@ export default function UserProfilePublic() {
           </div>
 
           <section className="trip-list">
-            <MasonryGrid
-              items={publicacionsItems}
-              currentUser={currentUser}
-              openRegister={() =>
-                alert("Has de iniciar sessió per interactuar")
-              }
-              showCreateButton={false}
-            />
-
-            {publicacionsItems.length === 0 && (
+            {isBlocked ? (
               <div className="empty-state">
-                <ImageOff className="empty-icon" size={60} />
-                <h3>No hi ha publicacions.</h3>
+                <h3>Has bloquejat aquest usuari.</h3>
               </div>
+            ) : (
+              <>
+                <MasonryGrid
+                  items={publicacionsItems}
+                  currentUser={currentUser}
+                  openRegister={() =>
+                    alert("Has de iniciar sessió per interactuar")
+                  }
+                  showCreateButton={false}
+                />
+
+                {publicacionsItems.length === 0 && (
+                  <div className="empty-state">
+                    <ImageOff className="empty-icon" size={60} />
+                    <h3>No hi ha publicacions.</h3>
+                  </div>
+                )}
+              </>
             )}
           </section>
 
-          {seguitsModalOpen && profile && (
+          {seguitsModalOpen && profile && !isBlocked && (
             <LlistaSeguitsModal
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
@@ -378,7 +393,7 @@ export default function UserProfilePublic() {
               goToProfile={goToProfile} currentUserId={""}            />
           )}
 
-          {seguidoresModalOpen && profile && (
+          {seguidoresModalOpen && profile && !isBlocked && (
             <LlistaSeguidorsModal
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
