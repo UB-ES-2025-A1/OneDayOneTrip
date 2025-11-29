@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "../styles/UserSettings.css";
 import { X, Trash2 } from "lucide-react";
-import { Auth } from "../firebase/auth"; // 👈 ajusta el path si cal
+import { Auth } from "../firebase/auth";
+import { deleteAccount } from "../api/client";
 
 type Props = {
   open: boolean;
@@ -28,36 +29,16 @@ export default function UserSettingsPopup({ open, onClose }: Props) {
       setLoading(true);
       setError("");
 
-      const user = Auth.getCurrentUser();
-      if (!user) {
-        setError("Has d'estar autenticat per esborrar el compte.");
-        return;
-      }
-
-      const token = await user.getIdToken(true);
-
-      const API_BASE = import.meta.env.VITE_API_URL || "";
-      const res = await fetch(`${API_BASE}/users/delete-account`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        const msg = await res.text().catch(() => "");
-        throw new Error(msg || "No s'ha pogut esborrar el compte.");
-      }
-
-      // Tanquem sessió al front
+      await deleteAccount();   
       await Auth.logout();
 
       alert("El teu compte s'ha esborrat correctament.");
-      window.location.href = "/"; // redirecció a home
+      window.location.href = "/";
     } catch (err: any) {
       console.error("Error esborrant el compte:", err);
-      setError(err.message || "Hi ha hagut un error en esborrar el compte.");
+      setError(
+        err?.message || "Hi ha hagut un error en esborrar el compte."
+      );
     } finally {
       setLoading(false);
     }
@@ -74,6 +55,7 @@ export default function UserSettingsPopup({ open, onClose }: Props) {
 
         <div className="settings-content">
           <div className="settings-section">
+            <h3 className="settings-section-title">Accions crítiques</h3>
             <p className="settings-warning">
               Esborrar el compte eliminarà totes les teves dades. Aquesta acció
               no es pot desfer.
