@@ -88,6 +88,51 @@ html, body, #root {
   margin-inline: auto;
 }
 
+/* 🔍 Contenidor filtre + buscador */
+.search-bar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem auto 0.5rem;
+  padding: 0 1rem;
+  max-width: 720px;
+}
+
+/* Desplegable de filtre */
+.search-filter-select {
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+  background-color: #fff;
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.search-filter-select:focus {
+  border-color: #2e492e;
+}
+
+/* Input de cerca */
+.search-input {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #2e492e;
+  box-shadow: 0 0 0 2px rgba(46, 73, 46, 0.15);
+}
+
+
+
 /* ---------- Messages no TRIP LIST ---------- */
 
 .no-trips-pretty {

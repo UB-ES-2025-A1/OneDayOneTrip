@@ -11,7 +11,9 @@ import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 
 import { getAllTrips, type Trip } from "../api/trips";
-import { getUserById} from "../api/client";
+import { getUserById } from "../api/client";
+
+type SearchFilter = "all" | "user" | "country" | "city" | "monument"; // 🔹 nou
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
@@ -21,7 +23,10 @@ export default function Home() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
+  const [searchTerm, setSearchTerm] = useState("");                // 🔹 nou (ja el tenies)
+  const [searchFilter, setSearchFilter] = useState<SearchFilter>("all"); // 🔹 nou
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
@@ -36,7 +41,6 @@ export default function Home() {
 
     return () => unsubscribe();
   }, []);
-
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => setCurrentUser(user));
@@ -64,9 +68,10 @@ export default function Home() {
     fetchTrips();
   }, []);
 
+  // 🔹 Primer filtre per "Seguint / Recomanats"
   const filteredTrips = trips.filter((t) => {
     if (selectedTab === "recomendados") {
-      return true; // Mostrar TODAS las trips
+      return true; // Mostrar totes les trips
     }
 
     if (!backendUser?.llista_seguits) return false;
@@ -75,9 +80,48 @@ export default function Home() {
     return backendUser.llista_seguits.includes(authorId);
   });
 
+  // 🔹 Després filtre per text + tipus de filtre
+  const search = searchTerm.trim().toLowerCase();
+
+  const visibleTrips = filteredTrips.filter((t) => {
+    if (!search) return true;
+
+    const title = (t.title || "").toLowerCase();
+    const city = (t.city || "").toLowerCase();
+    const country = (t.country || "").toLowerCase();
+    const userName = (t.author?.name || "").toLowerCase();
+
+    switch (searchFilter) {
+      case "user":
+        return userName.includes(search);
+      case "country":
+        return country.includes(search);
+      case "city":
+        return city.includes(search);
+      case "monument":
+        // aquí assumim que el "monument" és principalment el títol de la ruta
+        return title.includes(search);
+      case "all":
+      default:
+        return (
+          title.includes(search) ||
+          city.includes(search) ||
+          country.includes(search) ||
+          userName.includes(search)
+        );
+    }
+  });
 
   const normalizeId = (id: any) =>
     typeof id === "string" ? id : id?.$oid || String(id || "");
+
+  const placeholderMap: Record<SearchFilter, string> = {
+    all: "Cerca per títol, ciutat, país o usuari...",
+    user: "Cerca per nom d'usuari...",
+    country: "Cerca per país...",
+    city: "Cerca per ciutat...",
+    monument: "Cerca per nom de la ruta / monument...",
+  };
 
   return (
     <Layout
@@ -113,13 +157,36 @@ export default function Home() {
         </div>
       )}
 
+      {/* 🔹 Contenidor del filtre + buscador */}
+      <div className="search-bar-container">
+        <select
+          className="search-filter-select"
+          value={searchFilter}
+          onChange={(e) => setSearchFilter(e.target.value as SearchFilter)}
+        >
+          <option value="all">Tot</option>
+          <option value="user">Usuari</option>
+          <option value="country">País</option>
+          <option value="city">Ciutat</option>
+          <option value="monument">Monument</option>
+        </select>
+
+        <input
+          type="text"
+          className="search-input"
+          placeholder={placeholderMap[searchFilter]}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       <section className="trip-list-section">
         {loading && <p>Carregant rutes...</p>}
         {error && <p>{error}</p>}
 
-        {!loading && !error && filteredTrips.length > 0 ? (
+        {!loading && !error && visibleTrips.length > 0 ? (
           <MasonryGrid
-            items={filteredTrips.map((t) => ({
+            items={visibleTrips.map((t) => ({
               id: normalizeId(t._id),
               title: t.title || "Sense títol",
               img:
@@ -160,13 +227,17 @@ export default function Home() {
         )}
       </section>
 
-
-
       {modalOpen === "login" && (
-        <LoginModal onClose={() => setModalOpen(null)} openRegister={() => setModalOpen("register")} />
+        <LoginModal
+          onClose={() => setModalOpen(null)}
+          openRegister={() => setModalOpen("register")}
+        />
       )}
       {modalOpen === "register" && (
-        <RegisterModal onClose={() => setModalOpen(null)} openLogin={() => setModalOpen("login")} />
+        <RegisterModal
+          onClose={() => setModalOpen(null)}
+          openLogin={() => setModalOpen("login")}
+        />
       )}
     </Layout>
   );
