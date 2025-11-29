@@ -247,7 +247,7 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
     }
 
 @router.post("/remove-follower/{user_id}/{target_id}")
-async def remove_follower(user_id: str, target_id: str, user=Depends(verify_token)):
+async def remove_follower(user_id: str, target_id: str):
     """
     Elimina el target_id de la llista de seguidors de user_id.
     A més, elimina user_id de la llista de seguits del target_id
