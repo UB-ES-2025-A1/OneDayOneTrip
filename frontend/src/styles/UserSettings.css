@@ -35,7 +35,66 @@
 }
 
 .settings-content {
-  min-height: 40px; /* opcional, per mantenir estructura */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-description {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Seccions dins del popup */
+.settings-section {
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.settings-section-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.settings-warning {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  color: #b43b37;
+}
+
+/* Botó vermell d'acció crítica */
+.danger-btn {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.danger-btn:hover:not(:disabled) {
+  background: #c9302c;
+  transform: translateY(-1px);
+}
+
+.danger-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* Error text */
+.settings-error {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #c62828;
 }
 
 /* Animació */

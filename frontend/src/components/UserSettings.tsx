@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/UserSettings.css";
-import { X } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
+import { Auth } from "../firebase/auth"; // 👈 ajusta el path si cal
 
 type Props = {
   open: boolean;
@@ -8,10 +9,58 @@ type Props = {
 };
 
 export default function UserSettingsPopup({ open, onClose }: Props) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   if (!open) return null;
 
   const handleBackgroundClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirm1 = window.confirm(
+      "Segur que vols esborrar el compte? Aquesta acció és irreversible."
+    );
+    if (!confirm1) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const user = Auth.getCurrentUser();
+      if (!user) {
+        setError("Has d'estar autenticat per esborrar el compte.");
+        return;
+      }
+
+      const token = await user.getIdToken(true);
+
+      const API_BASE = import.meta.env.VITE_API_URL || "";
+      const res = await fetch(`${API_BASE}/users/delete-account`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const msg = await res.text().catch(() => "");
+        throw new Error(msg || "No s'ha pogut esborrar el compte.");
+      }
+
+      // Tanquem sessió al front
+      await Auth.logout();
+
+      alert("El teu compte s'ha esborrat correctament.");
+      window.location.href = "/"; // redirecció a home
+    } catch (err: any) {
+      console.error("Error esborrant el compte:", err);
+      setError(err.message || "Hi ha hagut un error en esborrar el compte.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -23,8 +72,25 @@ export default function UserSettingsPopup({ open, onClose }: Props) {
 
         <h2 className="settings-title">Configuració</h2>
 
-        {/* Contingut buit per ara */}
-        <div className="settings-content"></div>
+        <div className="settings-content">
+          <div className="settings-section">
+            <p className="settings-warning">
+              Esborrar el compte eliminarà totes les teves dades. Aquesta acció
+              no es pot desfer.
+            </p>
+
+            <button
+              className="danger-btn"
+              onClick={handleDeleteAccount}
+              disabled={loading}
+            >
+              <Trash2 size={18} />
+              <span>{loading ? "Esborrant..." : "Esborrar compte"}</span>
+            </button>
+
+            {error && <p className="settings-error">{error}</p>}
+          </div>
+        </div>
       </div>
     </div>
   );
