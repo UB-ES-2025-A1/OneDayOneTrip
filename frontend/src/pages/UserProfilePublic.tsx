@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, type User as FirebaseUser, signOut } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById, followUser, unfollowUser } from "../api/client"; // 👈 AFEGIT
+import { getUserById, followUser, unfollowUser, blockUser, unblockUser } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { ImageOff } from "lucide-react"; 
@@ -23,6 +23,8 @@ export type BackendUser = {
   publicacions?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
+  llista_bloquejats?: string[];
+  llista_bloquejadors?: string[];
 };
 /*
 type GridItem = {
@@ -54,6 +56,10 @@ export default function UserProfilePublic() {
   // 🔹 estat follow
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+
+  // 🔹 estat bloqueig
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockLoading, setBlockLoading] = useState(false);
 
   // Detectar usuario logueado
   useEffect(() => {
@@ -108,6 +114,16 @@ export default function UserProfilePublic() {
     setIsFollowing(followers.includes(currentUser.uid));
   }, [currentUser, profile]);
 
+  // 🔹 Saber si el currentUser ha bloquejat aquest perfil
+  useEffect(() => {
+    if (!currentUser || !profile) {
+      setIsBlocked(false);
+      return;
+    }
+    const blocked = profile.llista_bloquejadors || [];
+    setIsBlocked(blocked.includes(currentUser.uid));
+  }, [currentUser, profile]);
+
   // 🔹 Seguir / deixar de seguir (mateixa lògica que RutaDetall)
   const handleFollow = async () => {
     if (!currentUser) {
@@ -154,6 +170,66 @@ export default function UserProfilePublic() {
       console.error("Error seguint/seguint deixant:", err);
     } finally {
       setFollowLoading(false);
+    }
+  };
+
+// 🔹 Bloquejar / desbloquejar
+  const handleBlock = async () => {
+    if (!currentUser) {
+      alert("Has d'iniciar sessió per bloquejar usuaris");
+      return;
+    }
+    if (!profile) return;
+
+    const userId = currentUser.uid;
+    const targetId = profile.uid;
+
+    try {
+      setBlockLoading(true);
+
+      if (!isBlocked) {
+        await blockUser(userId, targetId);
+
+        setIsFollowing(false);
+
+        // Actualitzem localment la llista de seguidors, seguits i bloquejadors
+        setProfile((prev) =>
+          prev
+            ? ({
+                  ...prev,
+                llista_seguidors: (prev.llista_seguidors || []).filter(
+                  (uid) => uid !== userId
+                ),
+                llista_seguits: (prev.llista_seguits || []).filter(
+                  (uid) => uid !== userId
+                ),
+                llista_bloquejadors: [...(prev.llista_bloquejadors || []), userId],
+              } as BackendUser)
+            : prev
+        );
+
+        setIsBlocked(true);
+        
+      } else {
+        await unblockUser(userId, targetId);
+        setIsBlocked(false);
+
+        // Actualitzem localment la llista de bloquejadors
+        setProfile((prev) =>
+          prev
+            ? ({
+                ...prev,
+                llista_bloquejadors: (prev.llista_bloquejadors || []).filter(
+                  (uid) => uid !== userId
+                ),
+              } as BackendUser)
+            : prev
+        );
+      }
+    } catch (err) {
+      console.error("Error bloquejant/desbloquejant:", err);
+    } finally {
+      setBlockLoading(false);
     }
   };
 
@@ -232,6 +308,17 @@ export default function UserProfilePublic() {
                     onClick={handleFollow}
                   >
                     {isFollowing ? "Seguint" : "Seguir"}
+                  </button>
+                )}
+                
+                {/* 🔹 BOTÓ BLOQUEJAR SOTA EL NOM */}
+                {currentUser && currentUser.uid !== profile.uid && (
+                  <button
+                    className={`follow-button block-button ${isBlocked ? "blocked" : ""}`}
+                    disabled={blockLoading}
+                    onClick={handleBlock}
+                  >
+                    {isBlocked ? "Desbloquejar" : "Bloquejar"}
                   </button>
                 )}
               </div>
