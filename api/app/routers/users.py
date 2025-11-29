@@ -248,6 +248,15 @@ async def block_user(user_id: str, target_id: str):
     # Afegir a la llista de bloquejadors
     target_ref.update({"llista_bloquejadors": firestore.ArrayUnion([user_id])})
 
+    # Eliminar relacions de seguiment recíproques
+    # Si l'usuari (blocker) seguia el target, eliminar aquest seguiment
+    user_ref.update({"llista_seguits": firestore.ArrayRemove([target_id])})
+    target_ref.update({"llista_seguidors": firestore.ArrayRemove([user_id])})
+
+    # Si el target seguia al blocker, eliminar també aquest seguiment
+    user_ref.update({"llista_seguidors": firestore.ArrayRemove([target_id])})
+    target_ref.update({"llista_seguits": firestore.ArrayRemove([user_id])})
+
     return {"message": "Usuari bloquejat correctament"}
 
 

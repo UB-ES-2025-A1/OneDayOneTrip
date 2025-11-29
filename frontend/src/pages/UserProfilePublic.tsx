@@ -173,7 +173,7 @@ export default function UserProfilePublic() {
     }
   };
 
-  // 🔹 Bloquejar / desbloquejar
+// 🔹 Bloquejar / desbloquejar
   const handleBlock = async () => {
     if (!currentUser) {
       alert("Has d'iniciar sessió per bloquejar usuaris");
@@ -189,27 +189,38 @@ export default function UserProfilePublic() {
 
       if (!isBlocked) {
         await blockUser(userId, targetId);
+
+        setIsFollowing(false);
+
+        // Actualitzem localment la llista de seguidors, seguits i bloquejadors
+        setProfile((prev) =>
+          prev
+            ? ({
+                  ...prev,
+                llista_seguidors: (prev.llista_seguidors || []).filter(
+                  (uid) => uid !== userId
+                ),
+                llista_seguits: (prev.llista_seguits || []).filter(
+                  (uid) => uid !== userId
+                ),
+                llista_bloquejadors: [...(prev.llista_bloquejadors || []), userId],
+              } as BackendUser)
+            : prev
+        );
+
         setIsBlocked(true);
+        
+      } else {
+        await unblockUser(userId, targetId);
+        setIsBlocked(false);
 
         // Actualitzem localment la llista de bloquejadors
         setProfile((prev) =>
           prev
             ? ({
                 ...prev,
-                llista_bloquejadors: [...(prev.llista_bloquejadors || []), userId],
-              } as BackendUser)
-            : prev
-        );
-      } else {
-        await unblockUser(userId, targetId);
-        setIsBlocked(false);
-
-        setProfile((prev) =>
-          prev
-            ? ({
-                ...prev,
                 llista_bloquejadors: (prev.llista_bloquejadors || []).filter(
-                  (uid: string) => uid !== userId
+                  (uid) => uid !== userId
                 ),
               } as BackendUser)
             : prev
