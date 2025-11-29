@@ -1,10 +1,11 @@
 
 /* ---------- CONTENEDOR PRINCIPAL ---------- */
 .user-profile {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  flex-wrap: wrap; /* ✅ asegura que se adapte en móvil */
+  flex-wrap: wrap; 
   padding: 3rem 2rem;
   gap: 2rem;
   min-height: 220px;
@@ -238,6 +239,39 @@
   background: #ffffff;
   transform: scale(1.08);
 }
+
+.settings-btn {
+  position: absolute;
+  top: 50%;              /* mig d’alçada */
+  right: 16px;           /* enganxat a la dreta, com l'edit */
+  transform: translateY(-50%); /* centrat verticalment */
+
+  width: 42px;           /* mateix tamany que .edit-profile-btn */
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.settings-btn svg {
+  color: #333;
+}
+
+.settings-btn:hover {
+  background: #ffffff;
+  transform: translateY(-50%) scale(1.08);
+}
+
+
 
 .tab-title {
   color: #2e492e;

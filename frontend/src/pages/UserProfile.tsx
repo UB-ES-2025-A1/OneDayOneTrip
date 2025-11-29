@@ -6,6 +6,7 @@ import { getUserById } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { ImageOff, Pencil } from "lucide-react"; 
+import { Settings } from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
@@ -54,6 +55,11 @@ export default function UserProfile() {
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
 
   const navigate = useNavigate();
+
+    const handleOpenSettings = () => {
+    console.log("Obrir finestra de configuració de compte");
+  };
+
 
   // ---------------------------
   // Cargar usuario y trips
@@ -195,6 +201,16 @@ export default function UserProfile() {
               position:"relative",
             }}
           >
+          {currentUser && profile && currentUser.uid === profile.uid && (
+              <button
+                className="settings-btn"
+                onClick={handleOpenSettings}
+                aria-label="Obrir configuració del compte"
+              >
+                <Settings size={36} />
+              </button>
+            )}
+
             <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}> <Pencil size={22} /></button>
           
             <div className="user-photo">
