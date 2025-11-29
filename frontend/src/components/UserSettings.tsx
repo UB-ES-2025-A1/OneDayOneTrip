@@ -55,10 +55,8 @@ export default function UserSettingsPopup({ open, onClose }: Props) {
 
         <div className="settings-content">
           <div className="settings-section">
-            <h3 className="settings-section-title">Accions crítiques</h3>
             <p className="settings-warning">
-              Esborrar el compte eliminarà totes les teves dades. Aquesta acció
-              no es pot desfer.
+              Esborrar el compte eliminarà totes les teves dades. Aquesta acció és irreversible.
             </p>
 
             <button
@@ -66,8 +64,7 @@ export default function UserSettingsPopup({ open, onClose }: Props) {
               onClick={handleDeleteAccount}
               disabled={loading}
             >
-              <Trash2 size={18} />
-              <span>{loading ? "Esborrant..." : "Esborrar compte"}</span>
+              <span>{loading ? "Esborrant..." : "Eliminar compte"}</span>
             </button>
 
             {error && <p className="settings-error">{error}</p>}

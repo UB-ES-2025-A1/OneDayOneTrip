@@ -40,27 +40,13 @@
   gap: 1.5rem;
 }
 
-.settings-description {
-  margin: 0;
-  font-size: 0.95rem;
-  color: #555;
-}
-
-/* Seccions dins del popup */
 .settings-section {
   border-top: 1px solid #eee;
   padding-top: 1rem;
 }
 
-.settings-section-title {
-  margin: 0 0 0.5rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #333;
-}
-
 .settings-warning {
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 1rem 0;
   font-size: 0.9rem;
   color: #b43b37;
 }
@@ -75,9 +61,6 @@
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s ease, transform 0.1s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
 }
 
 .danger-btn:hover:not(:disabled) {
@@ -90,14 +73,12 @@
   cursor: default;
 }
 
-/* Error text */
 .settings-error {
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
   font-size: 0.85rem;
   color: #c62828;
 }
 
-/* Animació */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
