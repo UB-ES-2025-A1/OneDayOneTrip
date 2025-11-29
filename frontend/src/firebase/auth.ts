@@ -78,3 +78,8 @@ class AuthService {
 
 export const Auth = new AuthService();
 export { auth };
+
+
+//Per cridar al endpoint de elminar compte, per poder obtenir el verify token s'ha d'utilitzar el següent:
+//firebase.auth().currentUser.getIdToken(/* forceRefresh */ true), si no funciona probar el següent:
+//const tokenDelClient = await user.getIdToken(true);
