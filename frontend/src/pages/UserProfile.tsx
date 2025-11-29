@@ -13,6 +13,7 @@ import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal";
 import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
+import UserSettings from "../components/UserSettings";
 
 export type BackendUser = {
   uid: string;
@@ -53,10 +54,12 @@ export default function UserProfile() {
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
 
   const navigate = useNavigate();
 
-    const handleOpenSettings = () => {
+  const handleOpenSettings = () => {
     console.log("Obrir finestra de configuració de compte");
   };
 
@@ -202,11 +205,7 @@ export default function UserProfile() {
             }}
           >
           {currentUser && profile && currentUser.uid === profile.uid && (
-              <button
-                className="settings-btn"
-                onClick={handleOpenSettings}
-                aria-label="Obrir configuració del compte"
-              >
+              <button className="settings-btn" onClick={() => setSettingsOpen(true)}>
                 <Settings size={36} />
               </button>
             )}
@@ -302,6 +301,7 @@ export default function UserProfile() {
               goToProfile={goToProfile} // ✅ Navegación también aquí
             />
           )}
+          <UserSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
 
           {openEdit && profile && (
             <EditarPerfil 

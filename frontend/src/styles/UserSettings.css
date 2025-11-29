@@ -1,0 +1,45 @@
+.settings-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.settings-popup {
+  background: white;
+  width: 90%;
+  max-width: 420px;
+  padding: 2rem;
+  border-radius: 14px;
+  position: relative;
+  animation: fadeIn 0.25s ease;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.settings-title {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #2e492e;
+  text-align: center;
+}
+
+.settings-content {
+  min-height: 40px; /* opcional, per mantenir estructura */
+}
+
+/* Animació */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
