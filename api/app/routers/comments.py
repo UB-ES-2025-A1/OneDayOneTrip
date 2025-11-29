@@ -17,14 +17,14 @@ router = APIRouter(prefix="/trips", tags=["Comments"])
 async def create_comment(trip_id: str, comment: CommentModel, request: Request):
     try:
         print("\n==============================")
-        print("📩 POST comentario a trip:", trip_id)
+        print("📩 POST comentari a trip:", trip_id)
 
         created_at = comment.createdAt or datetime.utcnow()
 
         try:
             trip_obj_id = ObjectId(comment.tripId)
         except Exception:
-            raise HTTPException(status_code=400, detail="tripId inválido")
+            raise HTTPException(status_code=400, detail="tripId invàlid")
 
         new_comment = {
             "tripId": trip_obj_id,
@@ -41,7 +41,7 @@ async def create_comment(trip_id: str, comment: CommentModel, request: Request):
         new_comment["tripId"] = str(trip_obj_id)
         new_comment["createdAt"] = created_at.isoformat()
 
-        print("📨 Respuesta:", new_comment)
+        print("📨 Resposta:", new_comment)
         print("==============================\n")
 
         return {"comment": new_comment}
@@ -53,7 +53,7 @@ async def create_comment(trip_id: str, comment: CommentModel, request: Request):
 
 
 # ============================================================
-# 🟣 Obtener comentarios
+# 🟣 Obtenir Comentaris
 # ============================================================
 @router.get("/{trip_id}/comments")
 def get_comments_for_trip(
