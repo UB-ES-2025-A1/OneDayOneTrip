@@ -9,7 +9,7 @@ router = APIRouter(prefix="/ratings", tags=["Ratings"])
 def rate_trip(trip_id: str, rating: RatingModel):
     try:
         upsert_rating(trip_id, rating.userId, rating.rating, rating.date)
-        # devolvemos el estado actualizado
+        # retornem l'estat actualitzat
         stats = get_trip_rating_stats(trip_id)
         return stats
     except Exception as e:

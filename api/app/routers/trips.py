@@ -21,11 +21,11 @@ router = APIRouter(prefix="/trips", tags=["Trips"])
 
 
 # ============================================================
-# 🌍 Geocodificación con Debug
+# 🌍 Geocodificació amb Debug
 # ============================================================
 def get_location_name(lat: float, lon: float) -> str:
-    """Convierte coordenadas (lat, lon) en nombre de ubicación legible (con debug)."""
-    print(f"\n[DEBUG] 🌍 get_location_name() llamada con lat={lat}, lon={lon}")
+    """Converteix coordenades (lat, lon) en nom d'ubicació llegible (amb debug)."""
+    print(f"\n[DEBUG] 🌍 get_location_name() cridada amb lat={lat}, lon={lon}")
     try:
         url = "https://nominatim.openstreetmap.org/reverse"
         params = {"format": "jsonv2", "lat": lat, "lon": lon, "accept-language": "es"}
@@ -33,14 +33,14 @@ def get_location_name(lat: float, lon: float) -> str:
             "User-Agent": "OneDayOneTrip/1.0 (https://onedayonecity.web.app; contacto: admin@onedayonetrip.com)"
         }
 
-        print(f"[DEBUG] 🔗 Haciendo petición GET a {url} con params={params}")
+        print(f"[DEBUG] 🔗 Fent petició GET a {url} con params={params}")
         resp = requests.get(url, params=params, headers=headers, timeout=8)
-        print(f"[DEBUG] ✅ Respuesta HTTP: {resp.status_code}")
+        print(f"[DEBUG] ✅ Resposta HTTP: {resp.status_code}")
 
         resp.raise_for_status()
         data = resp.json()
         print(
-            f"[DEBUG] 📦 JSON recibido: {json.dumps(data, indent=2, ensure_ascii=False)[:400]}..."
+            f"[DEBUG] 📦 JSON rebut: {json.dumps(data, indent=2, ensure_ascii=False)[:400]}..."
         )
 
         name = (
@@ -48,12 +48,12 @@ def get_location_name(lat: float, lon: float) -> str:
             or data.get("name")
             or ", ".join(data.get("address", {}).values())
         )
-        print(f"[DEBUG] 📍 Nombre detectado: {name}")
-        return name if name else "Ubicación desconocida"
+        print(f"[DEBUG] 📍 Nom detectat: {name}")
+        return name if name else "Ubicació desconeguda"
 
     except Exception as e:
         print(f"[ERROR] ⚠️ Error geocoding ({lat},{lon}): {e}")
-        return "Ubicación desconocida"
+        return "Ubicació desconeguda"
 
 
 # ============================================================
@@ -63,13 +63,13 @@ def get_location_name(lat: float, lon: float) -> str:
 
 @router.get("/")
 def list_trips(include_stats: bool = False):
-    print(f"\n[DEBUG] 📄 list_trips() llamado con include_stats={include_stats}")
+    print(f"\n[DEBUG] 📄 list_trips() cridada amb include_stats={include_stats}")
     trips = get_all_trips()
-    print(f"[DEBUG] 📊 Número de trips recuperadas: {len(trips)}")
+    print(f"[DEBUG] 📊 Número de trips recuperades: {len(trips)}")
 
     if include_stats:
         for t in trips:
-            print(f"[DEBUG] Calculando estadísticas para trip_id={t['_id']}")
+            print(f"[DEBUG] Calculant estadístiques per trip_id={t['_id']}")
             stats = get_trip_rating_stats(t["_id"])
             t.update(stats)
     return trips
@@ -77,13 +77,13 @@ def list_trips(include_stats: bool = False):
 
 @router.get("/{trip_id}")
 def get_trip(trip_id: str):
-    print(f"\n[DEBUG] 🔍 get_trip() llamado con trip_id={trip_id}")
+    print(f"\n[DEBUG] 🔍 get_trip() cridada amb trip_id={trip_id}")
     trip = get_trip_by_id(trip_id)
     if not trip:
-        print(f"[ERROR] ❌ Trip no encontrada con ID: {trip_id}")
+        print(f"[ERROR] ❌ Trip no trobada amb ID: {trip_id}")
         raise HTTPException(status_code=404, detail="Trip not found")
 
-    print(f"[DEBUG] 🧮 Calculando avgRating dinámico para {trip_id}")
+    print(f"[DEBUG] 🧮 Calculant avgRating dinàmic per {trip_id}")
     trip.update(get_trip_rating_stats(trip_id))
     return trip
 
@@ -93,8 +93,8 @@ def get_trip(trip_id: str):
 # ============================================================
 @router.post(
     "/",
-    summary="Crear una trip (multipart con JSON + imágenes)",
-    description="Sube una trip con imágenes, puntos y geolocalización.",
+    summary="Crear una trip (multipart amb JSON + imatges)",
+    description="Pujar una trip amb imatges, punts i geolocalització.",
 )
 async def create_trip_multipart(
     trip_json: str = Form(...),
@@ -102,39 +102,39 @@ async def create_trip_multipart(
     gallery: Optional[List[UploadFile]] = File(None),
     point_images: Optional[List[UploadFile]] = File(None),
 ):
-    print("\n[DEBUG] 🚀 create_trip_multipart() llamado")
-    print(f"[DEBUG] trip_json recibido: {trip_json[:300]}...")
+    print("\n[DEBUG] 🚀 create_trip_multipart() cridada")
+    print(f"[DEBUG] trip_json rebut: {trip_json[:300]}...")
 
     try:
         # 1️⃣ Validar JSON
         data = TripCreateIn.model_validate_json(trip_json)
-        print(f"[DEBUG] ✅ JSON parseado correctamente. Título: {data.title}")
+        print(f"[DEBUG] ✅ JSON parsejat correctament. Títol: {data.title}")
 
-        # 2️⃣ Subir imágenes
-        print(f"[DEBUG] 🖼️ Subiendo cover: {cover.filename if cover else 'No cover'}")
+        # 2️⃣ Pujar imatges
+        print(f"[DEBUG] 🖼️ Pujant cover: {cover.filename if cover else 'No cover'}")
         cover_url = upload_image_to_imgbb(cover) if cover else None
 
-        print(f"[DEBUG] 📸 Subiendo {len(gallery or [])} imágenes de galería")
+        print(f"[DEBUG] 📸 Pujant {len(gallery or [])} imatges de galeria")
         gallery_urls = [upload_image_to_imgbb(f) for f in (gallery or [])]
 
-        # 3️⃣ Procesar puntos del recorrido
+        # 3️⃣ Processar punts del recorregut
         points_with_images = []
         for i, p in enumerate(data.trip_points):
-            print(f"\n[DEBUG] ➡️ Procesando punto #{i+1}: {p.title}")
+            print(f"\n[DEBUG] ➡️ Processant punt #{i+1}: {p.title}")
             img_url = None
             if point_images and i < len(point_images) and point_images[i] is not None:
                 print(
-                    f"[DEBUG] 🖼️ Subiendo imagen del punto: {point_images[i].filename}"
+                    f"[DEBUG] 🖼️ Pujant imatge del punt: {point_images[i].filename}"
                 )
                 img_url = upload_image_to_imgbb(point_images[i])
 
             coords = p.coordinates
-            print(f"[DEBUG] 📍 Coordenadas del punto (raw): {coords}")
-            print(f"[DEBUG] 🧩 Tipo de coordenadas: {type(coords)}")
-            location_name = "Ubicación desconocida"
+            print(f"[DEBUG] 📍 Coordenades del punt (raw): {coords}")
+            print(f"[DEBUG] 🧩 Tipus de coordenades: {type(coords)}")
+            location_name = "Ubicació desconeguda"
 
             try:
-                # ✅ Detectar si es dict o modelo
+                # ✅ Detectar si es dict o model
                 if hasattr(coords, "lat") and hasattr(coords, "lng"):
                     lat, lon = coords.lat, coords.lng
                 elif isinstance(coords, dict):
@@ -143,19 +143,19 @@ async def create_trip_multipart(
                 else:
                     lat = lon = None
 
-                print(f"[DEBUG] 🌐 Coordenadas parseadas: lat={lat}, lon={lon}")
+                print(f"[DEBUG] 🌐 Coordenades parsejades: lat={lat}, lon={lon}")
 
                 if lat is not None and lon is not None:
-                    print("[DEBUG] 🌍 Llamando a get_location_name()...")
+                    print("[DEBUG] 🌍 Cridant a get_location_name()...")
                     location_name = get_location_name(lat, lon)
-                    print(f"[DEBUG] 🗺️ Resultado del geocoding: {location_name}")
+                    print(f"[DEBUG] 🗺️ Resultat del geocoding: {location_name}")
                     time.sleep(1)  # evita rate limit
                 else:
-                    print("[DEBUG] ⚠️ No se encontraron coordenadas válidas.")
+                    print("[DEBUG] ⚠️ No s'han coordenades vàlides.")
 
             except Exception as geo_err:
                 print(
-                    f"[ERROR] ❌ Error procesando coordenadas del punto {p.title}: {geo_err}"
+                    f"[ERROR] ❌ Error processant coordenades del punt {p.title}: {geo_err}"
                 )
                 location_name = "Error al geocodificar"
 
@@ -163,8 +163,8 @@ async def create_trip_multipart(
                 {**p.dict(), "image": img_url, "location_name": location_name}
             )
 
-        # 4️⃣ Construir objeto TripModel
-        print(f"\n[DEBUG] 🏗️ Construyendo objeto TripModel para '{data.title}'")
+        # 4️⃣ Construir objecte TripModel
+        print(f"\n[DEBUG] 🏗️ Construint objecte TripModel per '{data.title}'")
         trip_to_store = TripModel(
             title=data.title,
             description=data.description,
@@ -184,13 +184,13 @@ async def create_trip_multipart(
             gallery=gallery_urls,
         )
 
-        # 5️⃣ Guardar en MongoDB
-        print("[DEBUG] 💾 Guardando trip en MongoDB...")
+        # 5️⃣ Guardar a MongoDB
+        print("[DEBUG] 💾 Guardant trip a MongoDB...")
         inserted_id = save_trip(trip_to_store.dict())
-        print(f"[DEBUG] ✅ Trip guardada con ID: {inserted_id}")
+        print(f"[DEBUG] ✅ Trip guardada amb ID: {inserted_id}")
 
         return {
-            "message": "Trip creada correctamente",
+            "message": "Trip creada correctament",
             "trip_id": inserted_id,
             "trip": trip_to_store,
         }
@@ -201,7 +201,7 @@ async def create_trip_multipart(
 
 
 # ============================================================
-# ⭐ Añadir o actualizar valoración
+# ⭐ Afegir o actualizar valoració
 # ============================================================
 @router.post("/{trip_id}/rating")
 def add_trip_rating(
@@ -210,11 +210,11 @@ def add_trip_rating(
     rating: int = Body(..., ge=1, le=5),
 ):
     """
-    Añade o actualiza una valoración (rating) de 1 a 5 para una trip.
+    Afageix o actualitza una valoració (rating) de 1 a 5 per a una trip.
     """
     print(
         f"\n[DEBUG] ⭐ add_trip_rating() -> trip_id={trip_id}, userId={userId}, rating={rating}"
     )
     upsert_rating(trip_id, userId, rating, datetime.utcnow())
-    print("[DEBUG] ✅ Rating guardado o actualizado correctamente")
-    return {"message": "Rating añadido o actualizado"}
+    print("[DEBUG] ✅ Rating guardat o actualizat correctament")
+    return {"message": "Rating afegit o actualizat"}

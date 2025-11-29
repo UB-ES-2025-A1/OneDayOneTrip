@@ -15,14 +15,14 @@ router = APIRouter(prefix="/users", tags=["Users"])
 @router.post("/register")
 async def register_user(data: dict, user=Depends(verify_token)):
     """
-    Guarda un nuevo usuario en Firestore tras registro en Firebase Auth.
-    El frontend envía fullname, username, mail, y el backend completa los defaults.
+    Desa un nou usuari al Firestore després de registre al Firebase Auth.
+    El frontend envia fullname, username, mail, i el backend completa els defaults.
     """
     uid = user.get("uid")
     if not uid:
         raise HTTPException(status_code=400, detail="Token inválido, falta UID")
 
-    # Defaults con valores seguros
+    # Defaults amb valors segurs
     user_data = {
         "uid": uid,
         "data_creacio": datetime.utcnow().isoformat(),
@@ -39,18 +39,18 @@ async def register_user(data: dict, user=Depends(verify_token)):
         "premium": data.get("premium", False),
     }
 
-    print(f"[DEBUG] Creando usuario {uid} con datos: {user_data}")
+    print(f"[DEBUG] Creant usuari {uid} amb dades: {user_data}")
 
-    # 🔸 merge=False asegura que todos los campos se escriban, incluso vacíos
+    # 🔸 merge=False asegura que tots eks camps s'escriguin, inclos vuits
     db.collection("users").document(uid).set(user_data, merge=False)
 
-    return {"message": "Usuario registrado correctamente", "user": user_data}
+    return {"message": "Usuari registrat correctament", "user": user_data}
 
 
 @router.get("/")
 async def get_all_users():
     """
-    Devuelve todos los usuarios si el usuario está autenticado.
+    Retorna tots els usuaris si l'usuari està autenticat.
     """
     docs = db.collection("users").get()
     return [d.to_dict() for d in docs]
@@ -59,23 +59,23 @@ async def get_all_users():
 @router.get("/me")
 async def get_current_user(user=Depends(verify_token)):
     """
-    Devuelve los datos del usuario autenticado.
+    Retorna les dades de l'usuari autenticat.
     """
     uid = user.get("uid")
     doc = db.collection("users").document(uid).get()
     if not doc.exists:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
     return doc.to_dict()
 
 
 @router.get("/{user_id}")
 async def get_current_user_by_id(user_id: str):
     """
-    Devuelve los datos del usuario por su ID.
+    Torna les dades de l'usuari pel vostre ID.
     """
     doc = db.collection("users").document(user_id).get()
     if not doc.exists:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
     return doc.to_dict()
 
 
@@ -216,11 +216,11 @@ async def unsave_trip(user_id: str, trip_id: str):
 @router.post("/{user_id}/publicacions/{trip_id}")
 async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token)):
     """
-    Añade el ID de una ruta a la lista de publicaciones del usuario.
-    Solo el propietario puede modificar sus publicaciones.
+    Afegeix l'ID d'una ruta a la llista de publicacions de l'usuari.
+    Només el propietari pot modificar les vostres publicacions.
     """
 
-    # 🔐 Solo el propio usuario puede modificar su perfil
+    # 🔐 Només l'usuari pot modificar el seu perfil
     if user.get("uid") != user_id:
         raise HTTPException(
             status_code=403, detail="No tens permís per modificar aquest usuari."
@@ -235,10 +235,10 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
     data = snapshot.to_dict()
     publicacions = set(data.get("publicacions", []))
 
-    # 🔹 Añadir la nueva publicación (sin duplicados)
+    # 🔹 Afegir una nova publicació (sense duplicats)
     publicacions.add(str(trip_id))
 
-    # 🔹 Guardar actualización
+    # 🔹 Guardar actualizació
     doc_ref.update({"publicacions": list(publicacions)})
 
     return {
