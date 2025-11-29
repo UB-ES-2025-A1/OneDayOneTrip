@@ -123,9 +123,7 @@ async def create_trip_multipart(
             print(f"\n[DEBUG] ➡️ Processant punt #{i+1}: {p.title}")
             img_url = None
             if point_images and i < len(point_images) and point_images[i] is not None:
-                print(
-                    f"[DEBUG] 🖼️ Pujant imatge del punt: {point_images[i].filename}"
-                )
+                print(f"[DEBUG] 🖼️ Pujant imatge del punt: {point_images[i].filename}")
                 img_url = upload_image_to_imgbb(point_images[i])
 
             coords = p.coordinates
