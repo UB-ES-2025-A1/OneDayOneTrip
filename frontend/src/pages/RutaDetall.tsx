@@ -2,7 +2,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { auth } from "../firebase";
-import "../styles/RutaDetalls.css";
+import "../styles/RutaDetall.gallery.css";
+import "../styles/RutaDetall.header-actions.css";
+import "../styles/RutaDetall.layout.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
 
@@ -261,33 +263,28 @@ export default function RutaDetall() {
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
   
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "10px",
-            }}
-          >
+          <div className="ruta-actions">            
             {/* Esquerra: Rating + Valorar */}
-            <div style={{display: "flex", width: "150%"}}>
+            <div className="ruta-actions-left">
               {tripData.avgRating != null && (
-                <div className="rating-summary">
-                  <span className="rating-star">★</span>
-                  <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
-                  <span className="rating-count">({tripData.numRatings})</span>
-                </div>
-              )}
-              <div style={{display: "flex", gap: "10px"}}>
-              <button
-                className="valorar-button"
-                onClick={() => setShowRatingModal(true)}
-              >
-                <span className="valorar-icon">★</span>
-                Valorar
-              </button>
-
+              <div className="rating-summary">
+                <span className="rating-star">★</span>
+                <span className="rating-value">
+                  {tripData.avgRating.toFixed(1)}
+                </span>
+                <span className="rating-count">
+                  ({tripData.numRatings})
+                </span>
+              </div>
+            )}
+          <div className="ruta-actions-buttons">
+            <button
+              className="valorar-button"
+              onClick={() => setShowRatingModal(true)}
+            >
+              <span className="valorar-icon">★</span>
+              Valorar
+            </button>
             {/* Dreta: Botó Guardar */}
             <button
               type="button"
@@ -383,7 +380,7 @@ export default function RutaDetall() {
         />
       </div>
 
-      {/* 🔥 Component de comentaris */}
+      {/*comentaris */}
       <Comments 
         tripId={tripData._id!} 
         currentUser={currentUser} 
