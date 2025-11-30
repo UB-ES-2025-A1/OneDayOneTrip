@@ -158,82 +158,84 @@ export default function Home() {
         </div>
       )}
 
-            {/* 🔍 Barra de cerca amb filtre + input + lupa */}
-      <div className="search-bar-container">
-        <div className="search-bar">
-          <select
-            className="search-filter-select"
-            value={searchFilter}
-            onChange={(e) => setSearchFilter(e.target.value as any)}
-          >
-            <option value="all">Tot</option>
-            <option value="user">Usuari</option>
-            <option value="country">País</option>
-            <option value="city">Ciutat</option>
-            <option value="monument">Monument</option>
-          </select>
+            {/* Barra de cerca amb filtre + input + lupa */}
+            {currentUser && (
+            <div className="search-bar-container">
+              <div className="search-bar">
+                <select
+                  className="search-filter-select"
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value as any)}
+                >
+                  <option value="all">Tot</option>
+                  <option value="user">Usuari</option>
+                  <option value="country">País</option>
+                  <option value="city">Ciutat</option>
+                  <option value="monument">Monument</option>
+                </select>
 
-          <span className="search-divider" />
+                <span className="search-divider" />
 
-          <input
-            type="text"
-            className="search-input"
-            placeholder={placeholderMap[searchFilter]}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder={placeholderMap[searchFilter]}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
 
-          <Search className="search-icon" size={18} />
-        </div>
-      </div>
-
-
-      <section className="trip-list-section">
-        {loading && <p>Carregant rutes...</p>}
-        {error && <p>{error}</p>}
-
-        {!loading && !error && visibleTrips.length > 0 ? (
-          <MasonryGrid
-            items={visibleTrips.map((t) => ({
-              id: normalizeId(t._id),
-              title: t.title || "Sense títol",
-              img:
-                t.coverImage ||
-                (t.gallery && t.gallery[0]) ||
-                "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-              user: t.author?.name || "Anònim",
-              rating: typeof t.avgRating === "number" ? t.avgRating : 0,
-              temps: t.duration || "—",
-              dificultat: t.difficulty || "—",
-              authorPic: t.author?.profilePic || undefined,
-              city: t.city || "",
-              country: t.country || "",
-            }))}
-            openRegister={() => setModalOpen("register")}
-            currentUser={currentUser}
-          />
-        ) : (
-          !loading &&
-          !error && (
-            <div className="no-trips-message">
-              <img
-                src={
-                  selectedTab === "recomendados"
-                    ? "https://cdn-icons-png.flaticon.com/512/7112/7112926.png"
-                    : "https://cdn-icons-png.flaticon.com/512/4076/4076500.png"
-                }
-                alt="Sense rutes"
-                className="no-trips-icon"
-              />
-              <p>
-                {selectedTab === "recomendados"
-                  ? "Encara no hi ha rutes recomanades per mostrar."
-                  : "Encara no segueixes a ningú, comença a explorar!"}
-              </p>
+                <Search className="search-icon" size={18} />
+              </div>
             </div>
-          )
-        )}
-      </section>
+          )}
+
+
+          <section className="trip-list-section">
+            {loading && <p>Carregant rutes...</p>}
+            {error && <p>{error}</p>}
+
+            {!loading && !error && visibleTrips.length > 0 ? (
+              <MasonryGrid
+                items={visibleTrips.map((t) => ({
+                  id: normalizeId(t._id),
+                  title: t.title || "Sense títol",
+                  img:
+                    t.coverImage ||
+                    (t.gallery && t.gallery[0]) ||
+                    "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
+                  user: t.author?.name || "Anònim",
+                  rating: typeof t.avgRating === "number" ? t.avgRating : 0,
+                  temps: t.duration || "—",
+                  dificultat: t.difficulty || "—",
+                  authorPic: t.author?.profilePic || undefined,
+                  city: t.city || "",
+                  country: t.country || "",
+                }))}
+                openRegister={() => setModalOpen("register")}
+                currentUser={currentUser}
+              />
+            ) : (
+              !loading &&
+              !error && (
+                <div className="no-trips-message">
+                  <img
+                    src={
+                      selectedTab === "recomendados"
+                        ? "https://cdn-icons-png.flaticon.com/512/7112/7112926.png"
+                        : "https://cdn-icons-png.flaticon.com/512/4076/4076500.png"
+                    }
+                    alt="Sense rutes"
+                    className="no-trips-icon"
+                  />
+                  <p>
+                    {selectedTab === "recomendados"
+                      ? "Encara no hi ha rutes recomanades per mostrar."
+                      : "Encara no segueixes a ningú, comença a explorar!"}
+                  </p>
+                </div>
+              )
+            )}
+          </section>
 
       {modalOpen === "login" && (
         <LoginModal
