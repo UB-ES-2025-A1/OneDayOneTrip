@@ -245,6 +245,67 @@
 .input-wrapper button:hover svg {
   color: #2e492e;
 }
+/* ---------- FLOATING LABEL INPUTS ---------- */
+
+.floating-input-group {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* input base, aprofitant auth-input però amb estil floating */
+.floating-input {
+  border-radius: 1rem;
+  background: #ffff;
+  border: 1.5px solid #c4c4c4;
+  font-size: 0.95rem;
+  color: #0d0c22;
+  padding: 0.75rem 2.6rem 0.75rem 3.4rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border 150ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* perquè el placeholder real no es vegi (només el fem servir per :placeholder-shown) */
+.floating-input::placeholder {
+  color: transparent;
+}
+
+/* label flotant */
+.floating-label {
+  position: absolute;
+  left: 3.4rem; /* alineat amb text (després de la icona) */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7a7a7a;
+  pointer-events: none;
+  font-size: 0.9rem;
+  transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #ffffff;
+  padding: 0 0.25em;
+}
+
+/* focus o quan l'input té contingut -> el label puja */
+.floating-input:focus,
+.floating-input:not(:placeholder-shown) {
+  outline: none;
+  border-color: #356a36;
+  box-shadow: 0 0 0 3px rgba(53, 106, 54, 0.15);
+  background-color: #ffffff;
+}
+
+.floating-input:focus + .floating-label,
+.floating-input:not(:placeholder-shown) + .floating-label {
+  transform: translateY(-135%) scale(0.85);
+  color: #356a36;
+}
+
+/* Ajust perquè l'input-icon segueixi quedant bé amb el nou input rounded */
+.floating-input-group .input-icon {
+  border-radius: 1rem 0 0 1rem;
+}
 
 
 /* ---------- RESPONSIVE DESIGN ---------- */
