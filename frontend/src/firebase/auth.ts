@@ -26,8 +26,6 @@ class AuthService {
 
     await updateProfile(user, { displayName: fullname });
 
-
-    // ⚠️ Usamos registerUser() que ya adjunta el token automáticamente
     await registerUser({ fullname, username, mail });
 
     return user;

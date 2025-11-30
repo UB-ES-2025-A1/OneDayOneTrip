@@ -1,8 +1,8 @@
 import { getAuth } from "firebase/auth";
 
-const API_URL = "https://onedayonetrip.onrender.com"; // o 
+// const API_URL = "https://onedayonetrip.onrender.com"; // o 
 
-//url local = http://127.0.0.1:8000 
+const API_URL = "http://127.0.0.1:8000";
 
 // url production = https://onedayonetrip-api.onrender.com
 
@@ -87,7 +87,38 @@ export async function unsaveTrip(userId: string, tripId: string) {
   return apiPost(`/users/unsave/${userId}/${tripId}`, {});
 }
   
-// 📌 Añadir una publicación al usuario
+// Afegir una publicació a l'usuari
 export async function addPublicationToUser(userId: string, tripId: string) {
   return apiPost(`/users/${userId}/publicacions/${tripId}`, {});
+}
+
+
+export async function apiDelete(path: string) {
+  const user = getAuth().currentUser;
+  const token = user ? await user.getIdToken(true) : null; // forceRefresh = true
+
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "DELETE",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) throw new Error(`API Error ${res.status}`);
+  try {
+    return await res.json();
+  } catch {
+    return null; // per si backend retorna 204 sense body
+  }
+}
+
+export async function deleteAccount() {
+  const user = getAuth().currentUser;
+  if (!user) {
+    throw new Error("No hi ha cap usuari autenticat.");
+  }
+
+  const uid = user.uid;
+
+  return apiDelete(`/users/delete/${uid}`);
 }
