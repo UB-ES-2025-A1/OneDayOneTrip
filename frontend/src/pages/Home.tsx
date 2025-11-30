@@ -12,6 +12,7 @@ import Layout from "../components/Layout";
 
 import { getAllTrips, type Trip } from "../api/trips";
 import { getUserById } from "../api/client";
+import { Search } from "lucide-react";
 
 type SearchFilter = "all" | "user" | "country" | "city" | "monument"; // 🔹 nou
 
@@ -157,28 +158,35 @@ export default function Home() {
         </div>
       )}
 
-      {/* 🔹 Contenidor del filtre + buscador */}
+            {/* 🔍 Barra de cerca amb filtre + input + lupa */}
       <div className="search-bar-container">
-        <select
-          className="search-filter-select"
-          value={searchFilter}
-          onChange={(e) => setSearchFilter(e.target.value as SearchFilter)}
-        >
-          <option value="all">Tot</option>
-          <option value="user">Usuari</option>
-          <option value="country">País</option>
-          <option value="city">Ciutat</option>
-          <option value="monument">Monument</option>
-        </select>
+        <div className="search-bar">
+          <select
+            className="search-filter-select"
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value as any)}
+          >
+            <option value="all">Tot</option>
+            <option value="user">Usuari</option>
+            <option value="country">País</option>
+            <option value="city">Ciutat</option>
+            <option value="monument">Monument</option>
+          </select>
 
-        <input
-          type="text"
-          className="search-input"
-          placeholder={placeholderMap[searchFilter]}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+          <span className="search-divider" />
+
+          <input
+            type="text"
+            className="search-input"
+            placeholder={placeholderMap[searchFilter]}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+
+          <Search className="search-icon" size={18} />
+        </div>
       </div>
+
 
       <section className="trip-list-section">
         {loading && <p>Carregant rutes...</p>}
