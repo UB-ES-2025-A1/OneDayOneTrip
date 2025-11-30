@@ -92,7 +92,7 @@ ter-select:focus {
   border-color: #2e492e;
 }
 
-/* Input de cerca */
+/* ---------- SEARCH BAR CONTAINER ---------- */
 .search-bar-container {
   display: flex;
   justify-content: center;
@@ -100,41 +100,72 @@ ter-select:focus {
   padding: 0 1rem;
 }
 
+/* ---------- SEARCH BAR ---------- */
 .search-bar {
   display: flex;
   align-items: center;
   width: 100%;
   max-width: 720px;
-  background-color: #ffffff;   /* Fons blanc sempre */
+
+  background: #ffffff;
   border-radius: 999px;
-  border: 2px solid #ccc;      /* Contorn gris per defecte */
-  padding: 0.2rem 0.75rem;
+
+  /* Contorn més gruixut i més suau */
+  border: 3px solid #d7e2d7;
+
+  padding: 0.45rem 1rem;
   box-sizing: border-box;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+
+  /* Suavitat i elegància */
+  transition: 
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.12s ease;
 }
 
+/* ---------- HOVER I FOCUS ---------- */
+.search-bar:hover {
+  border-color: #356a36;
+  transform: translateY(-1px); /* petit efecte d'elevació */
+}
+
+.search-bar:focus-within {
+  border-color: #356a36;
+  box-shadow: 0 0 0 4px rgba(53, 106, 54, 0.15); /* glow verd molt elegant */
+}
+
+/* ---------- SELECT (Tipus de filtre) ---------- */
 .search-filter-select {
   border: none;
   background: transparent;
   font-size: 0.9rem;
-  color: #444;
+  color: #000;
   outline: none;
   cursor: pointer;
-  padding: 0 0.5rem 0 0.25rem;
+  padding: 0 0.6rem 0 0.2rem;
+  font-weight: 500;
 }
 
+.search-filter-select:hover {
+  color: #000;
+}
+
+/* ---------- DIVISOR ---------- */
 .search-divider {
-  width: 1px;
-  height: 24px;
-  background-color: #ddd;
-  margin: 0 0.5rem;
+  width: 1.5px;
+  height: 25px;
+  background-color: #c4c4c4;
+  margin: 0 0.7rem;
+  border-radius: 4px;
 }
 
+/* ---------- INPUT ---------- */
 .search-input {
   flex: 1;
   border: none;
   outline: none;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  font-weight: 400;
   color: #0d0c22;
   padding: 0.4rem 0;
   background: transparent;
@@ -142,22 +173,27 @@ ter-select:focus {
 
 .search-input::placeholder {
   color: #9e9ea7;
+  font-weight: 400;
 }
 
+/* ---------- ICONA ---------- */
 .search-icon {
   margin-left: 0.5rem;
   flex-shrink: 0;
-  color: #9e9ea7;
-  width: 1rem;
-  height: 1rem;
+  color: #7a7b82;
+  width: 1.1rem;
+  height: 1.1rem;
+  transition: color 0.2s ease;
 }
 
-.search-bar:hover,
-.search-bar:focus-within {
-  border-color: #2e492e;                     
-  box-shadow: 0 0 0 3px rgba(46, 73, 46, 0.2); 
-  background-color: #ffffff !important;       
+.search-bar:hover .search-icon {
+  color: #356a36;
 }
+
+.search-bar:focus-within .search-icon {
+  color: #356a36;
+}
+
 
 /* Responsive */
 @media (max-width: 600px) {
