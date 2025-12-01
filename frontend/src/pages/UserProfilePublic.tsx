@@ -132,6 +132,7 @@ export default function UserProfilePublic() {
   useEffect(() => {
     if (!currentUser || !profile) {
       setImBlocked(false);
+      setBlockStateLoaded(true);
       return;
     }
     const blockedBy = profile.llista_bloquejats || [];
