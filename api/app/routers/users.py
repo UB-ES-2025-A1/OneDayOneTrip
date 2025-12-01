@@ -259,3 +259,17 @@ async def remove_publicacio_llista_publicacions(user_id: str, trip_id: str):
     })
 
     return {"message": "Publicació eliminada", "trip_id": trip_id}
+
+@router.delete("/{user_id}/guardats/{trip_id}")
+async def remove_guardat(user_id: str, trip_id: str):
+    doc_ref = db.collection("users").document(user_id)
+    snapshot = doc_ref.get()
+
+    if not snapshot.exists:
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
+
+    doc_ref.update({
+        "guardades": firestore.ArrayRemove([trip_id])
+    })
+
+    return {"message": "Ruta eliminada de guardats", "trip_id": trip_id}
