@@ -17,13 +17,9 @@ const ConfirmUnblockModal: FC<Props> = ({ open, onClose, onConfirm, username }) 
         <button className="modal-close" onClick={onClose}>
           <X size={20} />
         </button>
-        <h3>Desbloquejar {username || "l'usuari"}?</h3>
+        <h3>Desbloquejar a {username || "l'usuari"}?</h3>
         <p>
-          Si desbloqueges aquest usuari:
-          <ul>
-            <li>Tornarà a poder veure les teves publicacions</li>
-            <li>Pots bloquejar-lo de nou quan vulguis</li>
-          </ul>
+          Si desbloqueges aquest usuari, tornarà a tenir accés a les teves publicacions i tu podràs veure les seves.         
         </p>
         <div className="modal-actions">
           <button className="btn btn-cancel" onClick={onClose}>
