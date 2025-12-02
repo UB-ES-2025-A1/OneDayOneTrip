@@ -25,19 +25,6 @@ export type BackendUser = {
   url_foto_perfil?: string;
   url_foto_panell?: string;
 };
-/*
-type GridItem = {
-  id: string;
-  title: string;
-  img: string;
-  user: string;
-  rating: number;
-  temps: string;
-  dificultat: string;
-  authorPic?: string;
-  city?: string;
-  country?: string;
-};*/
 
 export default function UserProfilePublic() {
   const { id } = useParams();
@@ -56,13 +43,13 @@ export default function UserProfilePublic() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
-  // Detectar usuario logueado
+  // Detectar usuari loguejat
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => setCurrentUser(user));
     return () => unsub();
   }, []);
 
-  // Cargar perfil público y trips
+  // Carregar perfil públic i trips
   useEffect(() => {
     if (!id) return;
 

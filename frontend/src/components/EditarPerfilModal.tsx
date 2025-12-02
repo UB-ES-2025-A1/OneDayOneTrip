@@ -22,7 +22,7 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // Seleccionar archivos
+  // Seleccionar arxius
   const handleFileChange = (
     e: ChangeEvent<HTMLInputElement>,
     setFile: (f: File | null) => void,
@@ -35,7 +35,7 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
     }
   };
 
-  // Guardar cambios (PATCH multipart)
+  // Guardar canvis (PATCH multipart)
   const handleSave = async () => {
     setSaving(true);
     setError("");
@@ -48,7 +48,7 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
         username: username || null,
       };
 
-      // FastAPI requiere user_json como string
+      // FastAPI requereix user_json com string
       formData.append("user_json", JSON.stringify(jsonData));
 
       if (fotoPerfil) formData.append("foto_perfil", fotoPerfil);
@@ -99,7 +99,7 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
 
         {error && <p className="text-red">{error}</p>}
 
-        {/* Nombre + Username */}
+        {/* Nom + Username */}
         <div className="two-columns">
           <div className="form-group">
             <label>Nom complet</label>

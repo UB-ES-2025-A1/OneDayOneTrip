@@ -7,7 +7,7 @@
   color: #1b1b1b;
 }
 
-/* Variantes visuales por página */
+/* Variants visuals per pàgina */
 .layout.home {
   background: #f8f9fa;
 }
@@ -20,25 +20,25 @@
   background: #f8f9fa;
 }
 
-/* Contenedor de contenido principal */
+/* Contenidor de contingut principal */
 .layout-content {
   flex: 1;
   width: 100%;
-  max-width: 98vw;       /* ocupa casi todo el ancho visible */
+  max-width: 98vw;
   margin: 0 auto;
-  padding: 20px 2vw;     /* paddings proporcionales */
+  padding: 20px 2vw;
   box-sizing: border-box;
 }
 
 
-/* Secciones que necesitan ancho completo */
+/* Seccions que necessiten ample complert */
 .full-bleed {
   width: 100vw;
   margin-left: 50%;
   transform: translateX(-50%);
 }
 
-/* Responsividad */
+/* Responsive */
 @media (max-width: 1200px) {
   .layout-content {
     max-width: 1100px;

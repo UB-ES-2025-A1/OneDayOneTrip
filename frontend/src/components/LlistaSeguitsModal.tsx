@@ -32,12 +32,12 @@ export default function LlistaSeguitsModal({
   const [localSeguits, setLocalSeguits] = useState<string[]>(seguits);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Sync al actualizar seguits desde fuera
+  // Sync al actualitzar seguits des de fora
   useEffect(() => {
     setLocalSeguits(seguits);
   }, [seguits]);
 
-  // Cargar datos de los usuarios
+  // Carregar dades dels usuaris
   useEffect(() => {
     if (!open) return;
 
@@ -65,7 +65,7 @@ export default function LlistaSeguitsModal({
     fetchUsers();
   }, [open, localSeguits]);
 
-  // Animaciones
+  // Animacions
   useEffect(() => {
     if (!users || users.length === 0) return;
     const items = gsap.utils.toArray<HTMLElement>(".seguidor-item");
@@ -97,7 +97,7 @@ export default function LlistaSeguitsModal({
               const isFollowing = localSeguits.includes(u.uid);
 
               const handleToggleFollow = async (e: React.MouseEvent) => {
-                e.stopPropagation(); // Evita abrir el perfil al pulsar el botón
+                e.stopPropagation(); // Evitar obrir el perfil al pulsar el botó
 
                 try {
                   if (isFollowing) {
@@ -134,7 +134,7 @@ export default function LlistaSeguitsModal({
                     <p className="seguidor-username">@{u.username || "unknown"}</p>
                   </div>
 
-                  {/* BOTÓN SEGUIR / DEJAR DE SEGUIR */}
+                  {/* BOTÓ SEGUIR / DEIXAR DE SEGUIR */}
                   <button
                     className={
                       isFollowing

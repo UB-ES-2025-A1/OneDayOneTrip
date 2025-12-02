@@ -17,7 +17,7 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [backendUser, setBackendUser] = useState<any | null>(null);
-  const [selectedTab, setSelectedTab] = useState<"recomendados" | "siguiendo">("recomendados");
+  const [selectedTab, setSelectedTab] = useState<"recomenats" | "seguint">("recomenats");
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export default function Home() {
   const handleLogout = async () => {
     await signOut(auth);
     setCurrentUser(null);
-    setSelectedTab("recomendados");
+    setSelectedTab("recomenats");
   };
 
   useEffect(() => {
@@ -65,8 +65,8 @@ export default function Home() {
   }, []);
 
   const filteredTrips = trips.filter((t) => {
-    if (selectedTab === "recomendados") {
-      return true; // Mostrar TODAS las trips
+    if (selectedTab === "recomenats") {
+      return true; // Mostrar TOTES les trips
     }
 
     if (!backendUser?.llista_seguits) return false;
@@ -99,14 +99,14 @@ export default function Home() {
       {currentUser && (
         <div className="tabs-container" data-active={selectedTab}>
           <button
-            className={`tab-btn ${selectedTab === "siguiendo" ? "active" : ""}`}
-            onClick={() => setSelectedTab("siguiendo")}
+            className={`tab-btn ${selectedTab === "seguint" ? "active" : ""}`}
+            onClick={() => setSelectedTab("seguint")}
           >
             Seguint
           </button>
           <button
-            className={`tab-btn ${selectedTab === "recomendados" ? "active" : ""}`}
-            onClick={() => setSelectedTab("recomendados")}
+            className={`tab-btn ${selectedTab === "recomenats" ? "active" : ""}`}
+            onClick={() => setSelectedTab("recomenats")}
           >
             Recomanats
           </button>
@@ -143,7 +143,7 @@ export default function Home() {
             <div className="no-trips-message">
               <img
                 src={
-                  selectedTab === "recomendados"
+                  selectedTab === "recomenats"
                     ? "https://cdn-icons-png.flaticon.com/512/7112/7112926.png"
                     : "https://cdn-icons-png.flaticon.com/512/4076/4076500.png"
                 }
@@ -151,7 +151,7 @@ export default function Home() {
                 className="no-trips-icon"
               />
               <p>
-                {selectedTab === "recomendados"
+                {selectedTab === "recomenats"
                   ? "Encara no hi ha rutes recomanades per mostrar."
                   : "Encara no segueixes a ningú, comença a explorar!"}
               </p>

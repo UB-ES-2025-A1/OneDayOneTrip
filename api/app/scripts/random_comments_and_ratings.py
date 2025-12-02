@@ -4,7 +4,7 @@ import time
 
 API_URL = "http://localhost:8000/trips"
 
-# Algunos nombres y comentarios de ejemplo
+# Alguns noms i comentaris d'exemple
 USER_NAMES = [
     ("uid_001", "Maria"),
     ("uid_002", "Joan"),
@@ -37,9 +37,9 @@ def add_random_comment(trip_id, userId, userName):
     payload = {"userId": userId, "userName": userName, "content": comment}
     resp = requests.post(f"{API_URL}/{trip_id}/comment", json=payload)
     if resp.status_code == 200:
-        print(f"💬 Comentario añadido a {trip_id}: {comment}")
+        print(f"💬 Comentari afegit a {trip_id}: {comment}")
     else:
-        print(f"⚠️ Error al añadir comentario: {resp.text}")
+        print(f"⚠️ Error al afegir comentari: {resp.text}")
 
 
 def add_random_rating(trip_id, userId):
@@ -47,21 +47,21 @@ def add_random_rating(trip_id, userId):
     payload = {"userId": userId, "rating": rating}
     resp = requests.post(f"{API_URL}/{trip_id}/rating", json=payload)
     if resp.status_code == 200:
-        print(f"⭐ Rating {rating} añadido a {trip_id}")
+        print(f"⭐ Rating {rating} afegit a {trip_id}")
     else:
-        print(f"⚠️ Error al añadir rating: {resp.text}")
+        print(f"⚠️ Error al afegir rating: {resp.text}")
 
 
 def populate_all_trips():
     trips = get_all_trips()
-    print(f"🔢 {len(trips)} trips encontradas.")
+    print(f"🔢 {len(trips)} trips trobades.")
     for t in trips:
         trip_id = t["_id"]
-        print(f"\n🚀 Procesando trip: {t.get('title', '(sin título)')}")
+        print(f"\n🚀 Processant trip: {t.get('title', '(sense títol)')}")
         for uid, uname in random.sample(USER_NAMES, k=random.randint(2, 4)):
             add_random_comment(trip_id, uid, uname)
             add_random_rating(trip_id, uid)
-            time.sleep(0.5)  # pequeña pausa para evitar saturar el servidor
+            time.sleep(0.5)  # petita pausa per evitar saturar el servidor
 
 
 if __name__ == "__main__":

@@ -90,7 +90,7 @@ export default function MasonryGrid({
             <div className="overlay">
               <h3 className="masonry-title">{item.title}</h3>
 
-              {/* ⭐ Bloque de valoración */}
+              {/* ⭐ Bloc de valoració */}
               <div className="stars-block">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <span

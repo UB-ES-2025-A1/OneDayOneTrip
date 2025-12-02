@@ -58,7 +58,9 @@ export default function UserProfile() {
 
   const navigate = useNavigate();
 
-  // Cargar usuario y trips
+  // ---------------------------
+  // Carregar usuari i trips
+  // ---------------------------
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       setCurrentUser(fbUser);
@@ -97,7 +99,9 @@ export default function UserProfile() {
     return () => unsub();
   }, []);
 
-  // Funciones
+  // ---------------------------
+  // Funcions
+  // ---------------------------
   const handleLogout = async () => {
     await signOut(auth);
     navigate("/");
@@ -113,7 +117,7 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguidoresModalOpen(true);
     } catch (err) {
-      console.error("Error recargando seguidors:", err);
+      console.error("Error recarregant seguidors:", err);
     }
   };
 
@@ -125,10 +129,11 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguitsModalOpen(true);
     } catch (err) {
-      console.error("Error recargando seguits:", err);
+      console.error("Error recarregant seguits:", err);
     }
   };
 
+  // 🔹 Funció per navegar a altre perfil
   const goToProfile = (uid: string) => {
     navigate(`/user/${uid}`);
     setSeguidoresModalOpen(false);
@@ -152,7 +157,9 @@ export default function UserProfile() {
       country: t.country || "",
     }));
 
-  // Datos visuales derivados
+  // ---------------------------
+  // Derivats visuals
+  // ---------------------------
   const displayName =
     profile?.nom_i_cognoms ||
     currentUser?.displayName ||
@@ -296,8 +303,8 @@ export default function UserProfile() {
               />
             )}
           </section>
-
-          {/* ---------------- Modales ---------------- */}
+          
+          {/* ---------------- Modals ---------------- */}
           {seguitsModalOpen && profile && (
             <LlistaSeguits
               open={seguitsModalOpen}

@@ -33,7 +33,7 @@
   gap: 1.2rem;
 }
 
-/* ---------- TARJETA DEL COMENTARIO ---------- */
+/* ---------- TARGETA DEL COMENTARI ---------- */
 .comentari-item {
   background: white;
   padding: 1rem 1.2rem;
@@ -48,7 +48,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* ---------- CABECERA DEL COMENTARIO ---------- */
+/* ---------- CAPÇALERA DEL COMENTARI ---------- */
 .comentari-header {
   display: flex;
   justify-content: space-between;
@@ -82,7 +82,7 @@
   border-radius: 50%;
 }
 
-/* ---------- TEXTO ---------- */
+/* ---------- TEXT ---------- */
 .comentari-autor {
   font-weight: 600;
   color: #2e492e;
@@ -178,7 +178,7 @@
   padding: 6px 18px;
   border-radius: 999px;
   border: none;
-  background: #2e492e;    /* verd */
+  background: #2e492e;
   color: white;
   font-weight: 600;
   font-size: 0.9rem;

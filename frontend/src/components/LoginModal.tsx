@@ -26,12 +26,12 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
     try {
       setLoading(true);
 
-      // Autenticación con Firebase
+      // Autenticació amb Firebase
       const user = await Auth.login(email, password);
-      console.log("Usuario logueado:", user);
+      console.log("Usuari loguejant:", user);
 
-      onClose(); // Cerramos modal
-      navigate("/"); // Redirigimos al dashboard
+      onClose(); // Tanquem modal
+      navigate("/"); // Redirigim al dashboard
 
     } catch (err: any) {
       console.error("Error en login:", err);

@@ -12,11 +12,11 @@
   z-index: 1000;
 }
 
-/* Tarjeta del formulario */
+/* Targeta del formulari */
 .editar-perfil-card {
   background: #fff;
   border-radius: 20px;
-  width: 900px;            /* 🔥 Más ancho */
+  width: 900px;
   max-width: 95%;
   padding: 40px 50px;
   box-shadow: 0 12px 40px rgba(0,0,0,0.25);
@@ -30,28 +30,28 @@
   overflow-y: auto;
 }
 
-/* Título */
+/* Títol */
 .editar-perfil-card h2 {
   text-align: center;
   font-size: 28px;
   margin-bottom: 10px;
 }
 
-/* Dos columnas perfectamente alineadas */
+/* Duess columnes perfectament alineades */
 .two-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px; /* más espacio entre columnas */
+  gap: 28px;
 }
 
-/* En móvil, una columna */
+/* En mòbil, una columna */
 @media (max-width: 700px) {
   .two-columns {
     grid-template-columns: 1fr;
   }
 }
 
-/* Cada grupo idéntico en altura y estructura */
+/* Cada grup idèntic en alçada i estructura */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -66,7 +66,7 @@
   color: #444;
 }
 
-/* Inputs alineados */
+/* Inputs alineats */
 .form-group input {
   width: 100%;
   padding: 14px 16px;
@@ -74,21 +74,21 @@
   border: 1px solid #ccc;
   font-size: 16px;
   transition: border 0.2s;
-  box-sizing: border-box; /* 🔥 evita desalineación */
+  box-sizing: border-box;
 }
 
-/* Imagenes 100% idénticas */
+/* Imatges 100% idèntiques */
 .preview-img {
   width: 100%;
-  height: 200px;           /* 🔥 tamaño fijo para que no rompan la cuadrícula */
-  object-fit: cover;       /* 🔥 mantiene proporción */
+  height: 200px;
+  object-fit: cover;
   border-radius: 12px;
   margin-top: 6px;
   background: #f2f2f2;
   border: 1px solid #ddd;
 }
 
-/* Botón guardar */
+/* Botó guardar */
 .save-btn {
   background-color: #356a36;
   color: white;
@@ -109,7 +109,7 @@
   opacity: 0.6;
 }
 
-/* Botón cerrar */
+/* Botó tancar */
 .close-btn {
   position: absolute;
   top: 18px;
