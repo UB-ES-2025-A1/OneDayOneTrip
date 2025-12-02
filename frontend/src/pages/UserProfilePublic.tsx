@@ -181,7 +181,6 @@ export default function UserProfilePublic() {
   }, [trips, profile]);
 
   const displayName = profile?.nom_i_cognoms || profile?.username || "Usuari";
-  const photoUrl = profile?.url_foto_perfil || "/images/person.png";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
   const seguidors = profile?.llista_seguidors?.length ?? 0;
