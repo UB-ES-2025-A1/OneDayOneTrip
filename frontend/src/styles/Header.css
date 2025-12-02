@@ -173,3 +173,43 @@
     padding: 0.35rem 0.6rem;
   }
 }
+/* --- Botó de canvi de tema (light / dark) --- */
+
+.theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition:
+    background 0.25s ease,
+    transform 0.18s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
+}
+
+.theme-toggle-btn svg {
+  display: block;
+}
+
+/* Potser el text el vols amagar en pantalles petites */
+@media (max-width: 600px) {
+  .theme-toggle-text {
+    display: none;
+  }
+
+  .theme-toggle-btn {
+    padding: 0.35rem 0.45rem;
+  }
+}
