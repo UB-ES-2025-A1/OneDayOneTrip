@@ -41,7 +41,7 @@
   padding: 6px 0;
   cursor: pointer;
   transition: background 0.2s;
-  border-bottom: 1px solid #eee; /* línea fina elegante */
+  border-bottom: 1px solid #eee;
 }
 
 .seguidor-item:last-child {

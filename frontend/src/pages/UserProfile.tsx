@@ -56,7 +56,7 @@ export default function UserProfile() {
   const navigate = useNavigate();
 
   // ---------------------------
-  // Cargar usuario y trips
+  // Carregar usuari i trips
   // ---------------------------
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
@@ -95,7 +95,7 @@ export default function UserProfile() {
   }, []);
 
   // ---------------------------
-  // Funciones
+  // Funcions
   // ---------------------------
   const handleLogout = async () => {
     await signOut(auth);
@@ -112,7 +112,7 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguidoresModalOpen(true);
     } catch (err) {
-      console.error("Error recargando seguidors:", err);
+      console.error("Error recarregant seguidors:", err);
     }
   };
 
@@ -124,11 +124,11 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguitsModalOpen(true);
     } catch (err) {
-      console.error("Error recargando seguits:", err);
+      console.error("Error recarregant seguits:", err);
     }
   };
 
-  // 🔹 Función para navegar a otro perfil
+  // 🔹 Funció per navegar a altre perfil
   const goToProfile = (uid: string) => {
     navigate(`/user/${uid}`);
     setSeguidoresModalOpen(false);
@@ -150,7 +150,7 @@ export default function UserProfile() {
     }));
 
   // ---------------------------
-  // Derivados visuales
+  // Derivats visuals
   // ---------------------------
   const displayName = profile?.nom_i_cognoms || currentUser?.displayName || profile?.username || "Usuari";
   const displayMail = profile?.mail || currentUser?.email || "";
@@ -267,14 +267,14 @@ export default function UserProfile() {
             )}
           </section>
           
-          {/* ---------------- Modales ---------------- */}
+          {/* ---------------- Modals ---------------- */}
           {seguitsModalOpen && profile && (
             <LlistaSeguits
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
               currentUserId={currentUser.uid}
-              goToProfile={goToProfile} // ✅ AHORA FUNCIONA NAVEGACIÓN
+              goToProfile={goToProfile}
             />
           )}
 
@@ -283,7 +283,7 @@ export default function UserProfile() {
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
               seguidors={profile.llista_seguidors || []}
-              goToProfile={goToProfile} // ✅ Navegación también aquí
+              goToProfile={goToProfile}
             />
           )}
 

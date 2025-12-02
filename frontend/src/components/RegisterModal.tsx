@@ -37,7 +37,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
     try {
       setLoading(true);
 
-      // Registramos al usuario con Firebase Auth + Firestore
+      // Registrem a l'usuari amb Firebase Auth + Firestore
       await Auth.register(fullName, username, email, password);
 
 
