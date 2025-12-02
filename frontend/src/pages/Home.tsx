@@ -87,6 +87,7 @@ export default function Home() {
       onRegister={() => setModalOpen("register")}
       variant="home"
     >
+      <div className="home">
       <Carousel />
       <section className="intro-text">
         <p>Descobreix rutes d’un dia ideals per escapades exprés!</p>
@@ -168,6 +169,7 @@ export default function Home() {
       {modalOpen === "register" && (
         <RegisterModal onClose={() => setModalOpen(null)} openLogin={() => setModalOpen("login")} />
       )}
+    </div>
     </Layout>
   );
 }

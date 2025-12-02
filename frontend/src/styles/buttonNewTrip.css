@@ -1,7 +1,6 @@
 .create-card {
   min-height: 220px; 
   border-radius: 16px;
-  background-color: #ffffff;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   border: 2px dashed #2e492e;
   display: flex;
@@ -16,7 +15,6 @@
 .create-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  background-color: #f7fcf7;
 }
 
 .create-card-content {
