@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
 import { getUserById, followUser, unfollowUser } from "../api/client";
-import "../styles/SeguidoresModal.css";
+import "../styles/LlistaSeguits.css";
 
 interface BackendUser {
   uid: string;
@@ -118,6 +118,7 @@ export default function LlistaSeguitsModal({
                   className="seguidor-item"
                   onClick={() => goToProfile?.(u.uid)}
                 >
+                  
                   <img
                     src={u.url_foto_perfil || "/images/default-profile.png"}
                     className="seguidor-foto"
