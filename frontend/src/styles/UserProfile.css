@@ -380,3 +380,118 @@
     font-size: 0.9rem;
   }
 }
+
+/* ---------- MODAL OVERLAY ---------- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5); /* semi-transparente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  animation: fadeInOverlay 0.3s forwards;
+}
+
+/* ---------- ANIMACIÓN DE APARICIÓN ---------- */
+@keyframes fadeInOverlay {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUpModal {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ---------- MODAL CONTENT ---------- */
+.modal-content {
+  background: rgba(255, 255, 255, 0.95); /* semi-transparente */
+  border-radius: 12px; /* opcional: puedes poner 0 si quieres sin esquinas redondeadas */
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  text-align: center;
+  color: #111; /* texto profesional */
+  font-family: "Inter", "Segoe UI", Tahoma, sans-serif; /* tipografía moderna */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3); /* sombra para separar del fondo */
+  backdrop-filter: blur(5px);
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideUpModal 0.3s forwards;
+  transition: all 0.2s ease;
+  border: none; /* quitamos cualquier borde */
+}
+
+/* Intensificar al pasar el ratón */
+.modal-content:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+/* ---------- BOTÓN CERRAR ---------- */
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: rgba(0,0,0,0.05);
+  border-radius: 50%;
+  padding: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+/* ---------- BOTONES ACCIÓN ---------- */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Inter", "Segoe UI", Tahoma, sans-serif;
+  border: none; /* quitamos borde */
+}
+
+/* CANCELAR */
+.btn-cancel {
+  background: rgba(224,224,224,0.8);
+  color: #333;
+}
+
+.btn-cancel:hover {
+  background: rgba(224,224,224,1);
+}
+
+/* CONFIRMAR */
+.btn-confirm {
+  background: rgba(198, 40, 40, 0.85);
+  color: white;
+}
+
+.btn-confirm:hover {
+  background: rgba(198, 40, 40, 1);
+}

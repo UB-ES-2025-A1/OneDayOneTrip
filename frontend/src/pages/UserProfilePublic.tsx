@@ -10,6 +10,8 @@ import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
 import LlistaSeguidorsModal from "../components/LlistaSeguidorsModal";
+import ConfirmBlockModal from "../components/ConfirmBlockModal";
+
 
 export type BackendUser = {
   uid: string;
@@ -49,6 +51,8 @@ export default function UserProfilePublic() {
   const [blockStateLoaded, setBlockStateLoaded] = useState(false);
 
   const profileHidden = isBlocked || imBlocked;
+  const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
+
 
   // 🔹 Detectar usuario logueado
   useEffect(() => {
@@ -265,13 +269,23 @@ export default function UserProfilePublic() {
             {currentUser && currentUser.uid !== profile.uid && !imBlocked && (
               <button
                 className={`block-button ${isBlocked ? "blocked" : ""}`}
-                disabled={blockLoading}
-                onClick={handleBlock}
+                onClick={() => setConfirmBlockOpen(true)}
                 title={isBlocked ? "Desbloquejar usuari" : "Bloquejar usuari"}
               >
                 <UserX size={22} />
               </button>
             )}
+
+            <ConfirmBlockModal
+              open={confirmBlockOpen}
+              onClose={() => setConfirmBlockOpen(false)}
+              onConfirm={() => {
+                handleBlock(); // tu función de bloquear
+                setConfirmBlockOpen(false);
+              }}
+              username={profile?.username || profile?.nom_i_cognoms}
+            />
+
 
             <div className="user-photo">
               <img src={photoUrl} alt="Foto de perfil" />
