@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
 import { getUserById, followUser, unfollowUser } from "../api/client";
-import "../styles/SeguidoresModal.css";
+import "../styles/LlistaSeguits.css";
+import AvatarFallback from "../components/AvatarFallback";
+
 
 interface BackendUser {
   uid: string;
@@ -30,12 +32,12 @@ export default function LlistaSeguitsModal({
   const [localSeguits, setLocalSeguits] = useState<string[]>(seguits);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // 🔄 Sync al actualitzar seguits des de fora
+  // Sync al actualitzar seguits des de fora
   useEffect(() => {
     setLocalSeguits(seguits);
   }, [seguits]);
 
-  // 🔍 Carregar dades dels usuaris
+  // Carregar dades dels usuaris
   useEffect(() => {
     if (!open) return;
 
@@ -63,7 +65,7 @@ export default function LlistaSeguitsModal({
     fetchUsers();
   }, [open, localSeguits]);
 
-  // ✨ Animacions
+  // Animacions
   useEffect(() => {
     if (!users || users.length === 0) return;
     const items = gsap.utils.toArray<HTMLElement>(".seguidor-item");
@@ -95,7 +97,7 @@ export default function LlistaSeguitsModal({
               const isFollowing = localSeguits.includes(u.uid);
 
               const handleToggleFollow = async (e: React.MouseEvent) => {
-                e.stopPropagation(); // ❗ Evitar obrir el perfil al pulsar el botó
+                e.stopPropagation(); // Evitar obrir el perfil al pulsar el botó
 
                 try {
                   if (isFollowing) {
@@ -118,18 +120,21 @@ export default function LlistaSeguitsModal({
                   className="seguidor-item"
                   onClick={() => goToProfile?.(u.uid)}
                 >
-                  <img
-                    src={u.url_foto_perfil || "/images/default-profile.png"}
-                    className="seguidor-foto"
-                    alt={u.username || "usuari"}
-                  />
+                  
+                  <div className="seguidor-foto">
+                    {u.url_foto_perfil ? (
+                      <img src={u.url_foto_perfil} alt={u.username || "usuari"} />
+                      ) : (
+                      <AvatarFallback name={u.nom_i_cognoms || u.username || "?"} />
+                    )}
+                  </div>
 
                   <div className="seguidor-info">
                     <p className="seguidor-nom">{u.nom_i_cognoms || "Usuari"}</p>
                     <p className="seguidor-username">@{u.username || "unknown"}</p>
                   </div>
 
-                  {/* 🔘 BOTÓ SEGUIR / DEIXAR DE SEGUIR */}
+                  {/* BOTÓ SEGUIR / DEIXAR DE SEGUIR */}
                   <button
                     className={
                       isFollowing

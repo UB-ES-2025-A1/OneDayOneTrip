@@ -10,6 +10,7 @@ import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
 import LlistaSeguidorsModal from "../components/LlistaSeguidorsModal";
+import AvatarFallback from "../components/AvatarFallback"; 
 
 export type BackendUser = {
   uid: string;
@@ -167,7 +168,6 @@ export default function UserProfilePublic() {
   }, [trips, profile]);
 
   const displayName = profile?.nom_i_cognoms || profile?.username || "Usuari";
-  const photoUrl = profile?.url_foto_perfil || "/images/person.png";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
   const seguidors = profile?.llista_seguidors?.length ?? 0;
@@ -204,7 +204,11 @@ export default function UserProfilePublic() {
             }}
           >
             <div className="user-photo">
-              <img src={photoUrl} alt="Foto de perfil" />
+              {profile.url_foto_perfil ? (
+                <img src={profile.url_foto_perfil} alt="Foto de perfil" />
+              ) : (
+                <AvatarFallback name={displayName} />
+              )}
             </div>
 
             <div className="user-details">
