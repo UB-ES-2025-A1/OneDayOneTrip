@@ -508,3 +508,17 @@
 .btn-confirm-unblock:hover {
   background: rgba(30, 136, 229, 1);
 }
+
+.user-initials {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #858484;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+  margin: auto;
+}

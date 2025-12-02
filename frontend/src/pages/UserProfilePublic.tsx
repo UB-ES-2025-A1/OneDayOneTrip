@@ -245,9 +245,17 @@ export default function UserProfilePublic() {
       }));
   }, [trips, profile]);
 
-  const displayName = imBlocked ? "Usuari desconegut" : (profile?.nom_i_cognoms || profile?.username || "Usuari");
-  const photoUrl = imBlocked ? "/images/person.png" : (profile?.url_foto_perfil || "/images/person.png");
-  const panelUrl = imBlocked ? "/images/ny.jpg" : (profile?.url_foto_panell || "/images/ny.jpg");
+  const displayName = profileHidden
+    ? "Usuari desconegut"
+    : profile?.nom_i_cognoms || profile?.username || "Usuari";
+
+  const photoUrl = profileHidden
+    ? "" // no mostrar foto si bloqueado
+    : profile?.url_foto_perfil || "/images/person.png";
+
+  const panelUrl = profileHidden
+    ? "" // no mostrar panel si bloqueado
+    : profile?.url_foto_panell || "/images/ny.jpg";
 
   const seguidors = profile?.llista_seguidors?.length ?? 0;
   const seguits = profile?.llista_seguits?.length ?? 0;
@@ -279,22 +287,19 @@ export default function UserProfilePublic() {
           <div
             className="user-profile"
             style={{
-              background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${panelUrl}) center/cover no-repeat`,
+              background: profileHidden
+                ? "rgba(74, 73, 73, 0.67)" // fondo neutro si bloqueado con transparencia
+                : `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url(${panelUrl}) center/cover no-repeat`, // menos oscuro y ligeramente transparente
               position: "relative",
             }}
           >
-            {/* ICONO BLOQUEAR ARRIBA DERECHA */}
             {currentUser && currentUser.uid !== profile.uid && !imBlocked && (
               <button
                 className={`block-button ${isBlocked ? "blocked" : ""}`}
                 onClick={() => {
-                  if (!isBlocked) {
-                    setConfirmBlockOpen(true); // abrir modal de bloquear
-                  } else {
-                    setConfirmUnblockOpen(true); // abrir modal de desbloquear
-                  }
+                  if (!isBlocked) setConfirmBlockOpen(true);
+                  else setConfirmUnblockOpen(true);
                 }}
-
                 title={isBlocked ? "Desbloquejar usuari" : "Bloquejar usuari"}
               >
                 <UserX size={22} />
@@ -322,14 +327,17 @@ export default function UserProfilePublic() {
             />
 
             <div className="user-photo">
-              <img src={photoUrl} alt="Foto de perfil" />
+              {profileHidden ? (
+                <div className="user-initials">{displayName[0]}</div>
+              ) : (
+                <img src={photoUrl} alt="Foto de perfil" />
+              )}
             </div>
 
             <div className="user-details">
               <div className="user-info">
                 <h2>{displayName}</h2>
 
-                {/* BOTÓN SEGUIR DEBAJO DEL NOMBRE */}
                 {currentUser && currentUser.uid !== profile.uid && !imBlocked && (
                   <button
                     className={`follow-button ${isFollowing ? "following" : ""}`}
@@ -395,7 +403,8 @@ export default function UserProfilePublic() {
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
-              goToProfile={goToProfile} currentUserId={""} />
+              goToProfile={goToProfile} currentUserId={""}
+            />
           )}
 
           {seguidoresModalOpen && profile && !isBlocked && (
