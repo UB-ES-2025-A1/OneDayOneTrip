@@ -60,6 +60,10 @@ export default function UserProfilePublic() {
   // 🔹 estat bloqueig
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockLoading, setBlockLoading] = useState(false);
+  const [imBlocked, setImBlocked] = useState(false);
+  const [blockStateLoaded, setBlockStateLoaded] = useState(false);
+  const profileHidden = isBlocked || imBlocked;
+
 
   // Detectar usuario logueado
   useEffect(() => {
@@ -124,6 +128,18 @@ export default function UserProfilePublic() {
     setIsBlocked(blocked.includes(currentUser.uid));
   }, [currentUser, profile]);
 
+  // 🔹 Saber si el currentUser ha estat bloquejat pel propietari d'aquest perfil
+  useEffect(() => {
+    if (!currentUser || !profile) {
+      setImBlocked(false);
+      setBlockStateLoaded(true);
+      return;
+    }
+    const blockedBy = profile.llista_bloquejats || [];
+    setImBlocked(blockedBy.includes(currentUser.uid));
+    setBlockStateLoaded(true);
+  }, [currentUser, profile]);
+
   // 🔹 Seguir / deixar de seguir (mateixa lògica que RutaDetall)
   const handleFollow = async () => {
     if (!currentUser) {
@@ -131,6 +147,12 @@ export default function UserProfilePublic() {
       return;
     }
     if (!profile) return;
+
+    // No permetre seguir si aquest usuari està bloquejat pel currentUser
+    if (isBlocked) {
+      alert("No pots seguir un usuari que has bloquejat.");
+      return;
+    }
 
     const userId = currentUser.uid;
     const targetId = profile.uid;
@@ -173,7 +195,7 @@ export default function UserProfilePublic() {
     }
   };
 
-// 🔹 Bloquejar / desbloquejar
+  // 🔹 Bloquejar / desbloquejar
   const handleBlock = async () => {
     if (!currentUser) {
       alert("Has d'iniciar sessió per bloquejar usuaris");
@@ -255,9 +277,9 @@ export default function UserProfilePublic() {
       }));
   }, [trips, profile]);
 
-  const displayName = profile?.nom_i_cognoms || profile?.username || "Usuari";
-  const photoUrl = profile?.url_foto_perfil || "/images/person.png";
-  const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
+  const displayName = imBlocked ? "Usuari desconegut" : (profile?.nom_i_cognoms || profile?.username || "Usuari");
+  const photoUrl = imBlocked ? "/images/person.png" : (profile?.url_foto_perfil || "/images/person.png");
+  const panelUrl = imBlocked ? "/images/ny.jpg" : (profile?.url_foto_panell || "/images/ny.jpg");
 
   const seguidors = profile?.llista_seguidors?.length ?? 0;
   const seguits = profile?.llista_seguits?.length ?? 0;
@@ -284,7 +306,7 @@ export default function UserProfilePublic() {
       {loading && <div className="loading-state">Carregant...</div>}
       {error && !loading && <div className="error-state">{error}</div>}
 
-      {profile && !loading && (
+      {profile && !loading && blockStateLoaded && (
         <>
           <div
             className="user-profile"
@@ -301,18 +323,19 @@ export default function UserProfilePublic() {
                 <h2>{displayName}</h2>
 
                 {/* 🔹 BOTÓ SEGUIR SOTA EL NOM */}
-                {currentUser && currentUser.uid !== profile.uid && (
+                {currentUser && currentUser.uid !== profile.uid && !imBlocked && (
                   <button
                     className={`follow-button ${isFollowing ? "following" : ""}`}
-                    disabled={followLoading}
+                    disabled={followLoading || isBlocked}
                     onClick={handleFollow}
+                    title={isBlocked ? "Has bloquejat aquest usuari" : undefined}
                   >
                     {isFollowing ? "Seguint" : "Seguir"}
                   </button>
                 )}
                 
                 {/* 🔹 BOTÓ BLOQUEJAR SOTA EL NOM */}
-                {currentUser && currentUser.uid !== profile.uid && (
+                {currentUser && currentUser.uid !== profile.uid && !imBlocked && (
                   <button
                     className={`follow-button block-button ${isBlocked ? "blocked" : ""}`}
                     disabled={blockLoading}
@@ -325,23 +348,23 @@ export default function UserProfilePublic() {
 
               <div className="user-stats">
                 <div
-                  className="stat"
-                  onClick={() => setSeguidoresModalOpen(true)}
+                  className={`stat ${profileHidden ? "blocked" : ""}`}
+                  onClick={() => !profileHidden && setSeguidoresModalOpen(true)}
                 >
-                  <span className="number">{seguidors}</span>
+                  <span className="number">{profileHidden ? "?" : seguidors}</span>
                   <span className="label">Seguidors</span>
                 </div>
 
                 <div
-                  className="stat"
-                  onClick={() => setSeguitsModalOpen(true)}
+                  className={`stat ${profileHidden ? "blocked" : ""}`}
+                  onClick={() => !profileHidden && setSeguitsModalOpen(true)}
                 >
-                  <span className="number">{seguits}</span>
+                  <span className="number">{profileHidden ? "?" : seguits}</span>
                   <span className="label">Seguits</span>
                 </div>
 
-                <div className="stat">
-                  <span className="number">{publicacionsItems.length}</span>
+                <div className={`stat ${profileHidden ? "blocked" : ""}`}>
+                  <span className="number">{profileHidden ? "?" : publicacionsItems.length}</span>
                   <span className="label">Publicacions</span>
                 </div>
               </div>
@@ -353,24 +376,41 @@ export default function UserProfilePublic() {
           </div>
 
           <section className="trip-list">
-            <MasonryGrid
-              items={publicacionsItems}
-              currentUser={currentUser}
-              openRegister={() =>
-                alert("Has de iniciar sessió per interactuar")
-              }
-              showCreateButton={false}
-            />
+            {isBlocked ? (
+              // CurrentUser ha bloquejat l'usuari
+              <div className="empty-state">
+                <h3>Has bloquejat aquest usuari.</h3>
+              </div>
 
-            {publicacionsItems.length === 0 && (
+            ) : imBlocked ? (
+              // CurrentUser està bloquejat per l'usuari
               <div className="empty-state">
                 <ImageOff className="empty-icon" size={60} />
                 <h3>No hi ha publicacions.</h3>
               </div>
+
+            ) : (
+              <>
+                <MasonryGrid
+                  items={publicacionsItems}
+                  currentUser={currentUser}
+                  openRegister={() =>
+                    alert("Has de iniciar sessió per interactuar")
+                  }
+                  showCreateButton={false}
+                />
+
+                {publicacionsItems.length === 0 && (
+                  <div className="empty-state">
+                    <ImageOff className="empty-icon" size={60} />
+                    <h3>No hi ha publicacions.</h3>
+                  </div>
+                )}
+              </>
             )}
           </section>
 
-          {seguitsModalOpen && profile && (
+          {seguitsModalOpen && profile && !isBlocked && (
             <LlistaSeguitsModal
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
@@ -378,7 +418,7 @@ export default function UserProfilePublic() {
               goToProfile={goToProfile} currentUserId={""}            />
           )}
 
-          {seguidoresModalOpen && profile && (
+          {seguidoresModalOpen && profile && !isBlocked && (
             <LlistaSeguidorsModal
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
