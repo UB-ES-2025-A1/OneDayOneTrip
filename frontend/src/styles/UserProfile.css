@@ -495,3 +495,16 @@
 .btn-confirm:hover {
   background: rgba(198, 40, 40, 1);
 }
+
+
+/* CONFIRMAR DESBLOQUEO */
+.btn-confirm-unblock {
+  background: rgba(30, 136, 229, 0.85); /* azul elegante */
+  color: white;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-confirm-unblock:hover {
+  background: rgba(30, 136, 229, 1);
+}

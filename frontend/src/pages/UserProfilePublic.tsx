@@ -11,7 +11,7 @@ import Layout from "../components/Layout";
 import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
 import LlistaSeguidorsModal from "../components/LlistaSeguidorsModal";
 import ConfirmBlockModal from "../components/ConfirmBlockModal";
-
+import ConfirmUnblockModal from "../components/ConfirmUnblockModal";
 
 export type BackendUser = {
   uid: string;
@@ -51,8 +51,10 @@ export default function UserProfilePublic() {
   const [blockStateLoaded, setBlockStateLoaded] = useState(false);
 
   const profileHidden = isBlocked || imBlocked;
-  const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
 
+  // Estados de modales
+  const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
+  const [confirmUnblockOpen, setConfirmUnblockOpen] = useState(false);
 
   // 🔹 Detectar usuario logueado
   useEffect(() => {
@@ -129,7 +131,7 @@ export default function UserProfilePublic() {
     setBlockStateLoaded(true);
   }, [currentUser, profile]);
 
-  // 🔹 Seguir / deixar de seguir
+  // 🔹 Seguir / dejar de seguir
   const handleFollow = async () => {
     if (!currentUser || !profile) return;
     if (isBlocked) return alert("No pots seguir un usuari que has bloquejat.");
@@ -163,7 +165,7 @@ export default function UserProfilePublic() {
     }
   };
 
-  // 🔹 Bloquejar / desbloquejar
+  // 🔹 Bloquear
   const handleBlock = async () => {
     if (!currentUser || !profile) return;
 
@@ -187,18 +189,34 @@ export default function UserProfilePublic() {
               }
             : prev
         );
-      } else {
-        await unblockUser(userId, targetId);
-        setIsBlocked(false);
-        setProfile((prev) =>
-          prev
-            ? {
-                ...prev,
-                llista_bloquejadors: (prev.llista_bloquejadors || []).filter((uid) => uid !== userId),
-              }
-            : prev
-        );
       }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setBlockLoading(false);
+    }
+  };
+
+  // 🔹 Desbloquear
+  const handleUnblock = async () => {
+    if (!currentUser || !profile) return;
+
+    try {
+      setBlockLoading(true);
+      const userId = currentUser.uid;
+      const targetId = profile.uid;
+
+      await unblockUser(userId, targetId);
+      setIsBlocked(false);
+
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              llista_bloquejadors: (prev.llista_bloquejadors || []).filter((uid) => uid !== userId),
+            }
+          : prev
+      );
     } catch (err) {
       console.error(err);
     } finally {
@@ -269,7 +287,14 @@ export default function UserProfilePublic() {
             {currentUser && currentUser.uid !== profile.uid && !imBlocked && (
               <button
                 className={`block-button ${isBlocked ? "blocked" : ""}`}
-                onClick={() => setConfirmBlockOpen(true)}
+                onClick={() => {
+                  if (!isBlocked) {
+                    setConfirmBlockOpen(true); // abrir modal de bloquear
+                  } else {
+                    setConfirmUnblockOpen(true); // abrir modal de desbloquear
+                  }
+                }}
+
                 title={isBlocked ? "Desbloquejar usuari" : "Bloquejar usuari"}
               >
                 <UserX size={22} />
@@ -280,12 +305,21 @@ export default function UserProfilePublic() {
               open={confirmBlockOpen}
               onClose={() => setConfirmBlockOpen(false)}
               onConfirm={() => {
-                handleBlock(); // tu función de bloquear
+                handleBlock();
                 setConfirmBlockOpen(false);
               }}
               username={profile?.username || profile?.nom_i_cognoms}
             />
 
+            <ConfirmUnblockModal
+              open={confirmUnblockOpen}
+              onClose={() => setConfirmUnblockOpen(false)}
+              onConfirm={() => {
+                handleUnblock();
+                setConfirmUnblockOpen(false);
+              }}
+              username={profile?.username || profile?.nom_i_cognoms}
+            />
 
             <div className="user-photo">
               <img src={photoUrl} alt="Foto de perfil" />
