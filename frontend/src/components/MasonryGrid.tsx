@@ -4,6 +4,7 @@ import "../styles/MasonryGrid.css";
 import { type User } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import ButtonNewTrip from "./ButtonNewTrip";
+import {MapPin} from "lucide-react";
 
 
 interface MasonryItem {
@@ -130,11 +131,7 @@ export default function MasonryGrid({
               </div>
 
               <div className="meta-location">
-                <img
-                  src="/images/ubi.png"
-                  alt="Ubicació"
-                  className="meta-icon"
-                />
+                  <MapPin className="meta-icon" size={16} />                
                 <span>
                   {item.city
                     ? `${item.city}${item.country ? `, ${item.country}` : ""}`
