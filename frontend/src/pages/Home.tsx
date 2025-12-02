@@ -14,7 +14,7 @@ import { getAllTrips, type Trip } from "../api/trips";
 import { getUserById } from "../api/client";
 import { Search } from "lucide-react";
 
-type SearchFilter = "all" | "user" | "country" | "city" | "monument"; // 🔹 nou
+type SearchFilter = "all" | "user" | "country" | "city" | "monument";
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
@@ -25,8 +25,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [searchTerm, setSearchTerm] = useState("");                // 🔹 nou (ja el tenies)
-  const [searchFilter, setSearchFilter] = useState<SearchFilter>("all"); // 🔹 nou
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchFilter, setSearchFilter] = useState<SearchFilter>("all");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -69,7 +69,6 @@ export default function Home() {
     fetchTrips();
   }, []);
 
-  // 🔹 Primer filtre per "Seguint / Recomanats"
   const filteredTrips = trips.filter((t) => {
     if (selectedTab === "recomendados") {
       return true; // Mostrar totes les trips
@@ -81,7 +80,6 @@ export default function Home() {
     return backendUser.llista_seguits.includes(authorId);
   });
 
-  // 🔹 Després filtre per text + tipus de filtre
   const search = searchTerm.trim().toLowerCase();
 
   const visibleTrips = filteredTrips.filter((t) => {
@@ -100,7 +98,7 @@ export default function Home() {
       case "city":
         return city.includes(search);
       case "monument":
-        // aquí assumim que el "monument" és principalment el títol de la ruta
+        // assumim que el "monument" es correspon sobretot amb el títol
         return title.includes(search);
       case "all":
       default:
@@ -112,6 +110,8 @@ export default function Home() {
         );
     }
   });
+
+  const isFiltering = search.length > 0 || searchFilter !== "all";
 
   const normalizeId = (id: any) =>
     typeof id === "string" ? id : id?.$oid || String(id || "");
@@ -133,6 +133,7 @@ export default function Home() {
       variant="home"
     >
       <Carousel />
+
       <section className="intro-text">
         <p>Descobreix rutes d’un dia ideals per escapades exprés!</p>
         <p>
@@ -158,84 +159,87 @@ export default function Home() {
         </div>
       )}
 
-            {/* Barra de cerca amb filtre + input + lupa */}
-            {currentUser && (
-            <div className="search-bar-container">
-              <div className="search-bar">
-                <select
-                  className="search-filter-select"
-                  value={searchFilter}
-                  onChange={(e) => setSearchFilter(e.target.value as any)}
-                >
-                  <option value="all">Tot</option>
-                  <option value="user">Usuari</option>
-                  <option value="country">País</option>
-                  <option value="city">Ciutat</option>
-                  <option value="monument">Monument</option>
-                </select>
+      {/* Barra de cerca amb filtre + input + lupa (només per usuaris loguejats) */}
+      {currentUser && (
+        <div className="search-bar-container">
+          <div className="search-bar">
+            <select
+              className="search-filter-select"
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value as SearchFilter)}
+            >
+              <option value="all">Tot</option>
+              <option value="user">Usuari</option>
+              <option value="country">País</option>
+              <option value="city">Ciutat</option>
+              <option value="monument">Monument</option>
+            </select>
 
-                <span className="search-divider" />
+            <span className="search-divider" />
 
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder={placeholderMap[searchFilter]}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+            <input
+              type="text"
+              className="search-input"
+              placeholder={placeholderMap[searchFilter]}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
 
-                <Search className="search-icon" size={18} />
-              </div>
-            </div>
-          )}
+            <Search className="search-icon" size={18} />
+          </div>
+        </div>
+      )}
 
+      <section className="trip-list-section">
+        {loading && <p>Carregant rutes...</p>}
+        {error && <p>{error}</p>}
 
-          <section className="trip-list-section">
-            {loading && <p>Carregant rutes...</p>}
-            {error && <p>{error}</p>}
-
-            {!loading && !error && visibleTrips.length > 0 ? (
-              <MasonryGrid
-                items={visibleTrips.map((t) => ({
-                  id: normalizeId(t._id),
-                  title: t.title || "Sense títol",
-                  img:
-                    t.coverImage ||
-                    (t.gallery && t.gallery[0]) ||
-                    "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-                  user: t.author?.name || "Anònim",
-                  rating: typeof t.avgRating === "number" ? t.avgRating : 0,
-                  temps: t.duration || "—",
-                  dificultat: t.difficulty || "—",
-                  authorPic: t.author?.profilePic || undefined,
-                  city: t.city || "",
-                  country: t.country || "",
-                }))}
-                openRegister={() => setModalOpen("register")}
-                currentUser={currentUser}
+        {!loading && !error && visibleTrips.length > 0 ? (
+          <MasonryGrid
+            items={visibleTrips.map((t) => ({
+              id: normalizeId(t._id),
+              title: t.title || "Sense títol",
+              img:
+                t.coverImage ||
+                (t.gallery && t.gallery[0]) ||
+                "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
+              user: t.author?.name || "Anònim",
+              rating: typeof t.avgRating === "number" ? t.avgRating : 0,
+              temps: t.duration || "—",
+              dificultat: t.difficulty || "—",
+              authorPic: t.author?.profilePic || undefined,
+              city: t.city || "",
+              country: t.country || "",
+            }))}
+            openRegister={() => setModalOpen("register")}
+            currentUser={currentUser}
+          />
+        ) : (
+          !loading &&
+          !error && (
+            <div className="no-trips-message">
+              <img
+                src={
+                  isFiltering
+                    ? "https://static.vecteezy.com/system/resources/previews/027/771/065/non_2x/reject-icon-image-vector.jpg" // icona “sense resultats”
+                    : selectedTab === "recomendados"
+                    ? "https://cdn-icons-png.flaticon.com/512/7112/7112926.png"
+                    : "https://cdn-icons-png.flaticon.com/512/4076/4076500.png"
+                }
+                alt="Sense rutes"
+                className="no-trips-icon"
               />
-            ) : (
-              !loading &&
-              !error && (
-                <div className="no-trips-message">
-                  <img
-                    src={
-                      selectedTab === "recomendados"
-                        ? "https://cdn-icons-png.flaticon.com/512/7112/7112926.png"
-                        : "https://cdn-icons-png.flaticon.com/512/4076/4076500.png"
-                    }
-                    alt="Sense rutes"
-                    className="no-trips-icon"
-                  />
-                  <p>
-                    {selectedTab === "recomendados"
-                      ? "Encara no hi ha rutes recomanades per mostrar."
-                      : "Encara no segueixes a ningú, comença a explorar!"}
-                  </p>
-                </div>
-              )
-            )}
-          </section>
+              <p>
+                {isFiltering
+                  ? "No s’han trobat resultats per al filtre actual."
+                  : selectedTab === "recomendados"
+                  ? "Encara no hi ha rutes recomanades per mostrar."
+                  : "Encara no segueixes a ningú, comença a explorar!"}
+              </p>
+            </div>
+          )
+        )}
+      </section>
 
       {modalOpen === "login" && (
         <LoginModal
