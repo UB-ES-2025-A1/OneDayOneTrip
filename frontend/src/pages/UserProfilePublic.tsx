@@ -10,6 +10,7 @@ import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
 import LlistaSeguidorsModal from "../components/LlistaSeguidorsModal";
+import AvatarFallback from "../components/AvatarFallback"; 
 
 export type BackendUser = {
   uid: string;
@@ -217,7 +218,11 @@ export default function UserProfilePublic() {
             }}
           >
             <div className="user-photo">
-              <img src={photoUrl} alt="Foto de perfil" />
+              {profile.url_foto_perfil ? (
+                <img src={profile.url_foto_perfil} alt="Foto de perfil" />
+              ) : (
+                <AvatarFallback name={displayName} />
+              )}
             </div>
 
             <div className="user-details">

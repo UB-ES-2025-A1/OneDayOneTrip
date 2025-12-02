@@ -4,8 +4,8 @@ export default function AvatarFallback({ name }: { name: string }) {
   return (
     <div
       style={{
-        width: "110px",
-        height: "110px",
+        width: "160px",
+        height: "160px",
         borderRadius: "50%",
         backgroundColor: "#d3d4d5ba",
         display: "flex",
