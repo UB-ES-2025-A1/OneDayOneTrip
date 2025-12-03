@@ -14,6 +14,7 @@
   font-weight: 700;
 }
 
+/* En pantalles petites el títol pot ocupar més espai si cal */
 .ruta-actions {
   flex: 1;
 }
@@ -170,10 +171,10 @@
 }
 
 .valorar-icon {
-  font-size: 1rem;            
+  font-size: 1rem;
   display: inline-block;
   position: relative;
-  top: -1px;                  
+  top: -1px;
 }
 
 .valorar-button:hover {
@@ -192,14 +193,14 @@
   font-weight: 600;
   cursor: pointer;
   border: 2px solid #2e492e;
-  background-color: #2e492e; 
-  color: white; 
+  background-color: #2e492e;
+  color: white;
   transition: all 0.25s ease-in-out;
 }
 
 .follow-button.following {
-  background-color: white; 
-  color: #2e7d32; 
+  background-color: white;
+  color: #2e7d32;
   border-color: #2e7d32;
 }
 
@@ -236,4 +237,82 @@
 .rating-summary .rating-count {
   font-size: 14px;
   opacity: 0.8;
+}
+
+/* ============ DARK MODE ESPECÍFIC ============ */
+
+/* Títol amb verd més clar en fons fosc */
+[data-theme="dark"] .ruta-titol {
+  color: #8fda8f;
+}
+
+/* Botó guardar en dark */
+[data-theme="dark"] .guardar-button {
+  background-color: transparent;
+  border-color: #8fda8f;
+  color: #8fda8f;
+}
+
+[data-theme="dark"] .guardar-button.saved {
+  background-color: #8fda8f;
+  color: #111111;
+  border-color: #8fda8f;
+}
+
+/* Icona bookmark adaptada a dark */
+[data-theme="dark"] .guardar-button .ui-bookmark {
+  --icon-secondary-color: var(--bg-card);
+  --icon-primary-color: #8fda8f;
+  --icon-circle-border: 1px solid #8fda8f;
+}
+
+[data-theme="dark"] .guardar-button.saved .ui-bookmark {
+  --icon-secondary-color: #111111;
+  --icon-primary-color: #ffffff;
+  --icon-circle-border: 1px solid #ffffff;
+}
+
+[data-theme="dark"] .guardar-button .bookmark {
+  stroke: #8fda8f;
+}
+
+[data-theme="dark"] .guardar-button.saved .bookmark {
+  stroke: #ffffff;
+}
+
+/* Botó valorar en verd clar sobre fons fosc */
+[data-theme="dark"] .valorar-button {
+  color: #8fda8f;
+}
+
+[data-theme="dark"] .valorar-button:hover {
+  background: rgba(143, 218, 143, 0.12);
+}
+
+/* Botó seguir en dark: verd clar ple i variant "following" invertida */
+[data-theme="dark"] .follow-button {
+  background-color: #8fda8f;
+  border-color: #8fda8f;
+  color: #111111;
+}
+
+[data-theme="dark"] .follow-button.following {
+  background-color: transparent;
+  color: #8fda8f;
+  border-color: #8fda8f;
+}
+
+/* Rating summary amb taronja/daurat suau sobre fosc */
+[data-theme="dark"] .rating-summary {
+  background: rgba(255, 228, 150, 0.08);
+  color: #ffdd80;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+[data-theme="dark"] .rating-summary .rating-star {
+  color: #ffdd80;
+}
+
+[data-theme="dark"] .rating-summary .rating-count {
+  opacity: 0.9;
 }
