@@ -45,3 +45,37 @@
   margin-top: 20px;
   font-size: 14px;
 }
+
+.remove-follower-btn {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #d03b3bd1;
+  border: none;
+  color: white;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.remove-follower-btn:hover {
+  background: #d93636;
+}
+
+.seguidor-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.seguidor-click-zone {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-grow: 1;
+  cursor: pointer;
+}
