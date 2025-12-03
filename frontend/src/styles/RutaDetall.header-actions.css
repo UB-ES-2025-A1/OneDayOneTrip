@@ -1,0 +1,239 @@
+/* ============ HEADER + ACCIONS ============ */
+
+.ruta-header-line {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.ruta-titol {
+  margin: 0;
+  font-size: 2.4rem;
+  color: #2e492e;
+  font-weight: 700;
+}
+
+.ruta-actions {
+  flex: 1;
+}
+
+.ruta-actions-left {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ruta-actions-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* Botó GUARDAR */
+.guardar-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 2px solid #2e492e;
+  background-color: #ffffff;
+  color: #2e492e;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+}
+
+.guardar-button.saved {
+  background-color: #2e492e;
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.guardar-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Icona bookmark animada */
+.ui-bookmark {
+  --icon-size: 20px;
+  --icon-circle-size: 35px;
+  display: flex;
+  align-items: center;
+}
+
+.guardar-button .ui-bookmark {
+  --icon-secondary-color: #ffffff;
+  --icon-primary-color: #2e492e;
+  --icon-circle-border: 1px solid #2e492e;
+}
+
+.guardar-button.saved .ui-bookmark {
+  --icon-secondary-color: #2e492e;
+  --icon-primary-color: #ffffff;
+  --icon-circle-border: 1px solid #ffffff;
+}
+
+.ui-bookmark input {
+  display: none;
+}
+
+.ui-bookmark .bookmark {
+  width: var(--icon-size);
+  cursor: pointer;
+  fill: var(--icon-secondary-color);
+  transition: 0.2s;
+  position: relative;
+  stroke: #2e492e;
+  stroke-width: 1.5px;
+}
+
+.guardar-button.saved .bookmark {
+  stroke: #ffffff;
+}
+
+.bookmark::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  box-shadow:
+    0 30px 0 -4px var(--icon-primary-color),
+    30px 0 0 -4px var(--icon-primary-color),
+    0 -30px 0 -4px var(--icon-primary-color),
+    -30px 0 0 -4px var(--icon-primary-color),
+    -22px 22px 0 -4px var(--icon-primary-color),
+    -22px -22px 0 -4px var(--icon-primary-color),
+    22px -22px 0 -4px var(--icon-primary-color),
+    22px 22px 0 -4px var(--icon-primary-color);
+  border-radius: 50%;
+  transform: scale(0);
+}
+
+.bookmark::before {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  border: var(--icon-circle-border);
+  opacity: 0;
+}
+
+.ui-bookmark input:checked + .bookmark {
+  fill: var(--icon-primary-color);
+  animation: bookmark 0.3s forwards;
+}
+
+.ui-bookmark input:checked + .bookmark::before {
+  animation: circle 0.3s forwards;
+}
+
+.ui-bookmark input:checked + .bookmark::after {
+  animation: circles 0.3s forwards;
+}
+
+/* Animacions */
+@keyframes bookmark {
+  50% { transform: scaleY(0.6); }
+  100% { transform: scaleY(1); }
+}
+
+@keyframes circle {
+  0% { width: 0; height: 0; opacity: 0; }
+  90% { width: var(--icon-circle-size); height: var(--icon-circle-size); opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes circles {
+  from { transform: scale(0); }
+  40% { opacity: 1; }
+  to { transform: scale(0.8); opacity: 0; }
+}
+
+/* Botó VALORAR */
+.valorar-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  color: #2e492e;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.valorar-icon {
+  font-size: 1rem;            
+  display: inline-block;
+  position: relative;
+  top: -1px;                  
+}
+
+.valorar-button:hover {
+  background: rgba(46, 73, 46, 0.10);
+  border-radius: 15px;
+  padding: 6px 10px;
+  transition: background 0.2s ease;
+}
+
+/* Botó FOLLOW */
+.follow-button {
+  margin-left: auto;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 1.0rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid #2e492e;
+  background-color: #2e492e; 
+  color: white; 
+  transition: all 0.25s ease-in-out;
+}
+
+.follow-button.following {
+  background-color: white; 
+  color: #2e7d32; 
+  border-color: #2e7d32;
+}
+
+.follow-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* RATING SUMMARY */
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff7d7;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #5a4500;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-right: 10px;
+  height: fit-content;
+}
+
+.rating-summary .rating-star {
+  font-size: 18px;
+  color: #e6ae00;
+}
+
+.rating-summary .rating-value {
+  font-size: 16px;
+}
+
+.rating-summary .rating-count {
+  font-size: 14px;
+  opacity: 0.8;
+}
