@@ -6,7 +6,7 @@
   align-items: stretch;
   width: 100%;
   padding: 20px 0;
-  background: white;
+  background: var(--bg-card);   /* 🔹 abans: white */
   gap: 10px;
   box-sizing: border-box;
   flex-wrap: wrap;
@@ -52,9 +52,10 @@
 
 .miniatures img.active {
   opacity: 1;
-  border: 3px solid #2e492e;
+  border: 3px solid #2e492e;   /* 🔹 verd marca en light */
 }
 
+/* Target +X fotos */
 .mes-fotos {
   width: 100%;
   height: 150px;
@@ -120,7 +121,24 @@
   cursor: pointer;
 }
 
-/* Responsive específic galeria (opcional) */
+/* ============ DARK MODE ESPECÍFIC ============ */
+
+/* Border de la miniatura activa amb verd clar en fosc */
+[data-theme="dark"] .miniatures img.active {
+  border-color: #8fda8f;
+}
+
+/* Fons de la galeria manté el to de targeta del tema */
+[data-theme="dark"] .ruta-galeria-principal {
+  background: var(--bg-card);
+}
+
+/* Opcional: lleugerament menys agressiu el fons del “+X fotos” en dark */
+[data-theme="dark"] .mes-fotos {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+/* Responsive específic galeria */
 @media (max-width: 992px) {
   .ruta-galeria-principal {
     flex-direction: column;
