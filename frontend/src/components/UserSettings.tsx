@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "../styles/UserSettings.css";
-import { X, Trash2 } from "lucide-react";
-import { Auth } from "../firebase/auth";
+import { X } from "lucide-react";
+import { auth } from "../firebase";
+import { signOut } from "firebase/auth";
 import { deleteAccount } from "../api/client";
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
   onClose: () => void;
 };
 
-export default function UserSettingsPopup({ open, onClose }: Props) {
+export default function UserSettings({ open, onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,6 +21,13 @@ export default function UserSettingsPopup({ open, onClose }: Props) {
   };
 
   const handleDeleteAccount = async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      setError("Has d'estar identificat per eliminar el compte.");
+      return;
+    }
+
     const confirm1 = window.confirm(
       "Segur que vols esborrar el compte? Aquesta acció és irreversible."
     );
@@ -29,8 +37,11 @@ export default function UserSettingsPopup({ open, onClose }: Props) {
       setLoading(true);
       setError("");
 
-      await deleteAccount();   
-      await Auth.logout();
+      // 1) Backend: eliminar compte i totes les dades relacionades
+      await deleteAccount(user.uid);
+
+      // 2) Tancar sessió al frontend
+      await signOut(auth);
 
       alert("El teu compte s'ha esborrat correctament.");
       window.location.href = "/";

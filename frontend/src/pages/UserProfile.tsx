@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut, type User as FirebaseUser } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById, deleteTripAndPublication } from "../api/client"; 
+import { getUserById, removePublication } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { ImageOff, Pencil } from "lucide-react"; 
@@ -173,12 +173,11 @@ export default function UserProfile() {
     setDeleteModalOpen(true);
   };
 
-  // ✅ Confirmar eliminació al popup
   const handleConfirmDeleteTrip = async () => {
     if (!currentUser || !profile || !tripToDelete) return;
 
     try {
-      await deleteTripAndPublication(profile.uid, tripToDelete);
+      await removePublication(profile.uid, tripToDelete);
 
       // Treure-la de trips
       setTrips((prev) =>
