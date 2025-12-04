@@ -66,10 +66,12 @@
 }
 
 .etapa-ubi-icon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: currentColor;   
 }
+
 
 /* ---- Imagen ---- */
 .etapa-imagen {
@@ -120,10 +122,6 @@
 /* Ubicació */
 [data-theme="dark"] .etapa-ubicacio {
   color: #8fda8f;
-}
-
-[data-theme="dark"] .etapa-ubi-icon {
-  filter: brightness(0) invert(0.85); /* icona es veu en fosc */
 }
 
 /* Imatge (sense canvis, només bordes per coherència) */
