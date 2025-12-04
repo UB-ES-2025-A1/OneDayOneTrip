@@ -64,3 +64,38 @@
   transform: rotate(90deg) scale(1.15);
   transition-duration: 0s;
 }
+
+/* ============================ */
+/*        DARK MODE CREATE      */
+/* ============================ */
+
+[data-theme="dark"] .create-card {
+  background-color: #2b2e30; /* gris fosc però diferenciat del fons */
+  border-color: #8fda8f;     /* verd clar com tota la resta */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+[data-theme="dark"] .create-card-content {
+  color: #8fda8f; /* text verd clar */
+}
+
+[data-theme="dark"] .animated-plus {
+  stroke: #8fda8f;  /* icona + en verd clar */
+  fill: none;
+}
+
+/* Hover en dark mode */
+[data-theme="dark"] .create-card:hover {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.65);
+}
+
+[data-theme="dark"] .create-card:hover .animated-plus {
+  stroke: #a7ffb5; /* verd encara més clar en hover */
+  fill: #a7ffb5;
+}
+
+/* Click en dark mode */
+[data-theme="dark"] .create-card:active .animated-plus {
+  stroke: #c8ffd4;
+  fill: #c8ffd4;
+}
