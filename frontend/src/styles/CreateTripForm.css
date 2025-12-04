@@ -121,7 +121,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: #ffffff;
   z-index: 1;
   font-size: 0.85rem;
 }
@@ -297,6 +297,7 @@
   background: #7c0000;
 }
 
+/* ---------- FOOTER BOTONS ---------- */
 .form-actions {
   margin-top: 1.5rem;
   display: flex;
@@ -310,7 +311,7 @@
   font-size: 1rem;
   cursor: pointer;
   border: none;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
 }
 
 .form-actions button:first-child {
@@ -324,7 +325,6 @@
   background: #ffe5e5;
   transform: translateY(-1px);
 }
-
 
 .form-actions button:last-child {
   background: #356a36;
@@ -388,7 +388,6 @@
   justify-content: center;
 }
 
-
 /* =========================================================
    TAGS — pills + drag & drop
    ========================================================= */
@@ -407,12 +406,11 @@
   font-weight: 500;
 }
 
-
 .tags-helper {
-  margin: -2px 0 0 0;      
-  font-size: 0.78rem;     
-  color: #777777;        
-  font-weight: 400;       
+  margin: -2px 0 0 0;
+  font-size: 0.78rem;
+  color: #777777;
+  font-weight: 400;
 }
 
 .tag-columns {
@@ -556,7 +554,7 @@
   border-radius: 999px;
   padding: 0.5rem 1.1rem;
   background: #356a36;
-  color: #ffffff !important;;
+  color: #ffffff !important;
   font-size: 0.9rem;
   cursor: pointer;
   border: none;
@@ -594,7 +592,7 @@
   object-fit: cover;
 }
 
-/* Ajuste ligero trip-point para convivir con nuevas cards */
+/* Ajuste ligero trip-point per conviure amb noves cards */
 .trip-point {
   background: #f7f8f7;
   border-radius: 12px;
@@ -631,7 +629,7 @@
 
 /* reutilitzem estil del botó verd general */
 .image-point-button {
-  /* ja hereta de .image-input-button */
+  /* hereta de .image-input-button */
 }
 
 /* nom del fitxer seleccionat */
@@ -642,4 +640,216 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* =========================================================
+   🌙 DARK MODE — CREATE TRIP
+   ========================================================= */
+
+[data-theme="dark"] .create-trip-panel {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.85);
+}
+
+[data-theme="dark"] .create-trip-stepper {
+  background: var(--bg-card);
+  border-bottom-color: rgba(255,255,255,0.08);
+}
+
+[data-theme="dark"] .stepper-step {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .stepper-step::after {
+  background: rgba(255,255,255,0.12);
+}
+
+[data-theme="dark"] .stepper-circle {
+  background: var(--bg-card);                 
+  border-color: rgba(255,255,255,0.2);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .stepper-step.active .stepper-circle {
+  border-color: #8fda8f;
+  background: #8fda8f;
+  color: #111;
+}
+
+[data-theme="dark"] .stepper-step.active {
+  color: #8fda8f;
+}
+
+[data-theme="dark"] .stepper-step.completed .stepper-circle {
+  border-color: #8fda8f;
+  background: var(--bg-card);                
+  color: #8fda8f;
+}
+
+[data-theme="dark"] .stepper-step.completed::after {
+  background: #8fda8f;
+}
+
+[data-theme="dark"] .create-trip-form {
+  background: transparent;
+}
+
+/* missatges */
+[data-theme="dark"] .form-error {
+  background: rgba(248,113,113,0.1);
+  color: #fecaca;
+  border-left-color: #fecaca;
+}
+
+[data-theme="dark"] .form-success {
+  background: rgba(74,222,128,0.08);
+  color: #bbf7d0;
+  border-left-color: #22c55e;
+}
+
+/* labels + inputs */
+[data-theme="dark"] .create-trip-form label {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .create-trip-form input,
+[data-theme="dark"] .create-trip-form textarea,
+[data-theme="dark"] .create-trip-form select {
+  background: var(--bg-page);
+  border-color: rgba(255,255,255,0.12);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .create-trip-form input::placeholder,
+[data-theme="dark"] .create-trip-form textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+/* seccions */
+[data-theme="dark"] .form-section h3 {
+  color: #8fda8f;
+}
+
+/* trip-point */
+[data-theme="dark"] .trip-point {
+  background: #242628;
+  border-color: rgba(255,255,255,0.06);
+}
+
+/* header del punt */
+[data-theme="dark"] .trip-point-header button {
+  background: #b91c1c;
+}
+
+[data-theme="dark"] .trip-point-header button:hover {
+  background: #7f1d1d;
+}
+
+/* botons footer */
+[data-theme="dark"] .form-actions button:first-child {
+  background: transparent;
+  color: #fca5a5;
+  border-color: rgba(248,113,113,0.6);
+}
+
+[data-theme="dark"] .form-actions button:first-child:hover {
+  background: rgba(248,113,113,0.08);
+}
+
+[data-theme="dark"] .form-actions .secondary {
+  background: transparent;
+  border-color: rgba(255,255,255,0.2);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-actions button:last-child {
+  background: #8fda8f;
+  color: #101010;
+}
+
+[data-theme="dark"] .form-actions button:last-child:hover {
+  background: #a5f4a5;
+}
+
+/* TAGS */
+[data-theme="dark"] .tags-label {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .tags-helper {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .tag-pills {
+  background: #242628;
+  border-color: rgba(255,255,255,0.18);
+}
+
+[data-theme="dark"] .tag-column h4 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .tag-pill {
+  background: #1f3a25;
+  color: #b5f5c0;
+}
+
+[data-theme="dark"] .tag-pill.selected {
+  background: #8fda8f;
+  color: #0b0b0b;
+}
+
+[data-theme="dark"] .tag-empty {
+  color: var(--text-secondary);
+}
+
+/* IMATGES */
+[data-theme="dark"] .image-card {
+  background: #242628;
+  border-color: rgba(255,255,255,0.06);
+}
+
+[data-theme="dark"] .image-card-header h4 {
+  color: #8fda8f;
+}
+
+[data-theme="dark"] .image-card-subtitle {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .image-preview {
+  background: var(--bg-page);
+  border-color: rgba(255,255,255,0.1);
+}
+
+[data-theme="dark"] .image-preview.placeholder {
+  color: var(--text-secondary);
+}
+
+/* botons d'imatge */
+[data-theme="dark"] .image-input-button {
+  background: #8fda8f;
+  color: #111 !important;
+}
+
+[data-theme="dark"] .image-input-button:hover {
+  background: #a5f4a5;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* text nom fitxer */
+[data-theme="dark"] .image-point-wrapper {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .image-point-filename {
+  color: var(--text-secondary);
+}
+
+/* botó eliminar imatge (ja és fosc) */
+[data-theme="dark"] .remove-image-btn {
+  background: #000000aa;
+  color: #fff;
 }
