@@ -1,8 +1,8 @@
 import { getAuth } from "firebase/auth";
 
-const API_URL = "https://onedayonetrip.onrender.com"; // o 
+//const API_URL = "https://onedayonetrip.onrender.com"; // o 
 
-//url local = http://127.0.0.1:8000 
+const API_URL  = "http://127.0.0.1:8000"; 
 
 // url production = https://onedayonetrip-api.onrender.com
 
@@ -91,3 +91,35 @@ export async function unsaveTrip(userId: string, tripId: string) {
 export async function addPublicationToUser(userId: string, tripId: string) {
   return apiPost(`/users/${userId}/publicacions/${tripId}`, {});
 }
+
+export async function apiDelete(path: string) {
+  const user = getAuth().currentUser;
+  const token = user ? await user.getIdToken() : null;
+
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+
+  if (!res.ok) throw new Error(`API Error ${res.status}`);
+  return res.json();
+}
+
+// Eliminar una trip (backend: DELETE /trips/{trip_id})
+export async function deleteTripById(tripId: string) {
+  return apiDelete(`/trips/${tripId}`);
+}
+
+// Eliminar una publicació de l’usuari
+// backend: DELETE /users/{user_id}/publicacions/{trip_id}
+export async function removePublication(userId: string, tripId: string) {
+  return apiDelete(`/users/${userId}/publicacions/${tripId}`);
+}
+
+export async function deleteTripAndPublication(userId: string, tripId: string) {
+  // Elimina la trip
+  await deleteTripById(tripId);
+  // La treu de la llista de publicacions d’aquest usuari
+  await removePublication(userId, tripId);
+}
+

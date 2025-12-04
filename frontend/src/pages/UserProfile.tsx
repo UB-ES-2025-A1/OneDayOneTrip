@@ -12,6 +12,9 @@ import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal";
 import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
+import { deleteTripAndPublication } from "../api/client";
+import { Trash2 } from "lucide-react";
+
 
 export type BackendUser = {
   uid: string;
@@ -149,6 +152,34 @@ export default function UserProfile() {
       country: t.country || "",
     }));
 
+    const handleDeleteTrip = async (tripId: string) => {
+      if (!currentUser || !profile) return;
+
+      const confirmed = window.confirm("Segur que vols eliminar aquesta ruta?");
+      if (!confirmed) return;
+
+      try {
+        await deleteTripAndPublication(profile.uid, tripId);
+
+        setTrips((prev) => prev.filter((t) => String(t._id) !== String(tripId)));
+
+        setProfile((prev) =>
+          prev
+            ? {
+                ...prev,
+                publicacions: (prev.publicacions || []).filter(
+                  (id) => String(id) !== String(tripId)
+                ),
+              }
+            : prev
+        );
+      } catch (err: any) {
+        console.error("Error eliminant ruta:", err);
+        alert(err?.message || "Error eliminant la ruta");
+      }
+    };
+
+
   // ---------------------------
   // Derivados visuales
   // ---------------------------
@@ -239,6 +270,8 @@ export default function UserProfile() {
               currentUser={currentUser}
               showCreateButton={selectedTab === "publicacions"}
               onCreateTripClick={() => setModalOpen("createTrip")}
+              showDeleteIcon={selectedTab === "publicacions"}
+              onDeleteTrip={handleDeleteTrip}
             />
 
             {gridItems.length === 0 && (
@@ -274,7 +307,7 @@ export default function UserProfile() {
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
               currentUserId={currentUser.uid}
-              goToProfile={goToProfile} // ✅ AHORA FUNCIONA NAVEGACIÓN
+              goToProfile={goToProfile} 
             />
           )}
 
@@ -283,7 +316,7 @@ export default function UserProfile() {
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
               seguidors={profile.llista_seguidors || []}
-              goToProfile={goToProfile} // ✅ Navegación también aquí
+              goToProfile={goToProfile} 
             />
           )}
 
