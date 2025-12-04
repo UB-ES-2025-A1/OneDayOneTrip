@@ -45,3 +45,43 @@
   margin-top: 20px;
   font-size: 14px;
 }
+
+.seguidor-item:hover,
+.user-row:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+
+/* =========================================================
+   DARK MODE — LLISTA SEGUIDORS
+   ========================================================= */
+
+[data-theme="dark"] .seguidores-card {
+  background: #222425;
+  color: var(--text-primary);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.8);
+}
+
+[data-theme="dark"] .seguidores-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .seguidores-empty {
+  color: var(--text-secondary);
+}
+
+/* Botó tancar */
+[data-theme="dark"] .close-btn {
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+[data-theme="dark"] .close-btn:hover {
+  color: #fff;
+}
+
+[data-theme="dark"] .seguidor-item:hover,
+[data-theme="dark"] .user-row:hover {
+  background: rgba(255,255,255,0.05);
+}
