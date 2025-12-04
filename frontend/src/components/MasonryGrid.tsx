@@ -93,7 +93,7 @@ export default function MasonryGrid({
             style={{ backgroundImage: `url(${item.img})` }}
           >
             <div className="overlay">
-               {/* 🗑️ Botó de la brossa (només si es permet) */}
+
               {showDeleteIcon && onDeleteTrip && (
                 <button
                   className="masonry-delete-btn"
@@ -103,14 +103,12 @@ export default function MasonryGrid({
                   }}
                   aria-label="Eliminar ruta"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={22} />
                 </button>
               )}
               <h3 className="masonry-title">{item.title}</h3>
 
               
-
-              {/* ⭐ Bloque de valoración */}
               <div className="stars-block">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <span

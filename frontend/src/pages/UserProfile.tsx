@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut, type User as FirebaseUser } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById, deleteTripAndPublication } from "../api/client"; // 👈 he unificat imports
+import { getUserById, deleteTripAndPublication } from "../api/client"; 
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { ImageOff, Pencil } from "lucide-react"; 
@@ -317,7 +317,7 @@ export default function UserProfile() {
               showCreateButton={selectedTab === "publicacions"}
               onCreateTripClick={() => setModalOpen("createTrip")}
               showDeleteIcon={selectedTab === "publicacions"}
-              onDeleteTrip={askDeleteTrip} // 👈 ara només obre el popup
+              onDeleteTrip={askDeleteTrip} 
             />
 
             {gridItems.length === 0 && (
@@ -377,7 +377,6 @@ export default function UserProfile() {
             />
           )}
 
-          {/* 🗑️ Popup de confirmació d'eliminació */}
           {deleteModalOpen && (
             <div className="confirm-delete-backdrop">
               <div className="confirm-delete-modal">
