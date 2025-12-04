@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Form, File, UploadFile
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from app.services.image_service import upload_image_to_imgbb
 
 from google.cloud import firestore
@@ -252,38 +252,116 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
 
 
 @router.delete("/delete/{user_id}")
-def delete_account(
-        user_id: str,
-        credentials: HTTPAuthorizationCredentials = Depends(security)
+@router.delete("/delete/{user_id}")
+async def delete_account(
+    user_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
-    # Agafem el token brut
-    token = credentials.credentials
+    """
+    Elimina un compte d'usuari i neteja:
+    - el seu document de Firestore
+    - el seu usuari de Firebase Auth
+    - totes les seves publicacions (trips) a Mongo
+    - qualsevol referència a aquestes publicacions a guardades/publicacions d'altres usuaris
+    - referències a l'usuari en llistes de seguidors/seguits
+    """
 
-    # Verifiquem el token amb Firebase
+    # Verificar token amb Firebase i que l'uid coincideixi amb user_id
+    token = credentials.credentials
     try:
         decoded = auth.verify_id_token(token)
     except Exception:
         raise HTTPException(status_code=401, detail="Token invàlid o caducat")
 
     uid = decoded.get("uid")
-
-    # Només el propi usuari es pot eliminar
     if uid != user_id:
-        raise HTTPException(status_code=403, detail="No tens permís per eliminar aquest compte")
+        raise HTTPException(
+            status_code=403,
+            detail="No tens permís per eliminar aquest compte",
+        )
 
-    # Eliminar Firestore
+    # Obtenir dades de l'usuari a Firestore
     user_ref = db.collection("users").document(user_id)
     doc = user_ref.get()
-
     if not doc.exists:
         raise HTTPException(status_code=404, detail="Usuari no trobat")
 
+    data = doc.to_dict() or {}
+    publicacions: List[str] = list(map(str, data.get("publicacions", [])))
+
+    batch = db.batch()
+
+    # Treure user_id de llistes de seguits/seguidors d'altres usuaris
+    seguits_q = (
+        db.collection("users")
+        .where("llista_seguits", "array_contains", user_id)
+        .stream()
+    )
+    for d in seguits_q:
+        batch.update(
+            d.reference,
+            {"llista_seguits": firestore.ArrayRemove([user_id])},
+        )
+
+    seguidors_q = (
+        db.collection("users")
+        .where("llista_seguidors", "array_contains", user_id)
+        .stream()
+    )
+    for d in seguidors_q:
+        batch.update(
+            d.reference,
+            {"llista_seguidors": firestore.ArrayRemove([user_id])},
+        )
+
+    # Per a cada publicació seva:
+    #    - treure la trip de guardades/publicacions d'altres usuaris
+    #    - eliminar la trip de MongoDB
+    for trip_id in publicacions:
+        # Treure de guardades
+        guardades_q = (
+            db.collection("users")
+            .where("guardades", "array_contains", trip_id)
+            .stream()
+        )
+        for u in guardades_q:
+            batch.update(
+                u.reference,
+                {"guardades": firestore.ArrayRemove([trip_id])},
+            )
+
+        # Treure de publicacions d'altres usuaris
+        publicacions_q = (
+            db.collection("users")
+            .where("publicacions", "array_contains", trip_id)
+            .stream()
+        )
+        for u in publicacions_q:
+            batch.update(
+                u.reference,
+                {"publicacions": firestore.ArrayRemove([trip_id])},
+            )
+
+        # Eliminar trip a Mongo
+        try:
+            delete_trip_mongo(str(trip_id))
+        except Exception as e:
+            print(f"[ERROR] No s'ha pogut eliminar la trip {trip_id} de Mongo:", e)
+
+    # Aplicar totes les actualitzacions a Firestore
+    batch.commit()
+
+    # Eliminar document d'usuari
     user_ref.delete()
 
-    # Eliminar Firebase Auth
-    auth.delete_user(uid)
+    # Eliminar usuari de Firebase Auth
+    try:
+        auth.delete_user(uid)
+    except Exception as e:
+        print(f"[ERROR] No s'ha pogut eliminar l'usuari de Firebase Auth: {e}")
 
-    return {"message": "Compte eliminat correctament"}
+    return {"message": "Compte i dades relacionades eliminats correctament"}
+
 
 @router.delete("/{user_id}/publicacions/{trip_id}")
 async def remove_publicacio_llista_publicacions(user_id: str, trip_id: str):
