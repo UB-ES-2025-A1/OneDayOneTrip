@@ -1,8 +1,9 @@
 import { getAuth } from "firebase/auth";
 
-// const API_URL = "https://onedayonetrip.onrender.com"; // o 
 
-const API_URL = "http://127.0.0.1:8000";
+//const API_URL = "https://onedayonetrip.onrender.com"; // o 
+
+const API_URL  = "http://127.0.0.1:8000"; 
 
 // url production = https://onedayonetrip-api.onrender.com
 
@@ -92,33 +93,35 @@ export async function addPublicationToUser(userId: string, tripId: string) {
   return apiPost(`/users/${userId}/publicacions/${tripId}`, {});
 }
 
-
 export async function apiDelete(path: string) {
   const user = getAuth().currentUser;
-  const token = user ? await user.getIdToken(true) : null; // forceRefresh = true
+  const token = user ? await user.getIdToken() : null;
 
   const res = await fetch(`${API_URL}${path}`, {
     method: "DELETE",
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 
   if (!res.ok) throw new Error(`API Error ${res.status}`);
-  try {
-    return await res.json();
-  } catch {
-    return null; // per si backend retorna 204 sense body
-  }
+  return res.json();
 }
 
-export async function deleteAccount() {
-  const user = getAuth().currentUser;
-  if (!user) {
-    throw new Error("No hi ha cap usuari autenticat.");
-  }
-
-  const uid = user.uid;
-
-  return apiDelete(`/users/delete/${uid}`);
+// Eliminar una trip (backend: DELETE /trips/{trip_id})
+export async function deleteTripById(tripId: string) {
+  return apiDelete(`/trips/${tripId}`);
 }
+
+// Eliminar una publicació de l’usuari
+// backend: DELETE /users/{user_id}/publicacions/{trip_id}
+export async function removePublication(userId: string, tripId: string) {
+  return apiDelete(`/users/${userId}/publicacions/${tripId}`);
+}
+
+export async function deleteTripAndPublication(userId: string, tripId: string) {
+  // Elimina la trip
+  await deleteTripById(tripId);
+  // La treu de la llista de publicacions d’aquest usuari
+  await removePublication(userId, tripId);
+}
+
+
