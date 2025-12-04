@@ -4,6 +4,7 @@ import "../styles/MasonryGrid.css";
 import { type User } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import ButtonNewTrip from "./ButtonNewTrip";
+import { Trash2 } from "lucide-react";
 
 
 interface MasonryItem {
@@ -24,7 +25,9 @@ interface MasonryGridProps {
   openRegister: () => void;
   currentUser: User | null;
   showCreateButton?: boolean;
-  onCreateTripClick?: () => void;  
+  onCreateTripClick?: () => void; 
+  showDeleteIcon?: boolean;
+  onDeleteTrip?: (id: string) => void; 
 }
 
 
@@ -36,6 +39,8 @@ export default function MasonryGrid({
   currentUser,
   showCreateButton,
   onCreateTripClick,
+  showDeleteIcon,
+  onDeleteTrip,
 }: MasonryGridProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
@@ -88,9 +93,22 @@ export default function MasonryGrid({
             style={{ backgroundImage: `url(${item.img})` }}
           >
             <div className="overlay">
+
+              {showDeleteIcon && onDeleteTrip && (
+                <button
+                  className="masonry-delete-btn"
+                  onClick={(e) => {
+                    e.stopPropagation(); // no navegar a la ruta
+                    onDeleteTrip(item.id);
+                  }}
+                  aria-label="Eliminar ruta"
+                >
+                  <Trash2 size={22} />
+                </button>
+              )}
               <h3 className="masonry-title">{item.title}</h3>
 
-              {/* ⭐ Bloque de valoración */}
+              
               <div className="stars-block">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <span
