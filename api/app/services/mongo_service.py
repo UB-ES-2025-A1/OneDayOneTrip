@@ -187,3 +187,12 @@ def list_comments(trip_id: str, limit: int = 20, skip: int = 0):
     except Exception:
         print("[MOCK] list_comments() executat sense Mongo real.")
         return []
+
+def delete_trip(trip_id: str) -> int:
+    """Elimina una trip de MongoDB per ID i retorna quantes s'han eliminat (0 o 1)."""
+    try:
+        res = trips_collection.delete_one({"_id": ObjectId(trip_id)})
+        return res.deleted_count
+    except Exception as e:
+        print(f"[ERROR] No s'ha pogut eliminar la trip {trip_id}: {e}")
+        return 0

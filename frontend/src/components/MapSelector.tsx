@@ -116,7 +116,6 @@ export default function MapSelector({ lat, lng, onSelect }: MapSelectorProps) {
             borderRadius: "6px",
             border: "1px solid #ccc",
             cursor: "pointer",
-            background: "white",
           }}
         >
           Cercar

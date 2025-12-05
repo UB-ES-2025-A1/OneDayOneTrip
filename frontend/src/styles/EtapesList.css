@@ -66,12 +66,14 @@
 }
 
 .etapa-ubi-icon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: currentColor;   
 }
 
-/* ---- Imatge ---- */
+
+/* ---- Imagen ---- */
 .etapa-imagen {
   width: 100%;
   max-width: 600px;
@@ -88,7 +90,48 @@
 }
 
 /* =========================================================
-   📱 RESPONSIVE DESIGN
+   DARK MODE — ETAPES
+   ========================================================= */
+
+[data-theme="dark"] .etapes-container {
+  color: var(--text-primary);
+}
+
+/* Targeta general */
+[data-theme="dark"] .etapa-card {
+  background: #2b2e30; /* gris fosc però no massa */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Número */
+[data-theme="dark"] .etapa-numero {
+  color: #8fda8f; /* verd clar com hem fet a la resta */
+}
+
+/* Títol */
+[data-theme="dark"] .etapa-titol {
+  color: #8fda8f; /* verd clar */
+}
+
+/* Descripció */
+[data-theme="dark"] .etapa-descripcio {
+  color: var(--text-secondary);
+}
+
+/* Ubicació */
+[data-theme="dark"] .etapa-ubicacio {
+  color: #8fda8f;
+}
+
+/* Imatge (sense canvis, només bordes per coherència) */
+[data-theme="dark"] .etapa-imagen {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+/* =========================================================
+   RESPONSIVE DESIGN
    ========================================================= */
 
 /* Tablets (≤ 992px) */
