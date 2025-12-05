@@ -17,7 +17,8 @@
 .login-card, .register-card {
   display: flex;
   flex-direction: row;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
+  color: var(--text-primary);
   border-radius: 16px;
   overflow: hidden;
   position: relative;
@@ -46,7 +47,7 @@
   transition: transform 0.2s ease;
 }
 
-.close-btn-login { color: #000; }
+.close-btn-login { color: var(--text-primary); }  /* 🔹 adaptat a tema */
 .close-btn-reg { color: #fff; }
 
 .close-btn-login:hover, .close-btn-reg:hover {
@@ -78,6 +79,11 @@
   justify-content: center;
   align-items: center;
   text-align: center;
+  color: var(--text-primary);
+}
+
+.login-title {
+  color: var(--text-primary);              
 }
 
 .auth-form {
@@ -94,6 +100,8 @@
   border-radius: 8px;
   border: 1px solid #ccc;
   width: 100%;
+  background-color: var(--bg-card);        
+  color: var(--text-primary); 
 }
 
 .input-wrapper {
@@ -168,9 +176,11 @@
   margin-top: 1rem;
   text-align: center;
   font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
 .auth-link {
+  background: none;
   color: #356a36;
   text-decoration: underline;
   border: none;
@@ -238,7 +248,7 @@
 .input-wrapper button svg {
   width: 20px;
   height: 20px;
-  color: #666;
+  color: var(--text-secondary);
   transition: color 0.2s ease;
 }
 

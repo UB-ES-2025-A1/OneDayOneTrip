@@ -7,6 +7,8 @@ import "../styles/RutaDetall.header-actions.css";
 import "../styles/RutaDetall.layout.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
+import { MapPin } from "lucide-react";
+
 
 import {
   getTripById,
@@ -317,10 +319,11 @@ export default function RutaDetall() {
         </div>
         
         <div className="ubicacio">
-          <img src="/images/ubi.png" className="ubi-icon" />
+          <MapPin className="ubi-icon" />
           <span>{tripData.city}</span>
           {tripData.region && <span>, {tripData.region}</span>}
         </div>
+
 
         {/* Autor */}
         <div className="autor">

@@ -10,7 +10,7 @@
 .masonry-item {
   border-radius: 16px;
   overflow: hidden;
-  background-color: #fff;
+  background-color: var(--bg-card);  
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
@@ -65,7 +65,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-secondary);
   margin-bottom: 0.5rem;
 }
 
@@ -104,7 +104,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #333;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 

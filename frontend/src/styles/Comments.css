@@ -1,10 +1,10 @@
-/* -----------------💬 COMENTARIS---------------------- */
+/* -----------------COMENTARIS---------------------- */
 .ruta-comentaris {
   margin-top: 3rem;
-  background: #fafafa;
+  background: var(--bg-card);
   padding: 1.5rem 2rem;
   border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 6px var(--card-shadow);
 }
 
 .ruta-comentaris h2 {
@@ -16,9 +16,14 @@
   font-weight: 700;
 }
 
+[data-theme="dark"] .ruta-comentaris h2 {
+  color: #8fda8f; /* verd més clar */
+  border-bottom-color: rgba(255,255,255,0.1);
+}
+
 .comentaris-loading,
 .comentaris-buits {
-  color: #666;
+  color: var(--text-secondary);
   font-style: italic;
   text-align: center;
   padding: 1rem 0;
@@ -33,19 +38,23 @@
   gap: 1.2rem;
 }
 
-/* ---------- TARJETA DEL COMENTARIO ---------- */
+/* ---------- TARJETA DEL COMENTARI ---------- */
 .comentari-item {
-  background: white;
+  background: var(--bg-card);
   padding: 1rem 1.2rem;
   border-radius: 14px;
-  border: 1px solid #e6e6e6;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 2px 4px var(--card-shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme="dark"] .comentari-item {
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .comentari-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 10px var(--card-shadow);
 }
 
 /* ---------- CABECERA DEL COMENTARIO ---------- */
@@ -90,36 +99,43 @@
   font-size: 0.95rem;
 }
 
+[data-theme="dark"] .comentari-autor {
+  color: #8fda8f; /* Verd clar per veure's en fosc */
+}
+
 .comentari-data {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-secondary);
   display: block;
   margin-top: 2px;
 }
 
 .comentari-contingut {
   margin: 0;
-  color: #333;
+  color: var(--text-primary);
   line-height: 1.5;
   font-size: 0.95rem;
   white-space: pre-wrap;
-  background: #f9fafb;
+  background: var(--bg-page);
   padding: 0.8rem 1rem;
   border-radius: 8px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] .comentari-contingut {
+  border-color: rgba(255,255,255,0.05);
 }
 
 /* ---------- Nou comentari (formulari) ---------- */
 
 .comentari-nou {
-  background: #f4f4f4;
+  background: var(--bg-card);
   border-radius: 16px;
   padding: 1rem 1.2rem;
   display: flex;
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 1.5rem;
-  font-family: inherit;
 }
 
 .comentari-nou-avatar {
@@ -141,7 +157,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-family: inherit;
 }
 
 .comentari-nou-input {
@@ -151,15 +166,14 @@
   min-height: 60px;
   padding: 8px 10px;
   border-radius: 10px;
-  background: white;
+  background: var(--bg-page);
   font-size: 0.95rem;
   outline: none;
-  font-family: inherit;
+  color: var(--text-primary);
 }
 
 .comentari-nou-input::placeholder {
-  color: #888;       
-  font-style: inherit;                   
+  color: var(--text-secondary);
 }
 
 .comentari-nou-actions {
@@ -171,14 +185,14 @@
 
 .comentari-error {
   font-size: 0.8rem;
-  color: #b91c1c;
+  color: #ff6b6b;
 }
 
 .comentari-submit-btn {
   padding: 6px 18px;
   border-radius: 999px;
   border: none;
-  background: #2e492e;    /* verd */
+  background: #2e492e;
   color: white;
   font-weight: 600;
   font-size: 0.9rem;
@@ -186,9 +200,18 @@
   transition: background 0.2s ease, transform 0.1s ease;
 }
 
+[data-theme="dark"] .comentari-submit-btn {
+  background: #8fda8f;     /* verd clar en dark */
+  color: #0d0d0d;
+}
+
 .comentari-submit-btn:hover:enabled {
   background: #096330;
   transform: translateY(-1px);
+}
+
+[data-theme="dark"] .comentari-submit-btn:hover:enabled {
+  background: #a3f3a3;
 }
 
 .comentari-submit-btn:disabled {
@@ -201,4 +224,8 @@
   font-size: 1.3rem;
   margin-bottom: 1rem;
   color: #2e492e;
+}
+
+[data-theme="dark"] .comentaris-titol {
+  color: #8fda8f;
 }
