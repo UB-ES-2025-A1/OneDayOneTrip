@@ -5,7 +5,7 @@ import { auth } from "../firebase";
 import { getUserById } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
-import { ImageOff, Pencil } from "lucide-react";
+import { ImageOff, Pencil, Mail} from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
@@ -13,6 +13,7 @@ import EditarPerfil from "../components/EditarPerfilModal";
 import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
 import AvatarFallback from "../components/AvatarFallback"; 
+import Mailbox from "../components/Mailbox";
 
 export type BackendUser = {
   uid: string;
@@ -55,6 +56,8 @@ export default function UserProfile() {
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
+  const [mailboxOpen, setMailboxOpen] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -186,6 +189,12 @@ export default function UserProfile() {
   const gridItems =
     selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
 
+  
+    const openMailbox = () => {
+    setMailboxOpen(true);
+  };
+
+
   // Render
   return (
     <Layout
@@ -209,6 +218,10 @@ export default function UserProfile() {
           >
             <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}>
               <Pencil size={22} />
+            </button>
+
+             <button className="mailbox-btn" onClick={openMailbox}>
+              <Mail size={24} />
             </button>
 
             <div className="user-photo">
@@ -334,6 +347,23 @@ export default function UserProfile() {
               }}
             />
           )}
+
+                    {openEdit && profile && (
+            <EditarPerfil
+              profile={profile}
+              onClose={() => setOpenEdit(false)}
+              onSave={(updated) => {
+                setProfile(updated);
+                setOpenEdit(false);
+              }}
+            />
+          )}
+
+          <Mailbox
+            open={mailboxOpen}
+            onClose={() => setMailboxOpen(false)}
+          />
+
         </>
       )}
     </Layout>
