@@ -88,7 +88,7 @@ class TestTripsEndpoints:
         body = {"userId": "u1", "rating": 5}
         response = client.post("/trips/t1/rating", json=body)
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["message"] == "Rating añadido o actualizado"
+        assert response.json()["message"] == "Rating afegit o actualitzat"
 
     # def test_get_trip_comments(self, client):
     #     response = client.get("/trips/t1/comments")

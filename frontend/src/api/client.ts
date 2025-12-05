@@ -1,13 +1,7 @@
 import { getAuth } from "firebase/auth";
 
-const API_URL = "https://onedayonetrip.onrender.com"; // o 
-
-//url local = http://127.0.0.1:8000 
-
-// url production = https://onedayonetrip-api.onrender.com
-
-// url preproduction = https://onedayonetrip.onrender.com
-
+//const API_URL = "https://onedayonetrip.onrender.com"; // o 
+const API_URL  = "http://127.0.0.1:8000"; 
 
 // ------------------------------
 // Funciones base genéricas
@@ -68,10 +62,12 @@ export async function getUserById(userId: string) {
 export async function getAllUsers() {
   return apiGet("/users");
 }
+
 // Seguir un usuario
 export async function followUser(userId: string, targetId: string) {
   return apiPost(`/users/follow/${userId}/${targetId}`, {});
 }
+
 // Deixar de seguir un usuari
 export async function unfollowUser(userId: string, targetId: string) {
   return apiPost(`/users/unfollow/${userId}/${targetId}`, {});
@@ -87,7 +83,45 @@ export async function unsaveTrip(userId: string, tripId: string) {
   return apiPost(`/users/unsave/${userId}/${tripId}`, {});
 }
   
-// 📌 Añadir una publicación al usuario
+// 📌 Afegir una publicació a l'usuari
 export async function addPublicationToUser(userId: string, tripId: string) {
   return apiPost(`/users/${userId}/publicacions/${tripId}`, {});
+}
+
+// ------------------------------
+// DELETE helpers
+// ------------------------------
+export async function apiDelete(path: string) {
+  const user = getAuth().currentUser;
+  const token = user ? await user.getIdToken() : null;
+
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+
+  if (!res.ok) throw new Error(`API Error ${res.status}`);
+  return res.json();
+}
+
+// Eliminar una trip (backend: DELETE /trips/{trip_id})
+export async function deleteTripById(tripId: string) {
+  return apiDelete(`/trips/${tripId}`);
+}
+
+// Eliminar una publicació de l’usuari
+// backend: DELETE /users/{user_id}/publicacions/{trip_id}
+export async function removePublication(userId: string, tripId: string) {
+  return apiDelete(`/users/${userId}/publicacions/${tripId}`);
+}
+
+// (opcional) si ja no el fas servir, pots BORRAR aquesta funció
+export async function deleteTripAndPublication(userId: string, tripId: string) {
+  await deleteTripById(tripId);
+  await removePublication(userId, tripId);
+}
+
+// 🔻 NOVA: eliminar compte completament (backend: DELETE /users/delete/{user_id})
+export async function deleteAccount(userId: string) {
+  return apiDelete(`/users/delete/${userId}`);
 }

@@ -27,10 +27,10 @@ class TripCreateIn(BaseModel):
     author: AuthorIn
     city: str
     region: Optional[str] = None
-    country: Optional[str] = "España"
+    country: Optional[str] = "Espanya"
     routeMap: List[dict] = []
     trip_points: List[TripPointIn] = []
     distance: Optional[float] = None
     duration: Optional[str] = None
-    difficulty: Optional[str] = "Media"
+    difficulty: Optional[str] = "Mitjana"
     recommendedSeason: Optional[str] = "Primavera"

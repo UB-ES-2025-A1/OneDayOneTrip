@@ -30,6 +30,29 @@
   background-position: center;
 }
 
+.masonry-delete-btn {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  border: none;
+  border-radius: 999px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.masonry-item:hover .masonry-delete-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .overlay {
   position: absolute;
   bottom: 0;
