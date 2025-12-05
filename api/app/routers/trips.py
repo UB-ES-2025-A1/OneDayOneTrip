@@ -218,6 +218,7 @@ def add_trip_rating(
     print("[DEBUG] ✅ Rating guardat o actualizat correctament")
     return {"message": "Rating afegit o actualitzat"}
 
+
 @router.delete("/{trip_id}")
 async def delete_trip_endpoint(trip_id: str):
 

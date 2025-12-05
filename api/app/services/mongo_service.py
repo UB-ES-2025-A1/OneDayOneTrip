@@ -188,6 +188,7 @@ def list_comments(trip_id: str, limit: int = 20, skip: int = 0):
         print("[MOCK] list_comments() executat sense Mongo real.")
         return []
 
+
 def delete_trip(trip_id: str) -> int:
     """Elimina una trip de MongoDB per ID i retorna quantes s'han eliminat (0 o 1)."""
     try:
