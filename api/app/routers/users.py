@@ -253,7 +253,7 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
     }
 
 
-@router.delete("/delete/{user_id}") 
+@router.delete("/delete/{user_id}")
 async def delete_account(
     user_id: str,
     credentials: HTTPAuthorizationCredentials = Depends(security),
