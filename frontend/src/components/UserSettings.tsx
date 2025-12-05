@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/UserSettings.css";
 import { X } from "lucide-react";
 import { auth } from "../firebase";
@@ -10,9 +10,33 @@ type Props = {
   onClose: () => void;
 };
 
+// Funció per decidir tema inicial (localStorage o preferència del sistema)
+function getInitialTheme(): "light" | "dark" {
+  if (typeof window === "undefined") return "light";
+
+  const stored = localStorage.getItem("theme");
+  if (stored === "light" || stored === "dark") return stored;
+
+  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+  return prefersDark ? "dark" : "light";
+}
+
 export default function UserSettings({ open, onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // 🌙 estat del tema
+  const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
+
+  // Cada cop que canvia el tema → actualitzem l'HTML i el guardem
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
 
   if (!open) return null;
 
@@ -65,6 +89,38 @@ export default function UserSettings({ open, onClose }: Props) {
         <h2 className="settings-title">Configuració</h2>
 
         <div className="settings-content">
+          {/* 🌙 Aparença / Mode fosc */}
+          <div className="settings-section">
+            <h3 className="settings-subtitle">Aparença</h3>
+
+            <div className="settings-row">
+              <div className="settings-row-info">
+                <span className="settings-row-label">Mode fosc</span>
+
+              </div>
+
+              {/* Toggle animat tipus Uiverse */}
+              <label className="toggle-wrapper">
+                <input
+                  type="checkbox"
+                  className="toggle-checkbox"
+                  checked={theme === "dark"}
+                  onChange={toggleTheme}
+                />
+                <div className="toggle-slot">
+                  <div className="sun-icon-wrapper">
+                    <div className="sun-icon">☀</div>
+                  </div>
+                  <div className="moon-icon-wrapper">
+                    <div className="moon-icon">🌙</div>
+                  </div>
+                  <div className="toggle-button" />
+                </div>
+              </label>
+            </div>
+          </div>
+
+          {/* 🗑️ Secció eliminar compte */}
           <div className="settings-section">
             <p className="settings-warning">
               Esborrar el compte eliminarà totes les teves dades. Aquesta acció és irreversible.
