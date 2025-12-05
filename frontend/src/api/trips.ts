@@ -48,9 +48,9 @@ export interface Comment {
   tripId: string;
   userId: string;
   userName: string;
-  userProfilePicture?: string | null;  // opcional / puede ser null
+  userProfilePicture?: string | null;  // opcional / pot ser null
   text: string;
-  createdAt: string;                   // ISO string desde el backend
+  createdAt: string;                   // ISO string des de el backend
 }
 
 
@@ -64,7 +64,7 @@ const RAW_BASE_URL = "http://127.0.0.1:8000";
 const BASE_URL = RAW_BASE_URL.replace(/\/+$/, "");
 
 // ==========================================================
-// 🔍 Obtener todas las trips
+// 🔍 Obtenir totes les trips
 // ==========================================================
 
 export async function getAllTrips(includeStats: boolean = false): Promise<Trip[]> {
@@ -74,7 +74,7 @@ export async function getAllTrips(includeStats: boolean = false): Promise<Trip[]
 }
 
 // ==========================================================
-// 🔍 Obtener trip por ID
+// 🔍 Obtenir trip per ID
 // ==========================================================
 
 export async function getTripById(tripId: string): Promise<Trip> {
@@ -88,7 +88,7 @@ export async function getTripById(tripId: string): Promise<Trip> {
 
 
 // ==========================================================
-// 🔍 Obtener comentarios de una trip
+// 🔍 Obtenir comentaris d'una trip
 // ==========================================================
 
 export async function getTripComments(
@@ -130,12 +130,12 @@ export async function createTripComment(
   const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments`;
 
   const payload = {
-    tripId,                    // coincide con CommentModel.tripId
+    tripId,
     userId: data.userId,
     userName: data.userName,
     userProfilePicture: data.userProfilePicture ?? "",
     text: data.text,
-    // ❌ ya no mandamos createdAt: lo genera el backend
+    // ❌ ja no enviem createdAt: ho genera el backend
   };
 
   const res = await fetch(url, {
@@ -151,7 +151,7 @@ export async function createTripComment(
     throw new Error(`Error creant comentari (${tripId}): ${text}`);
   }
 
-  // El backend devuelve:
+  // El backend retorna:
   // { "comment": { ... } }
   const dataRes = await res.json();
   return dataRes.comment as Comment;
@@ -161,7 +161,7 @@ export async function createTripComment(
 
 
 // ==========================================================
-// ✨ Payload para crear trips (TripCreateIn)
+// ✨ Payload per crear trips (TripCreateIn)
 // ==========================================================
 
 export interface TripCreatePayload {
@@ -171,7 +171,7 @@ export interface TripCreatePayload {
   tags: string[];
 
   author: {
-    userId: string;                     // <-- corregido
+    userId: string;
     name: string | null | undefined;
     profilePic?: string | null | undefined;
   };
@@ -180,7 +180,7 @@ export interface TripCreatePayload {
   region?: string;
   country?: string;
 
-  routeMap: Coordinates[];             // <-- DEBE ser array
+  routeMap: Coordinates[];
 
   trip_points: {
     title: string;
@@ -188,7 +188,7 @@ export interface TripCreatePayload {
     coordinates: { lat: number; lng: number };
   }[];
 
-  distance?: number;                   // <-- corregido (número)
+  distance?: number;
   duration?: string;
   difficulty?: string;
   recommendedSeason?: string;
@@ -206,20 +206,18 @@ export async function createTripMultipart(
 ) {
   const formData = new FormData();
 
-  // JSON requerido por FastAPI
+  // JSON requerit per FastAPI
   formData.append("trip_json", JSON.stringify(tripPayload));
 
-  // portada
   if (cover) {
     formData.append("cover", cover);
   }
 
-  // galería
   gallery.forEach((file) => {
     formData.append("gallery", file);
   });
 
-  // imágenes de cada punto
+  // imatges de cada punt
   pointImages.forEach((file) => {
     if (file) formData.append("point_images", file);
   });
@@ -250,8 +248,8 @@ export interface TripRatingStats {
 
 export interface RateTripPayload {
   userId: string;
-  rating: number;      // por ejemplo 1-5
-  date?: string;       // ISO string opcional
+  rating: number;
+  date?: string;
 }
 
 export async function rateTrip(
@@ -266,7 +264,6 @@ export async function rateTrip(
     body: JSON.stringify({
       userId: payload.userId,
       rating: payload.rating,
-      // si no viene date, mandamos la fecha actual
       date: payload.date ?? new Date().toISOString(),
     }),
   });
@@ -276,7 +273,7 @@ export async function rateTrip(
     throw new Error(`Error valorant la ruta: ${res.status}. ${text}`);
   }
 
-  // 👇 aquí el backend devuelve lo que saque get_trip_rating_stats(trip_id)
+  // 👇 aquí el backend retorna el que tregui get_trip_rating_stats(trip_id)
   const data = await res.json();
   return data as TripRatingStats;
 }

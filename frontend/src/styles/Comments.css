@@ -57,7 +57,7 @@
   box-shadow: 0 4px 10px var(--card-shadow);
 }
 
-/* ---------- CABECERA DEL COMENTARIO ---------- */
+/* ---------- CAPÇALERA DEL COMENTARI ---------- */
 .comentari-header {
   display: flex;
   justify-content: space-between;
@@ -91,7 +91,7 @@
   border-radius: 50%;
 }
 
-/* ---------- TEXTO ---------- */
+/* ---------- TEXT ---------- */
 .comentari-autor {
   font-weight: 600;
   color: #2e492e;

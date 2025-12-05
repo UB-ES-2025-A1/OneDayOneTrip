@@ -1,5 +1,5 @@
 /* =========================================================
-   CREATE TRIP — MODAL PANEL
+   CREATE TRIP — MODAL PANELL
    ========================================================= */
 
 .create-trip-backdrop {
@@ -18,7 +18,7 @@
   box-sizing: border-box;
 }
 
-/* ---------- PANEL PRINCIPAL ---------- */
+/* ---------- PANELL PRINCIPAL ---------- */
 .create-trip-panel {
   background: #FFFFFF;
   backdrop-filter: blur(10px);
@@ -76,7 +76,7 @@
 }
 
 /* =========================================================
-   STEPPER (pasos superiors)
+   STEPPER (passes superiors)
    ========================================================= */
 
 .create-trip-stepper {
@@ -153,7 +153,7 @@
   background: #356a36;
 }
 
-/* ---------- CONTENIDO FORMULARIO ---------- */
+/* ---------- CONTINGUT FORMULARI ---------- */
 .create-trip-form {
   padding: 1.8rem 2rem;
   overflow-y: auto;
@@ -177,7 +177,7 @@
   }
 }
 
-/* ---------- MENSAJES ---------- */
+/* ---------- MISSATGES ---------- */
 .form-error {
   background: #ffebeb;
   color: #a30000;
@@ -232,7 +232,7 @@
   min-height: 90px;
 }
 
-/* ---------- SECCIONES ---------- */
+/* ---------- SECCIONS ---------- */
 .form-section {
   margin-top: 2rem;
 }

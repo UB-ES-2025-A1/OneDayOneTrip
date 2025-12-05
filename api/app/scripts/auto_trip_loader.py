@@ -10,7 +10,7 @@ class TripUploader:
         self.api_url = api_url.rstrip("/")
         self.endpoint = f"{self.api_url}/trips/"
 
-        # ✅ Sesión con headers adecuados (Wikimedia exige UA identificable)
+        # ✅ Sessió amb headers adecuats (Wikimedia exigeix UA identificable)
         self.session = requests.Session()
         self.session.headers.update(
             {
@@ -28,27 +28,27 @@ class TripUploader:
 
     def _download_image(self, url: str):
         try:
-            # permite redirecciones y lee binario
-            resp = self.session.get(url, timeout=20)  # allow_redirects=True por defecto
+            # Permet reedireccionar-se i llegir binari
+            resp = self.session.get(url, timeout=20)  # allow_redirects=True per defecte
             resp.raise_for_status()
 
             ctype = resp.headers.get("Content-Type", "")
             if "image" not in ctype:
                 raise ValueError(
-                    f"La URL no parece ser una imagen válida: {url} (Content-Type={ctype})"
+                    f"La URL no sembla ser una imatge vàlida: {url} (Content-Type={ctype})"
                 )
 
             filename = urlparse(url).path.split("/")[-1] or "image.jpg"
             return (filename, io.BytesIO(resp.content), ctype)
 
         except Exception as e:
-            print(f"⚠️ Error al descargar imagen {url}: {e}")
+            print(f"⚠️ Error al descargar imatge {url}: {e}")
             return None
 
     def upload_trips(self, trips: List[Dict]):
         results = []
         for i, trip_data in enumerate(trips):
-            print(f"\n🚀 Subiendo trip {i+1}/{len(trips)}: {trip_data.get('title')}")
+            print(f"\n🚀 Pujant trip {i+1}/{len(trips)}: {trip_data.get('title')}")
 
             cover_file = None
             gallery_files = []
@@ -73,7 +73,7 @@ class TripUploader:
             json_trip.pop("coverImage", None)
             json_trip.pop("gallery", None)
 
-            # ✅ Formato correcto para listas en FastAPI (mismo nombre repetido)
+            # ✅ Format correcte per les llistes a FastAPI (mateix nom repetit)
             multipart = [
                 ("trip_json", (None, json.dumps(json_trip), "application/json"))
             ]
@@ -88,21 +88,21 @@ class TripUploader:
             try:
                 response = self.session.post(self.endpoint, files=multipart, timeout=60)
                 if response.status_code == 200:
-                    print(f"✅ Trip '{trip_data['title']}' subida correctamente.")
+                    print(f"✅ Trip '{trip_data['title']}' pujada correctament.")
                 else:
                     print(
-                        f"❌ Error al subir trip '{trip_data['title']}': {response.text}"
+                        f"❌ Error al pujar trip '{trip_data['title']}': {response.text}"
                     )
                 results.append(response.json())
             except Exception as e:
-                print(f"💥 Error al conectar con la API: {e}")
+                print(f"💥 Error al conectar amb la API: {e}")
                 results.append({"error": str(e)})
 
         return results
 
 
 # ───────────────────────────────────────────────
-# 🧪 Ejemplo de uso manual
+# 🧪 Exemple de ús manual
 # ───────────────────────────────────────────────
 if __name__ == "__main__":
     uploader = TripUploader(api_url="http://localhost:8000")

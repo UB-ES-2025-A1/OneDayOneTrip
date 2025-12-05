@@ -11,8 +11,8 @@ export default function Valorar({ onClose, onSubmit }: ValorarProps) {
   const [rating, setRating] = useState(0);
 
   const handleSubmit = () => {
-    onSubmit(rating);  // 👈 llamamos al padre
-    onClose();         // 👈 cerramos modal
+    onSubmit(rating);  // 👈 cirdem al pare
+    onClose();         // 👈 tanquem el modal
   };
 
   const starElements: JSX.Element[] = [];

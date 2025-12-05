@@ -1,5 +1,5 @@
 
-/* ---------- CONTENEDOR PRINCIPAL ---------- */
+/* ---------- CONTENIDOR PRINCIPAL ---------- */
 .user-profile {
   position: relative;
   display: flex;
@@ -20,7 +20,7 @@
   margin-top: 1rem;
 }
 
-/* ---------- FOTO DEL USUARIO ---------- */
+/* ---------- IMATGE DE L'USUARI ---------- */
 .user-photo img {
   width: 180px;
   height: 180px;
@@ -30,7 +30,7 @@
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
 }
 
-/* ---------- DETALLES DEL USUARIO ---------- */
+/* ---------- DETALLS DE L'USUARI ---------- */
 .user-details {
   flex: 1;
   display: flex;
@@ -39,7 +39,7 @@
   min-width: 250px;
 }
 
-/* ---------- INFO DE NOMBRE / EMAIL ---------- */
+/* ---------- INFO DE NOM / EMAIL ---------- */
 .user-info h2 {
   font-size: 2rem;
   margin: 0 0 0.3rem 0;
@@ -53,7 +53,7 @@
   font-weight: 400;
 }
 
-/* ---------- ESTADÍSTICAS ---------- */
+/* ---------- ESTADÍSTIQUES ---------- */
 .user-stats {
   display: flex;
   flex-wrap: wrap;
@@ -161,7 +161,7 @@
   transform: translateX(100%);
 }
 
-/* ---------- GRID DE PUBLICACIONES ---------- */
+/* ---------- GRID DE PUBLICACIONS ---------- */
 .trip-list {
   margin-top: 2rem;
   display: flex;
@@ -169,7 +169,7 @@
   align-items: center;
 }
 
-/* ---------- ESTADOS (loading / error) ---------- */
+/* ---------- ESTATS (loading / error) ---------- */
 .loading-state,
 .error-state {
   text-align: center;
@@ -181,7 +181,7 @@
 .error-state {
   color: #c62828;
 }
-/* ---------- ESTADO VACÍO (sin publicaciones/guardadas) ---------- */
+/* ---------- ESTAT BUIT (sense publicacione/guardades) ---------- */
 .empty-state {
   text-align: center;
   margin: 4rem 1rem;
@@ -211,7 +211,7 @@
   margin: 0;
 }
 
-/* Botón de editar perfil (icono redondo arriba derecha) */
+/* Botó d'editar perfil (icona rodó adalt dreta) */
 .edit-profile-btn {
   position: absolute;
   top: 16px;
@@ -410,7 +410,7 @@
   }
 }
 
-/* Móviles (≤ 600px) */
+/* Mòbils (≤ 600px) */
 @media (max-width: 600px) {
   .user-profile {
     padding: 2rem 1rem;

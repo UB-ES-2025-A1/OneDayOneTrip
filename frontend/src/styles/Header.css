@@ -5,11 +5,11 @@
 /* ---------- BASE GENERAL ---------- */
 .main-header {
   padding: 1.2rem 2rem;
-  background-color: #2e492e; /* 💚 Verde botella uniforme */
+  background-color: #2e492e;
   color: white;
   display: flex;
   align-items: center;
-  justify-content: center;  /* logo centrado por defecto */
+  justify-content: center;
   position: relative;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
   z-index: 10;
@@ -18,7 +18,7 @@
   min-height: 72px;
 }
 
-/* Variantes (por si quieres personalizar más adelante) */
+/* Variants (por si vols personalitzar més endavant) */
 .main-header.home,
 .main-header.ruta,
 .main-header.perfil {
@@ -45,7 +45,7 @@
   color: #e0f4e0;
 }
 
-/* ---------- ZONAS LATERALES ---------- */
+/* ---------- ZONES LATERALS ---------- */
 .header-left,
 .header-right {
   position: absolute;
@@ -59,7 +59,7 @@
 .header-left { left: 1.6rem; }
 .header-right { right: 1.6rem; }
 
-/* ---------- BOTONES HEADER ---------- */
+/* ---------- BOTONS HEADER ---------- */
 .header-btn {
   background: transparent;
   border: 1.5px solid white;
@@ -95,7 +95,7 @@
   transform: scale(1.08);
 }
 
-/* ---------- BOTONES BACK / HOME ---------- */
+/* ---------- BOTONS BACK / HOME ---------- */
 .back-btn-header,
 .home-btn-header {
   background: rgba(255, 255, 255, 0.08);
@@ -141,7 +141,7 @@
   .header-right { right: 1.2rem; }
 }
 
-/* Móviles (≤ 600px) */
+/* Mòbils (≤ 600px) */
 @media (max-width: 600px) {
   .main-header {
     padding: 0.9rem 1.1rem;

@@ -4,7 +4,7 @@ import { getAuth } from "firebase/auth";
 const API_URL  = "http://127.0.0.1:8000"; 
 
 // ------------------------------
-// Funciones base genéricas
+// Funcions base genèriques
 // ------------------------------
 export async function apiGet(path: string) {
   const user = getAuth().currentUser;
@@ -36,10 +36,10 @@ export async function apiPost(path: string, body: object) {
 }
 
 // ------------------------------
-// Endpoints de usuarios
+// Endpoints d'usuaris
 // ------------------------------
 
-// Registrar usuario (nuevo endpoint FastAPI)
+// Registrar usuari (nou endpoint FastAPI)
 export async function registerUser(data: {
   fullname: string;
   username: string;
@@ -48,22 +48,21 @@ export async function registerUser(data: {
   return apiPost("/users/register", data);
 }
 
-// Obtener el usuario autenticado
+// Obtenir l'usuari autenticat
 export async function getCurrentUser() {
   return apiGet("/users/me");
 }
 
-// Obtener un usuario por su ID (público o autenticado)
+// Obtenir un usuari pel seu ID (públic o autenticat)
 export async function getUserById(userId: string) {
   return apiGet(`/users/${userId}`);
 }
 
-// Obtener todos los usuarios (solo si autenticado)
+// Obtenir tots els usuaris (només si està autenticat)
 export async function getAllUsers() {
   return apiGet("/users");
 }
 
-// Seguir un usuario
 export async function followUser(userId: string, targetId: string) {
   return apiPost(`/users/follow/${userId}/${targetId}`, {});
 }

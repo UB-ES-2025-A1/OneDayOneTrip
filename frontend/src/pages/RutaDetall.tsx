@@ -54,7 +54,7 @@ export default function RutaDetall() {
   const [saveLoading, setSaveLoading] = useState(false);
 
 
-  // 🔹 Cargar usuario Firebase + backendUser
+  // 🔹 Carregar usuari Firebase + backendUser
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setCurrentUser(fbUser);
@@ -80,7 +80,7 @@ export default function RutaDetall() {
     navigate("/");
   };
 
-  // 🔹 Cargar ruta
+  // 🔹 Carregar ruta
   useEffect(() => {
     const fetchTrip = async () => {
       if (!id) {
@@ -115,7 +115,7 @@ export default function RutaDetall() {
     fetchTrip();
   }, [id, navigate]);
 
-  // 🔹 Datos del autor
+  // 🔹 Dades de l'autor
   useEffect(() => {
     const loadAuthor = async () => {
       if (!tripData?.author?.userId || !tripData?._id) return;
@@ -146,7 +146,7 @@ export default function RutaDetall() {
     loadAuthor();
   }, [tripData, currentUser]);
 
-  // 🔹 Seguir / Dejar de seguir
+  // 🔹 Seguir / Deixar de seguir
   const handleFollow = async () => {
     if (!currentUser || !tripData?.author?.userId) return;
 
@@ -243,7 +243,7 @@ export default function RutaDetall() {
       onBack={() => navigate(-1)}
       variant="ruta"
     >
-      {/* Galería */}
+      {/* Galeria */}
       <div className="ruta-galeria-principal">
         <div className="imatge-gran">
           {mainImage ? (
@@ -260,7 +260,7 @@ export default function RutaDetall() {
         </div>
       </div>
 
-      {/* Datos */}
+      {/* Dades */}
       <div className="ruta-detall">
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
@@ -364,13 +364,13 @@ export default function RutaDetall() {
         </div>
 
 
-        {/* Descripción */}
+        {/* Descripció */}
         <div className="ruta-descripcio">
           <h2>Descripció</h2>
           <p>{tripData.description}</p>
         </div>
 
-        {/* Etapas */}
+        {/* Etapes */}
         <h2>Etapes de la Ruta</h2>
         <EtapesList
           etapes={tripData.trip_points.map((p, i) => ({

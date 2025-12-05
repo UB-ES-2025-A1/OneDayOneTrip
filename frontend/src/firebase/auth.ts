@@ -15,10 +15,10 @@ const auth = getAuth(app);
 
 class AuthService {
   /**
-   * Registro de usuario:
-   * 1. Crea cuenta en Firebase
-   * 2. Actualiza displayName
-   * 3. Llama al backend /users/register con token
+   * Registre d'usuari:
+   * 1. Crear compte a Firebase
+   * 2. Actualitza displayName
+   * 3. Crida al backend /users/register amb token
    */
   async register(fullname: string, username: string, mail: string, password: string) {
     const userCredential = await createUserWithEmailAndPassword(auth, mail, password);
@@ -32,7 +32,7 @@ class AuthService {
   }
 
   /**
-   * Iniciar sesión con Firebase Auth
+   * Iniciar sessió amb Firebase Auth
    */
   async login(mail: string, password: string) {
     const userCredential = await signInWithEmailAndPassword(auth, mail, password);
@@ -40,21 +40,21 @@ class AuthService {
   }
 
   /**
-   * Cerrar sesión
+   * Tancar sessió
    */
   async logout() {
     await signOut(auth);
   }
 
   /**
-   * Escucha cambios de sesión (login/logout)
+   * Escolta canvis de sessió (login/logout)
    */
   onAuthChange(callback: (user: User | null) => void) {
     return onAuthStateChanged(auth, callback);
   }
 
   /**
-   * Devuelve el usuario actual (si hay sesión activa)
+   * Retorna l'usuari actual (si hi ha sessió activa)
    */
   getCurrentUser(): User | null {
     return auth.currentUser;
