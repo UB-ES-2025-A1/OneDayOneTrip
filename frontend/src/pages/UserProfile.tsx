@@ -5,7 +5,7 @@ import { auth } from "../firebase";
 import { getUserById } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
-import { ImageOff, Pencil } from "lucide-react";
+import { ImageOff, Pencil, Mail} from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
@@ -186,6 +186,12 @@ export default function UserProfile() {
   const gridItems =
     selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
 
+    const openMailbox = () => {
+    // TODO: Obrir component de notificacions / mailbox
+    console.log("Open mailbox");
+  };
+
+
   // Render
   return (
     <Layout
@@ -209,6 +215,10 @@ export default function UserProfile() {
           >
             <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}>
               <Pencil size={22} />
+            </button>
+
+             <button className="mailbox-btn" onClick={openMailbox}>
+              <Mail size={24} />
             </button>
 
             <div className="user-photo">

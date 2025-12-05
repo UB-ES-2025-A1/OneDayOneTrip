@@ -239,6 +239,34 @@
   transform: scale(1.08);
 }
 
+.mailbox-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.mailbox-btn svg {
+  color: #333;
+}
+
+.mailbox-btn:hover {
+  background: #ffffff;
+  transform: scale(1.08);
+}
+
 .tab-title {
   color: #2e492e;
   font-size: 1.2rem;
