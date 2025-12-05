@@ -16,6 +16,31 @@ import { Search } from "lucide-react";
 
 type SearchFilter = "all" | "user" | "country" | "city" | "monument";
 
+function wilsonScore(avgRating: number, numRatings: number): number {
+    // Si no hi ha rating o no hi ha valoracions → score = 0
+    if (!avgRating || !numRatings) return 0;
+
+    // Valor z per a un interval de confiança del 95%
+    // Com més gran és z, més penalitza la manca de vots
+    const z = 1.96; // 95% confidence
+
+    // Convertim el rating de 1–5 a probabilitat 0–1
+    const p = avgRating / 5;
+
+    // Fórmula del Wilson Score - Combina la proporció p amb un terme de correcció pel nombre de vots
+    const numerator =
+        p + (z * z) / (2 * numRatings) -
+        z *
+        Math.sqrt(
+            ((p * (1 - p)) + (z * z) / (4 * numRatings)) / numRatings
+        );
+
+    // Normalitza el càlcul segons la confiança estadística
+    const denominator = 1 + (z * z) / numRatings;
+
+    return numerator / denominator;
+}
+
 export default function Home() {
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -69,16 +94,35 @@ export default function Home() {
     fetchTrips();
   }, []);
 
+    const filteredTrips = trips
+        // Eliminem les rutes dels usuaris que tenim bloquejats
+        .filter((t) => {
+            const authorId = t.author?.userId;
+            const bloquejats = backendUser?.llista_bloquejats || [];
+            return !bloquejats.includes(authorId);
+        })
+
+        // Mostrem les rutes dels usuaris que no seguim
+        .filter((t) => {
+            if (selectedTab === "recomenats") return true;
+
+            const seguits = backendUser?.llista_seguits || [];
+            const authorId = t.author?.userId || "";
+
+            return seguits.includes(authorId);
+        })
   const filteredTrips = trips.filter((t) => {
     if (selectedTab === "recomendados") {
       return true; // Mostrar totes les trips
     }
 
-    if (!backendUser?.llista_seguits) return false;
+        // Mostrem segons la funció de Wilson Score
+        .sort((a, b) => {
+            const scoreA = wilsonScore(a.avgRating || 0, a.numRatings || 0);
+            const scoreB = wilsonScore(b.avgRating || 0, b.numRatings || 0);
+            return scoreB - scoreA;
+        });
 
-    const authorId = t.author?.userId || "";
-    return backendUser.llista_seguits.includes(authorId);
-  });
 
   const search = searchTerm.trim().toLowerCase();
 
@@ -113,7 +157,7 @@ export default function Home() {
 
   const isFiltering = search.length > 0 || searchFilter !== "all";
 
-  const normalizeId = (id: any) =>
+    const normalizeId = (id: any) =>
     typeof id === "string" ? id : id?.$oid || String(id || "");
 
   const placeholderMap: Record<SearchFilter, string> = {

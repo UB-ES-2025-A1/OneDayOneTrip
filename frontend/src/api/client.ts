@@ -1,7 +1,13 @@
 import { getAuth } from "firebase/auth";
 
-//const API_URL = "https://onedayonetrip.onrender.com"; // o 
-const API_URL  = "http://127.0.0.1:8000"; 
+const API_URL = "http://127.0.0.1:8000"; // o
+
+//url local = http://127.0.0.1:8000 
+
+// url production = https://onedayonetrip-api.onrender.com
+
+// url preproduction = https://onedayonetrip.onrender.com
+
 
 // ------------------------------
 // Funcions base genèriques
