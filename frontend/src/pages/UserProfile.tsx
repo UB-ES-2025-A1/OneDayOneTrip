@@ -13,6 +13,7 @@ import EditarPerfil from "../components/EditarPerfilModal";
 import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
 import AvatarFallback from "../components/AvatarFallback"; 
+import Mailbox from "../components/Mailbox";
 
 export type BackendUser = {
   uid: string;
@@ -55,6 +56,8 @@ export default function UserProfile() {
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
+  const [mailboxOpen, setMailboxOpen] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -186,9 +189,9 @@ export default function UserProfile() {
   const gridItems =
     selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
 
+  
     const openMailbox = () => {
-    // TODO: Obrir component de notificacions / mailbox
-    console.log("Open mailbox");
+    setMailboxOpen(true);
   };
 
 
@@ -344,6 +347,23 @@ export default function UserProfile() {
               }}
             />
           )}
+
+                    {openEdit && profile && (
+            <EditarPerfil
+              profile={profile}
+              onClose={() => setOpenEdit(false)}
+              onSave={(updated) => {
+                setProfile(updated);
+                setOpenEdit(false);
+              }}
+            />
+          )}
+
+          <Mailbox
+            open={mailboxOpen}
+            onClose={() => setMailboxOpen(false)}
+          />
+
         </>
       )}
     </Layout>
