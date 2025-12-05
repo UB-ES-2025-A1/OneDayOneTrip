@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut, type User as FirebaseUser } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById } from "../api/client";
+import { getUserById, removePublication } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
+import { Settings } from "lucide-react";
 import { ImageOff, Pencil } from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
@@ -12,6 +13,7 @@ import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal";
 import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
+import UserSettings from "../components/UserSettings";
 import AvatarFallback from "../components/AvatarFallback"; 
 
 export type BackendUser = {
@@ -55,8 +57,19 @@ export default function UserProfile() {
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+
+  // 🗑️ estat per al popup d’eliminació
+  const [tripToDelete, setTripToDelete] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  const handleOpenSettings = () => {
+    console.log("Obrir finestra de configuració de compte");
+  };
+
 
   // ---------------------------
   // Carregar usuari i trips
@@ -157,6 +170,49 @@ export default function UserProfile() {
       country: t.country || "",
     }));
 
+  // 🗑️ Quan fas clic a la brossa: només obrim el popup
+  const askDeleteTrip = (tripId: string) => {
+    setTripToDelete(tripId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDeleteTrip = async () => {
+    if (!currentUser || !profile || !tripToDelete) return;
+
+    try {
+      await removePublication(profile.uid, tripToDelete);
+
+      // Treure-la de trips
+      setTrips((prev) =>
+        prev.filter((t) => String(t._id) !== String(tripToDelete))
+      );
+
+      // Treure-la de publicacions del perfil
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              publicacions: (prev.publicacions || []).filter(
+                (id) => String(id) !== String(tripToDelete)
+              ),
+            }
+          : prev
+      );
+    } catch (err: any) {
+      console.error("Error eliminant ruta:", err);
+      alert(err?.message || "Error eliminant la ruta");
+    } finally {
+      setDeleteModalOpen(false);
+      setTripToDelete(null);
+    }
+  };
+
+  // ❌ Cancel·lar popup
+  const handleCancelDeleteTrip = () => {
+    setDeleteModalOpen(false);
+    setTripToDelete(null);
+  };
+
   // ---------------------------
   // Derivats visuals
   // ---------------------------
@@ -165,7 +221,6 @@ export default function UserProfile() {
     currentUser?.displayName ||
     profile?.username ||
     "Usuari";
-
   const displayMail = profile?.mail || currentUser?.email || "";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
@@ -207,6 +262,14 @@ export default function UserProfile() {
               position: "relative",
             }}
           >
+          {currentUser && profile && currentUser.uid === profile.uid && (
+              <button className="settings-btn" onClick={() => setSettingsOpen(true)}>
+                <Settings size={36} />
+              </button>
+            )}
+
+            <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}> <Pencil size={22} /></button>
+          
             <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}>
               <Pencil size={22} />
             </button>
@@ -258,7 +321,6 @@ export default function UserProfile() {
             >
               Publicacions
             </button>
-
             <button
               className={`tab-btn ${
                 selectedTab === "guardat" ? "active" : ""
@@ -276,6 +338,8 @@ export default function UserProfile() {
               currentUser={currentUser}
               showCreateButton={selectedTab === "publicacions"}
               onCreateTripClick={() => setModalOpen("createTrip")}
+              showDeleteIcon={selectedTab === "publicacions"}
+              onDeleteTrip={askDeleteTrip} 
             />
 
             {gridItems.length === 0 && (
@@ -303,8 +367,8 @@ export default function UserProfile() {
               />
             )}
           </section>
-          
-          {/* ---------------- Modals ---------------- */}
+
+          {/* ---------------- Modales ---------------- */}
           {seguitsModalOpen && profile && (
             <LlistaSeguits
               open={seguitsModalOpen}
@@ -323,6 +387,7 @@ export default function UserProfile() {
               goToProfile={goToProfile}
             />
           )}
+          <UserSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
 
           {openEdit && profile && (
             <EditarPerfil
@@ -333,6 +398,46 @@ export default function UserProfile() {
                 setOpenEdit(false);
               }}
             />
+          )}
+
+          {deleteModalOpen && ( 
+          <div className="confirm-delete-backdrop">
+            <div className="confirm-delete-modal">
+              <h3>Eliminar publicació</h3>
+              <p>
+                Segur que vols eliminar aquesta publicació del teu perfil?
+                Aquesta acció no es pot desfer.
+              </p>
+
+              <div className="confirm-delete-buttons">
+                <button
+                  className="btn-secondary"
+                  onClick={handleCancelDeleteTrip}
+                >
+                  Cancel·lar
+                </button>
+                <button
+                  className="btn-danger"
+                  onClick={handleConfirmDeleteTrip}
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+          {openEdit && profile && (
+            <EditarPerfil
+              profile={profile}
+              onClose={() => setOpenEdit(false)}
+              onSave={(updated) => {
+                setProfile(updated);
+                setOpenEdit(false);
+              }}
+            />
+
           )}
         </>
       )}

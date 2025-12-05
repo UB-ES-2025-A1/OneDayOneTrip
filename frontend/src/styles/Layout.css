@@ -3,21 +3,21 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f8f9fa;
-  color: #1b1b1b;
+  background: var(--bg-page);
+  color: var(--text-primary);
 }
 
 /* Variants visuals per pàgina */
 .layout.home {
-  background: #f8f9fa;
+  background: var(--bg-page);
 }
 
 .layout.ruta {
-  background: #ffffff;
+  background: var(--bg-card);
 }
 
 .layout.perfil {
-  background: #f8f9fa;
+  background: var(--bg-page);
 }
 
 /* Contenidor de contingut principal */
