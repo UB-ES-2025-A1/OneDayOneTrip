@@ -48,7 +48,7 @@ export default function Carousel() {
     setCurrent((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
   };
 
-  // 📱 Swipe en dispositivos táctiles
+  // 📱 Swipe en dispositius tàctils
   useEffect(() => {
     const node = slideRef.current;
     if (!node) return;
@@ -93,7 +93,7 @@ export default function Carousel() {
         ))}
       </div>
 
-      {/* Botones de navegación */}
+      {/* Botons de navegació */}
       <button className="carousel-btn prev" onClick={prevSlide}>
         ‹
       </button>
@@ -101,7 +101,7 @@ export default function Carousel() {
         ›
       </button>
 
-      {/* Indicadores inferiores */}
+      {/* Indicadors inferiors */}
       <div className="carousel-indicators">
         {slides.map((_, i) => (
           <span

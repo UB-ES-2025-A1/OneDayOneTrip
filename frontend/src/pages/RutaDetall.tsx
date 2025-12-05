@@ -2,9 +2,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { auth } from "../firebase";
-import "../styles/RutaDetalls.css";
+import "../styles/RutaDetall.gallery.css";
+import "../styles/RutaDetall.header-actions.css";
+import "../styles/RutaDetall.layout.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
+import { MapPin } from "lucide-react";
+
 
 import {
   getTripById,
@@ -50,7 +54,7 @@ export default function RutaDetall() {
   const [saveLoading, setSaveLoading] = useState(false);
 
 
-  // 🔹 Cargar usuario Firebase + backendUser
+  // 🔹 Carregar usuari Firebase + backendUser
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setCurrentUser(fbUser);
@@ -76,7 +80,7 @@ export default function RutaDetall() {
     navigate("/");
   };
 
-  // 🔹 Cargar ruta
+  // 🔹 Carregar ruta
   useEffect(() => {
     const fetchTrip = async () => {
       if (!id) {
@@ -111,7 +115,7 @@ export default function RutaDetall() {
     fetchTrip();
   }, [id, navigate]);
 
-  // 🔹 Datos del autor
+  // 🔹 Dades de l'autor
   useEffect(() => {
     const loadAuthor = async () => {
       if (!tripData?.author?.userId || !tripData?._id) return;
@@ -142,7 +146,7 @@ export default function RutaDetall() {
     loadAuthor();
   }, [tripData, currentUser]);
 
-  // 🔹 Seguir / Dejar de seguir
+  // 🔹 Seguir / Deixar de seguir
   const handleFollow = async () => {
     if (!currentUser || !tripData?.author?.userId) return;
 
@@ -239,7 +243,7 @@ export default function RutaDetall() {
       onBack={() => navigate(-1)}
       variant="ruta"
     >
-      {/* Galería */}
+      {/* Galeria */}
       <div className="ruta-galeria-principal">
         <div className="imatge-gran">
           {mainImage ? (
@@ -256,38 +260,33 @@ export default function RutaDetall() {
         </div>
       </div>
 
-      {/* Datos */}
+      {/* Dades */}
       <div className="ruta-detall">
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
   
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "10px",
-            }}
-          >
+          <div className="ruta-actions">            
             {/* Esquerra: Rating + Valorar */}
-            <div style={{display: "flex", width: "150%"}}>
+            <div className="ruta-actions-left">
               {tripData.avgRating != null && (
-                <div className="rating-summary">
-                  <span className="rating-star">★</span>
-                  <span className="rating-value">{tripData.avgRating.toFixed(1)}</span>
-                  <span className="rating-count">({tripData.numRatings})</span>
-                </div>
-              )}
-              <div style={{display: "flex", gap: "10px"}}>
-              <button
-                className="valorar-button"
-                onClick={() => setShowRatingModal(true)}
-              >
-                <span className="valorar-icon">★</span>
-                Valorar
-              </button>
-
+              <div className="rating-summary">
+                <span className="rating-star">★</span>
+                <span className="rating-value">
+                  {tripData.avgRating.toFixed(1)}
+                </span>
+                <span className="rating-count">
+                  ({tripData.numRatings})
+                </span>
+              </div>
+            )}
+          <div className="ruta-actions-buttons">
+            <button
+              className="valorar-button"
+              onClick={() => setShowRatingModal(true)}
+            >
+              <span className="valorar-icon">★</span>
+              Valorar
+            </button>
             {/* Dreta: Botó Guardar */}
             <button
               type="button"
@@ -320,10 +319,11 @@ export default function RutaDetall() {
         </div>
         
         <div className="ubicacio">
-          <img src="/images/ubi.png" className="ubi-icon" />
+          <MapPin className="ubi-icon" />
           <span>{tripData.city}</span>
           {tripData.region && <span>, {tripData.region}</span>}
         </div>
+
 
         {/* Autor */}
         <div className="autor">
@@ -364,13 +364,13 @@ export default function RutaDetall() {
         </div>
 
 
-        {/* Descripción */}
+        {/* Descripció */}
         <div className="ruta-descripcio">
           <h2>Descripció</h2>
           <p>{tripData.description}</p>
         </div>
 
-        {/* Etapas */}
+        {/* Etapes */}
         <h2>Etapes de la Ruta</h2>
         <EtapesList
           etapes={tripData.trip_points.map((p, i) => ({
@@ -383,7 +383,7 @@ export default function RutaDetall() {
         />
       </div>
 
-      {/* 🔥 Component de comentaris */}
+      {/*comentaris */}
       <Comments 
         tripId={tripData._id!} 
         currentUser={currentUser} 

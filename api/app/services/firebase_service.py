@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-load_dotenv()  # carga variables de .env si existen
+load_dotenv()  # carrega variables de .env si existeixen
 
 # ==========================================================
-# 🔐 Inicialización segura de Firebase
+# 🔐 Inicailització segura de Firebase
 # ==========================================================
 firebase_credentials_str = os.environ.get("FIREBASE_CREDENTIALS")
 
@@ -21,25 +21,25 @@ try:
             firebase_admin.initialize_app(cred)
 
         db = firestore.client()
-        print("[INFO] ✅ Firestore inicializado correctamente.")
+        print("[INFO] ✅ Firestore inicialitzat correctament.")
     else:
-        raise ValueError("FIREBASE_CREDENTIALS no está definido")
+        raise ValueError("FIREBASE_CREDENTIALS no està definit")
 
 except Exception as e:
-    print(f"[WARN] ⚠️ No se pudo inicializar Firebase: {e}")
-    print("[INFO] 🧪 Usando mock de Firestore para entorno de test.")
+    print(f"[WARN] ⚠️ No s'ha pogut inicialitzar Firebase: {e}")
+    print("[INFO] 🧪 Utilitzant Mock de Firebase per entorn de test.")
 
     class MockFirestore:
         def collection(self, name):
-            print(f"[MOCK] Firestore.collection('{name}') llamado.")
+            print(f"[MOCK] Firestore.collection('{name}') cridat.")
             return self
 
         def document(self, uid):
-            print(f"[MOCK] Firestore.document('{uid}') llamado.")
+            print(f"[MOCK] Firestore.document('{uid}') cridat.")
             return self
 
         def set(self, data, merge=False):
-            print(f"[MOCK] Firestore.set() llamado con data={data}")
+            print(f"[MOCK] Firestore.set() cridat amb data={data}")
             return None
 
         def get(self):
