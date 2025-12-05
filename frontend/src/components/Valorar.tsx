@@ -11,8 +11,8 @@ export default function Valorar({ onClose, onSubmit }: ValorarProps) {
   const [rating, setRating] = useState(0);
 
   const handleSubmit = () => {
-    onSubmit(rating);  
-    onClose();         
+    onSubmit(rating); 
+    onClose();        
   };
 
   const starElements: JSX.Element[] = [];
