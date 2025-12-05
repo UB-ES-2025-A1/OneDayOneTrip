@@ -13,6 +13,31 @@ import Layout from "../components/Layout";
 import { getAllTrips, type Trip } from "../api/trips";
 import { getUserById} from "../api/client";
 
+function wilsonScore(avgRating: number, numRatings: number): number {
+    // Si no hi ha rating o no hi ha valoracions → score = 0
+    if (!avgRating || !numRatings) return 0;
+
+    // Valor z per a un interval de confiança del 95%
+    // Com més gran és z, més penalitza la manca de vots
+    const z = 1.96; // 95% confidence
+
+    // Convertim el rating de 1–5 a probabilitat 0–1
+    const p = avgRating / 5;
+
+    // Fórmula del Wilson Score - Combina la proporció p amb un terme de correcció pel nombre de vots
+    const numerator =
+        p + (z * z) / (2 * numRatings) -
+        z *
+        Math.sqrt(
+            ((p * (1 - p)) + (z * z) / (4 * numRatings)) / numRatings
+        );
+
+    // Normalitza el càlcul segons la confiança estadística
+    const denominator = 1 + (z * z) / numRatings;
+
+    return numerator / denominator;
+}
+
 export default function Home() {
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -64,19 +89,34 @@ export default function Home() {
     fetchTrips();
   }, []);
 
-  const filteredTrips = trips.filter((t) => {
-    if (selectedTab === "recomenats") {
-      return true; // Mostrar TOTES les trips
-    }
+    const filteredTrips = trips
+        // Eliminem les rutes dels usuaris que tenim bloquejats
+        .filter((t) => {
+            const authorId = t.author?.userId;
+            const bloquejats = backendUser?.llista_bloquejats || [];
+            return !bloquejats.includes(authorId);
+        })
 
-    if (!backendUser?.llista_seguits) return false;
+        // Mostrem les rutes dels usuaris que no seguim
+        .filter((t) => {
+            if (selectedTab === "recomenats") return true;
 
-    const authorId = t.author?.userId || "";
-    return backendUser.llista_seguits.includes(authorId);
-  });
+            const seguits = backendUser?.llista_seguits || [];
+            const authorId = t.author?.userId || "";
+
+            return seguits.includes(authorId);
+        })
+
+        // Mostrem segons la funció de Wilson Score
+        .sort((a, b) => {
+            const scoreA = wilsonScore(a.avgRating || 0, a.numRatings || 0);
+            const scoreB = wilsonScore(b.avgRating || 0, b.numRatings || 0);
+            return scoreB - scoreA;
+        });
 
 
-  const normalizeId = (id: any) =>
+
+    const normalizeId = (id: any) =>
     typeof id === "string" ? id : id?.$oid || String(id || "");
 
   return (
