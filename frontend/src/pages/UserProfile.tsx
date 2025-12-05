@@ -66,11 +66,6 @@ export default function UserProfile() {
 
   const navigate = useNavigate();
 
-  const handleOpenSettings = () => {
-    console.log("Obrir finestra de configuració de compte");
-  };
-
-
   // ---------------------------
   // Carregar usuari i trips
   // ---------------------------

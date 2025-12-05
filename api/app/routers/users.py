@@ -11,7 +11,9 @@ from app.auth.verify_token import verify_token
 from firebase_admin import auth
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from app.services.mongo_service import delete_trip  # 👈 AFEGIT: funció que esborra la trip a Mongo
+from app.services.mongo_service import (
+    delete_trip,
+)  # 👈 AFEGIT: funció que esborra la trip a Mongo
 
 security = HTTPBearer()
 
@@ -253,7 +255,7 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
     }
 
 
-@router.delete("/delete/{user_id}") 
+@router.delete("/delete/{user_id}")
 async def delete_account(
     user_id: str,
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -347,9 +349,7 @@ async def delete_account(
         try:
             deleted = delete_trip(str(trip_id))
             if deleted == 0:
-                print(
-                    f"[WARN] Trip {trip_id} no trobada o no eliminada a Mongo."
-                )
+                print(f"[WARN] Trip {trip_id} no trobada o no eliminada a Mongo.")
         except Exception as e:
             print(f"[ERROR] No s'ha pogut eliminar la trip {trip_id} de Mongo:", e)
 
@@ -376,11 +376,7 @@ async def remove_publicacio_llista_publicacions(user_id: str, trip_id: str):
     if not snapshot.exists:
         raise HTTPException(status_code=404, detail="Usuari no trobat")
 
-    doc_ref.update(
-        {
-            "publicacions": firestore.ArrayRemove([trip_id])
-        }
-    )
+    doc_ref.update({"publicacions": firestore.ArrayRemove([trip_id])})
 
     return {"message": "Publicació eliminada", "trip_id": trip_id}
 
@@ -393,10 +389,6 @@ async def remove_guardat(user_id: str, trip_id: str):
     if not snapshot.exists:
         raise HTTPException(status_code=404, detail="Usuari no trobat")
 
-    doc_ref.update(
-        {
-            "guardades": firestore.ArrayRemove([trip_id])
-        }
-    )
+    doc_ref.update({"guardades": firestore.ArrayRemove([trip_id])})
 
     return {"message": "Ruta eliminada de guardats", "trip_id": trip_id}
