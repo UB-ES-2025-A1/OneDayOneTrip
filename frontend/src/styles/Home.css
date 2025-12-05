@@ -30,6 +30,12 @@
   --card-shadow: rgba(255, 255, 255, 0.06);
   --empty-bg: #1a1d1f;
   --empty-text: #e0e0e0;
+
+  --search-bg: #3a3f42;         
+  --search-border: #555a5e;
+  --search-text: #ffffff;
+  --search-placeholder: #bfc3c7;
+  --search-icon: #d0d4d8;
 }
 
 html, body, #root {
@@ -141,54 +147,54 @@ ter-select:focus {
   width: 100%;
   max-width: 720px;
 
-  background: #ffffff;
+  background: var(--search-bg);
   border-radius: 999px;
 
-  /* Contorn més gruixut i més suau */
-  border: 3px solid #d7e2d7;
+  border: 3px solid var(--search-border);
 
   padding: 0.45rem 1rem;
   box-sizing: border-box;
 
-  /* Suavitat i elegància */
-  transition: 
+  transition:
     border-color 0.25s ease,
+    background-color 0.25s ease,
     box-shadow 0.25s ease,
     transform 0.12s ease;
 }
 
 /* ---------- HOVER I FOCUS ---------- */
 .search-bar:hover {
-  border-color: #356a36;
-  transform: translateY(-1px); /* petit efecte d'elevació */
+  border-color: #4fa64f; /* verd suau que funciona en dark/light */
+  transform: translateY(-1px);
 }
 
 .search-bar:focus-within {
-  border-color: #356a36;
-  box-shadow: 0 0 0 4px rgba(53, 106, 54, 0.15); /* glow verd molt elegant */
+  border-color: #4fa64f;
+  box-shadow: 0 0 0 4px rgba(79, 166, 79, 0.25);
 }
 
-/* ---------- SELECT (Tipus de filtre) ---------- */
+/* ---------- SELECT ---------- */
 .search-filter-select {
   border: none;
   background: transparent;
   font-size: 0.9rem;
-  color: #000;
+  color: var(--search-text);
   outline: none;
   cursor: pointer;
   padding: 0 0.6rem 0 0.2rem;
   font-weight: 500;
 }
 
-.search-filter-select:hover {
-  color: #000;
+.search-filter-select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
 /* ---------- DIVISOR ---------- */
 .search-divider {
   width: 1.5px;
   height: 25px;
-  background-color: #c4c4c4;
+  background-color: var(--search-border);
   margin: 0 0.7rem;
   border-radius: 4px;
 }
@@ -200,32 +206,28 @@ ter-select:focus {
   outline: none;
   font-size: 1rem;
   font-weight: 400;
-  color: #0d0c22;
+  color: var(--search-text);
   padding: 0.4rem 0;
   background: transparent;
 }
 
 .search-input::placeholder {
-  color: #9e9ea7;
-  font-weight: 400;
+  color: var(--search-placeholder);
 }
 
-/* ---------- ICONA ---------- */
+/* ---------- ICON ---------- */
 .search-icon {
   margin-left: 0.5rem;
   flex-shrink: 0;
-  color: #7a7b82;
+  color: var(--search-icon);
   width: 1.1rem;
   height: 1.1rem;
   transition: color 0.2s ease;
 }
 
-.search-bar:hover .search-icon {
-  color: #356a36;
-}
-
+.search-bar:hover .search-icon,
 .search-bar:focus-within .search-icon {
-  color: #356a36;
+  color: #4fa64f;
 }
 
 
