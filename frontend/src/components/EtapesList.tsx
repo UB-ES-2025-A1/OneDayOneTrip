@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import '../styles/EtapesList.css';
+import { MapPin } from "lucide-react";
 
 interface Etapa {
   id: number;
@@ -33,16 +34,12 @@ const EtapesList: React.FC<EtapesListProps> = ({ etapes }) => {
               <p className="etapa-descripcio">{etapa.descripcio}</p>
             )}
             <div className="etapa-ubicacio">
-              <img
-                src="/images/ubi.png"
-                alt="Ubicació"
-                className="etapa-ubi-icon"
-              />
+              <MapPin className="etapa-ubi-icon" />
+
               <span>{etapa.ubicacio || 'Ubicació desconeguda'}</span>
             </div>
           </div>
-
-          {/* 🔹 Imagen movida fuera del bloque de texto */}
+          
           {etapa.imatge && (
             <img
               src={etapa.imatge}

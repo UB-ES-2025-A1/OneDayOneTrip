@@ -28,7 +28,6 @@
   to { transform: scale(1); opacity: 1; }
 }
 
-
 .valorar-header {
   position: relative;
   text-align: center;
@@ -53,7 +52,7 @@
   color: #555;
 }
 
-
+/* Estrelles */
 .rating {
   display: flex;
   justify-content: center;
@@ -69,7 +68,7 @@
 
 .rating:not(:checked) > label {
   cursor: pointer;
-  font-size: 38px;    
+  font-size: 38px;
   color: #666;
   padding: 0 4px;
 }
@@ -87,19 +86,19 @@
   color: #ffa723;
 }
 
-
+/* Botó enviar */
 .valorar-submit {
   padding: 8px 20px;
   border-radius: 20px;
   border: none;
   background: #2e492e;
   color: white;
-  font-size: 0.95rem;  /* 🔹 més petit */
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease;
   display: block;
-  margin: 0 auto;      /* centrat */
+  margin: 0 auto;
   margin-top: 10px;
 }
 
@@ -110,4 +109,51 @@
 
 .valorar-submit:hover:enabled {
   background: #093b22;
+}
+
+/* ============================
+   DARK MODE
+============================ */
+
+[data-theme="dark"] .valorar-modal {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+[data-theme="dark"] .valorar-title {
+  color: #8fda8f; /* verd clar com a la resta de títols en dark */
+}
+
+[data-theme="dark"] .valorar-close {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .valorar-close:hover {
+  color: #ffffff;
+}
+
+/* estrelles en mode fosc */
+[data-theme="dark"] .rating:not(:checked) > label {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .rating:not(:checked) > label:hover,
+[data-theme="dark"] .rating:not(:checked) > label:hover ~ label {
+  color: #ffd47a;
+}
+
+[data-theme="dark"] .rating > input:checked ~ label {
+  color: #ffdd88;
+}
+
+/* botó enviar en dark */
+[data-theme="dark"] .valorar-submit {
+  background: #8fda8f;
+  color: #0f0f0f;
+}
+
+[data-theme="dark"] .valorar-submit:hover:enabled {
+  background: #a5f4a5;
 }

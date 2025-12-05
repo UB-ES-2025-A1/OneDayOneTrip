@@ -4,7 +4,6 @@ from app.routers import trips, comments, ratings, images, users
 
 app = FastAPI(title="OneDayOneTrip API")
 
-# Permitir llamadas desde tu frontend (ajusta dominio si lo sabes)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # o ["https://tu-frontend.web.app"]
@@ -13,7 +12,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Rutas
+# Rutes
 app.include_router(trips.router)
 app.include_router(comments.router)
 app.include_router(ratings.router)
@@ -23,4 +22,4 @@ app.include_router(users.router)
 
 @app.get("/")
 def root():
-    return {"status": "API funcionando"}
+    return {"status": "API funcionant"}

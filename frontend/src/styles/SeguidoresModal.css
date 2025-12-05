@@ -101,3 +101,72 @@
 }
 
 
+/* =========================================================
+   DARK MODE — LLISTA SEGUITS
+   ========================================================= */
+
+[data-theme="dark"] .seguidores-card {
+  background: #1f2122; /* gris fosc coherent amb la resta */
+  color: var(--text-primary);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.85);
+}
+
+[data-theme="dark"] .seguidores-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .seguidores-empty {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .close-btn {
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+[data-theme="dark"] .close-btn:hover {
+  color: #ffffff;
+}
+
+/* ------ Items de la llista ------ */
+[data-theme="dark"] .seguidor-item {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+[data-theme="dark"] .seguidor-item:hover {
+  background: rgba(255,255,255,0.06); /* Gris fosc lleuger */
+}
+
+/* Textos */
+[data-theme="dark"] .seguidor-nom {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .seguidor-username {
+  color: var(--text-secondary);
+}
+
+/* ------ Botó SEGUIR / SEGUINT ------ */
+[data-theme="dark"] .seguidor-toggle-btn {
+  background-color: transparent;
+  border-color: #8fda8f;
+  color: #8fda8f;
+}
+
+[data-theme="dark"] .seguidor-toggle-btn:hover {
+  background-color: #8fda8f;
+  color: #0f0f0f;
+}
+
+/* Estat "Seguint" */
+[data-theme="dark"] .seguidor-toggle-btn.following {
+  border-color: #ff6b6b; 
+  color: #ff6b6b;
+  background: transparent;
+}
+
+[data-theme="dark"] .seguidor-toggle-btn.following:hover {
+  background: #ff6b6b;
+  color: #0f0f0f;
+}
