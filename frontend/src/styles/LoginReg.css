@@ -88,38 +88,11 @@
   max-width: 320px;
 }
 
-/* ---------- INPUTS ---------- */
-.auth-input {
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  width: 100%;
-}
 
 .input-wrapper {
   position: relative;
   width: 100%;
   max-width: 300px;
-}
-
-.input-wrapper .auth-input {
-  width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 4.5rem;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  height: 40px;
-  box-sizing: border-box;
-  text-align: left;
-  vertical-align: middle;
-}
-
-
-
-.input-wrapper.relative .auth-input {
-  height: 40px;
-  line-height: 1.2;
-  padding: 0.75rem 2.5rem 0.75rem 3rem;
-  text-align: left;
 }
 
 
@@ -221,7 +194,9 @@
   background: white;
 }
 /* ---------- Eye (Mostrar/Ocultar contrasenya) ---------- */
-.input-wrapper button {
+/* ---------- Eye (Mostrar/Ocultar contrasenya) ---------- */
+
+.password-toggle {
   background: transparent;
   border: none;
   cursor: pointer;
@@ -230,20 +205,83 @@
   align-items: center;
   justify-content: center;
   position: absolute;
-  right: 2px;
+  right: 0.6rem;
   top: 50%;
   transform: translateY(-50%);
 }
 
-.input-wrapper button svg {
+.password-toggle svg {
   width: 20px;
   height: 20px;
   color: #666;
   transition: color 0.2s ease;
 }
 
-.input-wrapper button:hover svg {
+.password-toggle:hover svg {
   color: #2e492e;
+}
+
+/* ---------- FLOATING LABEL INPUTS ---------- */
+
+.floating-input-group {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* input base, aprofitant auth-input però amb estil floating */
+.floating-input {
+  border-radius: 1rem;
+  background: #ffff;
+  border: 1.5px solid #c4c4c4;
+  font-size: 0.95rem;
+  color: #0d0c22;
+  padding: 0.75rem 2.6rem 0.75rem 3.4rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border 150ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* perquè el placeholder real no es vegi (només el fem servir per :placeholder-shown) */
+.floating-input::placeholder {
+  color: transparent;
+}
+
+/* label flotant */
+.floating-label {
+  position: absolute;
+  left: 3.4rem; /* alineat amb text (després de la icona) */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7a7a7a;
+  pointer-events: none;
+  font-size: 0.9rem;
+  transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #ffffff;
+  padding: 0 0.25em;
+}
+
+/* focus o quan l'input té contingut -> el label puja */
+.floating-input:focus,
+.floating-input:not(:placeholder-shown) {
+  outline: none;
+  border-color: #356a36;
+  box-shadow: 0 0 0 3px rgba(53, 106, 54, 0.15);
+  background-color: #ffffff;
+}
+
+.floating-input:focus + .floating-label,
+.floating-input:not(:placeholder-shown) + .floating-label {
+  transform: translateY(-135%) scale(0.85);
+  color: #356a36;
+}
+
+/* Ajust perquè l'input-icon segueixi quedant bé amb el nou input rounded */
+.floating-input-group .input-icon {
+  border-radius: 1rem 0 0 1rem;
 }
 
 
@@ -306,13 +344,6 @@
   .auth-form {
     max-width: 90%;
   }
-
-  .auth-input {
-  text-align: left;
-  vertical-align: top;
-  line-height: normal;
-}
-
   .login-form .auth-button {
     font-size: 1rem;
     padding: 0.7rem;
