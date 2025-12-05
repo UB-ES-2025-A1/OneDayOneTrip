@@ -111,10 +111,6 @@ export default function Home() {
 
             return seguits.includes(authorId);
         })
-  const filteredTrips = trips.filter((t) => {
-    if (selectedTab === "recomendados") {
-      return true; // Mostrar totes les trips
-    }
 
         // Mostrem segons la funció de Wilson Score
         .sort((a, b) => {
@@ -122,7 +118,6 @@ export default function Home() {
             const scoreB = wilsonScore(b.avgRating || 0, b.numRatings || 0);
             return scoreB - scoreA;
         });
-
 
   const search = searchTerm.trim().toLowerCase();
 
