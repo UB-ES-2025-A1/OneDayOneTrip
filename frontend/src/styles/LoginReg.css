@@ -28,12 +28,12 @@
   box-sizing: border-box;
 }
 
-/* versión más grande para registro */
+/* versió més grans per registrar */
 .register-card {
   max-width: 1300px;
 }
 
-/* ---------- BOTONES CERRAR ---------- */
+/* ---------- BOTONS TANCAR ---------- */
 .close-btn-login, .close-btn-reg {
   position: absolute;
   top: 12px;
@@ -53,7 +53,7 @@
   transform: scale(1.1);
 }
 
-/* ---------- CONTENIDO ---------- */
+/* ---------- CONTINGUT ---------- */
 .login-content {
   display: flex;
   width: 100%;
@@ -118,7 +118,7 @@
   filter: brightness(0) invert(1);
 }
 
-/* ---------- BOTONES ---------- */
+/* ---------- BOTONS ---------- */
 .login-form .auth-button {
   background-color: #356a36;
   color: white !important;
@@ -324,7 +324,7 @@
   }
 
   .login-gallery {
-    display: none; /* 🔹 Oculta galería para simplificar en móvil */
+    display: none; /* 🔹 Ocultar galeria per simplificar en mòbil */
   }
 
   .login-form {

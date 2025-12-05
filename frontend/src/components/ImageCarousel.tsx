@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 interface ImageCarouselProps {
   images: string[];
-  interval?: number; // tiempo entre imágenes en ms
+  interval?: number; // temps entre imatges en ms
 }
 
 const ImageCarousel: React.FC<ImageCarouselProps> = ({ images, interval = 3000 }) => {
@@ -49,7 +49,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ images, interval = 3000 }
         ))}
       </div>
 
-      {/* Dots de navegación */}
+      {/* Dots de navegació */}
       <div className="carousel-dots" style={{ textAlign: "center", marginTop: "8px" }}>
         {images.map((_, index) => (
           <span

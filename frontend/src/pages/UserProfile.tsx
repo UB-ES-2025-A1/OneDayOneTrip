@@ -5,13 +5,14 @@ import { auth } from "../firebase";
 import { getUserById } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
-import { ImageOff, Pencil } from "lucide-react"; 
+import { ImageOff, Pencil } from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal";
 import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
+import AvatarFallback from "../components/AvatarFallback"; 
 
 export type BackendUser = {
   uid: string;
@@ -45,7 +46,9 @@ export default function UserProfile() {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<BackendUser | null>(null);
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [selectedTab, setSelectedTab] = useState<"publicacions" | "guardat">("publicacions");
+  const [selectedTab, setSelectedTab] = useState<"publicacions" | "guardat">(
+    "publicacions"
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [openEdit, setOpenEdit] = useState(false);
@@ -56,7 +59,7 @@ export default function UserProfile() {
   const navigate = useNavigate();
 
   // ---------------------------
-  // Cargar usuario y trips
+  // Carregar usuari i trips
   // ---------------------------
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
@@ -81,7 +84,9 @@ export default function UserProfile() {
         const allTrips = await getAllTrips(true);
         const pubIds = new Set(backendUser.publicacions.map(String));
         const guardIds = new Set(backendUser.guardades.map(String));
-        const userTrips = allTrips.filter(t => pubIds.has(String(t._id)) || guardIds.has(String(t._id)));
+        const userTrips = allTrips.filter(
+          (t) => pubIds.has(String(t._id)) || guardIds.has(String(t._id))
+        );
         setTrips(userTrips);
       } catch (e: any) {
         console.error("Error carregant perfil:", e);
@@ -95,7 +100,7 @@ export default function UserProfile() {
   }, []);
 
   // ---------------------------
-  // Funciones
+  // Funcions
   // ---------------------------
   const handleLogout = async () => {
     await signOut(auth);
@@ -112,7 +117,7 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguidoresModalOpen(true);
     } catch (err) {
-      console.error("Error recargando seguidors:", err);
+      console.error("Error recarregant seguidors:", err);
     }
   };
 
@@ -124,11 +129,11 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguitsModalOpen(true);
     } catch (err) {
-      console.error("Error recargando seguits:", err);
+      console.error("Error recarregant seguits:", err);
     }
   };
 
-  // 🔹 Función para navegar a otro perfil
+  // 🔹 Funció per navegar a altre perfil
   const goToProfile = (uid: string) => {
     navigate(`/user/${uid}`);
     setSeguidoresModalOpen(false);
@@ -139,7 +144,10 @@ export default function UserProfile() {
     trips.map((t) => ({
       id: String(t._id),
       title: t.title || "Sense títol",
-      img: t.coverImage || (t.gallery && t.gallery[0]) || "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
+      img:
+        t.coverImage ||
+        (t.gallery && t.gallery[0]) ||
+        "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
       user: t.author?.name || "Anònim",
       rating: typeof t.avgRating === "number" ? t.avgRating : 0,
       temps: t.duration || "—",
@@ -150,14 +158,19 @@ export default function UserProfile() {
     }));
 
   // ---------------------------
-  // Derivados visuales
+  // Derivats visuals
   // ---------------------------
-  const displayName = profile?.nom_i_cognoms || currentUser?.displayName || profile?.username || "Usuari";
+  const displayName =
+    profile?.nom_i_cognoms ||
+    currentUser?.displayName ||
+    profile?.username ||
+    "Usuari";
+
   const displayMail = profile?.mail || currentUser?.email || "";
-  const photoUrl = profile?.url_foto_perfil || "/images/person.png";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
-  const seguidors = profile?.llista_seguidors?.length ?? profile?.seguidors ?? 0;
+  const seguidors =
+    profile?.llista_seguidors?.length ?? profile?.seguidors ?? 0;
   const seguits = profile?.llista_seguits?.length ?? profile?.seguits ?? 0;
 
   const publicacionsItems = useMemo(() => {
@@ -170,11 +183,10 @@ export default function UserProfile() {
     return toGridItems(trips.filter((t) => guardIds.has(String(t._id))));
   }, [trips, profile?.guardades]);
 
-  const gridItems = selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
+  const gridItems =
+    selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
 
-  // ---------------------------
   // Render
-  // ---------------------------
   return (
     <Layout
       currentUser={currentUser}
@@ -192,13 +204,19 @@ export default function UserProfile() {
             className="user-profile"
             style={{
               background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${panelUrl}) center/cover no-repeat`,
-              position:"relative",
+              position: "relative",
             }}
           >
-            <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}> <Pencil size={22} /></button>
-          
+            <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}>
+              <Pencil size={22} />
+            </button>
+
             <div className="user-photo">
-              <img src={photoUrl} alt="Foto de perfil" />
+              {profile.url_foto_perfil ? (
+                <img src={profile.url_foto_perfil} alt="Foto de perfil" />
+              ) : (
+                <AvatarFallback name={displayName} />
+              )}
             </div>
 
             <div className="user-details">
@@ -206,19 +224,23 @@ export default function UserProfile() {
                 <h2>{displayName}</h2>
                 <h3>{displayMail}</h3>
               </div>
+
               <div className="user-stats">
                 <div className="stat" onClick={openSeguidorsModal}>
                   <span className="number">{seguidors}</span>
                   <span className="label">Seguidors</span>
                 </div>
+
                 <div className="stat" onClick={openSeguitsModal}>
                   <span className="number">{seguits}</span>
                   <span className="label">Seguits</span>
                 </div>
+
                 <div className="stat">
                   <span className="number">{publicacionsItems.length}</span>
                   <span className="label">Publicacions</span>
                 </div>
+
                 <div className="stat">
                   <span className="number">{guardadesItems.length}</span>
                   <span className="label">Guardades</span>
@@ -228,8 +250,23 @@ export default function UserProfile() {
           </div>
 
           <div className="tabs-container" data-active={selectedTab}>
-            <button className={`tab-btn ${selectedTab === "publicacions" ? "active" : ""}`} onClick={() => setSelectedTab("publicacions")}>Publicacions</button>
-            <button className={`tab-btn ${selectedTab === "guardat" ? "active" : ""}`} onClick={() => setSelectedTab("guardat")}>Guardat</button>
+            <button
+              className={`tab-btn ${
+                selectedTab === "publicacions" ? "active" : ""
+              }`}
+              onClick={() => setSelectedTab("publicacions")}
+            >
+              Publicacions
+            </button>
+
+            <button
+              className={`tab-btn ${
+                selectedTab === "guardat" ? "active" : ""
+              }`}
+              onClick={() => setSelectedTab("guardat")}
+            >
+              Guardat
+            </button>
           </div>
 
           <section className="trip-list">
@@ -267,14 +304,14 @@ export default function UserProfile() {
             )}
           </section>
           
-          {/* ---------------- Modales ---------------- */}
+          {/* ---------------- Modals ---------------- */}
           {seguitsModalOpen && profile && (
             <LlistaSeguits
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
               currentUserId={currentUser.uid}
-              goToProfile={goToProfile} // ✅ AHORA FUNCIONA NAVEGACIÓN
+              goToProfile={goToProfile}
             />
           )}
 
@@ -283,17 +320,17 @@ export default function UserProfile() {
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
               seguidors={profile.llista_seguidors || []}
-              goToProfile={goToProfile} // ✅ Navegación también aquí
+              goToProfile={goToProfile}
             />
           )}
 
           {openEdit && profile && (
-            <EditarPerfil 
-              profile={profile} 
+            <EditarPerfil
+              profile={profile}
               onClose={() => setOpenEdit(false)}
               onSave={(updated) => {
-                setProfile(updated);     
-                setOpenEdit(false);       
+                setProfile(updated);
+                setOpenEdit(false);
               }}
             />
           )}

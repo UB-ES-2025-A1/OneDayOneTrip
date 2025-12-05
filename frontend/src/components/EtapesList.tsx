@@ -42,7 +42,7 @@ const EtapesList: React.FC<EtapesListProps> = ({ etapes }) => {
             </div>
           </div>
 
-          {/* 🔹 Imagen movida fuera del bloque de texto */}
+          {/* 🔹 Imatge moguda fora del bloc de text */}
           {etapa.imatge && (
             <img
               src={etapa.imatge}

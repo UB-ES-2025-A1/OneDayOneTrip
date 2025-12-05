@@ -20,7 +20,7 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [backendUser, setBackendUser] = useState<any | null>(null);
-  const [selectedTab, setSelectedTab] = useState<"recomendados" | "siguiendo">("recomendados");
+  const [selectedTab, setSelectedTab] = useState<"recomenats" | "seguint">("recomenats");
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export default function Home() {
   const handleLogout = async () => {
     await signOut(auth);
     setCurrentUser(null);
-    setSelectedTab("recomendados");
+    setSelectedTab("recomenats");
   };
 
   useEffect(() => {
@@ -145,14 +145,14 @@ export default function Home() {
       {currentUser && (
         <div className="tabs-container" data-active={selectedTab}>
           <button
-            className={`tab-btn ${selectedTab === "siguiendo" ? "active" : ""}`}
-            onClick={() => setSelectedTab("siguiendo")}
+            className={`tab-btn ${selectedTab === "seguint" ? "active" : ""}`}
+            onClick={() => setSelectedTab("seguint")}
           >
             Seguint
           </button>
           <button
-            className={`tab-btn ${selectedTab === "recomendados" ? "active" : ""}`}
-            onClick={() => setSelectedTab("recomendados")}
+            className={`tab-btn ${selectedTab === "recomenats" ? "active" : ""}`}
+            onClick={() => setSelectedTab("recomenats")}
           >
             Recomanats
           </button>

@@ -59,7 +59,7 @@ html, body, #root {
   z-index: 1;
 }
 
-.tabs-container[data-active="recomendados"]::before {
+.tabs-container[data-active="recomenats"]::before {
   transform: translateX(100%);
 }
 
@@ -318,7 +318,7 @@ ter-select:focus {
 }
 
 /* =========================================================
-   MENSAJE DE LISTA VACÍA (SIN RUTAS)
+   MISSATGE DE LLISTA BUIDA (SENSE RUTES)
    ========================================================= */
 .no-trips-message {
   text-align: center;

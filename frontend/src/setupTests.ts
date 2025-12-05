@@ -6,7 +6,7 @@ import { http, HttpResponse } from 'msw';
 import { beforeAll, afterAll, afterEach } from 'vitest';
 
 // ─────────────────────────────────────────────
-// Datos dummy
+// Dades dummy
 // ─────────────────────────────────────────────
 const dummyTrips = [
   {
@@ -29,7 +29,6 @@ const server = setupServer(
 
   // POST /trips
   http.post('*/trips', async () => {
-    // Si necesitas leer el body:
     // const body = await request.json();
     return HttpResponse.json({ id: 'new-trip-id' }, { status: 201 });
   }),
@@ -46,12 +45,10 @@ const server = setupServer(
 );
 
 // ─────────────────────────────────────────────
-// Ciclo de vida
+// Cicle de vida
 // ─────────────────────────────────────────────
 beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-// Opcional: exponer para tests que quieran sobreescribir handlers
-// (añade un .d.ts si quieres tipos)
 Object.assign(globalThis, { mswServer: server, mswHttp: http, mswHttpResponse: HttpResponse });

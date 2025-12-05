@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
 import { getUserById } from "../api/client";
 import "../styles/LlistaSeguidors.css";
+import AvatarFallback from "../components/AvatarFallback";
 
 interface BackendUser {
   uid: string;
@@ -33,17 +34,17 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
           return;
         }
 
-        console.log("Seguidors a cargar:", seguidors);
+        console.log("Seguidors a carregar:", seguidors);
         const fetchedUsers = await Promise.all(
           seguidors.map(async (uid) => {
             const u = await getUserById(uid);
             return u ? { ...u } : null;
           })
         );
-        console.log("Usuarios fetched:", fetchedUsers);
+        console.log("Usuaris fetched:", fetchedUsers);
         setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
       } catch (err) {
-        console.error("Error cargando seguidores:", err);
+        console.error("Error carregant seguidors:", err);
         setUsers([]);
       } finally {
         setLoading(false);
@@ -83,11 +84,14 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
                 className="seguidor-item"
                 onClick={() => goToProfile ? goToProfile(u.uid) : null}
               >
-                <img
-                  src={u.url_foto_perfil || "/images/default-profile.png"}
-                  className="seguidor-foto"
-                  alt={u.username || "usuari"}
-                />
+                <div className="seguidor-foto">
+                  {u.url_foto_perfil ? (
+                    <img src={u.url_foto_perfil} alt={u.username || "usuari"} />
+                  ) : (
+                    <AvatarFallback name={u.nom_i_cognoms || u.username || "?"} />
+                  )}
+                </div>
+
                 <div className="seguidor-info">
                   <p className="seguidor-nom">{u.nom_i_cognoms || "Usuari"}</p>
                   <p className="seguidor-username">@{u.username || "unknown"}</p>
