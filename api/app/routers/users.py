@@ -11,6 +11,8 @@ from app.auth.verify_token import verify_token
 from firebase_admin import auth
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from app.services.mongo_service import delete_trip  # 👈 AFEGIT: funció que esborra la trip a Mongo
+
 security = HTTPBearer()
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -83,7 +85,7 @@ async def get_current_user_by_id(user_id: str):
     return doc.to_dict()
 
 
-# Model amb  els camps que poden ser editats del perfil
+# Model amb els camps que poden ser editats del perfil
 class UserEditIn(BaseModel):
     nom_i_cognoms: Optional[str] = None
     username: Optional[str] = None
@@ -251,8 +253,7 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
     }
 
 
-@router.delete("/delete/{user_id}")
-@router.delete("/delete/{user_id}")
+@router.delete("/delete/{user_id}") 
 async def delete_account(
     user_id: str,
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -342,9 +343,13 @@ async def delete_account(
                 {"publicacions": firestore.ArrayRemove([trip_id])},
             )
 
-        # Eliminar trip a Mongo
+        # Eliminar trip a Mongo amb la mateixa funció que uses al endpoint /trips/{trip_id}
         try:
-            delete_trip_mongo(str(trip_id))
+            deleted = delete_trip(str(trip_id))
+            if deleted == 0:
+                print(
+                    f"[WARN] Trip {trip_id} no trobada o no eliminada a Mongo."
+                )
         except Exception as e:
             print(f"[ERROR] No s'ha pogut eliminar la trip {trip_id} de Mongo:", e)
 
@@ -371,11 +376,14 @@ async def remove_publicacio_llista_publicacions(user_id: str, trip_id: str):
     if not snapshot.exists:
         raise HTTPException(status_code=404, detail="Usuari no trobat")
 
-    doc_ref.update({
-        "publicacions": firestore.ArrayRemove([trip_id])
-    })
+    doc_ref.update(
+        {
+            "publicacions": firestore.ArrayRemove([trip_id])
+        }
+    )
 
     return {"message": "Publicació eliminada", "trip_id": trip_id}
+
 
 @router.delete("/{user_id}/guardats/{trip_id}")
 async def remove_guardat(user_id: str, trip_id: str):
@@ -385,9 +393,10 @@ async def remove_guardat(user_id: str, trip_id: str):
     if not snapshot.exists:
         raise HTTPException(status_code=404, detail="Usuari no trobat")
 
-    doc_ref.update({
-        "guardades": firestore.ArrayRemove([trip_id])
-    })
+    doc_ref.update(
+        {
+            "guardades": firestore.ArrayRemove([trip_id])
+        }
+    )
 
     return {"message": "Ruta eliminada de guardats", "trip_id": trip_id}
-
