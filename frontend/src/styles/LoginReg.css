@@ -238,6 +238,41 @@
   color: #2e492e;
 }
 
+/* ---------- Privacitat del perfil ---------- */
+.privacy-section {
+  margin-top: 0.75rem;
+  text-align: left;
+  width: 100%;
+  max-width: 320px;
+}
+
+.privacy-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2e492e;
+  margin-bottom: 0.35rem;
+}
+
+.privacy-options {
+  display: flex;
+  gap: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.privacy-option {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.privacy-option input {
+  accent-color: #356a36; /* verd coherent amb el branding */
+}
+
+
 /* ---------- FLOATING LABEL INPUTS ---------- */
 
 .floating-input-group {
