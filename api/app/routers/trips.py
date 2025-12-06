@@ -16,6 +16,7 @@ import json
 from datetime import datetime
 from app.services.mongo_service import upsert_rating
 from fastapi import Body
+from app.services.mongo_service import delete_trip
 
 router = APIRouter(prefix="/trips", tags=["Trips"])
 
@@ -216,3 +217,16 @@ def add_trip_rating(
     upsert_rating(trip_id, userId, rating, datetime.utcnow())
     print("[DEBUG] ✅ Rating guardat o actualizat correctament")
     return {"message": "Rating afegit o actualitzat"}
+
+
+@router.delete("/{trip_id}")
+async def delete_trip_endpoint(trip_id: str):
+
+    deleted = delete_trip(trip_id)
+
+    if deleted == 0:
+        raise HTTPException(
+            status_code=404, detail="La trip no existeix o no s'ha pogut eliminar."
+        )
+
+    return {"message": "Trip eliminada correctament", "trip_id": trip_id}

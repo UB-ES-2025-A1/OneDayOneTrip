@@ -1,4 +1,6 @@
+
 import { User2, ArrowLeft, Home as HomeIcon } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
 import { type User } from "firebase/auth";
