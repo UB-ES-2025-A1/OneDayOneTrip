@@ -13,7 +13,14 @@
   --card-shadow: rgba(0, 0, 0, 0.1);
   --empty-bg: #f9fafb;
   --empty-text: #444;
+
+  --search-bg: #ffffff;
+  --search-border: #d0d7de;
+  --search-text: #1b1b1b;
+  --search-placeholder: #9aa0aa;
+  --search-icon: #6b7280;
 }
+
 
 /* ================================
    VARIABLES GLOBALS DARK MODE
