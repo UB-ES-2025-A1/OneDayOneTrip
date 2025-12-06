@@ -1,6 +1,5 @@
-import React from "react";
 import { X, Mail, Bell, MessageCircle, Star } from "lucide-react";
-import "../styles/Mailbox.css";
+import "../styles/MailBox.css";
 
 export type NotificationType = "follow" | "comment" | "rating";
 
