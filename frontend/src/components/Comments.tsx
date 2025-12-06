@@ -25,7 +25,7 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
 
         const data = await getTripComments(tripId);
 
-        // 🔥 Aseguramos orden: MÁS NUEVO ARRIBA
+        // 🔥 Assegurem ordre: més nou primer
         const sorted = (Array.isArray(data) ? data : []).sort(
             (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -44,7 +44,7 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
 
 
 
-  // 🔹 Enviar nuevo comentario
+  // 🔹 Enviar nou comentari
   const handleSubmit = async () => {
     if (!currentUser) {
       alert("Has d'iniciar sessió per escriure un comentari.");
@@ -87,7 +87,7 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
     <div className="ruta-comentaris">
       <h2 className="comentaris-titol">Comentaris ({comments.length})</h2>
 
-      {/* 🔹 Si está logueado -> formulario */}
+      {/* 🔹 Si està loguejat -> formulari */}
       {currentUser && backendUser ? (
         <div className="comentari-nou">
           <div className="comentari-nou-avatar">
@@ -124,7 +124,7 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
         </p>
       )}
 
-      {/* 🔹 Lista de comentarios */}
+      {/* 🔹 Llista de comentaris */}
       {loading ? (
         <p className="comentaris-loading">Carregant comentaris...</p>
       ) : comments.length === 0 ? (

@@ -4,4 +4,4 @@ import { app } from "./config";
 
 export const db = getFirestore(app);
 
- // importarlo con import { db } from "../firebase/firestore";
+ // importar-lo amb import { db } from "../firebase/firestore";

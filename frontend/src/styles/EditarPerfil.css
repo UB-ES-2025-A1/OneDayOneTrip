@@ -12,11 +12,11 @@
   z-index: 1000;
 }
 
-/* Tarjeta del formulario */
+/* Targeta del formulari */
 .editar-perfil-card {
   background: #fff;
   border-radius: 20px;
-  width: 900px;            /* 🔥 Más ancho */
+  width: 900px;
   max-width: 95%;
   padding: 40px 50px;
   box-shadow: 0 12px 40px rgba(0,0,0,0.25);
@@ -30,19 +30,21 @@
   overflow-y: auto;
 }
 
-/* Título */
+/* Títol */
 .editar-perfil-card h2 {
   text-align: center;
   font-size: 28px;
   margin-bottom: 10px;
 }
 
-/* Dos columnas perfectamente alineadas */
+/* Duess columnes perfectament alineades */
 .two-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px; /* más espacio entre columnas */
+  gap: 28px;
 }
+
+
 
 /* En móvil, una columna */
 @media (max-width: 700px) {
@@ -51,7 +53,7 @@
   }
 }
 
-/* Cada grupo idéntico en altura y estructura */
+/* Cada grup idèntic en alçada i estructura */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -66,7 +68,7 @@
   color: #444;
 }
 
-/* Inputs alineados */
+/* Inputs alineats */
 .form-group input {
   width: 100%;
   padding: 14px 16px;
@@ -74,21 +76,21 @@
   border: 1px solid #ccc;
   font-size: 16px;
   transition: border 0.2s;
-  box-sizing: border-box; /* 🔥 evita desalineación */
+  box-sizing: border-box;
 }
 
-/* Imagenes 100% idénticas */
+/* Imatges 100% idèntiques */
 .preview-img {
   width: 100%;
-  height: 200px;           /* 🔥 tamaño fijo para que no rompan la cuadrícula */
-  object-fit: cover;       /* 🔥 mantiene proporción */
+  height: 200px;
+  object-fit: cover;
   border-radius: 12px;
   margin-top: 6px;
   background: #f2f2f2;
   border: 1px solid #ddd;
 }
 
-/* Botón guardar */
+/* Botó guardar */
 .save-btn {
   background-color: #356a36;
   color: white;
@@ -109,7 +111,7 @@
   opacity: 0.6;
 }
 
-/* Botón cerrar */
+/* Botó tancar */
 .close-btn {
   position: absolute;
   top: 18px;
@@ -119,4 +121,61 @@
   font-size: 32px;
   cursor: pointer;
   color: #666;
+}
+
+/* =========================================================
+   🌙 DARK MODE — EDITAR PERFIL
+   ========================================================= */
+
+[data-theme="dark"] .editar-perfil-card {
+  background: #222425;
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+}
+
+/* Títol */
+[data-theme="dark"] .editar-perfil-card h2 {
+  color: var(--text-primary);
+}
+
+/* Labels */
+[data-theme="dark"] .editar-perfil-card .form-group label {
+  color: var(--text-primary);
+}
+
+/* Inputs */
+[data-theme="dark"] .editar-perfil-card .form-group input {
+  background: #303335;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .editar-perfil-card .form-group input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Imatge de previsualització */
+[data-theme="dark"] .editar-perfil-card .preview-img {
+  background: #303335;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Botó guardar */
+[data-theme="dark"] .editar-perfil-card .save-btn {
+  background-color: #8fda8f;
+  color: #0d0d0d;
+}
+
+[data-theme="dark"] .editar-perfil-card .save-btn:hover {
+  background-color: #a3f3a3;
+}
+
+/* Botó tancar */
+[data-theme="dark"] .editar-perfil-card .close-btn {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .editar-perfil-card .close-btn:hover {
+  color: #ffffff;
 }

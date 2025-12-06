@@ -26,12 +26,12 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
     try {
       setLoading(true);
 
-      // Autenticación con Firebase
+      // Autenticació amb Firebase
       const user = await Auth.login(email, password);
-      console.log("Usuario logueado:", user);
+      console.log("Usuari loguejant:", user);
 
-      onClose(); // Cerramos modal
-      navigate("/"); // Redirigimos al dashboard
+      onClose(); // Tanquem modal
+      navigate("/"); // Redirigim al dashboard
 
     } catch (err: any) {
       console.error("Error en login:", err);
@@ -79,33 +79,39 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
           <div className="login-form">
             <h2 className="login-title">Iniciar sessió</h2>
             <form onSubmit={handleLogin} className="auth-form">
-              <div className="input-wrapper">
+              <div className="input-wrapper floating-input-group">
                 <div className="input-icon">
                   <img src="/images/person.png" alt="Persona" />
                 </div>
+
                 <input
                   type="email"
-                  placeholder="Correu electrònic"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="auth-input"
+                  className="auth-input floating-input"
+                  placeholder=" " // 👈 IMPORTANT: un espai perquè funcioni :placeholder-shown
                 />
+                <label className="floating-label">Correu electrònic</label>
               </div>
 
-            <div className="input-wrapper">
-              <div className="input-icon">
-                <img src="/images/lockk.png" alt="Contrasenya" />
+
+            <div className="input-wrapper floating-input-group">
+                <div className="input-icon">
+                  <img src="/images/lockk.png" alt="Contrasenya" />
+                </div>
+
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="auth-input floating-input"
+                  placeholder=" " // 👈 també aquí
+                />
+                <label className="floating-label">Contrasenya</label>
               </div>
-              <input
-                type="password"
-                placeholder="Contrasenya"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="auth-input"
-              />
-            </div>
+
 
               <button type="submit" className="auth-button" disabled={loading}>
                 {loading ? "Iniciant sessió..." : "Iniciar Sessió"}              

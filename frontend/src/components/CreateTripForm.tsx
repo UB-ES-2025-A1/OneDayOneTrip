@@ -64,7 +64,7 @@ const ALL_TAGS = [
   "rural",
 ];
 
-// Ciudades grandes de España (sugerencias)
+// Ciutats grans d'Espanya
 const BIG_SPANISH_CITIES = [
   "Madrid",
   "Barcelona",
@@ -88,7 +88,7 @@ const BIG_SPANISH_CITIES = [
   "Oviedo",
 ];
 
-// Comunidades autónomas
+// Comunitats autònomes
 const AUTONOMOUS_REGIONS = [
   "Andalusia",
   "Aragó",
@@ -111,7 +111,7 @@ const AUTONOMOUS_REGIONS = [
   "Melilla",
 ];
 
-// Lista mundial pero solo 20 países
+// Lista mundial per només 20 països
 const TOP_COUNTRIES = [
   "Espanya",
   "França",
@@ -154,16 +154,16 @@ export default function CreateTripForm({
   const [step, setStep] = useState(1);
   const totalSteps = STEPS.length;
 
-  // ---------- campos básicos ----------
+  // ---------- camps bàsics ----------
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
 
-  // Tags opción C: click + drag & drop
+  // Tags opció C: click + drag & drop
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [draggingTag, setDraggingTag] = useState<string | null>(null);
 
-  // Ubicación / datos
+  // Ubicació / dades
   const [city, setCity] = useState("");
   const [region, setRegion] = useState("");
   const [country, setCountry] = useState("");
@@ -173,12 +173,12 @@ export default function CreateTripForm({
   const [difficulty, setDifficulty] = useState("");
   const [recommendedSeason, setRecommendedSeason] = useState("");
 
-  // ---------- puntos de la ruta ----------
+  // ---------- punts de la ruta ----------
   const [tripPoints, setTripPoints] = useState<TripPointForm[]>([
     { title: "", description: "", lat: null, lng: null },
   ]);
 
-  // imágenes
+  // imatges
   const [cover, setCover] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
 
@@ -187,7 +187,7 @@ export default function CreateTripForm({
 
   const [pointImages, setPointImages] = useState<(File | null)[]>([null]);
 
-  // estado UI
+  // estat UI
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -217,7 +217,7 @@ export default function CreateTripForm({
     setDraggingTag(null);
   };
 
-  // ---------- helpers puntos ----------
+  // ---------- helpers punts ----------
   const handleAddPoint = () => {
     setTripPoints((prev) => [
       ...prev,
@@ -245,7 +245,7 @@ export default function CreateTripForm({
     setPointImages((prev) => prev.map((f, i) => (i === index ? file : f)));
   };
 
-  // ---------- helpers imágenes ----------
+  // ---------- helpers imatges ----------
   const handleGalleryChange = (files: FileList | null) => {
     if (!files) return;
 
@@ -268,7 +268,7 @@ export default function CreateTripForm({
     }
   };
 
-  // ---------- navegación ----------
+  // ---------- navegació ----------
   const goNext = () => {
     if (step < totalSteps) setStep((s) => s + 1);
   };
@@ -278,10 +278,10 @@ export default function CreateTripForm({
   };
 
   // =============================================================
-  // ✅ VALIDACIONES
+  // ✅ VALIDACIONS
   // =============================================================
   const validateStep = (currentStep: number): boolean => {
-    // limpiamos mensaje previo
+    // netegem missatge previ
     setError("");
 
     if (currentStep === 1) {
@@ -386,14 +386,14 @@ export default function CreateTripForm({
   };
 
   // =============================================================
-  // 🚀 Submit: llama a createTripMultipart()
+  // 🚀 Submit: crida a createTripMultipart()
   // =============================================================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    // Si no estamos en el último paso -> solo validamos ese paso y avanzamos
+    // Si no estem en l'últim pas -> només validem aquell pas i avancem
     if (step !== totalSteps) {
       const ok = validateStep(step);
       if (!ok) return;
@@ -401,7 +401,7 @@ export default function CreateTripForm({
       return;
     }
 
-    // Último paso: validamos TODO
+    // Últim pas: validem
     const allValid =
       validateStep(1) && validateStep(2) && validateStep(3);
     if (!allValid) return;
@@ -546,7 +546,7 @@ export default function CreateTripForm({
                     Fes clic o arrossega els tags per afegir-los a la teva ruta.
                   </p>
                   <div className="tag-columns">
-                    {/* Columna izquierda: disponibles */}
+                    {/* Columna esquerra: disponibles */}
                     <div
                       className="tag-column"
                       onDragOver={(e) => e.preventDefault()}
@@ -585,7 +585,7 @@ export default function CreateTripForm({
                       </div>
                     </div>
 
-                    {/* Columna derecha: seleccionados */}
+                    {/* Columna dreta: seleccionades */}
                     <div
                       className="tag-column"
                       onDragOver={(e) => e.preventDefault()}
@@ -644,7 +644,7 @@ export default function CreateTripForm({
           {step === 2 && (
             <div className="step-content">
               <div className="form-grid">
-                {/* Ciudad con datalist (sugerencias + escritura libre) */}
+                {/* Ciutat amb datalist (sugerencias + escritura lliure) */}
                 <label>
                   Ciutat
                   <input
@@ -797,7 +797,7 @@ export default function CreateTripForm({
                     </div>
                   </div>
 
-                  {/* Galería */}
+                  {/* Galeria */}
                   <div className="image-card image-card-gallery">
                     <div className="image-card-header">
                       <h4>Galeria d’imatges</h4>
@@ -955,7 +955,7 @@ export default function CreateTripForm({
             </div>
           )}
 
-          {/* ---------- BOTONES FOOTER (BACK/NEXT/SUBMIT) ---------- */}
+          {/* ---------- BOTONS FOOTER (BACK/NEXT/SUBMIT) ---------- */}
           <div className="form-actions wizard-actions">
             {/* PAS 1 -> Cancel·lar + Següent */}
             {step === 1 && (

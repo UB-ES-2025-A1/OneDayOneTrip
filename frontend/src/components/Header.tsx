@@ -1,4 +1,6 @@
-import { UserCircle, ArrowLeft, Home as HomeIcon } from "lucide-react";
+
+import { User2, ArrowLeft, Home as HomeIcon } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
 import { type User } from "firebase/auth";
@@ -54,7 +56,7 @@ export default function Header({
               title="Veure perfil"
               onClick={goProfile}
             >
-              <UserCircle size={28} />
+              <User2 size={28} strokeWidth={2} color="white" />
             </button>
             <button onClick={onLogout} className="header-btn logout">
               Tancar sessió
