@@ -99,7 +99,7 @@ html, body, #root {
   z-index: 1;
 }
 
-.tabs-container[data-active="recomenats"]::before {
+.tabs-container[data-active="recommended"]::before {
   transform: translateX(100%);
 }
 

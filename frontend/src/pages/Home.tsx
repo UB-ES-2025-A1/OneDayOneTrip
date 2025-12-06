@@ -14,6 +14,8 @@ import { getAllTrips, type Trip } from "../api/trips";
 import { getUserById } from "../api/client";
 import { Search } from "lucide-react";
 
+import { useTranslation } from 'react-i18next'; // Importa el hook
+
 type SearchFilter = "all" | "user" | "country" | "city" | "monument";
 
 function wilsonScore(avgRating: number, numRatings: number): number {
@@ -42,10 +44,12 @@ function wilsonScore(avgRating: number, numRatings: number): number {
 }
 
 export default function Home() {
+  const { t } = useTranslation();
+
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [backendUser, setBackendUser] = useState<any | null>(null);
-  const [selectedTab, setSelectedTab] = useState<"recomenats" | "seguint">("recomenats");
+  const [selectedTab, setSelectedTab] = useState<"recommended" | "following">("recommended");
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,7 +80,7 @@ export default function Home() {
   const handleLogout = async () => {
     await signOut(auth);
     setCurrentUser(null);
-    setSelectedTab("recomenats");
+    setSelectedTab("recommended");
   };
 
   useEffect(() => {
@@ -86,7 +90,7 @@ export default function Home() {
         const data = await getAllTrips(true);
         setTrips(data);
       } catch {
-        setError("No s'han pogut carregar les rutes");
+        setError(t('home_error_loading_routes'));
       } finally {
         setLoading(false);
       }
@@ -104,7 +108,7 @@ export default function Home() {
 
         // Mostrem les rutes dels usuaris que no seguim
         .filter((t) => {
-            if (selectedTab === "recomenats") return true;
+            if (selectedTab === "recommended") return true;
 
             const seguits = backendUser?.llista_seguits || [];
             const authorId = t.author?.userId || "";
@@ -156,11 +160,11 @@ export default function Home() {
     typeof id === "string" ? id : id?.$oid || String(id || "");
 
   const placeholderMap: Record<SearchFilter, string> = {
-    all: "Cerca per títol, ciutat, país o usuari...",
-    user: "Cerca per nom d'usuari...",
-    country: "Cerca per país...",
-    city: "Cerca per ciutat...",
-    monument: "Cerca per nom de la ruta / monument...",
+    all: t('home_placeholder_all'),
+    user: t('home_placeholder_user'),
+    country:t('home_placeholder_country'),
+    city: t('home_placeholder_city'),
+    monument: t('home_placeholder_monument'),
   };
 
   return (
@@ -175,26 +179,25 @@ export default function Home() {
       <Carousel />
 
       <section className="intro-text">
-        <p>Descobreix rutes d’un dia ideals per escapades exprés!</p>
+        <p>{t('home_slogan_1')}</p>
         <p>
-          Rutes guiades amb horaris, dificultat i recomanacions locals perquè
-          aprofitis al màxim cada ciutat.
+            {t('home_slogan_2')}
         </p>
       </section>
 
       {currentUser && (
         <div className="tabs-container" data-active={selectedTab}>
           <button
-            className={`tab-btn ${selectedTab === "seguint" ? "active" : ""}`}
-            onClick={() => setSelectedTab("seguint")}
+            className={`tab-btn ${selectedTab === "following" ? "active" : ""}`}
+            onClick={() => setSelectedTab("following")}
           >
-            Seguint
+              {t('home_tab_following')}
           </button>
           <button
-            className={`tab-btn ${selectedTab === "recomenats" ? "active" : ""}`}
-            onClick={() => setSelectedTab("recomenats")}
+            className={`tab-btn ${selectedTab === "recommended" ? "active" : ""}`}
+            onClick={() => setSelectedTab("recommended")}
           >
-            Recomanats
+              {t('home_tab_recommended')}
           </button>
         </div>
       )}
@@ -208,11 +211,11 @@ export default function Home() {
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value as SearchFilter)}
             >
-              <option value="all">Tot</option>
-              <option value="user">Usuari</option>
-              <option value="country">País</option>
-              <option value="city">Ciutat</option>
-              <option value="monument">Monument</option>
+              <option value="all">{t('home_search_all')}</option>
+              <option value="user">{t('home_search_user')}</option>
+              <option value="country">{t('home_search_country')}</option>
+              <option value="city">{t('home_search_city')}</option>
+              <option value="monument">{t('home_search_monument')}</option>
             </select>
 
             <span className="search-divider" />
@@ -231,19 +234,19 @@ export default function Home() {
       )}
 
       <section className="trip-list-section">
-        {loading && <p>Carregant rutes...</p>}
+        {loading && <p>{t('home_loading_routes')}</p>}
         {error && <p>{error}</p>}
 
         {!loading && !error && visibleTrips.length > 0 ? (
           <MasonryGrid
             items={visibleTrips.map((t) => ({
               id: normalizeId(t._id),
-              title: t.title || "Sense títol",
+              title: t.title || t('general_no_title'),
               img:
                 t.coverImage ||
                 (t.gallery && t.gallery[0]) ||
                 "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-              user: t.author?.name || "Anònim",
+              user: t.author?.name || t('general_anonymous'),
               rating: typeof t.avgRating === "number" ? t.avgRating : 0,
               temps: t.duration || "—",
               dificultat: t.difficulty || "—",
@@ -262,7 +265,7 @@ export default function Home() {
                 src={
                   isFiltering
                     ? "https://static.vecteezy.com/system/resources/previews/027/771/065/non_2x/reject-icon-image-vector.jpg" // icona “sense resultats”
-                    : selectedTab === "recomendados"
+                    : selectedTab === "recommended"
                     ? "https://cdn-icons-png.flaticon.com/512/7112/7112926.png"
                     : "https://cdn-icons-png.flaticon.com/512/4076/4076500.png"
                 }
@@ -271,10 +274,11 @@ export default function Home() {
               />
               <p>
                 {isFiltering
-                  ? "No s’han trobat resultats per al filtre actual."
-                  : selectedTab === "recomendados"
-                  ? "Encara no hi ha rutes recomanades per mostrar."
-                  : "Encara no segueixes a ningú, comença a explorar!"}
+                  ? t('home_no_results_filter')
+                  : selectedTab === "recommended"
+                  ? t('home_no_recommended_routes')
+                  : t('home_no_following')
+                }
               </p>
             </div>
           )
