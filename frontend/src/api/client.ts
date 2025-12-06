@@ -50,6 +50,7 @@ export async function registerUser(data: {
   fullname: string;
   username: string;
   mail: string;
+  isPrivate?: boolean;
 }) {
   return apiPost("/users/register", data);
 }
