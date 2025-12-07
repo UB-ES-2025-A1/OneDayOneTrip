@@ -29,6 +29,7 @@ export type BackendUser = {
   guardades?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
+  isPrivate?: boolean;
 };
 
 type GridItem = {
@@ -382,7 +383,14 @@ export default function UserProfile() {
               goToProfile={goToProfile}
             />
           )}
-          <UserSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+          <UserSettings 
+            open={settingsOpen} 
+            onClose={() => setSettingsOpen(false)}
+            isPrivate={!!profile.isPrivate}
+            onChangePrivacy={(value) =>
+              setProfile((prev) => (prev ? { ...prev, isPrivate: value } : prev))
+            }
+          />
 
           {openEdit && profile && (
             <EditarPerfil

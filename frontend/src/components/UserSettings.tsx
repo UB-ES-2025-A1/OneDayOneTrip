@@ -8,6 +8,8 @@ import { deleteAccount } from "../api/client";
 type Props = {
   open: boolean;
   onClose: () => void;
+  isPrivate: boolean;
+  onChangePrivacy: (value: boolean) => void;
 };
 
 // Funció per decidir tema inicial (localStorage o preferència del sistema)
@@ -21,7 +23,7 @@ function getInitialTheme(): "light" | "dark" {
   return prefersDark ? "dark" : "light";
 }
 
-export default function UserSettings({ open, onClose }: Props) {
+export default function UserSettings({ open, onClose, isPrivate, onChangePrivacy }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -96,7 +98,6 @@ export default function UserSettings({ open, onClose }: Props) {
             <div className="settings-row">
               <div className="settings-row-info">
                 <span className="settings-row-label">Mode fosc</span>
-
               </div>
 
               {/* Toggle animat tipus Uiverse */}
@@ -114,6 +115,37 @@ export default function UserSettings({ open, onClose }: Props) {
                   <div className="moon-icon-wrapper">
                     <div className="moon-icon">🌙</div>
                   </div>
+                  <div className="toggle-button" />
+                </div>
+              </label>
+            </div>
+          </div>
+
+          {/* 🔒 Privacitat / Perfil privat */}
+          <div className="settings-section">
+            <h3 className="settings-subtitle">Privacitat</h3>
+
+            <div className="settings-row">
+              <div className="settings-row-info">
+                <span className="settings-row-label">
+                  Perfil {isPrivate ? "privat" : "públic"}
+                </span>
+                <span className="settings-row-helper">
+                  {isPrivate
+                    ? "Només els seguidors aprovats podran veure el teu perfil i les teves rutes."
+                    : "Qualsevol usuari podrà veure el teu perfil i les teves rutes."}
+                </span>
+              </div>
+
+              {/* Toggle senzill per privacitat (reutilitza l’estil) */}
+              <label className="toggle-wrapper">
+                <input
+                  type="checkbox"
+                  className="toggle-checkbox"
+                  checked={isPrivate}
+                  onChange={(e) => onChangePrivacy(e.target.checked)}
+                />
+                <div className="toggle-slot">
                   <div className="toggle-button" />
                 </div>
               </label>
