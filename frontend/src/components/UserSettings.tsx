@@ -27,7 +27,6 @@ export default function UserSettings({ open, onClose, isPrivate, onChangePrivacy
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 🌙 estat del tema
   const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
 
   // Cada cop que canvia el tema → actualitzem l'HTML i el guardem
@@ -91,7 +90,6 @@ export default function UserSettings({ open, onClose, isPrivate, onChangePrivacy
         <h2 className="settings-title">Configuració</h2>
 
         <div className="settings-content">
-          {/* 🌙 Aparença / Mode fosc */}
           <div className="settings-section">
             <h3 className="settings-subtitle">Aparença</h3>
 
@@ -121,7 +119,6 @@ export default function UserSettings({ open, onClose, isPrivate, onChangePrivacy
             </div>
           </div>
 
-          {/* 🔒 Privacitat / Perfil privat */}
           <div className="settings-section">
             <h3 className="settings-subtitle">Privacitat</h3>
 
@@ -152,7 +149,6 @@ export default function UserSettings({ open, onClose, isPrivate, onChangePrivacy
             </div>
           </div>
 
-          {/* 🗑️ Secció eliminar compte */}
           <div className="settings-section">
             <p className="settings-warning">
               Esborrar el compte eliminarà totes les teves dades. Aquesta acció és irreversible.
