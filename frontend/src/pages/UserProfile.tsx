@@ -29,6 +29,7 @@ export type BackendUser = {
   guardades?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
+  isPrivate?: boolean;
 };
 
 type GridItem = {
@@ -58,9 +59,6 @@ export default function UserProfile() {
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-
-
-  // 🗑️ estat per al popup d’eliminació
   const [tripToDelete, setTripToDelete] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
@@ -165,7 +163,6 @@ export default function UserProfile() {
       country: t.country || "",
     }));
 
-  // 🗑️ Quan fas clic a la brossa: només obrim el popup
   const askDeleteTrip = (tripId: string) => {
     setTripToDelete(tripId);
     setDeleteModalOpen(true);
@@ -182,7 +179,6 @@ export default function UserProfile() {
         prev.filter((t) => String(t._id) !== String(tripToDelete))
       );
 
-      // Treure-la de publicacions del perfil
       setProfile((prev) =>
         prev
           ? {
@@ -202,7 +198,6 @@ export default function UserProfile() {
     }
   };
 
-  // ❌ Cancel·lar popup
   const handleCancelDeleteTrip = () => {
     setDeleteModalOpen(false);
     setTripToDelete(null);
@@ -382,7 +377,14 @@ export default function UserProfile() {
               goToProfile={goToProfile}
             />
           )}
-          <UserSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+          <UserSettings 
+            open={settingsOpen} 
+            onClose={() => setSettingsOpen(false)}
+            isPrivate={!!profile.isPrivate}
+            onChangePrivacy={(value) =>
+              setProfile((prev) => (prev ? { ...prev, isPrivate: value } : prev))
+            }
+          />
 
           {openEdit && profile && (
             <EditarPerfil
