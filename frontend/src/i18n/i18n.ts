@@ -22,5 +22,10 @@ i18n
         },
         interpolation: { escapeValue: false }
     });
+const savedLang = localStorage.getItem("lang");
+if (savedLang) {
+    i18n.changeLanguage(savedLang);
+}
+
 
 export default i18n;

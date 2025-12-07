@@ -4,6 +4,8 @@ import { X } from "lucide-react";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { deleteAccount } from "../api/client";
+import i18n from "../i18n/i18n";
+
 
 type Props = {
   open: boolean;
@@ -28,7 +30,16 @@ export default function UserSettings({ open, onClose }: Props) {
   // 🌙 estat del tema
   const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
 
-  // Cada cop que canvia el tema → actualitzem l'HTML i el guardem
+  const [language, setLanguage] = useState(i18n.language || "ca");
+
+  const changeLanguage = (lng: string) => {
+      i18n.changeLanguage(lng);
+      setLanguage(lng);
+      localStorage.setItem("lang", lng);
+  };
+
+
+    // Cada cop que canvia el tema → actualitzem l'HTML i el guardem
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
@@ -120,7 +131,28 @@ export default function UserSettings({ open, onClose }: Props) {
             </div>
           </div>
 
-          {/* 🗑️ Secció eliminar compte */}
+            <div className="settings-section">
+                <h3 className="settings-subtitle">Idioma</h3>
+
+                <div className="settings-row">
+                    <div className="settings-row-info">
+                        <span className="settings-row-label">Selecciona idioma</span>
+                    </div>
+
+                    <select
+                        className="settings-select"
+                        value={language}
+                        onChange={(e) => changeLanguage(e.target.value)}
+                    >
+                        <option value="ca">Català</option>
+                        <option value="es">Castellà</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+
+
+            {/* 🗑️ Secció eliminar compte */}
           <div className="settings-section">
             <p className="settings-warning">
               Esborrar el compte eliminarà totes les teves dades. Aquesta acció és irreversible.
