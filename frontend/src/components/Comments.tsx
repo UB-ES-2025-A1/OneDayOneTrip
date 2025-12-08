@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ca";
 import { createTripComment, getTripComments, type Comment } from "../api/trips";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface CommentsProps {
   tripId: string;
@@ -11,6 +12,7 @@ interface CommentsProps {
 }
 
 export default function Comments({ tripId, currentUser, backendUser }: CommentsProps) {
+  const { t } = useTranslation();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +35,7 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
 
         setComments(sorted);
         } catch (err) {
-        console.error("Error carregant comentaris:", err);
+        console.error(t('comments_error_loading'), err);
         } finally {
         setLoading(false);
         }
@@ -47,11 +49,11 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
   // 🔹 Enviar nou comentari
   const handleSubmit = async () => {
     if (!currentUser) {
-      alert("Has d'iniciar sessió per escriure un comentari.");
+      alert(t('comments_have_to_login'));
       return;
     }
     if (!backendUser) {
-      alert("Error: usuari backend no carregat.");
+      alert(t('comments_error_backend_user'));
       return;
     }
     if (!newComment.trim()) return;
@@ -66,7 +68,7 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
           backendUser.nom_i_cognoms ||
           backendUser.username ||
           backendUser.mail?.split("@")[0] ||
-          "Usuari",
+          t('general_user'),
         userProfilePicture: backendUser.url_foto_perfil,
         text: newComment.trim(),
       };
@@ -76,8 +78,8 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
       setComments((prev) => [created, ...prev]);
       setNewComment("");
     } catch (err) {
-      console.error("Error creant comentari:", err);
-      setError("No s'ha pogut enviar el comentari.");
+      console.error(t('comments_error_creating'), err);
+      setError(t('comments_error_sending'));
     } finally {
       setSending(false);
     }
@@ -85,7 +87,7 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
 
   return (
     <div className="ruta-comentaris">
-      <h2 className="comentaris-titol">Comentaris ({comments.length})</h2>
+      <h2 className="comentaris-titol">{t('comments_title')} ({comments.length})</h2>
 
       {/* 🔹 Si està loguejat -> formulari */}
       {currentUser && backendUser ? (
@@ -93,14 +95,14 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
           <div className="comentari-nou-avatar">
             <img
               src={backendUser.url_foto_perfil || "/images/person.png"}
-              alt="Tu"
+              alt={t('comments_person')}
             />
           </div>
 
           <div className="comentari-nou-main">
             <textarea
               className="comentari-nou-input"
-              placeholder="Afegeix un comentari..."
+              placeholder={t('comments_add_placeholder')}
               rows={3}
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
@@ -113,22 +115,22 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
                 disabled={sending || !newComment.trim()}
                 onClick={handleSubmit}
               >
-                {sending ? "Enviant..." : "Enviar"}
+                {sending ? t('general_sending') : t('general_send')}
               </button>
             </div>
           </div>
         </div>
       ) : (
         <p className="comentaris-login-hint">
-          Inicia sessió per deixar un comentari.
+          {t('comments_error_login_hint')}
         </p>
       )}
 
       {/* 🔹 Llista de comentaris */}
       {loading ? (
-        <p className="comentaris-loading">Carregant comentaris...</p>
+        <p className="comentaris-loading">{t('comments_loading')}</p>
       ) : comments.length === 0 ? (
-        <p className="comentaris-buits">Encara no hi ha comentaris.</p>
+        <p className="comentaris-buits">{t('comments_empty')}</p>
       ) : (
         <ul className="comentaris-llista">
           {comments.map((c) => (
