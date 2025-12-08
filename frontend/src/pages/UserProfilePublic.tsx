@@ -31,6 +31,8 @@ export type BackendUser = {
   isPrivate?: boolean;
 };
 
+type FollowStatus = "none" | "pending" | "following";
+
 export default function UserProfilePublic() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -47,6 +49,7 @@ export default function UserProfilePublic() {
   // 🔹 estat follow
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [followStatus, setFollowStatus] = useState<FollowStatus>("none");
 
   // Detectar usuari loguejat
   useEffect(() => {
@@ -92,17 +95,22 @@ export default function UserProfilePublic() {
     fetchProfile();
   }, [id]);
 
-  // 🔹 Saber si el currentUser segueix aquest perfil
+  // Saber si el currentUser segueix aquest perfil
   useEffect(() => {
     if (!currentUser || !profile) {
       setIsFollowing(false);
+      setFollowStatus("none");
       return;
     }
+
     const followers = profile.llista_seguidors || [];
-    setIsFollowing(followers.includes(currentUser.uid));
+    const alreadyFollowing = followers.includes(currentUser.uid);
+
+    setIsFollowing(alreadyFollowing);
+    setFollowStatus(alreadyFollowing ? "following" : "none");
   }, [currentUser, profile]);
 
-  // 🔹 Seguir / deixar de seguir
+  // 🔹 Seguir / deixar de seguir (amb estat PENDENT per perfils privats)
   const handleFollow = async () => {
     if (!currentUser) {
       alert("Has d'iniciar sessió per seguir usuaris");
@@ -112,13 +120,43 @@ export default function UserProfilePublic() {
 
     const userId = currentUser.uid;
     const targetId = profile.uid;
+    const isPrivateProfile = !!profile.isPrivate;
 
     try {
       setFollowLoading(true);
 
+      // PERFIL PRIVAT → de moment només front-end: PENDENT
+      if (isPrivateProfile) {
+        if (followStatus === "none") {
+          // TODO: quan el backend tingui endpoint de sol·licitud, cridar-lo aquí
+          // await requestFollow(userId, targetId);
+          setFollowStatus("pending");
+        } else if (followStatus === "following") {
+          // Si ja seguia i vol deixar de seguir en un perfil privat aprovat
+          await unfollowUser(userId, targetId);
+          setIsFollowing(false);
+          setFollowStatus("none");
+
+          setProfile((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  llista_seguidors: (prev.llista_seguidors || []).filter(
+                    (uid) => uid !== userId
+                  ),
+                }
+              : prev
+          );
+        }
+        // Si està "pending", de moment no fem res (en el futur podria ser "cancel·lar sol·licitud")
+        return;
+      }
+
+      // PERFIL PÚBLIC → lògica actual de seguir / deixar de seguir
       if (!isFollowing) {
         await followUser(userId, targetId);
         setIsFollowing(true);
+        setFollowStatus("following");
 
         setProfile((prev) =>
           prev
@@ -131,6 +169,7 @@ export default function UserProfilePublic() {
       } else {
         await unfollowUser(userId, targetId);
         setIsFollowing(false);
+        setFollowStatus("none");
 
         setProfile((prev) =>
           prev
@@ -189,17 +228,30 @@ export default function UserProfilePublic() {
     navigate("/");
   };
 
-  // 🔐 PRIVACITAT
+  // PRIVACITAT
   const isOwner =
     currentUser && profile ? currentUser.uid === profile.uid : false;
 
   const isPrivate = !!profile?.isPrivate;
-
-  // Pot veure el contingut si:
-  // - el perfil NO és privat
-  // - o és el propietari
-  // - o ja el segueix
   const canViewContent = !isPrivate || isOwner || isFollowing;
+
+  // Text i estil del botó segons estat
+  const buttonLabel = (() => {
+    if (isPrivate) {
+      if (followStatus === "pending") return "Pendent";
+      if (followStatus === "following") return "Seguint";
+      return "Seguir";
+    }
+    return isFollowing ? "Seguint" : "Seguir";
+  })();
+
+  const buttonClass = `follow-button ${
+    isPrivate && followStatus === "pending"
+      ? "pending"
+      : isFollowing || followStatus === "following"
+      ? "following"
+      : ""
+  }`;
 
   return (
     <Layout
@@ -232,21 +284,20 @@ export default function UserProfilePublic() {
               <div className="user-info">
                 <h2>{displayName}</h2>
 
-                {/* Badge de perfil privat opcional */}
                 {isPrivate && (
                   <span className="private-badge">Perfil privat</span>
                 )}
 
-                {/* Botó seguir sota el nom */}
                 {currentUser && currentUser.uid !== profile.uid && (
                   <button
-                    className={`follow-button ${
-                      isFollowing ? "following" : ""
-                    }`}
-                    disabled={followLoading}
+                    className={buttonClass}
+                    disabled={
+                      followLoading ||
+                      (isPrivate && followStatus === "pending")
+                    }
                     onClick={handleFollow}
                   >
-                    {isFollowing ? "Seguint" : "Seguir"}
+                    {buttonLabel}
                   </button>
                 )}
               </div>
@@ -310,9 +361,7 @@ export default function UserProfilePublic() {
                   <button
                     className="btn-primary"
                     onClick={() =>
-                      alert(
-                        "Inicia sessió per poder seguir aquest usuari."
-                      )
+                      alert("Inicia sessió per poder seguir aquest usuari.")
                     }
                   >
                     Inicia sessió per seguir
