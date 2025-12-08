@@ -14,24 +14,28 @@ interface Props {
   open: boolean;
   onClose: () => void;
   seguidors: string[];
+  currentUserId: string;        
   goToProfile?: (uid: string) => void;
 }
 
-export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToProfile }: Props) {
+export default function LlistaSeguidorsModal({
+  open,
+  onClose,
+  seguidors,
+  currentUserId,
+  goToProfile
+}: Props) {
   const [users, setUsers] = useState<BackendUser[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // ⭐ Estado local independiente para los seguidores
   const [localSeguidors, setLocalSeguidors] = useState<string[]>(seguidors);
-
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // 🔄 Sincronizar al abrir el modal
+  // Sync cuando lleguen nuevos seguidors
   useEffect(() => {
     setLocalSeguidors(seguidors);
-  }, [seguidors, open]);
+  }, [seguidors]);
 
-  // ---------------- LOAD USERS ----------------
+  // Cargar usuarios
   useEffect(() => {
     if (!open) return;
 
@@ -43,17 +47,13 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
           return;
         }
 
-        const fetchedUsers = await Promise.all(
-          localSeguidors.map(async (uid) => {
-            const u = await getUserById(uid);
-            return u ? { ...u } : null;
-          })
+        const fetched = await Promise.all(
+          localSeguidors.map(async (uid) => await getUserById(uid))
         );
 
-        setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
+        setUsers(fetched.filter(Boolean) as BackendUser[]);
       } catch (err) {
         console.error("Error carregant seguidors:", err);
-        setUsers([]);
       } finally {
         setLoading(false);
       }
@@ -62,29 +62,25 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
     fetchUsers();
   }, [open, localSeguidors]);
 
-  // ✨ Animaciones con GSAP
+  // Animaciones
   useEffect(() => {
-    if (!users || users.length === 0) return;
+    if (!users || !users.length) return;
     const items = gsap.utils.toArray<HTMLElement>(".seguidor-item");
     gsap.fromTo(
       items,
       { opacity: 0, y: 20, filter: "blur(5px)" },
-      { opacity: 1, y: 0, filter: "blur(0)", duration: 0.5, stagger: 0.1, ease: "power2.out" }
+      { opacity: 1, y: 0, filter: "blur(0)", duration: 0.5, stagger: 0.1 }
     );
   }, [users]);
 
-  // ⭐ FUNCION PARA ELIMINAR UN SEGUIDOR
-  const handleRemoveFollower = async (targetId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // evitar abrir perfil al pulsar botón
-
+  // Función para eliminar seguidor
+  const handleRemoveFollower = async (uid: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
-      const currentUser = localStorage.getItem("uid");
-      if (!currentUser) return;
-
-      await removeFollower(currentUser, targetId);
-
-      // actualizar el estado local
-      setLocalSeguidors((prev) => prev.filter((id) => id !== targetId));
+      await removeFollower(currentUserId, uid);
+      // Actualizamos estado local
+      setLocalSeguidors((prev) => prev.filter((id) => id !== uid));
+      setUsers((prev) => prev.filter((user) => user.uid !== uid));
     } catch (err) {
       console.error("Error eliminant seguidor:", err);
     }
@@ -106,11 +102,9 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
           <div className="seguidores-list">
             {users.map((u) => (
               <div key={u.uid} className="seguidor-item">
-                
-                {/* ZONA CLICABLE PARA IR AL PERFIL */}
                 <div
                   className="seguidor-click-zone"
-                  onClick={() => goToProfile && goToProfile(u.uid)}
+                  onClick={() => goToProfile?.(u.uid)}
                 >
                   <img
                     src={u.url_foto_perfil || "/images/default-profile.png"}
@@ -124,14 +118,13 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
                   </div>
                 </div>
 
-                {/* BOTÓN REDONDO PARA ELIMINAR */}
+                {/* BOTÓN ELIMINAR SEGUIDOR */}
                 <button
                   className="remove-follower-btn"
                   onClick={(e) => handleRemoveFollower(u.uid, e)}
                 >
                   ✕
                 </button>
-
               </div>
             ))}
           </div>
