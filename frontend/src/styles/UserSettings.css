@@ -85,7 +85,7 @@
 .settings-subtitle {
   font-size: 1.2rem;
   font-weight: 600;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.2rem;
   color: #2e492e;
 }
 
@@ -105,6 +105,7 @@
 .settings-row-label {
   font-weight: 500;
   color: #333333;
+  font-size: 0.92rem; 
 }
 
 /* =========================================
