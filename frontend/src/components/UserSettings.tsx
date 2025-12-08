@@ -27,7 +27,6 @@ export default function UserSettings({ open, onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 🌙 estat del tema
   const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
 
   const [language, setLanguage] = useState(i18n.language || "ca");
@@ -139,15 +138,19 @@ export default function UserSettings({ open, onClose }: Props) {
                         <span className="settings-row-label">Selecciona idioma</span>
                     </div>
 
-                    <select
+                    <div className="settings-select-wrapper">
+                      <select
                         className="settings-select"
                         value={language}
                         onChange={(e) => changeLanguage(e.target.value)}
-                    >
+                      >
                         <option value="ca">Català</option>
                         <option value="es">Castellà</option>
                         <option value="en">English</option>
-                    </select>
+                      </select>
+                      <span className="settings-select-arrow">▾</span>
+                    </div>
+
                 </div>
             </div>
 

@@ -108,7 +108,7 @@
 }
 
 /* =========================================
-   🌙 Toggle animat Mode Fosc (Uiverse style)
+   Toggle animat Mode Fosc (Uiverse style)
 ========================================= */
 
 .toggle-wrapper {
@@ -218,6 +218,59 @@
   color: #ffffff;
 }
 
+/* ---------- SELECT IDIOMA BONIC ---------- */
+
+.settings-select-wrapper {
+  position: relative;
+  min-width: 150px;
+}
+
+.settings-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  width: 100%;
+  padding: 0.45rem 2.2rem 0.45rem 0.8rem;
+  border-radius: 999px;
+  border: 1.5px solid #d0d5d0;
+
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: #f7faf7;
+  color: #2e492e;
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.08s ease;
+}
+
+.settings-select:hover {
+  border-color: #2e492e;
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.settings-select:focus {
+  outline: none;
+  border-color: #2e492e;
+  box-shadow: 0 0 0 3px rgba(46, 73, 46, 0.18);
+}
+
+/* Fletxa decorativa */
+.settings-select-arrow {
+  pointer-events: none;
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  color: #2e492e;
+}
+
 /* Responsive petit: reduïm una mica */
 @media (max-width: 600px) {
   .toggle-slot {
@@ -234,6 +287,27 @@
 /* ============================
    DARK MODE (UserSettings)
 ============================ */
+
+/* DARK MODE per al select d'idioma */
+[data-theme="dark"] .settings-select {
+  background: #111827;
+  border-color: rgba(156, 163, 175, 0.7);
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .settings-select:hover {
+  background: #020617;
+  border-color: #8fda8f;
+}
+
+[data-theme="dark"] .settings-select:focus {
+  box-shadow: 0 0 0 3px rgba(143, 218, 143, 0.25);
+}
+
+[data-theme="dark"] .settings-select-arrow {
+  color: #e5e7eb;
+}
+
 
 [data-theme="dark"] .settings-popup-overlay {
   background: rgba(0, 0, 0, 0.65);
