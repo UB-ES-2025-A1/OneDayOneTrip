@@ -94,6 +94,6 @@ export async function addPublicationToUser(userId: string, tripId: string) {
 
 // Eliminar un follower
 export async function removeFollower(userId: string, targetId: string) {
-  return apiPost(`/remove-follower/${userId}/${targetId}`, {});
+  return apiPost(`/users/remove-follower/${userId}/${targetId}`, {});
 }
 

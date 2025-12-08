@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
-import { getUserById } from "../api/client";
-import { removeFollower } from "../api/client"; // ⭐ AFEGIT
+import { getUserById, removeFollower } from "../api/client";
 import "../styles/LlistaSeguidors.css";
 
 interface BackendUser {
@@ -21,24 +20,16 @@ interface Props {
 export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToProfile }: Props) {
   const [users, setUsers] = useState<BackendUser[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // ⭐ Estado local independiente para los seguidores
+  const [localSeguidors, setLocalSeguidors] = useState<string[]>(seguidors);
+
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // ⭐ FUNCION PARA ELIMINAR UN SEGUIDOR
-  const handleRemoveFollower = async (targetId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // evita navegar al perfil
-
-    try {
-      const currentUser = localStorage.getItem("uid");
-      if (!currentUser) return;
-
-      await removeFollower(currentUser, targetId);
-
-      // Quitarlo de la UI sin recargar
-      setUsers((prev) => prev.filter((u) => u.uid !== targetId));
-    } catch (err) {
-      console.error("Error eliminant seguidor:", err);
-    }
-  };
+  // 🔄 Sincronizar al abrir el modal
+  useEffect(() => {
+    setLocalSeguidors(seguidors);
+  }, [seguidors, open]);
 
   // ---------------- LOAD USERS ----------------
   useEffect(() => {
@@ -47,13 +38,13 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        if (!seguidors || seguidors.length === 0) {
+        if (!localSeguidors || localSeguidors.length === 0) {
           setUsers([]);
           return;
         }
 
         const fetchedUsers = await Promise.all(
-          seguidors.map(async (uid) => {
+          localSeguidors.map(async (uid) => {
             const u = await getUserById(uid);
             return u ? { ...u } : null;
           })
@@ -69,8 +60,9 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
     };
 
     fetchUsers();
-  }, [open, seguidors]);
+  }, [open, localSeguidors]);
 
+  // ✨ Animaciones con GSAP
   useEffect(() => {
     if (!users || users.length === 0) return;
     const items = gsap.utils.toArray<HTMLElement>(".seguidor-item");
@@ -80,6 +72,23 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
       { opacity: 1, y: 0, filter: "blur(0)", duration: 0.5, stagger: 0.1, ease: "power2.out" }
     );
   }, [users]);
+
+  // ⭐ FUNCION PARA ELIMINAR UN SEGUIDOR
+  const handleRemoveFollower = async (targetId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // evitar abrir perfil al pulsar botón
+
+    try {
+      const currentUser = localStorage.getItem("uid");
+      if (!currentUser) return;
+
+      await removeFollower(currentUser, targetId);
+
+      // actualizar el estado local
+      setLocalSeguidors((prev) => prev.filter((id) => id !== targetId));
+    } catch (err) {
+      console.error("Error eliminant seguidor:", err);
+    }
+  };
 
   if (!open) return null;
 
@@ -96,29 +105,33 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
         ) : (
           <div className="seguidores-list">
             {users.map((u) => (
-              <div
-                key={u.uid}
-                className="seguidor-item"
-                onClick={() => goToProfile ? goToProfile(u.uid) : null}
-              >
-                <img
-                  src={u.url_foto_perfil || "/images/default-profile.png"}
-                  className="seguidor-foto"
-                  alt={u.username || "usuari"}
-                />
+              <div key={u.uid} className="seguidor-item">
+                
+                {/* ZONA CLICABLE PARA IR AL PERFIL */}
+                <div
+                  className="seguidor-click-zone"
+                  onClick={() => goToProfile && goToProfile(u.uid)}
+                >
+                  <img
+                    src={u.url_foto_perfil || "/images/default-profile.png"}
+                    className="seguidor-foto"
+                    alt={u.username || "usuari"}
+                  />
 
-                <div className="seguidor-info">
-                  <p className="seguidor-nom">{u.nom_i_cognoms || "Usuari"}</p>
-                  <p className="seguidor-username">@{u.username || "unknown"}</p>
+                  <div className="seguidor-info">
+                    <p className="seguidor-nom">{u.nom_i_cognoms || "Usuari"}</p>
+                    <p className="seguidor-username">@{u.username || "unknown"}</p>
+                  </div>
                 </div>
 
-                {/* ⭐ BOTÓN ELIMINAR */}
+                {/* BOTÓN REDONDO PARA ELIMINAR */}
                 <button
                   className="remove-follower-btn"
                   onClick={(e) => handleRemoveFollower(u.uid, e)}
                 >
                   ✕
                 </button>
+
               </div>
             ))}
           </div>

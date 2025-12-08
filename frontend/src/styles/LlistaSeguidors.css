@@ -1,16 +1,22 @@
+/* ─────────────────────────────── */
+/*   BACKDROP DEL MODAL            */
+/* ─────────────────────────────── */
 .modal-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
 
+/* ─────────────────────────────── */
+/*   TARJETA DEL MODAL             */
+/* ─────────────────────────────── */
 .seguidores-card {
   background: #fff;
   border-radius: 12px;
@@ -22,6 +28,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+/* Cerrar modal */
 .close-btn {
   position: absolute;
   top: 10px;
@@ -32,6 +39,7 @@
   cursor: pointer;
 }
 
+/* Título */
 .seguidores-title {
   text-align: center;
   margin-bottom: 15px;
@@ -39,6 +47,7 @@
   font-weight: bold;
 }
 
+/* Estado vacío y loading */
 .seguidores-empty {
   text-align: center;
   color: #888;
@@ -46,36 +55,81 @@
   font-size: 14px;
 }
 
-.remove-follower-btn {
-  margin-left: auto;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #d03b3bd1;
-  border: none;
-  color: white;
-  font-size: 15px;
+/* ─────────────────────────────── */
+/*   LISTA Y ELEMENTOS             */
+/* ─────────────────────────────── */
+.seguidores-list {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.remove-follower-btn:hover {
-  background: #d93636;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 5px;
 }
 
 .seguidor-item {
   display: flex;
   align-items: center;
-  gap: 15px;
+  justify-content: space-between; /* MUY IMPORTANTE */
+  padding: 8px 6px;
+  border-bottom: 1px solid #eee;
 }
 
+/* Zona clicable del perfil */
 .seguidor-click-zone {
   display: flex;
   align-items: center;
   gap: 15px;
   flex-grow: 1;
   cursor: pointer;
+}
+
+/* Imagen del usuario */
+.seguidor-foto {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Info */
+.seguidor-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.seguidor-nom {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.seguidor-username {
+  font-size: 13px;
+  color: #666;
+}
+
+/* ─────────────────────────────── */
+/*   BOTÓN REDONDO DE ELIMINAR     */
+/* ─────────────────────────────── */
+.remove-follower-btn {
+  min-width: 30px;
+  min-height: 30px;
+  width: 30px;
+  height: 30px;
+
+  border-radius: 50%;
+  background: #e44;
+  border: none;
+  color: white;
+  font-size: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.remove-follower-btn:hover {
+  background: #d22;
+  transform: scale(1.1);
 }
