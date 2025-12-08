@@ -24,7 +24,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 async def register_user(data: dict, user=Depends(verify_token)):
     """
     Desa un nou usuari al Firestore després de registre al Firebase Auth.
-    El frontend envia fullname, username, mail, i el backend completa els defaults.
+    El frontend envia fullname, username, mail i isPrivate, i el backend completa els defaults.
     """
     uid = user.get("uid")
     if not uid:
@@ -45,6 +45,7 @@ async def register_user(data: dict, user=Depends(verify_token)):
         "url_foto_perfil": data.get("url_foto_perfil", ""),
         "url_foto_panell": data.get("url_foto_panell", ""),
         "premium": data.get("premium", False),
+        "isPrivate": data.get("isPrivate", False),
         "llista_bloquejats": data.get("llista_bloquejats", []),
         "llista_bloquejadors": data.get("llista_bloquejadors", []),
     }
@@ -95,6 +96,7 @@ class UserEditIn(BaseModel):
     username: Optional[str] = None
     url_foto_perfil: Optional[str] = None
     url_foto_panell: Optional[str] = None
+    isPrivate: Optional[bool] = None
 
 
 # (PATCH = modificació parcial)

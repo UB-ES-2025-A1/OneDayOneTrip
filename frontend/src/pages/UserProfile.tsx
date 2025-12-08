@@ -153,12 +153,12 @@ export default function UserProfile() {
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((t) => ({
       id: String(t._id),
-      title: t.title || t('general_no_title'),
+      title: t.title || ('general_no_title'),
       img:
         t.coverImage ||
         (t.gallery && t.gallery[0]) ||
         "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-      user: t.author?.name || t('general_anonymous'),
+      user: t.author?.name || ('general_anonymous'),
       rating: typeof t.avgRating === "number" ? t.avgRating : 0,
       temps: t.duration || "—",
       dificultat: t.difficulty || "—",
@@ -385,10 +385,8 @@ export default function UserProfile() {
           <UserSettings 
             open={settingsOpen} 
             onClose={() => setSettingsOpen(false)}
-            isPrivate={!!profile.isPrivate}
-            onChangePrivacy={(value) =>
-              setProfile((prev) => (prev ? { ...prev, isPrivate: value } : prev))
-            }
+            profile={profile}
+            onSavePrivacy={(updatedProfile) => setProfile(updatedProfile)}
           />
 
           {openEdit && profile && (
