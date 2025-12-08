@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react"; 
 import { gsap } from "gsap";
-import { getUserById } from "../api/client";
+import { getUserById, followUser, unfollowUser } from "../api/client";
 import "../styles/LlistaS.css";
 import AvatarFallback from "../components/AvatarFallback";
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ interface BackendUser {
   nom_i_cognoms?: string;
   username?: string;
   url_foto_perfil?: string;
+  llista_seguidors?: string[];
 }
 
 interface Props {
@@ -30,33 +31,44 @@ export default function LlistaSeguidorsModalPublic({
   const { t } = useTranslation();
   const [users, setUsers] = useState<BackendUser[]>([]);
   const [loading, setLoading] = useState(false);
-  const [localSeguidors, setLocalSeguidors] = useState<string[]>(seguidors);
+  const [followState, setFollowState] = useState<{ [uid: string]: boolean }>({});
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Sync cuando lleguen nuevos seguidors
+  // Sincronizar seguidors cuando cambian
   useEffect(() => {
-    setLocalSeguidors(seguidors);
+    setUsers([]);
+    setFollowState({});
   }, [seguidors]);
 
-  // Cargar usuarios
+  // Cargar datos de usuarios
   useEffect(() => {
     if (!open) return;
 
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        if (!localSeguidors || localSeguidors.length === 0) {
+        if (!seguidors || seguidors.length === 0) {
           setUsers([]);
           return;
         }
 
         const fetchedUsers = await Promise.all(
-          localSeguidors.map(async (uid) => {
+          seguidors.map(async uid => {
             const u = await getUserById(uid);
             return u ? { ...u } : null;
           })
         );
-        setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
+
+        const validUsers = fetchedUsers.filter(Boolean) as BackendUser[];
+        setUsers(validUsers);
+
+        // Inicializar estado de seguimiento
+        const initialFollow: { [uid: string]: boolean } = {};
+        validUsers.forEach(u => {
+          initialFollow[u.uid] = u.llista_seguidors?.includes(currentUserId) ?? false;
+        });
+        setFollowState(initialFollow);
+
       } catch (err) {
         console.error(t('error_loading_followers'), err);
         setUsers([]);
@@ -66,11 +78,11 @@ export default function LlistaSeguidorsModalPublic({
     };
 
     fetchUsers();
-  }, [open, localSeguidors, t]);
+  }, [open, seguidors, currentUserId, t]);
 
-  // Animaciones
+  // Animaciones GSAP
   useEffect(() => {
-    if (!users || !users.length) return;
+    if (!users || users.length === 0) return;
     const items = gsap.utils.toArray<HTMLElement>(".seguidor-item");
     gsap.fromTo(
       items,
@@ -78,6 +90,28 @@ export default function LlistaSeguidorsModalPublic({
       { opacity: 1, y: 0, filter: "blur(0)", duration: 0.5, stagger: 0.1 }
     );
   }, [users]);
+
+  // Seguir / dejar de seguir con actualización instantánea
+  const handleToggleFollow = async (uid: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // evitar que abra perfil al hacer click
+    const currentlyFollowing = followState[uid];
+
+    // Actualización optimista
+    setFollowState(prev => ({ ...prev, [uid]: !currentlyFollowing }));
+
+    try {
+      if (currentlyFollowing) {
+        await unfollowUser(currentUserId, uid);
+      } else {
+        await followUser(currentUserId, uid);
+      }
+    } catch (err) {
+      console.error(t('error_changing_state'), err);
+      // Revertir si falla
+      setFollowState(prev => ({ ...prev, [uid]: currentlyFollowing }));
+      alert(t('error_changing_state'));
+    }
+  };
 
   if (!open) return null;
 
@@ -93,11 +127,11 @@ export default function LlistaSeguidorsModalPublic({
           <p className="seguidores-empty">{t('followers_modal_empty')}</p>
         ) : (
           <div className="seguidores-list">
-            {users.map((u) => (
+            {users.map(u => (
               <div key={u.uid} className="seguidor-item">
                 <div
                   className="seguidor-click-zone"
-                  onClick={() => goToProfile ? goToProfile(u.uid) : null}
+                  onClick={() => goToProfile?.(u.uid)}
                 >
                   <div className="seguidor-foto">
                     {u.url_foto_perfil ? (
@@ -113,7 +147,14 @@ export default function LlistaSeguidorsModalPublic({
                   </div>
                 </div>
 
-                {/* BOTÓN ELIMINAR SEGUIDOR ELIMINADO */}
+                {currentUserId !== u.uid && (
+                  <button
+                    className={`seguidor-toggle-btn ${followState[u.uid] ? "following" : ""}`}
+                    onClick={(e) => handleToggleFollow(u.uid, e)}
+                  >
+                    {followState[u.uid] ? t('route_detail_following') : t('route_detail_follow')}
+                  </button>
+                )}
               </div>
             ))}
           </div>
