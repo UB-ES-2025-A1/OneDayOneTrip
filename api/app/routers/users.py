@@ -45,6 +45,8 @@ async def register_user(data: dict, user=Depends(verify_token)):
         "url_foto_perfil": data.get("url_foto_perfil", ""),
         "url_foto_panell": data.get("url_foto_panell", ""),
         "premium": data.get("premium", False),
+        "llista_bloquejats": data.get("llista_bloquejats", []),
+        "llista_bloquejadors": data.get("llista_bloquejadors", []),
     }
 
     print(f"[DEBUG] Creant usuari {uid} amb dades: {user_data}")
@@ -221,6 +223,87 @@ async def unsave_trip(user_id: str, trip_id: str):
     return {"message": "Ruta eliminada de guardades correctament"}
 
 
+@router.post("/block/{user_id}/{target_id}")
+async def block_user(user_id: str, target_id: str):
+    """
+    Afegeix el target_id a la llista 'llista_bloquejats' del user_id,
+    i afegeix el user_id a la llista 'llista_bloquejadors' del target_id.
+    """
+    if user_id == target_id:
+        raise HTTPException(status_code=400, detail="No pots bloquejar-te a tu mateix")
+
+    user_ref = db.collection("users").document(user_id)
+    target_ref = db.collection("users").document(target_id)
+
+    user_doc = user_ref.get()
+    target_doc = target_ref.get()
+
+    # Comprovem que l'usuari bloquejador existeix
+    if not user_doc.exists:
+        raise HTTPException(
+            status_code=404, detail="L'usuari que intenta bloquejar no existeix"
+        )
+
+    # Comprovem que l'usuari a bloquejar existeix
+    if not target_doc.exists:
+        raise HTTPException(
+            status_code=404, detail="L'usuari que vols bloquejar no existeix"
+        )
+
+    # Afegir a la llista de bloquejats
+    user_ref.update({"llista_bloquejats": firestore.ArrayUnion([target_id])})
+
+    # Afegir a la llista de bloquejadors
+    target_ref.update({"llista_bloquejadors": firestore.ArrayUnion([user_id])})
+
+    # Eliminar relacions de seguiment recíproques
+    # Si l'usuari (blocker) seguia el target, eliminar aquest seguiment
+    user_ref.update({"llista_seguits": firestore.ArrayRemove([target_id])})
+    target_ref.update({"llista_seguidors": firestore.ArrayRemove([user_id])})
+
+    # Si el target seguia al blocker, eliminar també aquest seguiment
+    user_ref.update({"llista_seguidors": firestore.ArrayRemove([target_id])})
+    target_ref.update({"llista_seguits": firestore.ArrayRemove([user_id])})
+
+    return {"message": "Usuari bloquejat correctament"}
+
+
+@router.post("/unblock/{user_id}/{target_id}")
+async def unblock_user(user_id: str, target_id: str):
+    """
+    Elimina el target_id de la llista 'llista_bloquejats' del user_id,
+    i elimina el user_id de la llista 'llista_bloquejadors' del target_id.
+    """
+    if user_id == target_id:
+        raise HTTPException(status_code=400, detail="No pots desbloquejar-te a tu mateix")
+
+    user_ref = db.collection("users").document(user_id)
+    target_ref = db.collection("users").document(target_id)
+
+    user_doc = user_ref.get()
+    target_doc = target_ref.get()
+
+    # Comprovem que l'usuari desbloquejador existeix
+    if not user_doc.exists:
+        raise HTTPException(
+            status_code=404, detail="L'usuari que intenta desbloquejar no existeix"
+        )
+
+    # Comprovem que l'usuari a desbloquejar existeix
+    if not target_doc.exists:
+        raise HTTPException(
+            status_code=404, detail="L'usuari que vols desbloquejar no existeix"
+        )
+
+    # Eliminar de la llista de bloquejats
+    user_ref.update({"llista_bloquejats": firestore.ArrayRemove([target_id])})
+
+    # Eliminar de la llista de bloquejadors
+    target_ref.update({"llista_bloquejadors": firestore.ArrayRemove([user_id])})
+
+    return {"message": "Has desbloquejat l'usuari correctament"}
+
+
 @router.post("/{user_id}/publicacions/{trip_id}")
 async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token)):
     """
@@ -254,6 +337,39 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
         "publicacions": list(publicacions),
     }
 
+@router.post("/removefollower/{user_id}/{target_id}")
+async def remove_follower(user_id: str, target_id: str):
+    """
+    Elimina el target_id de la llista de seguidors de user_id.
+    A més, elimina user_id de la llista de seguits del target_id
+    per mantenir la coherència.
+    """
+
+    user_ref = db.collection("users").document(user_id)
+    target_ref = db.collection("users").document(target_id)
+
+    user_doc = user_ref.get()
+    target_doc = target_ref.get()
+
+    if not user_doc.exists:
+        raise HTTPException(
+            status_code=404,
+            detail="L'usuari que rep el seguidor no existeix"
+        )
+
+    if not target_doc.exists:
+        raise HTTPException(
+            status_code=404,
+            detail="L'usuari que vols eliminar de seguidors no existeix"
+        )
+
+    # Eliminar target_id de la llista de seguidors
+    user_ref.update({"llista_seguidors": firestore.ArrayRemove([target_id])})
+
+    # Eliminar user_id de la llista de seguits del target
+    target_ref.update({"llista_seguits": firestore.ArrayRemove([user_id])})
+
+    return {"message": "Seguidor eliminat correctament"}
 
 @router.delete("/delete/{user_id}")
 async def delete_account(
