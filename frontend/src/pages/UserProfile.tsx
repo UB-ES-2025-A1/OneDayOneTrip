@@ -208,7 +208,7 @@ export default function UserProfile() {
               {profile.url_foto_perfil ? (
                 <img src={profile.url_foto_perfil} alt="Foto de perfil" />
               ) : (
-                <AvatarFallback name={displayName} />
+                <AvatarFallback name={displayName} size={160}/>
               )}
             </div>
 
