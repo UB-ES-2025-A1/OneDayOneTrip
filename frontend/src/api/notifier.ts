@@ -1,5 +1,6 @@
 import { getAuth } from "firebase/auth";
 
+
 const API_URL = "http://127.0.0.1:8000";
 
 // ------------------------------
@@ -62,7 +63,7 @@ export async function getNotifications(userId: string, onlyUnread = false) {
 export async function createNotification(data: {
   fromUserId: string;
   toUserId: string;
-  type: "follow" | "comment" | "rating" | "follow_request";
+  type: "follow" | "comment" | "rating" | "follow_request" | "publication";
   message: string;
   extra?: object; // datos adicionales como nombre, avatar, título de ruta...
 }) {

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut, type User as FirebaseUser } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById, removePublication } from "../api/client";
+import { getUserById, deleteTripAndPublication } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { Settings } from "lucide-react";
@@ -184,7 +184,7 @@ export default function UserProfile() {
     if (!currentUser || !profile || !tripToDelete) return;
 
     try {
-      await removePublication(profile.uid, tripToDelete);
+      await deleteTripAndPublication(profile.uid, tripToDelete);
 
       // Treure-la de trips
       setTrips((prev) =>

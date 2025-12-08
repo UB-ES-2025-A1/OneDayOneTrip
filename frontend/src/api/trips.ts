@@ -1,4 +1,5 @@
 import { createNotification } from "../api/notifier"; 
+import { getUserById } from "../api/client";
 
 // ==========================================================
 // 📌 Interfaces base (Trip, TripPoint, Comment…)
@@ -178,8 +179,6 @@ export async function createTripComment(
 
 
 
-
-
 // ==========================================================
 // ✨ Payload per crear trips (TripCreateIn)
 // ==========================================================
@@ -237,11 +236,11 @@ export async function createTripMultipart(
     formData.append("gallery", file);
   });
 
-  // imatges de cada punt
   pointImages.forEach((file) => {
     if (file) formData.append("point_images", file);
   });
 
+  // 1️⃣ Crear la nueva ruta en backend
   const res = await fetch(`${BASE_URL}/trips/`, {
     method: "POST",
     body: formData,
@@ -252,7 +251,32 @@ export async function createTripMultipart(
     throw new Error(errMsg || "Error creant la ruta");
   }
 
-  return await res.json();
+  const tripData = await res.json(); // contiene trip creada con _id
+
+  // 2️⃣ Obtener seguidores del autor
+  const authorId = tripPayload.author.userId;
+  const authorName = tripPayload.author.name ?? "";
+  const authorPic = tripPayload.author.profilePic ?? "";
+
+  const authorBackendUser = await getUserById(authorId);
+  const followers: string[] = authorBackendUser.llista_seguidors ?? [];
+
+  // 3️⃣ Crear notificación para cada seguidor
+  for (const followerId of followers) {
+    await createNotification({
+      fromUserId: authorId,
+      toUserId: followerId,
+      type: "publication",
+      message: "ha publicat una nova ruta",
+      extra: {
+        fromUserName: authorName,
+        fromUserAvatar: authorPic,
+        tripTitle: tripPayload.title,
+      },
+    });
+  }
+
+  return tripData;
 }
 
 
