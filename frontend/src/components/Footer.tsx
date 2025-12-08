@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 export default function Footer({ children }: { children?: ReactNode }) {
+  const { t } = useTranslation();
   return (
     <footer style={{marginTop: '50px',backgroundColor:'#2e492e', height: '200px', color: '#fff', paddingLeft: '30px', paddingTop:'1px'}} className="bg-gray-800 text-white py-4 mt-8">
       <div style={{height: '3px', backgroundColor: '#2e492e'}}></div>
@@ -11,7 +13,7 @@ export default function Footer({ children }: { children?: ReactNode }) {
         {children}
       </div>
         <div>
-            <h2>Contacte</h2>
+            <h2>{t('footer_contact')}</h2>
             <p> <a style={{color: '#fff', textDecoration: 'none'}} href="mailto:help@onedayonetrip.com">help@onedayonetrip.com</a></p>
             <p><a  style={{color: '#fff', textDecoration: 'none'}} href="tel:+34 123 456 789">+34 123 456 789</a></p>
         </div>

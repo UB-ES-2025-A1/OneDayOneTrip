@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import { getUserById } from "../api/client";
 import "../styles/LlistaSeguidors.css";
 import AvatarFallback from "../components/AvatarFallback";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface BackendUser {
   uid: string;
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToProfile }: Props) {
+    const { t } = useTranslation();
   const [users, setUsers] = useState<BackendUser[]>([]);
   const [loading, setLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -34,17 +36,17 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
           return;
         }
 
-        console.log("Seguidors a carregar:", seguidors);
+        console.log(t('followers_to_load'), seguidors);
         const fetchedUsers = await Promise.all(
           seguidors.map(async (uid) => {
             const u = await getUserById(uid);
             return u ? { ...u } : null;
           })
         );
-        console.log("Usuaris fetched:", fetchedUsers);
+        console.log(t('followers_fetched'), fetchedUsers);
         setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
       } catch (err) {
-        console.error("Error carregant seguidors:", err);
+        console.error(t('error_loading_followers'), err);
         setUsers([]);
       } finally {
         setLoading(false);
@@ -70,12 +72,12 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
     <div className="modal-backdrop">
       <div className="seguidores-card" ref={containerRef}>
         <button className="close-btn" onClick={onClose}>×</button>
-        <h2 className="seguidores-title">Seguidors</h2>
+        <h2 className="seguidores-title">{t('profile_stat_followers')}</h2>
 
         {loading ? (
-          <p className="seguidores-empty">Carregant...</p>
+          <p className="seguidores-empty">{t('general_loading')}</p>
         ) : users.length === 0 ? (
-          <p className="seguidores-empty">Encara no tens cap seguidor</p>
+          <p className="seguidores-empty">{t('followers_modal_empty')}</p>
         ) : (
           <div className="seguidores-list">
             {users.map((u) => (
@@ -86,14 +88,14 @@ export default function LlistaSeguidorsModal({ open, onClose, seguidors, goToPro
               >
                 <div className="seguidor-foto">
                   {u.url_foto_perfil ? (
-                    <img src={u.url_foto_perfil} alt={u.username || "usuari"} />
+                    <img src={u.url_foto_perfil} alt={u.username || t('home_search_user')} />
                   ) : (
                     <AvatarFallback name={u.nom_i_cognoms || u.username || "?"} />
                   )}
                 </div>
 
                 <div className="seguidor-info">
-                  <p className="seguidor-nom">{u.nom_i_cognoms || "Usuari"}</p>
+                  <p className="seguidor-nom">{u.nom_i_cognoms || t('home_search_user')}</p>
                   <p className="seguidor-username">@{u.username || "unknown"}</p>
                 </div>
               </div>

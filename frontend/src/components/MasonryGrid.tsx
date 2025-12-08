@@ -5,6 +5,7 @@ import { type User } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import ButtonNewTrip from "./ButtonNewTrip";
 import {MapPin, Trash2} from "lucide-react";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface MasonryItem {
   id: string;
@@ -41,6 +42,7 @@ export default function MasonryGrid({
   showDeleteIcon,
   onDeleteTrip,
 }: MasonryGridProps) {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
@@ -100,7 +102,7 @@ export default function MasonryGrid({
                     e.stopPropagation(); // no navegar a la ruta
                     onDeleteTrip(item.id);
                   }}
-                  aria-label="Eliminar ruta"
+                  aria-label={t('delete_route')}
                 >
                   <Trash2 size={22} />
                 </button>
@@ -139,7 +141,7 @@ export default function MasonryGrid({
                 ) : (
                   <img
                     src="/images/person.png"
-                    alt="Autor"
+                    alt={t('author')}
                     className="meta-avatar default"
                   />
                 )}

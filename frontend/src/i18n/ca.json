@@ -241,5 +241,134 @@
   "map_selector_search_placeholder": "Escriu una adreça o lloc",
   "map_selector_search_button": "Cercar",
   "map_selector_search_not_found": "No s'ha trobat cap ubicació.",
-  "map_selector_search_error": "Hi ha hagut un problema cercant la ubicació."
+  "map_selector_search_error": "Hi ha hagut un problema cercant la ubicació.",
+
+  "carousel_title_1": "La teva propera aventura t'espera",
+  "carousel_subtitle_1": "Des de senderisme fins a gastronomia local, troba l'experiència perfecta per a tu",
+  "carousel_title_2": "Explora noves rutes i cultures",
+  "carousel_subtitle_2": "Viatja, descobreix i comparteix les teves millors experiències amb altres viatgers",
+  "carousel_title_3": "Cada dia, una història que explicar",
+  "carousel_subtitle_3": "Troba inspiració per al teu proper destí",
+  "comments_error_loading": "Error carregant comentaris:",
+  "comments_have_to_login": "Has d'iniciar sessió per escriure un comentari.",
+  "comments_error_creating": "Error creant comentari:",
+  "comments_person": "Tu",
+
+
+  "category_nature_mountain": "Natura i muntanya",
+  "category_cities": "Ciutats",
+  "category_beach": "Platja",
+  "category_villages_rural": "Pobles i rutes rurals",
+  "category_gastronomy": "Gastronomia",
+  "category_cultural_historic": "Cultural / Històric",
+  "category_sports_adventure": "Esport i aventura",
+  "category_family": "Familiar",
+
+  "tag_cultural": "cultural",
+  "tag_gastronomic": "gastronòmic",
+  "tag_artistic": "artístic",
+  "tag_nature": "natura",
+  "tag_mountain": "muntanya",
+  "tag_urban": "urbà",
+  "tag_romantic": "romàntic",
+  "tag_family": "familiar",
+  "tag_adventure": "aventura",
+  "tag_relax": "relax",
+  "tag_photography": "fotografia",
+  "tag_music": "música",
+  "tag_history": "història",
+  "tag_beach": "platja",
+  "tag_rural": "rural",
+
+  "difficulty_very_easy": "Molt fàcil",
+  "difficulty_easy": "Fàcil",
+  "difficulty_moderate": "Moderada",
+  "difficulty_hard": "Difícil",
+  "difficulty_very_hard": "Molt difícil",
+
+  "season_spring": "Primavera",
+  "season_summer": "Estiu",
+  "season_autumn": "Tardor",
+  "season_winter": "Hivern",
+
+  "region_andalusia": "Andalusia",
+  "region_aragon": "Aragó",
+  "region_asturias": "Astúries",
+  "region_balearic_islands": "Illes Balears",
+  "region_canary_islands": "Canàries",
+  "region_cantabria": "Cantàbria",
+  "region_castile_leon": "Castella i Lleó",
+  "region_castile_la_mancha": "Castella-la Manxa",
+  "region_catalonia": "Catalunya",
+  "region_valencian_community": "Comunitat Valenciana",
+  "region_extremadura": "Extremadura",
+  "region_galicia": "Galícia",
+  "region_la_rioja": "La Rioja",
+  "region_madrid": "Comunitat de Madrid",
+  "region_murcia": "Regió de Múrcia",
+  "region_navarre": "Navarra",
+  "region_basque_country": "País Basc",
+  "region_ceuta": "Ceuta",
+  "region_melilla": "Melilla",
+
+  "country_spain": "Espanya",
+  "country_france": "França",
+  "country_italy": "Itàlia",
+  "country_portugal": "Portugal",
+  "country_germany": "Alemanya",
+  "country_united_kingdom": "Regne Unit",
+  "country_netherlands": "Països Baixos",
+  "country_belgium": "Bèlgica",
+  "country_switzerland": "Suïssa",
+  "country_austria": "Àustria",
+  "country_greece": "Grècia",
+  "country_united_states": "Estats Units",
+  "country_canada": "Canadà",
+  "country_mexico": "Mèxic",
+  "country_brazil": "Brasil",
+  "country_morocco": "Marroc",
+  "country_japan": "Japó",
+  "country_china": "Xina",
+  "country_australia": "Austràlia",
+  "country_argentina": "Argentina",
+
+
+
+
+  "profile_error_updating": "Error actualitzant el perfil",
+  "error": "Error:",
+
+
+  "followers_to_load": "Seguidors a carregar:",
+  "followers_fetched": "Usuaris fetched:",
+  "error_loading_followers": "Error carregant seguidors:",
+
+
+
+  "error_loading_followed": "Error carregant seguits:",
+  "error_changing_state": "Error canviant estat de seguir:",
+
+
+  "loged_user": "Usuari loguejant:",
+  "login_error": "Error en login:",
+  "person": "Persona",
+
+
+  "error_searching_location": "Error cercant ubicació:",
+
+
+  "delete_route": "Eliminar ruta",
+  "author": "Autor",
+
+
+  "email": "Email",
+
+
+  "error_reset_password": "Error al recuperar contrasenya:",
+  "correu": "Correu",
+
+
+  "error_deleting_account": "Error esborrant el compte:",
+  "language": "Idioma",
+  "select_language": "Selecciona idioma"
 }

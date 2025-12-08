@@ -5,6 +5,7 @@ import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { deleteAccount } from "../api/client";
 import i18n from "../i18n/i18n";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 
 type Props = {
@@ -24,6 +25,7 @@ function getInitialTheme(): "light" | "dark" {
 }
 
 export default function UserSettings({ open, onClose }: Props) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -58,12 +60,12 @@ export default function UserSettings({ open, onClose }: Props) {
     const user = auth.currentUser;
 
     if (!user) {
-      setError("Has d'estar identificat per eliminar el compte.");
+      setError(t('settings_error_not_logged_in_delete'));
       return;
     }
 
     const confirm1 = window.confirm(
-      "Segur que vols esborrar el compte? Aquesta acció és irreversible."
+      t('settings_confirm_delete')
     );
     if (!confirm1) return;
 
@@ -77,13 +79,12 @@ export default function UserSettings({ open, onClose }: Props) {
       // 2) Tancar sessió al frontend
       await signOut(auth);
 
-      alert("El teu compte s'ha esborrat correctament.");
+      alert(t('settings_success_delete'));
       window.location.href = "/";
     } catch (err: any) {
-      console.error("Error esborrant el compte:", err);
+      console.error(t('error_deleting_account'), err);
       setError(
-        err?.message || "Hi ha hagut un error en esborrar el compte."
-      );
+        err?.message || t('settings_error_delete'));
     } finally {
       setLoading(false);
     }
@@ -96,16 +97,16 @@ export default function UserSettings({ open, onClose }: Props) {
           <X size={22} />
         </button>
 
-        <h2 className="settings-title">Configuració</h2>
+        <h2 className="settings-title">{t('profile_settings_button')}</h2>
 
         <div className="settings-content">
           {/* 🌙 Aparença / Mode fosc */}
           <div className="settings-section">
-            <h3 className="settings-subtitle">Aparença</h3>
+            <h3 className="settings-subtitle">{t('settings_subtitle_appearance')}</h3>
 
             <div className="settings-row">
               <div className="settings-row-info">
-                <span className="settings-row-label">Mode fosc</span>
+                <span className="settings-row-label">{t('settings_label_dark_mode')}</span>
 
               </div>
 
@@ -131,11 +132,11 @@ export default function UserSettings({ open, onClose }: Props) {
           </div>
 
             <div className="settings-section">
-                <h3 className="settings-subtitle">Idioma</h3>
+                <h3 className="settings-subtitle">{t('language')}</h3>
 
                 <div className="settings-row">
                     <div className="settings-row-info">
-                        <span className="settings-row-label">Selecciona idioma</span>
+                        <span className="settings-row-label">{t('select_language')}</span>
                     </div>
 
                     <div className="settings-select-wrapper">
@@ -158,7 +159,7 @@ export default function UserSettings({ open, onClose }: Props) {
             {/* 🗑️ Secció eliminar compte */}
           <div className="settings-section">
             <p className="settings-warning">
-              Esborrar el compte eliminarà totes les teves dades. Aquesta acció és irreversible.
+                {t('settings_warning_delete')}
             </p>
 
             <button
@@ -166,7 +167,7 @@ export default function UserSettings({ open, onClose }: Props) {
               onClick={handleDeleteAccount}
               disabled={loading}
             >
-              <span>{loading ? "Esborrant..." : "Eliminar compte"}</span>
+              <span>{loading ? t('settings_button_deleting') : t('settings_button_delete') }</span>
             </button>
 
             {error && <p className="settings-error">{error}</p>}

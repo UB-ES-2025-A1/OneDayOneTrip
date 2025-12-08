@@ -233,5 +233,127 @@
   "map_selector_search_placeholder": "Enter an address or place",
   "map_selector_search_button": "Search",
   "map_selector_search_not_found": "No location found.",
-  "map_selector_search_error": "There was a problem searching for the location."
+  "map_selector_search_error": "There was a problem searching for the location.",
+
+  "carousel_title_1": "Your next adventure awaits",
+  "carousel_subtitle_1": "From hiking to local cuisine, find the perfect experience for you",
+  "carousel_title_2": "Explore new routes and cultures",
+  "carousel_subtitle_2": "Travel, discover and share your best experiences with other travellers",
+  "carousel_title_3": "Every day, a story to tell",
+  "carousel_subtitle_3": "Find inspiration for your next destination",
+  "comments_error_loading": "Error loading comments:",
+  "comments_have_to_login": "You must log in to write a comment.",
+  "comments_error_creating": "Error creating comment:",
+  "comments_person": "You",
+
+
+  "category_nature_mountain": "Nature and mountains",
+  "category_cities": "Cities",
+  "category_beach": "Beach",
+  "category_villages_rural": "Villages and rural routes",
+  "category_gastronomy": "Gastronomy",
+  "category_cultural_historic": "Cultural / Historical",
+  "category_sports_adventure": "Sports and adventure",
+  "category_family": "Family",
+
+  "tag_cultural": "cultural",
+  "tag_gastronomic": "gastronomic",
+  "tag_artistic": "artistic",
+  "tag_nature": "nature",
+  "tag_mountain": "mountain",
+  "tag_urban": "urban",
+  "tag_romantic": "romantic",
+  "tag_family": "family",
+  "tag_adventure": "adventure",
+  "tag_relax": "relax",
+  "tag_photography": "photography",
+  "tag_music": "music",
+  "tag_history": "history",
+  "tag_beach": "beach",
+  "tag_rural": "rural",
+
+  "difficulty_very_easy": "Very easy",
+  "difficulty_easy": "Easy",
+  "difficulty_moderate": "Moderate",
+  "difficulty_hard": "Hard",
+  "difficulty_very_hard": "Very hard",
+
+  "season_spring": "Spring",
+  "season_summer": "Summer",
+  "season_autumn": "Autumn",
+  "season_winter": "Winter",
+
+  "region_andalusia": "Andalusia",
+  "region_aragon": "Aragon",
+  "region_asturias": "Asturias",
+  "region_balearic_islands": "Balearic Islands",
+  "region_canary_islands": "Canary Islands",
+  "region_cantabria": "Cantabria",
+  "region_castile_leon": "Castile and León",
+  "region_castile_la_mancha": "Castile-La Mancha",
+  "region_catalonia": "Catalonia",
+  "region_valencian_community": "Valencian Community",
+  "region_extremadura": "Extremadura",
+  "region_galicia": "Galicia",
+  "region_la_rioja": "La Rioja",
+  "region_madrid": "Community of Madrid",
+  "region_murcia": "Region of Murcia",
+  "region_navarre": "Navarre",
+  "region_basque_country": "Basque Country",
+  "region_ceuta": "Ceuta",
+  "region_melilla": "Melilla",
+
+  "country_spain": "Spain",
+  "country_france": "France",
+  "country_italy": "Italy",
+  "country_portugal": "Portugal",
+  "country_germany": "Germany",
+  "country_united_kingdom": "United Kingdom",
+  "country_netherlands": "Netherlands",
+  "country_belgium": "Belgium",
+  "country_switzerland": "Switzerland",
+  "country_austria": "Austria",
+  "country_greece": "Greece",
+  "country_united_states": "United States",
+  "country_canada": "Canada",
+  "country_mexico": "Mexico",
+  "country_brazil": "Brazil",
+  "country_morocco": "Morocco",
+  "country_japan": "Japan",
+  "country_china": "China",
+  "country_australia": "Australia",
+  "country_argentina": "Argentina",
+
+
+  "profile_error_updating": "Error updating profile",
+  "error": "Error:",
+
+  "followers_to_load": "Followers to load:",
+  "followers_fetched": "Users fetched:",
+  "error_loading_followers": "Error loading followers:",
+
+  "error_loading_followed": "Error loading followed:",
+  "error_changing_state": "Error changing follow state:",
+
+
+  "loged_user": "User logged:",
+  "login_error": "Error logging in:",
+  "person": "Persona",
+
+  "error_searching_location": "Error searching for location:",
+
+
+  "delete_route": "Eliminar ruta",
+  "author": "Autor",
+
+
+  "email": "Email",
+
+  "error_reset_password": "Error resetting password:",
+  "correu": "Email",
+
+
+  "error_deleting_account": "Error deleting account:",
+  "language": "Language",
+  "select_language": "Select language"
 }

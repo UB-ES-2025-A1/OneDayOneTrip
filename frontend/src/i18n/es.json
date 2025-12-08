@@ -232,5 +232,127 @@
   "map_selector_search_placeholder": "Escribe una dirección o lugar",
   "map_selector_search_button": "Buscar",
   "map_selector_search_not_found": "No se ha encontrado ninguna ubicación.",
-  "map_selector_search_error": "Ha habido un problema buscando la ubicación."
+  "map_selector_search_error": "Ha habido un problema buscando la ubicación.",
+
+  "carousel_title_1": "Tu próxima aventura te espera",
+  "carousel_subtitle_1": "Desde senderismo hasta gastronomía local, encuentra la experiencia perfecta para ti",
+  "carousel_title_2": "Explora nuevas rutas y culturas",
+  "carousel_subtitle_2": "Viaja, descubre y comparte tus mejores experiencias con otros viajeros",
+  "carousel_title_3": "Cada día, una historia que contar",
+  "carousel_subtitle_3": "Encuentra inspiración para tu próximo destino",
+  "comments_error_loading": "Error cargando comentarios:",
+  "comments_have_to_login": "Tienes que iniciar sesión para escribir un comentario.",
+  "comments_error_creating": "Error creando comentario:",
+  "comments_person": "Tú",
+
+
+  "category_nature_mountain": "Naturaleza y montaña",
+  "category_cities": "Ciudades",
+  "category_beach": "Playa",
+  "category_villages_rural": "Pueblos y rutas rurales",
+  "category_gastronomy": "Gastronomía",
+  "category_cultural_historic": "Cultural / Histórico",
+  "category_sports_adventure": "Deporte y aventura",
+  "category_family": "Familiar",
+
+  "tag_cultural": "cultural",
+  "tag_gastronomic": "gastronómico",
+  "tag_artistic": "artístico",
+  "tag_nature": "naturaleza",
+  "tag_mountain": "montaña",
+  "tag_urban": "urbano",
+  "tag_romantic": "romántico",
+  "tag_family": "familiar",
+  "tag_adventure": "aventura",
+  "tag_relax": "relax",
+  "tag_photography": "fotografía",
+  "tag_music": "música",
+  "tag_history": "historia",
+  "tag_beach": "playa",
+  "tag_rural": "rural",
+
+  "difficulty_very_easy": "Muy fácil",
+  "difficulty_easy": "Fácil",
+  "difficulty_moderate": "Moderada",
+  "difficulty_hard": "Difícil",
+  "difficulty_very_hard": "Muy difícil",
+
+  "season_spring": "Primavera",
+  "season_summer": "Verano",
+  "season_autumn": "Otoño",
+  "season_winter": "Invierno",
+
+  "region_andalusia": "Andalucía",
+  "region_aragon": "Aragón",
+  "region_asturias": "Asturias",
+  "region_balearic_islands": "Islas Baleares",
+  "region_canary_islands": "Canarias",
+  "region_cantabria": "Cantabria",
+  "region_castile_leon": "Castilla y León",
+  "region_castile_la_mancha": "Castilla-La Mancha",
+  "region_catalonia": "Cataluña",
+  "region_valencian_community": "Comunidad Valenciana",
+  "region_extremadura": "Extremadura",
+  "region_galicia": "Galicia",
+  "region_la_rioja": "La Rioja",
+  "region_madrid": "Comunidad de Madrid",
+  "region_murcia": "Región de Murcia",
+  "region_navarre": "Navarra",
+  "region_basque_country": "País Vasco",
+  "region_ceuta": "Ceuta",
+  "region_melilla": "Melilla",
+
+  "country_spain": "España",
+  "country_france": "Francia",
+  "country_italy": "Italia",
+  "country_portugal": "Portugal",
+  "country_germany": "Alemania",
+  "country_united_kingdom": "Reino Unido",
+  "country_netherlands": "Países Bajos",
+  "country_belgium": "Bélgica",
+  "country_switzerland": "Suiza",
+  "country_austria": "Austria",
+  "country_greece": "Grecia",
+  "country_united_states": "Estados Unidos",
+  "country_canada": "Canadá",
+  "country_mexico": "México",
+  "country_brazil": "Brasil",
+  "country_morocco": "Marruecos",
+  "country_japan": "Japón",
+  "country_china": "China",
+  "country_australia": "Australia",
+  "country_argentina": "Argentina",
+
+  "profile_error_updating": "Error actualizando el perfil",
+  "error": "Error:",
+
+
+  "followers_to_load": "Seguidores a cargar:",
+  "followers_fetched": "Usuarios fetched:",
+  "error_loading_followers": "Error cargando seguidores:",
+
+  "error_loading_followed": "Error cargando seguidos:",
+  "error_changing_state": "Error cambiante estado de seguir:",
+
+  "loged_user": "Usuario conectado:",
+  "login_error": "Error al iniciar sesión:",
+  "person": "Persona",
+
+
+  "error_searching_location": "Error buscando ubicación:",
+
+
+  "delete_route": "Eliminar ruta",
+  "author": "Autor",
+
+  "email": "Correo electrónico",
+
+
+  "error_reset_password": "Error al recuperar contraseña:",
+  "correu": "Correo",
+
+
+  "error_deleting_account": "Error borrando la cuenta:",
+  "language": "Idioma",
+  "select_language": "Selecciona idioma"
 }
