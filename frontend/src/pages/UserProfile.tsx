@@ -14,7 +14,8 @@ import EditarPerfil from "../components/EditarPerfilModal";
 import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
 import UserSettings from "../components/UserSettings";
-import AvatarFallback from "../components/AvatarFallback"; 
+import AvatarFallback from "../components/AvatarFallback";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 export type BackendUser = {
   uid: string;
@@ -45,6 +46,7 @@ type GridItem = {
 };
 
 export default function UserProfile() {
+  const { t } = useTranslation();
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<BackendUser | null>(null);
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -99,8 +101,8 @@ export default function UserProfile() {
         );
         setTrips(userTrips);
       } catch (e: any) {
-        console.error("Error carregant perfil:", e);
-        setError(e?.message || "No s'ha pogut carregar el perfil.");
+        console.error(t('profile_error_loading_profile'), e);
+        setError(e?.message || t('profile_error_loading'));
       } finally {
         setLoading(false);
       }
@@ -117,7 +119,7 @@ export default function UserProfile() {
     navigate("/");
   };
 
-  const openRegister = () => alert("Has d'iniciar sessió per continuar.");
+  const openRegister = () => alert(t('profile_login'));
 
   const openSeguidorsModal = async () => {
     if (!profile) return;
@@ -127,7 +129,7 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguidoresModalOpen(true);
     } catch (err) {
-      console.error("Error recarregant seguidors:", err);
+      console.error(t('followers_modal_loading'), err);
     }
   };
 
@@ -139,7 +141,7 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguitsModalOpen(true);
     } catch (err) {
-      console.error("Error recarregant seguits:", err);
+      console.error(t('profile_reloading_following'), err);
     }
   };
 
@@ -153,12 +155,12 @@ export default function UserProfile() {
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((t) => ({
       id: String(t._id),
-      title: t.title || "Sense títol",
+      title: t.title || t('general_no_title'),
       img:
         t.coverImage ||
         (t.gallery && t.gallery[0]) ||
         "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-      user: t.author?.name || "Anònim",
+      user: t.author?.name || t('general_anonymous'),
       rating: typeof t.avgRating === "number" ? t.avgRating : 0,
       temps: t.duration || "—",
       dificultat: t.difficulty || "—",
@@ -196,8 +198,8 @@ export default function UserProfile() {
           : prev
       );
     } catch (err: any) {
-      console.error("Error eliminant ruta:", err);
-      alert(err?.message || "Error eliminant la ruta");
+      console.error(t('profile_error_deleting_route'), err);
+      alert(err?.message || t('profile_error_deleting_route'));
     } finally {
       setDeleteModalOpen(false);
       setTripToDelete(null);
@@ -217,7 +219,7 @@ export default function UserProfile() {
     profile?.nom_i_cognoms ||
     currentUser?.displayName ||
     profile?.username ||
-    "Usuari";
+    t('home_search_user');
   const displayMail = profile?.mail || currentUser?.email || "";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
@@ -247,7 +249,7 @@ export default function UserProfile() {
       onRegister={() => navigate("/")}
       variant="perfil"
     >
-      {loading && <div className="loading-state">Carregant perfil...</div>}
+      {loading && <div className="loading-state">{t('profile_loading')}</div>}
       {error && !loading && <div className="error-state">{error}</div>}
 
       {currentUser && profile && !loading && (
@@ -273,7 +275,7 @@ export default function UserProfile() {
 
             <div className="user-photo">
               {profile.url_foto_perfil ? (
-                <img src={profile.url_foto_perfil} alt="Foto de perfil" />
+                <img src={profile.url_foto_perfil} alt={t('edit_profile_profile_photo')} />
               ) : (
                 <AvatarFallback name={displayName} />
               )}
@@ -288,22 +290,22 @@ export default function UserProfile() {
               <div className="user-stats">
                 <div className="stat" onClick={openSeguidorsModal}>
                   <span className="number">{seguidors}</span>
-                  <span className="label">Seguidors</span>
+                  <span className="label">{t('followers_modal_title')}</span>
                 </div>
 
                 <div className="stat" onClick={openSeguitsModal}>
                   <span className="number">{seguits}</span>
-                  <span className="label">Seguits</span>
+                  <span className="label">{t('following_modal_title')}</span>
                 </div>
 
                 <div className="stat">
                   <span className="number">{publicacionsItems.length}</span>
-                  <span className="label">Publicacions</span>
+                  <span className="label">{t('profile_tab_publications')}</span>
                 </div>
 
                 <div className="stat">
                   <span className="number">{guardadesItems.length}</span>
-                  <span className="label">Guardades</span>
+                  <span className="label">{t('profile_stat_saved')}</span>
                 </div>
               </div>
             </div>
@@ -316,7 +318,7 @@ export default function UserProfile() {
               }`}
               onClick={() => setSelectedTab("publicacions")}
             >
-              Publicacions
+                {t('profile_stat_publications')}
             </button>
             <button
               className={`tab-btn ${
@@ -324,7 +326,7 @@ export default function UserProfile() {
               }`}
               onClick={() => setSelectedTab("guardat")}
             >
-              Guardat
+                {t('profile_tab_saved')}
             </button>
           </div>
 
@@ -344,13 +346,13 @@ export default function UserProfile() {
                 <ImageOff className="empty-icon" size={60} />
                 {selectedTab === "publicacions" ? (
                   <>
-                    <h3>Encara no has publicat cap ruta</h3>
-                    <p>Comparteix les teves aventures amb la comunitat!</p>
+                    <h3>{t('profile_empty_publications_title')}</h3>
+                    <p>{t('profile_empty_publications_text')}</p>
                   </>
                 ) : (
                   <>
-                    <h3>Encara no has desat cap ruta</h3>
-                    <p>Explora i desa les teves preferides per més tard.</p>
+                    <h3>{t('profile_empty_saved_title')}</h3>
+                    <p>{t('profile_empty_saved_text')}</p>
                   </>
                 )}
               </div>
@@ -401,10 +403,9 @@ export default function UserProfile() {
           {deleteModalOpen && ( 
           <div className="confirm-delete-backdrop">
             <div className="confirm-delete-modal">
-              <h3>Eliminar publicació</h3>
+              <h3>{t('profile_confirm_delete_title')}</h3>
               <p>
-                Segur que vols eliminar aquesta publicació del teu perfil?
-                Aquesta acció no es pot desfer.
+                  {t('profile_confirm_delete_text')}
               </p>
 
               <div className="confirm-delete-buttons">
@@ -412,13 +413,13 @@ export default function UserProfile() {
                   className="btn-secondary"
                   onClick={handleCancelDeleteTrip}
                 >
-                  Cancel·lar
+                    {t('general_cancel')}
                 </button>
                 <button
                   className="btn-danger"
                   onClick={handleConfirmDeleteTrip}
                 >
-                  Eliminar
+                    {t('general_delete')}
                 </button>
               </div>
             </div>

@@ -4,995 +4,591 @@ import "../styles/CreateTripForm.css";
 import "leaflet/dist/leaflet.css";
 import MapSelector from "../components/MapSelector";
 import { addPublicationToUser } from "../api/client";
+import { useTranslation } from "react-i18next";
 
 import {
-  createTripMultipart,
-  type TripCreatePayload,
+    createTripMultipart,
+    type TripCreatePayload,
 } from "../api/trips";
 
 type BackendUser = {
-  uid: string;
-  nom_i_cognoms?: string;
-  username?: string;
-  mail?: string;
-  url_foto_perfil?: string;
+    uid: string;
+    nom_i_cognoms?: string;
+    username?: string;
+    mail?: string;
+    url_foto_perfil?: string;
 };
 
 type TripPointForm = {
-  title: string;
-  description: string;
-  lat: number | null;
-  lng: number | null;
+    title: string;
+    description: string;
+    lat: number | null;
+    lng: number | null;
 };
 
 interface CreateTripFormProps {
-  onClose: () => void;
-  currentUser: FirebaseUser;
-  backendUser: BackendUser;
+    onClose: () => void;
+    currentUser: FirebaseUser;
+    backendUser: BackendUser;
 }
 
-const STEPS = ["Detalls bàsics", "Ubicació i dades", "Imatges i punts"];
+// -------------------------------------------------------------
+// DEFINICIÓ DE LLISTES AMB CLAUS DE TRADUCCIÓ
+// { value: "Valor BD", labelKey: "clau_json" }
+// -------------------------------------------------------------
 
-// Categorías de ruta
 const CATEGORIES = [
-  "Natura i muntanya",
-  "Ciutats",
-  "Platja",
-  "Pobles i rutes rurals",
-  "Gastronomia",
-  "Cultural / Històric",
-  "Esport i aventura",
-  "Familiar",
+    { value: "Natura i muntanya", labelKey: "category_nature_mountain" },
+    { value: "Ciutats", labelKey: "category_cities" },
+    { value: "Platja", labelKey: "category_beach" },
+    { value: "Pobles i rutes rurals", labelKey: "category_villages_rural" },
+    { value: "Gastronomia", labelKey: "category_gastronomy" },
+    { value: "Cultural / Històric", labelKey: "category_cultural_historic" },
+    { value: "Esport i aventura", labelKey: "category_sports_adventure" },
+    { value: "Familiar", labelKey: "category_family" },
 ];
 
-// Tags disponibles
 const ALL_TAGS = [
-  "cultural",
-  "gastronòmic",
-  "artístic",
-  "natura",
-  "muntanya",
-  "urbà",
-  "romàntic",
-  "familiar",
-  "aventura",
-  "relax",
-  "fotografia",
-  "música",
-  "història",
-  "platja",
-  "rural",
+    { value: "cultural", labelKey: "tag_cultural" },
+    { value: "gastronòmic", labelKey: "tag_gastronomic" },
+    { value: "artístic", labelKey: "tag_artistic" },
+    { value: "natura", labelKey: "tag_nature" },
+    { value: "muntanya", labelKey: "tag_mountain" },
+    { value: "urbà", labelKey: "tag_urban" },
+    { value: "romàntic", labelKey: "tag_romantic" },
+    { value: "familiar", labelKey: "tag_family" },
+    { value: "aventura", labelKey: "tag_adventure" },
+    { value: "relax", labelKey: "tag_relax" },
+    { value: "fotografia", labelKey: "tag_photography" },
+    { value: "música", labelKey: "tag_music" },
+    { value: "història", labelKey: "tag_history" },
+    { value: "platja", labelKey: "tag_beach" },
+    { value: "rural", labelKey: "tag_rural" },
 ];
 
-// Ciutats grans d'Espanya
+// Ciutats (Normalment no es tradueixen, es deixen com a string simple)
 const BIG_SPANISH_CITIES = [
-  "Madrid",
-  "Barcelona",
-  "València",
-  "Sevilla",
-  "Zaragoza",
-  "Màlaga",
-  "Múrcia",
-  "Palma",
-  "Bilbao",
-  "Alacant",
-  "Còrdova",
-  "Valladolid",
-  "Vigo",
-  "Gijón",
-  "L'Hospitalet de Llobregat",
-  "A Coruña",
-  "Vitoria-Gasteiz",
-  "Granada",
-  "Elx",
-  "Oviedo",
+    "Madrid", "Barcelona", "València", "Sevilla", "Zaragoza", "Màlaga", "Múrcia",
+    "Palma", "Bilbao", "Alacant", "Còrdova", "Valladolid", "Vigo", "Gijón",
+    "L'Hospitalet de Llobregat", "A Coruña", "Vitoria-Gasteiz", "Granada", "Elx", "Oviedo",
 ];
 
-// Comunitats autònomes
 const AUTONOMOUS_REGIONS = [
-  "Andalusia",
-  "Aragó",
-  "Astúries",
-  "Illes Balears",
-  "Canàries",
-  "Cantàbria",
-  "Castella i Lleó",
-  "Castella-la Manxa",
-  "Catalunya",
-  "Comunitat Valenciana",
-  "Extremadura",
-  "Galícia",
-  "La Rioja",
-  "Comunitat de Madrid",
-  "Regió de Múrcia",
-  "Navarra",
-  "País Basc",
-  "Ceuta",
-  "Melilla",
+    { value: "Andalusia", labelKey: "region_andalusia" },
+    { value: "Aragó", labelKey: "region_aragon" },
+    { value: "Astúries", labelKey: "region_asturias" },
+    { value: "Illes Balears", labelKey: "region_balearic_islands" },
+    { value: "Canàries", labelKey: "region_canary_islands" },
+    { value: "Cantàbria", labelKey: "region_cantabria" },
+    { value: "Castella i Lleó", labelKey: "region_castile_leon" },
+    { value: "Castella-la Manxa", labelKey: "region_castile_la_mancha" },
+    { value: "Catalunya", labelKey: "region_catalonia" },
+    { value: "Comunitat Valenciana", labelKey: "region_valencian_community" },
+    { value: "Extremadura", labelKey: "region_extremadura" },
+    { value: "Galícia", labelKey: "region_galicia" },
+    { value: "La Rioja", labelKey: "region_la_rioja" },
+    { value: "Comunitat de Madrid", labelKey: "region_madrid" },
+    { value: "Regió de Múrcia", labelKey: "region_murcia" },
+    { value: "Navarra", labelKey: "region_navarre" },
+    { value: "País Basc", labelKey: "region_basque_country" },
+    { value: "Ceuta", labelKey: "region_ceuta" },
+    { value: "Melilla", labelKey: "region_melilla" },
 ];
 
-// Lista mundial per només 20 països
 const TOP_COUNTRIES = [
-  "Espanya",
-  "França",
-  "Itàlia",
-  "Portugal",
-  "Alemanya",
-  "Regne Unit",
-  "Països Baixos",
-  "Bèlgica",
-  "Suïssa",
-  "Àustria",
-  "Grècia",
-  "Estats Units",
-  "Canadà",
-  "Mèxic",
-  "Brasil",
-  "Marroc",
-  "Japó",
-  "Xina",
-  "Austràlia",
-  "Argentina",
+    { value: "Espanya", labelKey: "country_spain" },
+    { value: "França", labelKey: "country_france" },
+    { value: "Itàlia", labelKey: "country_italy" },
+    { value: "Portugal", labelKey: "country_portugal" },
+    { value: "Alemanya", labelKey: "country_germany" },
+    { value: "Regne Unit", labelKey: "country_united_kingdom" },
+    { value: "Països Baixos", labelKey: "country_netherlands" },
+    { value: "Bèlgica", labelKey: "country_belgium" },
+    { value: "Suïssa", labelKey: "country_switzerland" },
+    { value: "Àustria", labelKey: "country_austria" },
+    { value: "Grècia", labelKey: "country_greece" },
+    { value: "Estats Units", labelKey: "country_united_states" },
+    { value: "Canadà", labelKey: "country_canada" },
+    { value: "Mèxic", labelKey: "country_mexico" },
+    { value: "Brasil", labelKey: "country_brazil" },
+    { value: "Marroc", labelKey: "country_morocco" },
+    { value: "Japó", labelKey: "country_japan" },
+    { value: "Xina", labelKey: "country_china" },
+    { value: "Austràlia", labelKey: "country_australia" },
+    { value: "Argentina", labelKey: "country_argentina" },
 ];
 
 const DIFFICULTY_LEVELS = [
-  "Molt fàcil",
-  "Fàcil",
-  "Moderada",
-  "Difícil",
-  "Molt difícil",
+    { value: "Molt fàcil", labelKey: "difficulty_very_easy" },
+    { value: "Fàcil", labelKey: "difficulty_easy" },
+    { value: "Moderada", labelKey: "difficulty_moderate" },
+    { value: "Difícil", labelKey: "difficulty_hard" },
+    { value: "Molt difícil", labelKey: "difficulty_very_hard" },
 ];
 
-const SEASONS = ["Primavera", "Estiu", "Tardor", "Hivern"];
+const SEASONS = [
+    { value: "Primavera", labelKey: "season_spring" },
+    { value: "Estiu", labelKey: "season_summer" },
+    { value: "Tardor", labelKey: "season_autumn" },
+    { value: "Hivern", labelKey: "season_winter" },
+];
 
 export default function CreateTripForm({
-  onClose,
-  currentUser,
-  backendUser,
-}: CreateTripFormProps) {
-  // ---------- stepper ----------
-  const [step, setStep] = useState(1);
-  const totalSteps = STEPS.length;
+                                           onClose,
+                                           currentUser,
+                                           backendUser,
+                                       }: CreateTripFormProps) {
+    const { t } = useTranslation();
 
-  // ---------- camps bàsics ----------
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
+    const STEPS = [
+        t('create_trip_step_1'),
+        t('create_trip_step_2'),
+        t('create_trip_step_3')
+    ];
 
-  // Tags opció C: click + drag & drop
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [draggingTag, setDraggingTag] = useState<string | null>(null);
+    const [step, setStep] = useState(1);
+    const totalSteps = STEPS.length;
 
-  // Ubicació / dades
-  const [city, setCity] = useState("");
-  const [region, setRegion] = useState("");
-  const [country, setCountry] = useState("");
-  const [routeMap] = useState<{ lat: number; lng: number }[]>([]);
-  const [distance, setDistance] = useState(""); // km
-  const [duration, setDuration] = useState(""); // horas
-  const [difficulty, setDifficulty] = useState("");
-  const [recommendedSeason, setRecommendedSeason] = useState("");
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [category, setCategory] = useState("");
 
-  // ---------- punts de la ruta ----------
-  const [tripPoints, setTripPoints] = useState<TripPointForm[]>([
-    { title: "", description: "", lat: null, lng: null },
-  ]);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [draggingTag, setDraggingTag] = useState<string | null>(null);
 
-  // imatges
-  const [cover, setCover] = useState<File | null>(null);
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+    const [city, setCity] = useState("");
+    const [region, setRegion] = useState("");
+    const [country, setCountry] = useState("");
+    const [routeMap] = useState<{ lat: number; lng: number }[]>([]);
+    const [distance, setDistance] = useState("");
+    const [duration, setDuration] = useState("");
+    const [difficulty, setDifficulty] = useState("");
+    const [recommendedSeason, setRecommendedSeason] = useState("");
 
-  const [gallery, setGallery] = useState<File[]>([]);
-  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
-
-  const [pointImages, setPointImages] = useState<(File | null)[]>([null]);
-
-  // estat UI
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<string>("");
-
-  // ---------- helpers tags ----------
-  const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
-
-  const handleTagDropToSelected = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev : [...prev, tag]
-    );
-  };
-
-  const handleTagDropToAvailable = (tag: string) => {
-    setSelectedTags((prev) => prev.filter((t) => t !== tag));
-  };
-
-  const handleDragStart = (tag: string) => {
-    setDraggingTag(tag);
-  };
-
-  const handleDragEnd = () => {
-    setDraggingTag(null);
-  };
-
-  // ---------- helpers punts ----------
-  const handleAddPoint = () => {
-    setTripPoints((prev) => [
-      ...prev,
-      { title: "", description: "", lat: null, lng: null },
+    const [tripPoints, setTripPoints] = useState<TripPointForm[]>([
+        { title: "", description: "", lat: null, lng: null },
     ]);
-    setPointImages((prev) => [...prev, null]);
-  };
 
-  const handleRemovePoint = (index: number) => {
-    setTripPoints((prev) => prev.filter((_, i) => i !== index));
-    setPointImages((prev) => prev.filter((_, i) => i !== index));
-  };
+    const [cover, setCover] = useState<File | null>(null);
+    const [coverPreview, setCoverPreview] = useState<string | null>(null);
+    const [gallery, setGallery] = useState<File[]>([]);
+    const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+    const [pointImages, setPointImages] = useState<(File | null)[]>([null]);
 
-  const updatePointField = (
-    index: number,
-    field: keyof TripPointForm,
-    value: string | number | null
-  ) => {
-    setTripPoints((prev) =>
-      prev.map((p, i) => (i === index ? { ...p, [field]: value } : p))
-    );
-  };
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string>("");
+    const [success, setSuccess] = useState<string>("");
 
-  const handlePointImageChange = (index: number, file: File | null) => {
-    setPointImages((prev) => prev.map((f, i) => (i === index ? file : f)));
-  };
+    // ---------- helpers tags ----------
+    const toggleTag = (tagValue: string) => {
+        setSelectedTags((prev) =>
+            prev.includes(tagValue) ? prev.filter((t) => t !== tagValue) : [...prev, tagValue]
+        );
+    };
 
-  // ---------- helpers imatges ----------
-  const handleGalleryChange = (files: FileList | null) => {
-    if (!files) return;
+    const handleTagDropToSelected = (tagValue: string) => {
+        setSelectedTags((prev) => (prev.includes(tagValue) ? prev : [...prev, tagValue]));
+    };
 
-    const newFiles = Array.from(files);
+    const handleTagDropToAvailable = (tagValue: string) => {
+        setSelectedTags((prev) => prev.filter((t) => t !== tagValue));
+    };
 
-    setGallery((prev) => [...prev, ...newFiles]);
+    const handleDragStart = (tagValue: string) => setDraggingTag(tagValue);
+    const handleDragEnd = () => setDraggingTag(null);
 
-    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
-    setGalleryPreviews((prev) => [...prev, ...newPreviews]);
-  };
+    const handleAddPoint = () => {
+        setTripPoints((prev) => [
+            ...prev,
+            { title: "", description: "", lat: null, lng: null },
+        ]);
+        setPointImages((prev) => [...prev, null]);
+    };
 
+    const handleRemovePoint = (index: number) => {
+        setTripPoints((prev) => prev.filter((_, i) => i !== index));
+        setPointImages((prev) => prev.filter((_, i) => i !== index));
+    };
 
-  const handleCoverChange = (file: File | null) => {
-    setCover(file);
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setCoverPreview(url);
-    } else {
-      setCoverPreview(null);
-    }
-  };
+    const updatePointField = (index: number, field: keyof TripPointForm, value: string | number | null) => {
+        setTripPoints((prev) => prev.map((p, i) => (i === index ? { ...p, [field]: value } : p)));
+    };
 
-  // ---------- navegació ----------
-  const goNext = () => {
-    if (step < totalSteps) setStep((s) => s + 1);
-  };
+    const handlePointImageChange = (index: number, file: File | null) => {
+        setPointImages((prev) => prev.map((f, i) => (i === index ? file : f)));
+    };
 
-  const goBack = () => {
-    if (step > 1) setStep((s) => s - 1);
-  };
+    const handleGalleryChange = (files: FileList | null) => {
+        if (!files) return;
+        const newFiles = Array.from(files);
+        setGallery((prev) => [...prev, ...newFiles]);
+        const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+        setGalleryPreviews((prev) => [...prev, ...newPreviews]);
+    };
 
-  // =============================================================
-  // ✅ VALIDACIONS
-  // =============================================================
-  const validateStep = (currentStep: number): boolean => {
-    // netegem missatge previ
-    setError("");
-
-    if (currentStep === 1) {
-      if (!title.trim()) {
-        setError("El títol és obligatori.");
-        return false;
-      }
-      if (!category) {
-        setError("Has de triar una categoria.");
-        return false;
-      }
-      if (selectedTags.length === 0) {
-        setError("Has de seleccionar almenys un tag.");
-        return false;
-      }
-      if (!description.trim()) {
-        setError("La descripció és obligatòria.");
-        return false;
-      }
-    }
-
-    if (currentStep === 2) {
-      if (!city.trim()) {
-        setError("La ciutat és obligatòria.");
-        return false;
-      }
-      if (!region) {
-        setError("Has de triar una comunitat autònoma.");
-        return false;
-      }
-      if (!country) {
-        setError("Has de triar un país.");
-        return false;
-      }
-
-      const distanceNum = Number(distance);
-      if (!distance || Number.isNaN(distanceNum)) {
-        setError("La distància ha de ser un número en km.");
-        return false;
-      }
-      if (distanceNum <= 0 || distanceNum > 1000) {
-        setError("La distància ha de ser entre 1 i 1000 km.");
-        return false;
-      }
-
-      const durationNum = Number(duration);
-      if (!duration || Number.isNaN(durationNum)) {
-        setError("La durada ha de ser un número en hores.");
-        return false;
-      }
-      if (durationNum <= 0 || durationNum > 72) {
-        setError("La durada ha de ser entre 1 i 72 hores.");
-        return false;
-      }
-
-      if (!difficulty) {
-        setError("Has de triar un nivell de dificultat.");
-        return false;
-      }
-      if (!recommendedSeason) {
-        setError("Has de triar una temporada recomanada.");
-        return false;
-      }
-    }
-
-    if (currentStep === 3) {
-      if (!cover) {
-        setError("Has d’afegir una imatge de portada.");
-        return false;
-      }
-      if (gallery.length === 0) {
-        setError("Has d’afegir almenys una imatge a la galeria.");
-        return false;
-      }
-      if (tripPoints.length === 0) {
-        setError("Has d’afegir almenys un punt de ruta.");
-        return false;
-      }
-
-      for (let i = 0; i < tripPoints.length; i++) {
-        const p = tripPoints[i];
-        if (!p.title.trim()) {
-          setError(`Falta el títol del punt #${i + 1}.`);
-          return false;
+    const handleCoverChange = (file: File | null) => {
+        setCover(file);
+        if (file) {
+            setCoverPreview(URL.createObjectURL(file));
+        } else {
+            setCoverPreview(null);
         }
-        if (!p.description.trim()) {
-          setError(`Falta la descripció del punt #${i + 1}.`);
-          return false;
+    };
+
+    const goNext = () => { if (step < totalSteps) setStep((s) => s + 1); };
+    const goBack = () => { if (step > 1) setStep((s) => s - 1); };
+
+    const validateStep = (currentStep: number): boolean => {
+        setError("");
+
+        if (currentStep === 1) {
+            if (!title.trim()) { setError(t('create_trip_error_title_required')); return false; }
+            if (!category) { setError(t('create_trip_error_category_required')); return false; }
+            if (selectedTags.length === 0) { setError(t('create_trip_error_tags_required')); return false; }
+            if (!description.trim()) { setError(t('create_trip_error_description_required')); return false; }
         }
-        if (p.lat === null || p.lng === null) {
-          setError(`Has de seleccionar la ubicació al mapa del punt #${i + 1}.`);
-          return false;
+
+        if (currentStep === 2) {
+            if (!city.trim()) { setError(t('create_trip_error_city_required')); return false; }
+            if (!region) { setError(t('create_trip_error_region_required')); return false; }
+            if (!country) { setError(t('create_trip_error_country_required')); return false; }
+
+            const distanceNum = Number(distance);
+            if (!distance || Number.isNaN(distanceNum)) { setError(t('create_trip_error_distance_number')); return false; }
+            if (distanceNum <= 0 || distanceNum > 1000) { setError(t('create_trip_error_distance_range')); return false; }
+
+            const durationNum = Number(duration);
+            if (!duration || Number.isNaN(durationNum)) { setError(t('create_trip_error_duration_number')); return false; }
+            if (durationNum <= 0 || durationNum > 72) { setError(t('create_trip_error_duration_range')); return false; }
+
+            if (!difficulty) { setError(t('create_trip_error_difficulty_required')); return false; }
+            if (!recommendedSeason) { setError(t('create_trip_error_season_required')); return false; }
         }
-        if (!pointImages[i]) {
-          setError(`Has d’afegir una imatge al punt #${i + 1}.`);
-          return false;
+
+        if (currentStep === 3) {
+            if (!cover) { setError(t('create_trip_error_cover_required')); return false; }
+            if (gallery.length === 0) { setError(t('create_trip_error_gallery_required')); return false; }
+            if (tripPoints.length === 0) { setError(t('create_trip_error_points_required')); return false; }
+
+            for (let i = 0; i < tripPoints.length; i++) {
+                const p = tripPoints[i];
+                if (!p.title.trim()) { setError(`${t('create_trip_error_point_title_missing')} ${i + 1}.`); return false; }
+                if (!p.description.trim()) { setError(`${t('create_trip_error_point_description_missing')} ${i + 1}.`); return false; }
+                if (p.lat === null || p.lng === null) { setError(`${t('create_trip_error_point_location_missing')} ${i + 1}.`); return false; }
+                if (!pointImages[i]) { setError(`${t('create_trip_error_point_image_missing')} ${i + 1}.`); return false; }
+            }
         }
-      }
-    }
 
-    return true;
-  };
+        return true;
+    };
 
-  // =============================================================
-  // 🚀 Submit: crida a createTripMultipart()
-  // =============================================================
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+        setSuccess("");
 
-    // Si no estem en l'últim pas -> només validem aquell pas i avancem
-    if (step !== totalSteps) {
-      const ok = validateStep(step);
-      if (!ok) return;
-      goNext();
-      return;
-    }
+        if (step !== totalSteps) {
+            const ok = validateStep(step);
+            if (!ok) return;
+            goNext();
+            return;
+        }
 
-    // Últim pas: validem
-    const allValid =
-      validateStep(1) && validateStep(2) && validateStep(3);
-    if (!allValid) return;
+        const allValid = validateStep(1) && validateStep(2) && validateStep(3);
+        if (!allValid) return;
 
-    try {
-      setSubmitting(true);
+        try {
+            setSubmitting(true);
+            const distanceNum = Number(distance);
+            const durationNum = Number(duration);
 
-      const distanceNum = Number(distance);
-      const durationNum = Number(duration);
+            const payload: TripCreatePayload = {
+                title,
+                description,
+                category,
+                tags: selectedTags,
+                author: {
+                    userId: backendUser.uid,
+                    name: backendUser.nom_i_cognoms || backendUser.username || currentUser.displayName || t('general_user'),
+                    profilePic: backendUser.url_foto_perfil || currentUser.photoURL || null,
+                },
+                city,
+                region,
+                country,
+                routeMap: routeMap || [],
+                trip_points: tripPoints.map((p) => ({
+                    title: p.title,
+                    description: p.description,
+                    coordinates: { lat: p.lat ?? 0, lng: p.lng ?? 0 },
+                })),
+                distance: distanceNum,
+                duration: `${durationNum} h`,
+                difficulty,
+                recommendedSeason,
+            };
 
-      const payload: TripCreatePayload = {
-        title,
-        description,
-        category,
-        tags: selectedTags,
-        author: {
-          userId: backendUser.uid,
-          name:
-            backendUser.nom_i_cognoms ||
-            backendUser.username ||
-            currentUser.displayName ||
-            "Usuari",
-          profilePic:
-            backendUser.url_foto_perfil || currentUser.photoURL || null,
-        },
-        city,
-        region,
-        country,
-        routeMap: routeMap || [],
-        trip_points: tripPoints.map((p) => ({
-          title: p.title,
-          description: p.description,
-          coordinates: {
-            lat: p.lat ?? 0,
-            lng: p.lng ?? 0,
-          },
-        })),
-        distance: distanceNum,
-        duration: `${durationNum} h`,
-        difficulty,
-        recommendedSeason,
-      };
+            const result = await createTripMultipart(payload, cover, gallery, pointImages);
+            await addPublicationToUser(currentUser.uid, result.trip_id);
 
-      const result = await createTripMultipart(
-        payload,
-        cover,
-        gallery,
-        pointImages
-      );
+            setSuccess(t('create_trip_success'));
+            onClose();
+        } catch (err: any) {
+            console.error("Error creant trip:", err);
+            setError(err.message || t('general_error'));
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
-      await addPublicationToUser(currentUser.uid, result.trip_id);
-
-      setSuccess("Ruta creada correctament 🎉");
-      onClose();
-    } catch (err: any) {
-      console.error("Error creant trip:", err);
-      setError(err.message || "Error inesperat creant la ruta");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // ===================================================================
-  // 🌈 UI
-  // ===================================================================
-  return (
-    <div className="create-trip-backdrop">
-      <div className="create-trip-panel">
-        <div className="create-trip-header">
-          <h2>Crear nova ruta</h2>
-          <button
-            type="button"
-            className="create-trip-close"
-            onClick={onClose}
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* STEP INDICATOR */}
-        <div className="create-trip-stepper">
-          {STEPS.map((label, index) => {
-            const stepNumber = index + 1;
-            const isActive = stepNumber === step;
-            const isCompleted = stepNumber < step;
-
-            return (
-              <div
-                key={label}
-                className={`stepper-step ${
-                  isCompleted ? "completed" : isActive ? "active" : ""
-                }`}
-              >
-                <div className="stepper-circle">{stepNumber}</div>
-                <div className="stepper-label">{label}</div>
-              </div>
-            );
-          })}
-        </div>
-
-        <form className="create-trip-form" onSubmit={handleSubmit}>
-          {/* mensajes */}
-          {error && <div className="form-error">{error}</div>}
-          {success && <div className="form-success">{success}</div>}
-
-          {/* =========================
-              PAS 1: DETALLS BÀSICS
-             ========================= */}
-          {step === 1 && (
-            <div className="step-content">
-              <div className="form-grid">
-                <label>
-                  Títol
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                  />
-                </label>
-
-                <label>
-                  Categoria
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    required
-                  >
-                    <option value="">Selecciona una categoria</option>
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                {/* TAGS: click + drag & drop */}
-                <div className="full-width tags-section">
-                  <span className="tags-label">Tags de la ruta</span>
-                  <p className="tags-helper">
-                    Fes clic o arrossega els tags per afegir-los a la teva ruta.
-                  </p>
-                  <div className="tag-columns">
-                    {/* Columna esquerra: disponibles */}
-                    <div
-                      className="tag-column"
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        if (draggingTag) {
-                          handleTagDropToAvailable(draggingTag);
-                        }
-                      }}
-                    >
-                      <div className="tag-pills">
-                        {ALL_TAGS.filter(
-                          (tag) => !selectedTags.includes(tag)
-                        ).map((tag) => (
-                          <button
-                            key={tag}
-                            type="button"
-                            className={`tag-pill ${
-                              draggingTag === tag ? "dragging" : ""
-                            }`}
-                            draggable
-                            onDragStart={() => handleDragStart(tag)}
-                            onDragEnd={handleDragEnd}
-                            onClick={() => toggleTag(tag)}
-                          >
-                            {tag}
-                          </button>
-                        ))}
-                        {ALL_TAGS.filter(
-                          (tag) => !selectedTags.includes(tag)
-                        ).length === 0 && (
-                          <span className="tag-empty">
-                            Tots els tags estan seleccionats.
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Columna dreta: seleccionades */}
-                    <div
-                      className="tag-column"
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        if (draggingTag) {
-                          handleTagDropToSelected(draggingTag);
-                        }
-                      }}
-                    >
-                      <h4>Els teus tags</h4>
-                      <div
-                        className={`tag-pills tag-dropzone ${
-                          selectedTags.length === 0 ? "empty" : ""
-                        }`}
-                      >
-                        {selectedTags.length === 0 && (
-                          <span className="tag-empty">
-                            Arrossega aquí tags o fes clic per seleccionar-ne.
-                          </span>
-                        )}
-                        {selectedTags.map((tag) => (
-                          <button
-                            key={tag}
-                            type="button"
-                            className="tag-pill selected"
-                            draggable
-                            onDragStart={() => handleDragStart(tag)}
-                            onDragEnd={handleDragEnd}
-                            onClick={() => toggleTag(tag)}
-                          >
-                            {tag}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+    return (
+        <div className="create-trip-backdrop">
+            <div className="create-trip-panel">
+                <div className="create-trip-header">
+                    <h2>{t('create_trip_title')}</h2>
+                    <button type="button" className="create-trip-close" onClick={onClose}>✕</button>
                 </div>
 
-                <label className="full-width">
-                  Descripció
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={4}
-                    required
-                  />
-                </label>
-              </div>
-            </div>
-          )}
+                <div className="create-trip-stepper">
+                    {STEPS.map((label, index) => {
+                        const stepNumber = index + 1;
+                        const isActive = stepNumber === step;
+                        const isCompleted = stepNumber < step;
 
-          {/* =========================
-              PAS 2: UBICACIÓ + DADES
-             ========================= */}
-          {step === 2 && (
-            <div className="step-content">
-              <div className="form-grid">
-                {/* Ciutat amb datalist (sugerencias + escritura lliure) */}
-                <label>
-                  Ciutat
-                  <input
-                    list="ciutats-espanya"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Escriu o selecciona una ciutat"
-                    required
-                  />
-                  <datalist id="ciutats-espanya">
-                    {BIG_SPANISH_CITIES.map((c) => (
-                      <option key={c} value={c} />
-                    ))}
-                  </datalist>
-                </label>
-
-                <label>
-                  Regió (Comunitat autònoma)
-                  <select
-                    value={region}
-                    onChange={(e) => setRegion(e.target.value)}
-                    required
-                  >
-                    <option value="">Selecciona una comunitat</option>
-                    {AUTONOMOUS_REGIONS.map((reg) => (
-                      <option key={reg} value={reg}>
-                        {reg}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  País
-                  <select
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    required
-                  >
-                    <option value="">Selecciona un país</option>
-                    {TOP_COUNTRIES.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  Distància (km)
-                  <input
-                    type="number"
-                    min={1}
-                    max={1000}
-                    step="0.1"
-                    value={distance}
-                    onChange={(e) => setDistance(e.target.value)}
-                    required
-                  />
-                </label>
-
-                <label>
-                  Durada (hores)
-                  <input
-                    type="number"
-                    min={1}
-                    max={72}
-                    step="0.5"
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                    required
-                  />
-                </label>
-
-                <label>
-                  Dificultat
-                  <select
-                    value={difficulty}
-                    onChange={(e) => setDifficulty(e.target.value)}
-                    required
-                  >
-                    <option value="">Selecciona dificultat</option>
-                    {DIFFICULTY_LEVELS.map((d) => (
-                      <option key={d} value={d}>
-                        {d}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  Temporada recomanada
-                  <select
-                    value={recommendedSeason}
-                    onChange={(e) =>
-                      setRecommendedSeason(e.target.value)
-                    }
-                    required
-                  >
-                    <option value="">Selecciona temporada</option>
-                    {SEASONS.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-            </div>
-          )}
-
-          {/* =========================
-              PAS 3: IMATGES + PUNTS
-             ========================= */}
-          {step === 3 && (
-            <div className="step-content">
-              {/* --- imatges principals --- */}
-              <div className="form-section">
-                <h3>Imatges principals</h3>
-
-                <div className="image-upload-grid">
-                  {/* Cover */}
-                  <div className="image-card image-card-cover">
-                    <div className="image-card-header">
-                      <h4>Imatge de portada</h4>
-                      <span className="image-card-subtitle">
-                        Aquesta serà la imatge principal de la ruta.
-                      </span>
-                    </div>
-                    <div className="image-card-body">
-                      {coverPreview ? (
-                        <div className="image-preview">
-                          <img src={coverPreview} alt="Portada" />
-                        </div>
-                      ) : (
-                        <div className="image-preview placeholder">
-                          <span>Cap imatge seleccionada</span>
-                        </div>
-                      )}
-                      <label className="image-input-button">
-                        Selecciona imatge
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) =>
-                            handleCoverChange(e.target.files?.[0] ?? null)
-                          }
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Galeria */}
-                  <div className="image-card image-card-gallery">
-                    <div className="image-card-header">
-                      <h4>Galeria d’imatges</h4>
-                      <span className="image-card-subtitle">
-                        Afegeix diverses imatges de la ruta.
-                      </span>
-                    </div>
-                    <div className="image-card-body">
-                      <div className="gallery-preview-grid">
-                        {galleryPreviews.length > 0 ? (
-                          galleryPreviews.map((src, idx) => (
-                            <div key={idx} className="gallery-preview-item" style={{ position: "relative" }}>
-                              <img src={src} alt={`Galeria ${idx + 1}`} />
-
-                              <button
-                                type="button"
-                                className="remove-image-btn"
-                                onClick={() => {
-                                  setGallery((prev) => prev.filter((_, i) => i !== idx));
-                                  setGalleryPreviews((prev) => prev.filter((_, i) => i !== idx));
-                                }}
-                              >
-                                ✕
-                              </button>
+                        return (
+                            <div key={index} className={`stepper-step ${isCompleted ? "completed" : isActive ? "active" : ""}`}>
+                                <div className="stepper-circle">{stepNumber}</div>
+                                <div className="stepper-label">{label}</div>
                             </div>
-                          ))
-                        ) : (
-                          <div className="image-preview placeholder">
-                            <span>Encara no hi ha imatges a la galeria</span>
-                          </div>
-                        )}
-                      </div>
-                      <label className="image-input-button">
-                        Afegeix imatges
-                        <input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          onChange={(e) => handleGalleryChange(e.target.files)}
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* --- punts de la ruta --- */}
-              <div className="form-section">
-                <div className="section-header">
-                  <h3>Punts de la ruta</h3>
-                  <button type="button" onClick={handleAddPoint}>
-                    + Afegir punt de ruta
-                  </button>
+                        );
+                    })}
                 </div>
 
-                {tripPoints.map((p, index) => (
-                  <div key={index} className="trip-point">
-                    <div className="trip-point-header">
-                      <h4>Punt #{index + 1}</h4>
-                      {tripPoints.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemovePoint(index)}
-                        >
-                          Eliminar
-                        </button>
-                      )}
-                    </div>
+                <form className="create-trip-form" onSubmit={handleSubmit}>
+                    {error && <div className="form-error">{error}</div>}
+                    {success && <div className="form-success">{success}</div>}
 
-                    <div className="form-grid">
-                      <label>
-                        Títol
-                        <input
-                          type="text"
-                          value={p.title}
-                          onChange={(e) =>
-                            updatePointField(
-                              index,
-                              "title",
-                              e.target.value
-                            )
-                          }
-                          required
-                        />
-                      </label>
+                    {step === 1 && (
+                        <div className="step-content">
+                            <div className="form-grid">
+                                <label>
+                                    {t('create_trip_title_label')}
+                                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                                </label>
 
-                      <label className="full-width">
-                        Descripció
-                        <textarea
-                          value={p.description}
-                          onChange={(e) =>
-                            updatePointField(
-                              index,
-                              "description",
-                              e.target.value
-                            )
-                          }
-                          rows={3}
-                          required
-                        />
-                      </label>
+                                <label>
+                                    {t('create_trip_category_label')}
+                                    <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+                                        <option value="">{t('create_trip_select_category')}</option>
+                                        {CATEGORIES.map((cat) => (
+                                            <option key={cat.value} value={cat.value}>{t(cat.labelKey)}</option>
+                                        ))}
+                                    </select>
+                                </label>
 
-                      <label className="full-width">
-                        Ubicació del punt:
-                        <MapSelector
-                          lat={p.lat}
-                          lng={p.lng}
-                          onSelect={(lat, lng) => {
-                            updatePointField(index, "lat", lat);
-                            updatePointField(index, "lng", lng);
-                          }}
-                        />
+                                <div className="full-width tags-section">
+                                    <span className="tags-label">{t('create_trip_tags_label')}</span>
+                                    <p className="tags-helper">{t('create_trip_tags_helper')}</p>
+                                    <div className="tag-columns">
+                                        <div className="tag-column" onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); if (draggingTag) handleTagDropToAvailable(draggingTag); }}>
+                                            <div className="tag-pills">
+                                                {ALL_TAGS.filter((tagObj) => !selectedTags.includes(tagObj.value)).map((tagObj) => (
+                                                    <button key={tagObj.value} type="button" className={`tag-pill ${draggingTag === tagObj.value ? "dragging" : ""}`} draggable onDragStart={() => handleDragStart(tagObj.value)} onDragEnd={handleDragEnd} onClick={() => toggleTag(tagObj.value)}>
+                                                        {t(tagObj.labelKey)}
+                                                    </button>
+                                                ))}
+                                                {ALL_TAGS.filter((tagObj) => !selectedTags.includes(tagObj.value)).length === 0 && (
+                                                    <span className="tag-empty">{t('create_trip_tags_empty_available')}</span>
+                                                )}
+                                            </div>
+                                        </div>
 
-                      </label>
+                                        <div className="tag-column" onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); if (draggingTag) handleTagDropToSelected(draggingTag); }}>
+                                            <h4>{t('create_trip_tags_your_tags')}</h4>
+                                            <div className={`tag-pills tag-dropzone ${selectedTags.length === 0 ? "empty" : ""}`}>
+                                                {selectedTags.length === 0 && (
+                                                    <span className="tag-empty">{t('create_trip_tags_dropzone_placeholder')}</span>
+                                                )}
+                                                {selectedTags.map((tagVal) => {
+                                                    const tagObj = ALL_TAGS.find(t => t.value === tagVal);
+                                                    return (
+                                                        <button key={tagVal} type="button" className="tag-pill selected" draggable onDragStart={() => handleDragStart(tagVal)} onDragEnd={handleDragEnd} onClick={() => toggleTag(tagVal)}>
+                                                            {tagObj ? t(tagObj.labelKey) : tagVal}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                      <div className="image-point-wrapper">
-                          <span className="image-point-label-text">Imatge del punt</span>
-
-                          {/* input ocult (nadiu) */}
-                          <input
-                            id={`point-image-${index}`}
-                            type="file"
-                            accept="image/*"
-                            className="image-point-input"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0] ?? null;
-                              handlePointImageChange(index, file);
-                            }}
-                            required
-                          />
-
-                          <div className="image-point-controls">
-                            {/* botó maco que obre el selector */}
-                            <label
-                              htmlFor={`point-image-${index}`}
-                              className="image-input-button image-point-button"
-                            >
-                              Selecciona imatge del punt
-                            </label>
-
-                            {/* text amb el nom del fitxer escollit */}
-                            <span className="image-point-filename">
-                              {pointImages[index]?.name
-                                ? pointImages[index]!.name
-                                : "Cap fitxer seleccionat"}
-                            </span>
-                          </div>
+                                <label className="full-width">
+                                    {t('create_trip_description_label')}
+                                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} required />
+                                </label>
+                            </div>
                         </div>
+                    )}
 
+                    {step === 2 && (
+                        <div className="step-content">
+                            <div className="form-grid">
+                                <label>
+                                    {t('create_trip_city_label')}
+                                    <input list="ciutats-espanya" value={city} onChange={(e) => setCity(e.target.value)} placeholder={t('create_trip_city_placeholder')} required />
+                                    <datalist id="ciutats-espanya">{BIG_SPANISH_CITIES.map((c) => (<option key={c} value={c} />))}</datalist>
+                                </label>
 
+                                <label>
+                                    {t('create_trip_region_label')}
+                                    <select value={region} onChange={(e) => setRegion(e.target.value)} required>
+                                        <option value="">{t('create_trip_select_region')}</option>
+                                        {AUTONOMOUS_REGIONS.map((reg) => (<option key={reg.value} value={reg.value}>{t(reg.labelKey)}</option>))}
+                                    </select>
+                                </label>
+
+                                <label>
+                                    {t('create_trip_country_label')}
+                                    <select value={country} onChange={(e) => setCountry(e.target.value)} required>
+                                        <option value="">{t('create_trip_select_country')}</option>
+                                        {TOP_COUNTRIES.map((p) => (<option key={p.value} value={p.value}>{t(p.labelKey)}</option>))}
+                                    </select>
+                                </label>
+
+                                <label>
+                                    {t('create_trip_distance_label')}
+                                    <input type="number" min={1} max={1000} step="0.1" value={distance} onChange={(e) => setDistance(e.target.value)} required />
+                                </label>
+
+                                <label>
+                                    {t('create_trip_duration_label')}
+                                    <input type="number" min={1} max={72} step="0.5" value={duration} onChange={(e) => setDuration(e.target.value)} required />
+                                </label>
+
+                                <label>
+                                    {t('create_trip_difficulty_label')}
+                                    <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} required>
+                                        <option value="">{t('create_trip_select_difficulty')}</option>
+                                        {DIFFICULTY_LEVELS.map((d) => (<option key={d.value} value={d.value}>{t(d.labelKey)}</option>))}
+                                    </select>
+                                </label>
+
+                                <label>
+                                    {t('create_trip_season_label')}
+                                    <select value={recommendedSeason} onChange={(e) => setRecommendedSeason(e.target.value)} required>
+                                        <option value="">{t('create_trip_select_season')}</option>
+                                        {SEASONS.map((s) => (<option key={s.value} value={s.value}>{t(s.labelKey)}</option>))}
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 3 && (
+                        <div className="step-content">
+                            <div className="form-section">
+                                <h3>{t('create_trip_images_title')}</h3>
+                                <div className="image-upload-grid">
+                                    <div className="image-card image-card-cover">
+                                        <div className="image-card-header">
+                                            <h4>{t('create_trip_cover_title')}</h4>
+                                            <span className="image-card-subtitle">{t('create_trip_cover_subtitle')}</span>
+                                        </div>
+                                        <div className="image-card-body">
+                                            {coverPreview ? (<div className="image-preview"><img src={coverPreview} alt="Portada" /></div>) : (<div className="image-preview placeholder"><span>{t('create_trip_cover_no_image')}</span></div>)}
+                                            <label className="image-input-button">
+                                                {t('create_trip_cover_select_button')}
+                                                <input type="file" accept="image/*" onChange={(e) => handleCoverChange(e.target.files?.[0] ?? null)} />
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div className="image-card image-card-gallery">
+                                        <div className="image-card-header">
+                                            <h4>{t('create_trip_gallery_title')}</h4>
+                                            <span className="image-card-subtitle">{t('create_trip_gallery_subtitle')}</span>
+                                        </div>
+                                        <div className="image-card-body">
+                                            <div className="gallery-preview-grid">
+                                                {galleryPreviews.length > 0 ? (
+                                                    galleryPreviews.map((src, idx) => (
+                                                        <div key={idx} className="gallery-preview-item" style={{ position: "relative" }}>
+                                                            <img src={src} alt={`Galeria ${idx + 1}`} />
+                                                            <button type="button" className="remove-image-btn" onClick={() => { setGallery((prev) => prev.filter((_, i) => i !== idx)); setGalleryPreviews((prev) => prev.filter((_, i) => i !== idx)); }}>✕</button>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className="image-preview placeholder"><span>{t('create_trip_gallery_no_image')}</span></div>
+                                                )}
+                                            </div>
+                                            <label className="image-input-button">
+                                                {t('create_trip_gallery_add_button')}
+                                                <input type="file" multiple accept="image/*" onChange={(e) => handleGalleryChange(e.target.files)} />
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <div className="section-header">
+                                    <h3>{t('create_trip_points_title')}</h3>
+                                    <button type="button" onClick={handleAddPoint}>{t('create_trip_add_point')}</button>
+                                </div>
+
+                                {tripPoints.map((p, index) => (
+                                    <div key={index} className="trip-point">
+                                        <div className="trip-point-header">
+                                            <h4>{t('create_trip_point_number')}{index + 1}</h4>
+                                            {tripPoints.length > 1 && (<button type="button" onClick={() => handleRemovePoint(index)}>{t('create_trip_point_delete')}</button>)}
+                                        </div>
+
+                                        <div className="form-grid">
+                                            <label>
+                                                {t('create_trip_title_label')}
+                                                <input type="text" value={p.title} onChange={(e) => updatePointField(index, "title", e.target.value)} required />
+                                            </label>
+
+                                            <label className="full-width">
+                                                {t('create_trip_description_label')}
+                                                <textarea value={p.description} onChange={(e) => updatePointField(index, "description", e.target.value)} rows={3} required />
+                                            </label>
+
+                                            <label className="full-width">
+                                                {t('create_trip_point_location')}
+                                                <MapSelector lat={p.lat} lng={p.lng} onSelect={(lat, lng) => { updatePointField(index, "lat", lat); updatePointField(index, "lng", lng); }} />
+                                            </label>
+
+                                            <div className="image-point-wrapper">
+                                                <span className="image-point-label-text">{t('create_trip_point_image')}</span>
+                                                <input id={`point-image-${index}`} type="file" accept="image/*" className="image-point-input" onChange={(e) => { const file = e.target.files?.[0] ?? null; handlePointImageChange(index, file); }} required />
+                                                <div className="image-point-controls">
+                                                    <label htmlFor={`point-image-${index}`} className="image-input-button image-point-button">{t('create_trip_point_select_image')}</label>
+                                                    <span className="image-point-filename">{pointImages[index]?.name ? pointImages[index]!.name : t('create_trip_point_no_file')}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="form-actions wizard-actions">
+                        {step === 1 && (
+                            <>
+                                <button type="button" onClick={onClose}>{t('general_cancel')}</button>
+                                <button type="submit" disabled={submitting}>{t('create_trip_next')}</button>
+                            </>
+                        )}
+                        {step > 1 && (
+                            <>
+                                <button type="button" className="secondary" onClick={goBack}>{t('create_trip_back')}</button>
+                                <button type="submit" disabled={submitting}>{step === totalSteps ? (submitting ? t('create_trip_creating_route') : t('create_trip_create_route')) : t('create_trip_next')}</button>
+                            </>
+                        )}
                     </div>
-                  </div>
-                ))}
-              </div>
+                </form>
             </div>
-          )}
-
-          {/* ---------- BOTONS FOOTER (BACK/NEXT/SUBMIT) ---------- */}
-          <div className="form-actions wizard-actions">
-            {/* PAS 1 -> Cancel·lar + Següent */}
-            {step === 1 && (
-              <>
-                <button type="button" onClick={onClose}>
-                  Cancel·lar
-                </button>
-
-                <button type="submit" disabled={submitting}>
-                  Següent
-                </button>
-              </>
-            )}
-
-            {/* PAS 2 i 3 -> Enrere + Següent / Crear ruta */}
-            {step > 1 && (
-              <>
-                <button
-                  type="button"
-                  className="secondary"
-                  onClick={goBack}
-                >
-                  Enrere
-                </button>
-
-                <button type="submit" disabled={submitting}>
-                  {step === totalSteps
-                    ? submitting
-                      ? "Creant ruta..."
-                      : "Crear ruta"
-                    : "Següent"}
-                </button>
-              </>
-            )}
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+        </div>
+    );
 }

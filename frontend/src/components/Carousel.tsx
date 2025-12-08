@@ -1,33 +1,35 @@
 import { useEffect, useState, useRef } from "react";
 import "../styles/Carousel.css";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface Slide {
-  image: string;
-  title: string;
-  subtitle: string;
+    image: string;
+    titleKey: string;
+    subtitleKey: string;
 }
 
+
 const slides: Slide[] = [
-  {
-    image: "/images/pantalla_principal1.png",
-    title: "La teva propera aventura t'espera",
-    subtitle:
-      "Des de senderisme fins a gastronomia local, troba l'experiència perfecta per a tu",
-  },
-  {
-    image: "/images/paris.png",
-    title: "Explora noves rutes i cultures",
-    subtitle:
-      "Viatja, descobreix i comparteix les teves millors experiències amb altres viatgers",
-  },
-  {
-    image: "/images/londres.png",
-    title: "Cada dia, una història que explicar",
-    subtitle: "Troba inspiració per al teu proper destí",
-  },
+    {
+        image: "/images/pantalla_principal1.png",
+        titleKey: "carousel_title_1",
+        subtitleKey: "carousel_subtitle_1",
+    },
+    {
+        image: "/images/paris.png",
+        titleKey: "carousel_title_2",
+        subtitleKey: "carousel_subtitle_2",
+    },
+    {
+        image: "/images/londres.png",
+        titleKey: "carousel_title_3",
+        subtitleKey: "carousel_subtitle_3",
+    }
 ];
 
+
 export default function Carousel() {
+  const { t } = useTranslation();
   const [current, setCurrent] = useState(0);
   const slideRef = useRef<HTMLDivElement | null>(null);
   const totalSlides = slides.length;
@@ -86,8 +88,8 @@ export default function Carousel() {
           >
             <div className="carousel-overlay"></div>
             <div className="carousel-content">
-              <h2 className="carousel-title">{slide.title}</h2>
-              <p className="carousel-subtitle">{slide.subtitle}</p>
+              <h2 className="carousel-title">{t(slide.titleKey)}</h2>
+              <p className="carousel-subtitle">{t(slide.subtitleKey)}</p>
             </div>
           </div>
         ))}

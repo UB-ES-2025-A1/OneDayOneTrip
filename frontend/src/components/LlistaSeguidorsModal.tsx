@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import { getUserById, removeFollower } from "../api/client";
 import "../styles/LlistaSeguidors.css";
 import AvatarFallback from "../components/AvatarFallback";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface BackendUser {
   uid: string;
@@ -15,7 +16,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   seguidors: string[];
-  currentUserId: string;        
+  currentUserId: string;       
   goToProfile?: (uid: string) => void;
 }
 
@@ -26,6 +27,7 @@ export default function LlistaSeguidorsModal({
   currentUserId,
   goToProfile
 }: Props) {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<BackendUser[]>([]);
   const [loading, setLoading] = useState(false);
   const [localSeguidors, setLocalSeguidors] = useState<string[]>(seguidors);
@@ -48,20 +50,23 @@ export default function LlistaSeguidorsModal({
           return;
         }
 
-        const fetched = await Promise.all(
-          localSeguidors.map(async (uid) => await getUserById(uid))
+        const fetchedUsers = await Promise.all(
+          localSeguidors.map(async (uid) => {
+            const u = await getUserById(uid);
+            return u ? { ...u } : null;
+          })
         );
-
-        setUsers(fetched.filter(Boolean) as BackendUser[]);
+        setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
       } catch (err) {
-        console.error("Error carregant seguidors:", err);
+        console.error(t('error_loading_followers'), err);
+        setUsers([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchUsers();
-  }, [open, localSeguidors]);
+  }, [open, localSeguidors, t]);
 
   // Animaciones
   useEffect(() => {
@@ -93,28 +98,30 @@ export default function LlistaSeguidorsModal({
     <div className="modal-backdrop">
       <div className="seguidores-card" ref={containerRef}>
         <button className="close-btn" onClick={onClose}>×</button>
-        <h2 className="seguidores-title">Seguidors</h2>
+        <h2 className="seguidores-title">{t('profile_stat_followers')}</h2>
 
         {loading ? (
-          <p className="seguidores-empty">Carregant...</p>
+          <p className="seguidores-empty">{t('general_loading')}</p>
         ) : users.length === 0 ? (
-          <p className="seguidores-empty">Encara no tens cap seguidor</p>
+          <p className="seguidores-empty">{t('followers_modal_empty')}</p>
         ) : (
           <div className="seguidores-list">
             {users.map((u) => (
               <div key={u.uid} className="seguidor-item">
                 <div
                   className="seguidor-click-zone"
-                  onClick={() => goToProfile?.(u.uid)}
+                  onClick={() => goToProfile ? goToProfile(u.uid) : null}
                 >
-                  <img
-                    src={u.url_foto_perfil || "/images/default-profile.png"}
-                    className="seguidor-foto"
-                    alt={u.username || "usuari"}
-                  />
+                  <div className="seguidor-foto">
+                    {u.url_foto_perfil ? (
+                      <img src={u.url_foto_perfil} alt={u.username || t('home_search_user')} />
+                    ) : (
+                      <AvatarFallback name={u.nom_i_cognoms || u.username || "?"} />
+                    )}
+                  </div>
 
                   <div className="seguidor-info">
-                    <p className="seguidor-nom">{u.nom_i_cognoms || "Usuari"}</p>
+                    <p className="seguidor-nom">{u.nom_i_cognoms || t('home_search_user')}</p>
                     <p className="seguidor-username">@{u.username || "unknown"}</p>
                   </div>
                 </div>

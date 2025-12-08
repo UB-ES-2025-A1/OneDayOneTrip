@@ -5,6 +5,7 @@ import "../styles/LoginReg.css";
 import ImageCarousel from "../components/ImageCarousel";
 import "../styles/LoginReg.css";
 import ResetPasswordModal from "./ResetPasswordModal";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface LoginProps {
   onClose: () => void;
@@ -12,6 +13,7 @@ interface LoginProps {
 }
 
 export default function LoginModal({ onClose, openRegister }: LoginProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -28,19 +30,19 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
 
       // Autenticació amb Firebase
       const user = await Auth.login(email, password);
-      console.log("Usuari loguejant:", user);
+      console.log(t('loged_user') , user);
 
       onClose(); // Tanquem modal
       navigate("/"); // Redirigim al dashboard
 
     } catch (err: any) {
-      console.error("Error en login:", err);
+      console.error(t('login_error'), err);
       if (err.code === "auth/user-not-found") {
-        setError("No s'ha trobat cap compte amb aquest correu");
+        setError(t('login_error_user_not_found'));
       } else if (err.code === "auth/wrong-password") {
-        setError("Contrasenya incorrecta");
+        setError(t('login_error_wrong_password'));
       } else {
-        setError("Error: " + err.message);
+        setError(t('error') + err.message);
       }
     } finally {
       setLoading(false);
@@ -77,11 +79,11 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
           </div>
 
           <div className="login-form">
-            <h2 className="login-title">Iniciar sessió</h2>
+            <h2 className="login-title">{t('header_start_session')}</h2>
             <form onSubmit={handleLogin} className="auth-form">
               <div className="input-wrapper floating-input-group">
                 <div className="input-icon">
-                  <img src="/images/person.png" alt="Persona" />
+                  <img src="/images/person.png" alt={t('person')} />
                 </div>
 
                 <input
@@ -92,13 +94,13 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
                   className="auth-input floating-input"
                   placeholder=" " // 👈 IMPORTANT: un espai perquè funcioni :placeholder-shown
                 />
-                <label className="floating-label">Correu electrònic</label>
+                <label className="floating-label">{t('login_email')}</label>
               </div>
 
 
             <div className="input-wrapper floating-input-group">
                 <div className="input-icon">
-                  <img src="/images/lockk.png" alt="Contrasenya" />
+                  <img src="/images/lockk.png" alt={t('login_password')} />
                 </div>
 
                 <input
@@ -109,12 +111,12 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
                   className="auth-input floating-input"
                   placeholder=" " // 👈 també aquí
                 />
-                <label className="floating-label">Contrasenya</label>
+                <label className="floating-label">{t('login_password')}</label>
               </div>
 
 
               <button type="submit" className="auth-button" disabled={loading}>
-                {loading ? "Iniciant sessió..." : "Iniciar Sessió"}              
+                {loading ? t('login_logging_in') : t('header_start_session')}
               </button>
             </form>
 
@@ -126,11 +128,11 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
               className="auth-link"
               style={{ marginTop: "16px" }}
             >
-              Has oblidat la contrasenya?
+                {t('login_forgot_password')}
             </button>
 
             <p className="auth-footer">
-              No tens compte?{" "}
+                {t('login_no_account')}{" "}
               <button
                 type="button"
                 onClick={() => {
@@ -139,7 +141,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
                 }}
                 className="auth-link"
               >
-                Registra't
+                  {t('login_register_here')}
               </button>
             </p>
           </div>

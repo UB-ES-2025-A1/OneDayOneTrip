@@ -3,6 +3,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+import "./i18n/i18n";
+
 import "./styles/styles.css";
 import "leaflet/dist/leaflet.css";
 
