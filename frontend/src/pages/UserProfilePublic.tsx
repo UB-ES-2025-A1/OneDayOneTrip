@@ -1,16 +1,20 @@
-import { useEffect, useMemo, useState } from "react"; 
-import { onAuthStateChanged, type User as FirebaseUser, signOut } from "firebase/auth";
+import { useEffect, useMemo, useState } from "react";
+import {
+  onAuthStateChanged,
+  type User as FirebaseUser,
+  signOut,
+} from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById, followUser, unfollowUser } from "../api/client"; // 👈 AFEGIT
+import { getUserById, followUser, unfollowUser } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
-import { ImageOff } from "lucide-react"; 
+import { ImageOff } from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
 import LlistaSeguidorsModal from "../components/LlistaSeguidorsModal";
-import AvatarFallback from "../components/AvatarFallback"; 
+import AvatarFallback from "../components/AvatarFallback";
 
 export type BackendUser = {
   uid: string;
@@ -24,6 +28,7 @@ export type BackendUser = {
   publicacions?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
+  isPrivate?: boolean;
 };
 
 export default function UserProfilePublic() {
@@ -63,6 +68,7 @@ export default function UserProfilePublic() {
           setTrips([]);
           return;
         }
+
         backendUser.llista_seguidors = backendUser.llista_seguidors || [];
         backendUser.llista_seguits = backendUser.llista_seguits || [];
         backendUser.publicacions = backendUser.publicacions || [];
@@ -96,7 +102,7 @@ export default function UserProfilePublic() {
     setIsFollowing(followers.includes(currentUser.uid));
   }, [currentUser, profile]);
 
-  // 🔹 Seguir / deixar de seguir (mateixa lògica que RutaDetall)
+  // 🔹 Seguir / deixar de seguir
   const handleFollow = async () => {
     if (!currentUser) {
       alert("Has d'iniciar sessió per seguir usuaris");
@@ -114,7 +120,6 @@ export default function UserProfilePublic() {
         await followUser(userId, targetId);
         setIsFollowing(true);
 
-        // Actualitzem localment la llista de seguidors
         setProfile((prev) =>
           prev
             ? {
@@ -139,13 +144,13 @@ export default function UserProfilePublic() {
         );
       }
     } catch (err) {
-      console.error("Error seguint/seguint deixant:", err);
+      console.error("Error seguint/deixant de seguir:", err);
     } finally {
       setFollowLoading(false);
     }
   };
 
-  // Conversión Trip → GridItem
+  // Convertir Trips → items de grid
   const publicacionsItems = useMemo(() => {
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return trips
@@ -184,6 +189,18 @@ export default function UserProfilePublic() {
     navigate("/");
   };
 
+  // 🔐 PRIVACITAT
+  const isOwner =
+    currentUser && profile ? currentUser.uid === profile.uid : false;
+
+  const isPrivate = !!profile?.isPrivate;
+
+  // Pot veure el contingut si:
+  // - el perfil NO és privat
+  // - o és el propietari
+  // - o ja el segueix
+  const canViewContent = !isPrivate || isOwner || isFollowing;
+
   return (
     <Layout
       currentUser={currentUser}
@@ -215,10 +232,17 @@ export default function UserProfilePublic() {
               <div className="user-info">
                 <h2>{displayName}</h2>
 
-                {/* 🔹 BOTÓ SEGUIR SOTA EL NOM */}
+                {/* Badge de perfil privat opcional */}
+                {isPrivate && (
+                  <span className="private-badge">Perfil privat</span>
+                )}
+
+                {/* Botó seguir sota el nom */}
                 {currentUser && currentUser.uid !== profile.uid && (
                   <button
-                    className={`follow-button ${isFollowing ? "following" : ""}`}
+                    className={`follow-button ${
+                      isFollowing ? "following" : ""
+                    }`}
                     disabled={followLoading}
                     onClick={handleFollow}
                   >
@@ -236,10 +260,7 @@ export default function UserProfilePublic() {
                   <span className="label">Seguidors</span>
                 </div>
 
-                <div
-                  className="stat"
-                  onClick={() => setSeguitsModalOpen(true)}
-                >
+                <div className="stat" onClick={() => setSeguitsModalOpen(true)}>
                   <span className="number">{seguits}</span>
                   <span className="label">Seguits</span>
                 </div>
@@ -252,34 +273,83 @@ export default function UserProfilePublic() {
             </div>
           </div>
 
-          <div className="tabs-container1">
-            <h2 className="tab-title">Rutes Publicades</h2>
-          </div>
-
-          <section className="trip-list">
-            <MasonryGrid
-              items={publicacionsItems}
-              currentUser={currentUser}
-              openRegister={() =>
-                alert("Has de iniciar sessió per interactuar")
-              }
-              showCreateButton={false}
-            />
-
-            {publicacionsItems.length === 0 && (
-              <div className="empty-state">
-                <ImageOff className="empty-icon" size={60} />
-                <h3>No hi ha publicacions.</h3>
+          {canViewContent ? (
+            <>
+              <div className="tabs-container1">
+                <h2 className="tab-title">Rutes publicades</h2>
               </div>
-            )}
-          </section>
+
+              <section className="trip-list">
+                <MasonryGrid
+                  items={publicacionsItems}
+                  currentUser={currentUser}
+                  openRegister={() =>
+                    alert("Has d'iniciar sessió per interactuar")
+                  }
+                  showCreateButton={false}
+                />
+
+                {publicacionsItems.length === 0 && (
+                  <div className="empty-state">
+                    <ImageOff className="empty-icon" size={60} />
+                    <h3>No hi ha publicacions.</h3>
+                  </div>
+                )}
+              </section>
+            </>
+          ) : (
+            <section className="trip-list">
+              <div className="private-profile-box">
+                <h3>Perfil privat</h3>
+                <p>
+                  Aquest usuari només comparteix les seves rutes amb seguidors
+                  aprovats.
+                </p>
+
+                {!currentUser && (
+                  <button
+                    className="btn-primary"
+                    onClick={() =>
+                      alert(
+                        "Inicia sessió per poder seguir aquest usuari."
+                      )
+                    }
+                  >
+                    Inicia sessió per seguir
+                  </button>
+                )}
+
+                {currentUser &&
+                  !isFollowing &&
+                  currentUser.uid !== profile.uid && (
+                    <button
+                      className="btn-primary"
+                      onClick={handleFollow}
+                      disabled={followLoading}
+                    >
+                      {followLoading ? "Processant..." : "Seguir usuari"}
+                    </button>
+                  )}
+
+                {currentUser &&
+                  (isFollowing || currentUser.uid === profile.uid) && (
+                    <p className="private-hint">
+                      Ja tens accés concedit. Si us plau, recarrega la pàgina si
+                      no veus les rutes.
+                    </p>
+                  )}
+              </div>
+            </section>
+          )}
 
           {seguitsModalOpen && profile && (
             <LlistaSeguitsModal
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
-              goToProfile={goToProfile} currentUserId={""}            />
+              goToProfile={goToProfile}
+              currentUserId={currentUser?.uid || ""}
+            />
           )}
 
           {seguidoresModalOpen && profile && (
