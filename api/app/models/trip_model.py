@@ -25,12 +25,12 @@ class TripModel(BaseModel):
     author: Author
     city: str
     region: Optional[str] = None
-    country: Optional[str] = "España"
+    country: Optional[str] = "Espanya"
     routeMap: Optional[List[dict]] = []
     trip_points: Optional[List[TripPoint]] = []
     distance: Optional[float] = None
     duration: Optional[str] = None
-    difficulty: Optional[str] = "Media"
+    difficulty: Optional[str] = "Mitjana"
     recommendedSeason: Optional[str] = "Primavera"
     coverImage: Optional[str] = None
     gallery: Optional[List[str]] = []

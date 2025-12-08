@@ -6,10 +6,10 @@ security = HTTPBearer()
 
 
 async def verify_token(request: Request):
-    """Verifica el token JWT de Firebase enviado desde el frontend"""
+    """Verifica el token JWT de Firebase enviat des de el frontend"""
     token = request.headers.get("Authorization")
     if not token:
-        raise HTTPException(status_code=401, detail="Falta token de autenticación")
+        raise HTTPException(status_code=401, detail="Falta token d'autenticació")
 
     token = token.replace("Bearer ", "")
 
@@ -18,4 +18,4 @@ async def verify_token(request: Request):
         request.state.user = decoded_token
         return decoded_token
     except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Token inválido: {str(e)}")
+        raise HTTPException(status_code=401, detail=f"Token invàlid: {str(e)}")

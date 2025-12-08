@@ -12,6 +12,7 @@ import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
 import LlistaSeguidorsModal from "../components/LlistaSeguidorsModal";
 import ConfirmBlockModal from "../components/ConfirmBlockModal";
 import ConfirmUnblockModal from "../components/ConfirmUnblockModal";
+import AvatarFallback from "../components/AvatarFallback"; 
 
 export type BackendUser = {
   uid: string;
@@ -62,7 +63,7 @@ export default function UserProfilePublic() {
     return () => unsub();
   }, []);
 
-  // 🔹 Cargar perfil público y trips
+  // Carregar perfil públic i trips
   useEffect(() => {
     if (!id) return;
 
@@ -109,7 +110,7 @@ export default function UserProfilePublic() {
     setIsFollowing(followers.includes(currentUser.uid));
   }, [currentUser, profile]);
 
-  // 🔹 Saber si el currentUser ha bloquejat aquest perfil
+  // Saber si el currentUser ha bloquejat aquest perfil
   useEffect(() => {
     if (!currentUser || !profile) {
       setIsBlocked(false);
@@ -119,7 +120,7 @@ export default function UserProfilePublic() {
     setIsBlocked(blocked.includes(currentUser.uid));
   }, [currentUser, profile]);
 
-  // 🔹 Saber si el currentUser ha estat bloquejat pel propietari d'aquest perfil
+  // Saber si el currentUser ha estat bloquejat pel propietari d'aquest perfil
   useEffect(() => {
     if (!currentUser || !profile) {
       setImBlocked(false);
@@ -131,7 +132,7 @@ export default function UserProfilePublic() {
     setBlockStateLoaded(true);
   }, [currentUser, profile]);
 
-  // 🔹 Seguir / dejar de seguir
+  // Seguir / dejar de seguir
   const handleFollow = async () => {
     if (!currentUser || !profile) return;
     if (isBlocked) return alert("No pots seguir un usuari que has bloquejat.");
@@ -165,7 +166,7 @@ export default function UserProfilePublic() {
     }
   };
 
-  // 🔹 Bloquear
+  // Bloquear
   const handleBlock = async () => {
     if (!currentUser || !profile) return;
 
@@ -197,7 +198,7 @@ export default function UserProfilePublic() {
     }
   };
 
-  // 🔹 Desbloquear
+  // Desbloquear
   const handleUnblock = async () => {
     if (!currentUser || !profile) return;
 
@@ -245,7 +246,7 @@ export default function UserProfilePublic() {
       }));
   }, [trips, profile]);
 
-  // 🔹 Mostrar siempre el nombre real, aunque el perfil esté bloqueado
+  // Mostrar siempre el nombre real, aunque el perfil esté bloqueado
   const displayName = profile?.nom_i_cognoms || profile?.username || "Usuari";
 
   const photoUrl = profileHidden
@@ -326,10 +327,10 @@ export default function UserProfilePublic() {
             />
 
             <div className="user-photo">
-              {profileHidden ? (
-                <div className="user-initials">{displayName[0]}</div>
+              {profile.url_foto_perfil ? (
+                <img src={profile.url_foto_perfil} alt="Foto de perfil" />
               ) : (
-                <img src={photoUrl} alt="Foto de perfil" />
+                <AvatarFallback name={displayName} />
               )}
             </div>
 

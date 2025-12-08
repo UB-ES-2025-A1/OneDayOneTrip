@@ -3,13 +3,13 @@
    (Compat con Header nuevo; sin reglas de header aquí)
    ========================================================= */
 
-/* ---------- CONTENEDOR GENERAL ---------- */
+/* ---------- CONTENIDOR GENERAL ---------- */
 .ruta-detall-page {
   background-color: white;
   min-height: 100vh;
 }
 
-/* ---------- GALERÍA PRINCIPAL ---------- */
+/* ---------- GALERIA PRINCIPAL ---------- */
 .ruta-galeria-principal {
   display: flex;
   justify-content: center;
@@ -19,7 +19,7 @@
   background: white;
   gap: 10px;
   box-sizing: border-box;
-  flex-wrap: wrap; /* 🔹 apila en móvil */
+  flex-wrap: wrap;
 }
 
 .imatge-gran {
@@ -116,7 +116,7 @@
   color: #f7f7f7;
 }
 
-/* ---------- CONTENIDO PRINCIPAL ---------- */
+/* ---------- CONTINGUT PRINCIPAL ---------- */
 .ruta-detall {
   max-width: 100%;
   width: 100%;
@@ -161,9 +161,9 @@
   gap: 8px;
   padding: 6px 14px;
   border-radius: 20px;
-  border: 2px solid #2e492e; /* Vora verda */
-  background-color: #ffffff; /* Fons blanc */
-  color: #2e492e; /* Text verd */
+  border: 2px solid #2e492e;
+  background-color: #ffffff;
+  color: #2e492e;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -172,9 +172,9 @@
 
 
 .guardar-button.saved {
-  background-color: #2e492e; /* Fons verd */
-  color: #ffffff; /* Text blanc */
-  border-color: #ffffff; /* Vora blanca */
+  background-color: #2e492e;
+  color: #ffffff;
+  border-color: #ffffff;
 }
 
 .guardar-text {
@@ -191,15 +191,15 @@
 
 /* ----------- ESTAT NO GUARDAT ----------- */
 .guardar-button .ui-bookmark {
-  --icon-secondary-color: #ffffff;  /* Cor blanc ple */
-  --icon-primary-color: #2e492e;    /* Verd per animació/burst */
+  --icon-secondary-color: #ffffff;
+  --icon-primary-color: #2e492e;
   --icon-circle-border: 1px solid #2e492e;
 }
 
 /* ----------- ESTAT GUARDAT ----------- */
 .guardar-button.saved .ui-bookmark {
-  --icon-secondary-color: #2e492e;  /* Cor verd ple */
-  --icon-primary-color: #ffffff;    /* Blanc per animació/burst */
+  --icon-secondary-color: #2e492e;
+  --icon-primary-color: #ffffff;
   --icon-circle-border: 1px solid #ffffff;
 }
 
@@ -330,7 +330,7 @@
 
 
 
-/* ---------- UBICACIÓN Y AUTOR ---------- */
+/* ---------- UBICACIÓ I AUTOR ---------- */
 .ubicacio {
   display: flex;
   align-items: center;
@@ -357,7 +357,7 @@
   border-radius: 15px;
 }
 
-/* ---------- CONTENEDOR autor ---------- */
+/* ---------- CONTENIDOR autor ---------- */
 .autor {
   display: flex;
   align-items: center;      
@@ -482,7 +482,7 @@
   color: #333;
 }
 
-/* ---------- DESCRIPCIÓN ---------- */
+/* ---------- DESCRIPCIÓ ---------- */
 .ruta-descripcio {
   width: 100%;
   margin: 50px 30px;
@@ -502,7 +502,7 @@
   color: #333;
 }
 
-/* ---------- ETAPAS ---------- */
+/* ---------- ETAPES ---------- */
 .ruta-etapes h2 {
   color: #2e492e;
   font-size: 1.4rem;
@@ -561,20 +561,19 @@
   font-size: 1.0rem;
   font-weight: 600;
   cursor: pointer;
-  border: 2px solid #2e492e; /* Verd fosc estil natura */
-  background-color: #2e492e; /* Fons verd */
-  color: white; /* Lletra blanca */
+  border: 2px solid #2e492e;
+  background-color: #2e492e;
+  color: white;
   transition: all 0.25s ease-in-out;
 }
 
-/* Estat quan pulsas "Seguir" i passa a "Seguint" */
+/* Estat quan prems "Seguir" i passa a "Seguint" */
 .follow-button.following {
-  background-color: white !important; /* Fons blanc */
-  color: #2e7d32 !important; /* Text verd */
+  background-color: white !important;
+  color: #2e7d32 !important;
   border-color: #2e7d32;
 }
 
-/* Loading (opcional) */
 .follow-button:disabled {
   opacity: 0.6;
   cursor: default;
@@ -649,7 +648,7 @@
   }
 }
 
-/* Móviles (≤ 600px) */
+/* Mòbils (≤ 600px) */
 @media (max-width: 600px) {
   .ruta-galeria-principal {
     flex-direction: column;

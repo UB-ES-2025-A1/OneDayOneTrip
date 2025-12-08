@@ -1,13 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException, Form, File, UploadFile
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from app.services.image_service import upload_image_to_imgbb
 
 from google.cloud import firestore
 
 from app.services.firebase_service import db
 from app.auth.verify_token import verify_token
+from firebase_admin import auth
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from app.services.mongo_service import (
+    delete_trip,
+)  # 👈 AFEGIT: funció que esborra la trip a Mongo
+
+security = HTTPBearer()
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -15,14 +23,14 @@ router = APIRouter(prefix="/users", tags=["Users"])
 @router.post("/register")
 async def register_user(data: dict, user=Depends(verify_token)):
     """
-    Guarda un nuevo usuario en Firestore tras registro en Firebase Auth.
-    El frontend envía fullname, username, mail, y el backend completa los defaults.
+    Desa un nou usuari al Firestore després de registre al Firebase Auth.
+    El frontend envia fullname, username, mail, i el backend completa els defaults.
     """
     uid = user.get("uid")
     if not uid:
         raise HTTPException(status_code=400, detail="Token inválido, falta UID")
 
-    # Defaults con valores seguros
+    # Defaults amb valors segurs
     user_data = {
         "uid": uid,
         "data_creacio": datetime.utcnow().isoformat(),
@@ -41,18 +49,18 @@ async def register_user(data: dict, user=Depends(verify_token)):
         "llista_bloquejadors": data.get("llista_bloquejadors", []),
     }
 
-    print(f"[DEBUG] Creando usuario {uid} con datos: {user_data}")
+    print(f"[DEBUG] Creant usuari {uid} amb dades: {user_data}")
 
-    # 🔸 merge=False asegura que todos los campos se escriban, incluso vacíos
+    # 🔸 merge=False asegura que tots eks camps s'escriguin, inclos vuits
     db.collection("users").document(uid).set(user_data, merge=False)
 
-    return {"message": "Usuario registrado correctamente", "user": user_data}
+    return {"message": "Usuari registrat correctament", "user": user_data}
 
 
 @router.get("/")
 async def get_all_users():
     """
-    Devuelve todos los usuarios si el usuario está autenticado.
+    Retorna tots els usuaris si l'usuari està autenticat.
     """
     docs = db.collection("users").get()
     return [d.to_dict() for d in docs]
@@ -61,27 +69,27 @@ async def get_all_users():
 @router.get("/me")
 async def get_current_user(user=Depends(verify_token)):
     """
-    Devuelve los datos del usuario autenticado.
+    Retorna les dades de l'usuari autenticat.
     """
     uid = user.get("uid")
     doc = db.collection("users").document(uid).get()
     if not doc.exists:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
     return doc.to_dict()
 
 
 @router.get("/{user_id}")
 async def get_current_user_by_id(user_id: str):
     """
-    Devuelve los datos del usuario por su ID.
+    Torna les dades de l'usuari pel vostre ID.
     """
     doc = db.collection("users").document(user_id).get()
     if not doc.exists:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
     return doc.to_dict()
 
 
-# Model amb  els camps que poden ser editats del perfil
+# Model amb els camps que poden ser editats del perfil
 class UserEditIn(BaseModel):
     nom_i_cognoms: Optional[str] = None
     username: Optional[str] = None
@@ -299,11 +307,11 @@ async def unblock_user(user_id: str, target_id: str):
 @router.post("/{user_id}/publicacions/{trip_id}")
 async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token)):
     """
-    Añade el ID de una ruta a la lista de publicaciones del usuario.
-    Solo el propietario puede modificar sus publicaciones.
+    Afegeix l'ID d'una ruta a la llista de publicacions de l'usuari.
+    Només el propietari pot modificar les vostres publicacions.
     """
 
-    # 🔐 Solo el propio usuario puede modificar su perfil
+    # 🔐 Només l'usuari pot modificar el seu perfil
     if user.get("uid") != user_id:
         raise HTTPException(
             status_code=403, detail="No tens permís per modificar aquest usuari."
@@ -318,13 +326,152 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
     data = snapshot.to_dict()
     publicacions = set(data.get("publicacions", []))
 
-    # 🔹 Añadir la nueva publicación (sin duplicados)
+    # 🔹 Afegir una nova publicació (sense duplicats)
     publicacions.add(str(trip_id))
 
-    # 🔹 Guardar actualización
+    # 🔹 Guardar actualizació
     doc_ref.update({"publicacions": list(publicacions)})
 
     return {
         "message": "Publicació afegida correctament",
         "publicacions": list(publicacions),
     }
+
+
+@router.delete("/delete/{user_id}")
+async def delete_account(
+    user_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+):
+    """
+    Elimina un compte d'usuari i neteja:
+    - el seu document de Firestore
+    - el seu usuari de Firebase Auth
+    - totes les seves publicacions (trips) a Mongo
+    - qualsevol referència a aquestes publicacions a guardades/publicacions d'altres usuaris
+    - referències a l'usuari en llistes de seguidors/seguits
+    """
+
+    # Verificar token amb Firebase i que l'uid coincideixi amb user_id
+    token = credentials.credentials
+    try:
+        decoded = auth.verify_id_token(token)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token invàlid o caducat")
+
+    uid = decoded.get("uid")
+    if uid != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="No tens permís per eliminar aquest compte",
+        )
+
+    # Obtenir dades de l'usuari a Firestore
+    user_ref = db.collection("users").document(user_id)
+    doc = user_ref.get()
+    if not doc.exists:
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
+
+    data = doc.to_dict() or {}
+    publicacions: List[str] = list(map(str, data.get("publicacions", [])))
+
+    batch = db.batch()
+
+    # Treure user_id de llistes de seguits/seguidors d'altres usuaris
+    seguits_q = (
+        db.collection("users")
+        .where("llista_seguits", "array_contains", user_id)
+        .stream()
+    )
+    for d in seguits_q:
+        batch.update(
+            d.reference,
+            {"llista_seguits": firestore.ArrayRemove([user_id])},
+        )
+
+    seguidors_q = (
+        db.collection("users")
+        .where("llista_seguidors", "array_contains", user_id)
+        .stream()
+    )
+    for d in seguidors_q:
+        batch.update(
+            d.reference,
+            {"llista_seguidors": firestore.ArrayRemove([user_id])},
+        )
+
+    # Per a cada publicació seva:
+    #    - treure la trip de guardades/publicacions d'altres usuaris
+    #    - eliminar la trip de MongoDB
+    for trip_id in publicacions:
+        # Treure de guardades
+        guardades_q = (
+            db.collection("users")
+            .where("guardades", "array_contains", trip_id)
+            .stream()
+        )
+        for u in guardades_q:
+            batch.update(
+                u.reference,
+                {"guardades": firestore.ArrayRemove([trip_id])},
+            )
+
+        # Treure de publicacions d'altres usuaris
+        publicacions_q = (
+            db.collection("users")
+            .where("publicacions", "array_contains", trip_id)
+            .stream()
+        )
+        for u in publicacions_q:
+            batch.update(
+                u.reference,
+                {"publicacions": firestore.ArrayRemove([trip_id])},
+            )
+
+        # Eliminar trip a Mongo amb la mateixa funció que uses al endpoint /trips/{trip_id}
+        try:
+            deleted = delete_trip(str(trip_id))
+            if deleted == 0:
+                print(f"[WARN] Trip {trip_id} no trobada o no eliminada a Mongo.")
+        except Exception as e:
+            print(f"[ERROR] No s'ha pogut eliminar la trip {trip_id} de Mongo:", e)
+
+    # Aplicar totes les actualitzacions a Firestore
+    batch.commit()
+
+    # Eliminar document d'usuari
+    user_ref.delete()
+
+    # Eliminar usuari de Firebase Auth
+    try:
+        auth.delete_user(uid)
+    except Exception as e:
+        print(f"[ERROR] No s'ha pogut eliminar l'usuari de Firebase Auth: {e}")
+
+    return {"message": "Compte i dades relacionades eliminats correctament"}
+
+
+@router.delete("/{user_id}/publicacions/{trip_id}")
+async def remove_publicacio_llista_publicacions(user_id: str, trip_id: str):
+    doc_ref = db.collection("users").document(user_id)
+    snapshot = doc_ref.get()
+
+    if not snapshot.exists:
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
+
+    doc_ref.update({"publicacions": firestore.ArrayRemove([trip_id])})
+
+    return {"message": "Publicació eliminada", "trip_id": trip_id}
+
+
+@router.delete("/{user_id}/guardats/{trip_id}")
+async def remove_guardat(user_id: str, trip_id: str):
+    doc_ref = db.collection("users").document(user_id)
+    snapshot = doc_ref.get()
+
+    if not snapshot.exists:
+        raise HTTPException(status_code=404, detail="Usuari no trobat")
+
+    doc_ref.update({"guardades": firestore.ArrayRemove([trip_id])})
+
+    return {"message": "Ruta eliminada de guardats", "trip_id": trip_id}

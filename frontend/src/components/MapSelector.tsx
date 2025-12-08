@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-lea
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// ICONO OFICIAL LEAFLET USANDO CDN
+// ICONA OFICIAL LEAFLET UTILITZANT CDN
 const markerIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -32,7 +32,7 @@ export default function MapSelector({ lat, lng, onSelect }: MapSelectorProps) {
     }
   }, [lat, lng]);
 
-  // Detectar clics en el mapa
+  // Detectar clics al mapa
   function MapClickHandler() {
     useMapEvents({
       click(e) {
@@ -44,14 +44,14 @@ export default function MapSelector({ lat, lng, onSelect }: MapSelectorProps) {
     return null;
   }
 
-  // Mover el mapa cuando cambian coords
+  // Moure el mapa quan canviïn les coords
   function ChangeView({ lat, lng }: { lat: number; lng: number }) {
     const map = useMap();
     map.setView([lat, lng], 14);
     return null;
   }
 
-  // Buscar ubicación
+  // Buscar ubicació
   const runSearch = async () => {
     if (!query.trim()) return;
 
@@ -116,7 +116,6 @@ export default function MapSelector({ lat, lng, onSelect }: MapSelectorProps) {
             borderRadius: "6px",
             border: "1px solid #ccc",
             cursor: "pointer",
-            background: "white",
           }}
         >
           Cercar

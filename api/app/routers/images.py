@@ -8,7 +8,7 @@ router = APIRouter(prefix="/images", tags=["Images"])
 @router.post("/upload")
 async def upload_image(file: UploadFile = File(...)):
     """
-    Sube una imagen a ImgBB y devuelve la URL pública.
+    Puja una imatge a ImgBB i retorna la URL pública.
     """
     try:
         image_url = upload_image_to_imgbb(file)
