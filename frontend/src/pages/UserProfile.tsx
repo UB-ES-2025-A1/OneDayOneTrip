@@ -381,7 +381,8 @@ export default function UserProfile() {
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
               seguidors={profile.llista_seguidors || []}
-              goToProfile={goToProfile}
+              currentUserId={currentUser.uid}
+              goToProfile={goToProfile} 
             />
           )}
           <UserSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />

@@ -28,6 +28,8 @@ class AuthService {
 
     await registerUser({ fullname, username, mail });
 
+    localStorage.setItem("uid", user.uid);
+
     return user;
   }
 
@@ -36,7 +38,10 @@ class AuthService {
    */
   async login(mail: string, password: string) {
     const userCredential = await signInWithEmailAndPassword(auth, mail, password);
-    return userCredential.user;
+    const user = userCredential.user;
+    localStorage.setItem("uid", user.uid);
+
+    return user;
   }
 
   /**
