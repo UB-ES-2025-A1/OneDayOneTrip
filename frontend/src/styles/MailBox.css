@@ -193,3 +193,101 @@
     border-radius: 14px;
   }
 }
+
+/* =========================================================
+   DARK MODE — MAILBOX 
+   ========================================================= */
+
+/* Overlay més fosc */
+[data-theme="dark"] .mailbox-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Panell */
+[data-theme="dark"] .mailbox-panel {
+  background: #1a1c1d;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  color: var(--text-primary);
+}
+
+/* Header */
+[data-theme="dark"] .mailbox-header {
+  background: #111314;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+[data-theme="dark"] .mailbox-title {
+  color: #8fda8f; /* Verd igual que config */
+}
+
+[data-theme="dark"] .mailbox-title svg {
+  color: #8fda8f;
+}
+
+[data-theme="dark"] .mailbox-badge {
+  background: #8fda8f;
+  color: #0f0f0f;
+}
+
+/* Botó tancar */
+[data-theme="dark"] .mailbox-close-btn {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .mailbox-close-btn:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+/* Items de la bústia */
+[data-theme="dark"] .mailbox-item.unread {
+  background: rgba(143, 218, 143, 0.08);
+}
+
+[data-theme="dark"] .mailbox-item.read {
+  background: #1a1c1d;
+}
+
+[data-theme="dark"] .mailbox-item:hover {
+  background: rgba(143, 218, 143, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Icona */
+[data-theme="dark"] .mailbox-icon svg {
+  color: #8fda8f;
+}
+
+/* Text */
+[data-theme="dark"] .mailbox-text {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .mailbox-meta {
+  color: var(--text-secondary);
+}
+
+/* Tag / nom de ruta */
+[data-theme="dark"] .mailbox-trip {
+  background: rgba(143, 218, 143, 0.15);
+  color: var(--text-primary);
+}
+
+/* Punt no llegit */
+[data-theme="dark"] .mailbox-dot {
+  background: #8fda8f;
+}
+
+/* Estat buit */
+[data-theme="dark"] .mailbox-empty {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .mailbox-empty p {
+  color: #8fda8f;
+}
+
+[data-theme="dark"] .mailbox-empty span {
+  color: var(--text-secondary);
+}
+
