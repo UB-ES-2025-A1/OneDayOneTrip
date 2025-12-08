@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
 import { getUserById, removeFollower } from "../api/client";
 import "../styles/LlistaSeguidors.css";
+import AvatarFallback from "../components/AvatarFallback";
 
 interface BackendUser {
   uid: string;

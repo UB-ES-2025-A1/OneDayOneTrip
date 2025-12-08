@@ -1,0 +1,291 @@
+.settings-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.settings-popup {
+  background: #ffffff;
+  width: 90%;
+  max-width: 420px;
+  padding: 2rem;
+  border-radius: 14px;
+  position: relative;
+  animation: fadeIn 0.25s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.settings-title {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #2e492e;
+  text-align: center;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-section {
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.settings-warning {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  color: #b43b37;
+}
+
+/* Botó vermell d'acció crítica */
+.danger-btn {
+  background: #d9534f;
+  color: #ffffff;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.danger-btn:hover:not(:disabled) {
+  background: #c9302c;
+  transform: translateY(-1px);
+}
+
+.danger-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.settings-error {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #c62828;
+}
+
+/* ---------- Aparença / Theme row ---------- */
+
+.settings-subtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  color: #2e492e;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.settings-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.settings-row-label {
+  font-weight: 500;
+  color: #333333;
+}
+
+/* =========================================
+   🌙 Toggle animat Mode Fosc (Uiverse style)
+========================================= */
+
+.toggle-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Checkbox ocult */
+.toggle-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Fons del toggle */
+.toggle-slot {
+  font-size: 10px;
+  position: relative;
+  height: 3.2em;
+  width: 6.4em;
+  border-radius: 10em;
+  background-color: #ffffff;
+  border: 1px solid #d0d5d0;
+  transition: background-color 250ms, border-color 250ms;
+  overflow: hidden;
+}
+
+/* Quan està activat (dark) */
+.toggle-checkbox:checked ~ .toggle-slot {
+  background-color: #374151;
+  border-color: #111827;
+}
+
+/* Botó circular que es mou */
+.toggle-button {
+  transform: translate(0.3em, 0.25em);
+  position: absolute;
+  height: 2.7em;
+  width: 2.7em;
+  border-radius: 50%;
+  background-color: #ffeccf;
+  box-shadow: inset 0px 0px 0px 0.75em #ffbb52;
+  transition:
+    background-color 250ms,
+    box-shadow 250ms,
+    transform 500ms cubic-bezier(.26,2,.46,.71);
+}
+
+.toggle-checkbox:checked ~ .toggle-slot .toggle-button {
+  background-color: #485367;
+  box-shadow: inset 0px 0px 0px 0.75em #ffffff;
+  transform: translate(3.2em, 0.25em);
+}
+
+/* Icons sol / lluna */
+.sun-icon-wrapper,
+.moon-icon-wrapper {
+  position: absolute;
+  height: 6em;
+  width: 6em;
+  transform-origin: 50% 50%;
+  transition:
+    opacity 150ms,
+    transform 500ms cubic-bezier(.26,2,.46,.71);
+}
+
+.sun-icon,
+.moon-icon {
+  position: absolute;
+  height: 6em;
+  width: 6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4em;
+}
+
+/* Posició sol */
+.sun-icon-wrapper {
+  opacity: 1;
+  transform: translate(2em, 2em) rotate(15deg);
+}
+
+.toggle-checkbox:checked ~ .toggle-slot .sun-icon-wrapper {
+  opacity: 0;
+  transform: translate(3em, 2em) rotate(0deg);
+}
+
+.sun-icon {
+  color: #ffbb52;
+}
+
+/* Posició lluna */
+.moon-icon-wrapper {
+  opacity: 0;
+  transform: translate(11em, 2em) rotate(0deg);
+}
+
+.toggle-checkbox:checked ~ .toggle-slot .moon-icon-wrapper {
+  opacity: 1;
+  transform: translate(2em, 2em) rotate(-15deg);
+}
+
+.moon-icon {
+  color: #ffffff;
+}
+
+/* Responsive petit: reduïm una mica */
+@media (max-width: 600px) {
+  .toggle-slot {
+    font-size: 9px;
+  }
+}
+
+/* Animació d'entrada */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================
+   DARK MODE (UserSettings)
+============================ */
+
+[data-theme="dark"] .settings-popup-overlay {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+[data-theme="dark"] .settings-popup {
+  background: var(--bg-card, #151515);
+  color: var(--text-primary, #f5f5f5);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .settings-title {
+  color: #8fda8f; 
+}
+
+[data-theme="dark"] .settings-subtitle {
+  color: #8fda8f;
+}
+
+[data-theme="dark"] .close-btn svg {
+  color: var(--text-secondary, #bbbbbb);
+}
+
+[data-theme="dark"] .close-btn:hover svg {
+  color: #ffffff;
+}
+
+/* seccions / línies */
+[data-theme="dark"] .settings-section {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* textos */
+[data-theme="dark"] .settings-row-label {
+  color: var(--text-primary, #f5f5f5);
+}
+
+[data-theme="dark"] .settings-warning {
+  color: #ff8a80;
+}
+
+/* botó per eliminar compte en dark */
+[data-theme="dark"] .danger-btn {
+  background: #ff6b63;
+  color: #0f0f0f;
+}
+
+[data-theme="dark"] .danger-btn:hover:not(:disabled) {
+  background: #ff827b;
+}
+
+[data-theme="dark"] .settings-error {
+  color: #ff8a80;
+}
