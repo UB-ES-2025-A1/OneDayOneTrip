@@ -245,9 +245,8 @@ export default function UserProfilePublic() {
       }));
   }, [trips, profile]);
 
-  const displayName = profileHidden
-    ? "Usuari desconegut"
-    : profile?.nom_i_cognoms || profile?.username || "Usuari";
+  // 🔹 Mostrar siempre el nombre real, aunque el perfil esté bloqueado
+  const displayName = profile?.nom_i_cognoms || profile?.username || "Usuari";
 
   const photoUrl = profileHidden
     ? "" // no mostrar foto si bloqueado
@@ -288,8 +287,8 @@ export default function UserProfilePublic() {
             className="user-profile"
             style={{
               background: profileHidden
-                ? "rgba(74, 73, 73, 0.67)" // fondo neutro si bloqueado con transparencia
-                : `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url(${panelUrl}) center/cover no-repeat`, // menos oscuro y ligeramente transparente
+                ? "rgba(74, 73, 73, 0.67)" // fondo neutro si bloqueado
+                : `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url(${panelUrl}) center/cover no-repeat`,
               position: "relative",
             }}
           >
@@ -403,7 +402,8 @@ export default function UserProfilePublic() {
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
-              goToProfile={goToProfile} currentUserId={""}
+              goToProfile={goToProfile} 
+              currentUserId={currentUser?.uid || ""}
             />
           )}
 
