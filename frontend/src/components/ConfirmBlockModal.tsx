@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import { X } from "lucide-react";
+import "../styles/ConfirmModal.css";
 
 type Props = {
   open: boolean;
@@ -21,9 +22,17 @@ const ConfirmBlockModal: FC<Props> = ({ open, onClose, onConfirm, username }) =>
         >
           <X size={20} />
         </button>
+
         <h3>Bloquejar a {username || "usuari"}?</h3>
-        <p>Si bloqueges a aquest usuari deixaràs de seguir-lo i 
-            l'usuari tampoc podrà seguir-te ni veure les teves publicacions. </p>
+
+        <p>Què passa quan bloqueges a aquest usuari:</p>
+        <ul>
+          <li>No podrà veure el teu perfil ni les teves publicacions.</li>
+          <li>No podrà enviar-te sol·licitud de seguiment.</li>
+          <li>No veuràs les seves publicacions ni comentaris.</li>
+          <li>Podràs desbloquejar-lo en qualsevol moment.</li>
+        </ul>
+
         <div className="modal-actions">
           <button className="btn btn-cancel" onClick={onClose}>
             Cancel·lar
