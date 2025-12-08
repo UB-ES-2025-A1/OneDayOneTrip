@@ -6,7 +6,6 @@ import { getUserById, removePublication } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { Settings } from "lucide-react";
-import { ImageOff, Pencil } from "lucide-react";
 import { ImageOff, Pencil, Mail} from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
