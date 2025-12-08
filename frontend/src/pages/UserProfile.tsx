@@ -16,6 +16,7 @@ import CreateTripForm from "../components/CreateTripForm";
 import UserSettings from "../components/UserSettings";
 import AvatarFallback from "../components/AvatarFallback"; 
 import Mailbox from "../components/Mailbox";
+import useNotifications from "../hooks/useNotifications";
 
 export type BackendUser = {
   uid: string;
@@ -65,6 +66,7 @@ export default function UserProfile() {
   const [tripToDelete, setTripToDelete] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [mailboxOpen, setMailboxOpen] = useState(false);
+  const { notifications, loading: notifLoading, markRead } = useNotifications();
 
 
   const navigate = useNavigate();
@@ -240,7 +242,7 @@ export default function UserProfile() {
     selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
 
   
-    const openMailbox = () => {
+  const openMailbox = () => {
     setMailboxOpen(true);
   };
 
@@ -280,7 +282,15 @@ export default function UserProfile() {
 
              <button className="mailbox-btn" onClick={openMailbox}>
               <Mail size={24} />
+
+              {/* BADGE DE NOTIFICACIONES SIN LEER */}
+              {notifications && notifications.some((n) => !n.read) && (
+                <span className="mailbox-badge-icon">
+                  {notifications.filter((n) => !n.read).length}
+                </span>
+              )}
             </button>
+
 
             <div className="user-photo">
               {profile.url_foto_perfil ? (
@@ -448,7 +458,7 @@ export default function UserProfile() {
 
           )}
 
-                    {openEdit && profile && (
+          {openEdit && profile && (
             <EditarPerfil
               profile={profile}
               onClose={() => setOpenEdit(false)}
@@ -462,7 +472,10 @@ export default function UserProfile() {
           <Mailbox
             open={mailboxOpen}
             onClose={() => setMailboxOpen(false)}
+            notifications={notifications}
+            onMarkRead={markRead}
           />
+
 
         </>
       )}

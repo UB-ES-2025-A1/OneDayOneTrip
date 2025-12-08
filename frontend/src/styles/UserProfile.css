@@ -301,6 +301,21 @@
   transform: scale(1.08);
 }
 
+.mailbox-badge-icon {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ff3b30;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .tab-title {
   color: #2e492e;
   font-size: 1.2rem;

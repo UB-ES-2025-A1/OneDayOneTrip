@@ -1,3 +1,5 @@
+import { createNotification } from "../api/notifier"; 
+
 // ==========================================================
 // 📌 Interfaces base (Trip, TripPoint, Comment…)
 // ==========================================================
@@ -126,6 +128,12 @@ export async function createTripComment(
     text: string;
   }
 ): Promise<Comment> {
+
+  // 1️⃣ Obtenemos la trip para saber quién es el autor
+  const trip = await getTripById(tripId);
+  const toUserId = trip.author.userId;
+
+  // 2️⃣ Creamos el comentario en backend
   const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments`;
 
   const payload = {
@@ -134,14 +142,11 @@ export async function createTripComment(
     userName: data.userName,
     userProfilePicture: data.userProfilePicture ?? "",
     text: data.text,
-    // ❌ ja no enviem createdAt: ho genera el backend
   };
 
   const res = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
@@ -150,11 +155,27 @@ export async function createTripComment(
     throw new Error(`Error creant comentari (${tripId}): ${text}`);
   }
 
-  // El backend retorna:
-  // { "comment": { ... } }
   const dataRes = await res.json();
-  return dataRes.comment as Comment;
+  const comment = dataRes.comment as Comment;
+
+  // 3️⃣ NOTIFICACIÓN para el autor (si no comenta él mismo)
+  if (data.userId !== toUserId) {
+    await createNotification({
+      fromUserId: data.userId,
+      toUserId,
+      type: "comment",
+      message: "ha comentat la teva ruta",
+      extra: {
+        fromUserName: data.userName,
+        fromUserAvatar: data.userProfilePicture,
+        tripTitle: trip.title,
+      },
+    });
+  }
+
+  return comment;
 }
+
 
 
 
@@ -253,13 +274,17 @@ export interface RateTripPayload {
 
 export async function rateTrip(
   tripId: string,
-  payload: RateTripPayload
+  payload: RateTripPayload & { userName?: string; userProfilePicture?: string }
 ): Promise<TripRatingStats> {
+  
+  // 1️⃣ Obtener info del autor para notificar
+  const trip = await getTripById(tripId);
+  const toUserId = trip.author.userId;
+
+  // 2️⃣ Enviar rating al backend
   const res = await fetch(`${BASE_URL}/ratings/trip/${encodeURIComponent(tripId)}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       userId: payload.userId,
       rating: payload.rating,
@@ -272,7 +297,22 @@ export async function rateTrip(
     throw new Error(`Error valorant la ruta: ${res.status}. ${text}`);
   }
 
-  // 👇 aquí el backend retorna el que tregui get_trip_rating_stats(trip_id)
-  const data = await res.json();
-  return data as TripRatingStats;
+  const stats = await res.json();
+
+  // 3️⃣ NOTIFICACIÓN
+  if (payload.userId !== toUserId) {
+    await createNotification({
+      fromUserId: payload.userId,
+      toUserId,
+      type: "rating",
+      message: `ha valorat la teva ruta amb ${payload.rating} ★`,
+      extra: {
+        fromUserName: payload.userName,
+        fromUserAvatar: payload.userProfilePicture,
+        tripTitle: trip.title,
+      },
+    });
+  }
+
+  return stats;
 }
