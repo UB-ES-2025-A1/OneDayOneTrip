@@ -274,7 +274,7 @@ export default function UserProfile() {
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
               currentUserId={currentUser.uid}
-              goToProfile={goToProfile} // ✅ AHORA FUNCIONA NAVEGACIÓN
+              goToProfile={goToProfile} // AHORA FUNCIONA NAVEGACIÓN
             />
           )}
 
@@ -283,7 +283,8 @@ export default function UserProfile() {
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
               seguidors={profile.llista_seguidors || []}
-              goToProfile={goToProfile} // ✅ Navegación también aquí
+              currentUserId={currentUser.uid}
+              goToProfile={goToProfile} // Navegación también aquí
             />
           )}
 

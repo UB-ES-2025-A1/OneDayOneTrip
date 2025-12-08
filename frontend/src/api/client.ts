@@ -1,9 +1,9 @@
 import { getAuth } from "firebase/auth";
 
-const API_URL = "https://onedayonetrip.onrender.com"; // o 
+// const API_URL = "https://onedayonetrip.onrender.com"; // o 
 
 //url local = http://127.0.0.1:8000 
-
+const API_URL = "http://127.0.0.1:8000"
 // url production = https://onedayonetrip-api.onrender.com
 
 // url preproduction = https://onedayonetrip.onrender.com
@@ -91,3 +91,9 @@ export async function unsaveTrip(userId: string, tripId: string) {
 export async function addPublicationToUser(userId: string, tripId: string) {
   return apiPost(`/users/${userId}/publicacions/${tripId}`, {});
 }
+
+// Eliminar un follower
+export async function removeFollower(userId: string, targetId: string) {
+  return apiPost(`/users/removefollower/${userId}/${targetId}`, {});
+}
+
