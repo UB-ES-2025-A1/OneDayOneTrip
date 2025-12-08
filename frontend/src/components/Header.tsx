@@ -1,7 +1,8 @@
-import { User2, ArrowLeft, Home as HomeIcon } from "lucide-react";
+import { ArrowLeft, Home as HomeIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
 import { type User } from "firebase/auth";
+import AvatarFallback from "./AvatarFallback"; // ⬅️ IMPORTANTE
 
 interface HeaderProps {
   currentUser: User | null;
@@ -53,9 +54,29 @@ export default function Header({
               className="profile-btn"
               title="Veure perfil"
               onClick={goProfile}
+              style={{
+                borderRadius: "50%",
+                overflow: "hidden",
+                width: "35px",
+                height: "35px",
+                padding: 0,
+              }}
             >
-              <User2 size={28} strokeWidth={2} color="white" />
+              {currentUser.photoURL ? (
+                <img
+                  src={currentUser.photoURL}
+                  alt="Foto de perfil"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : (
+                <AvatarFallback name={currentUser.displayName || "?"} size={40} />
+              )}
             </button>
+
             <button onClick={onLogout} className="header-btn logout">
               Tancar sessió
             </button>
