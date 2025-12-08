@@ -11,17 +11,52 @@ import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 
 import { getAllTrips, type Trip } from "../api/trips";
-import { getUserById} from "../api/client";
+import { getUserById } from "../api/client";
+import { Search } from "lucide-react";
+
+import { useTranslation } from 'react-i18next'; // Importa el hook
+
+type SearchFilter = "all" | "user" | "country" | "city" | "monument";
+
+function wilsonScore(avgRating: number, numRatings: number): number {
+    // Si no hi ha rating o no hi ha valoracions → score = 0
+    if (!avgRating || !numRatings) return 0;
+
+    // Valor z per a un interval de confiança del 95%
+    // Com més gran és z, més penalitza la manca de vots
+    const z = 1.96; // 95% confidence
+
+    // Convertim el rating de 1–5 a probabilitat 0–1
+    const p = avgRating / 5;
+
+    // Fórmula del Wilson Score - Combina la proporció p amb un terme de correcció pel nombre de vots
+    const numerator =
+        p + (z * z) / (2 * numRatings) -
+        z *
+        Math.sqrt(
+            ((p * (1 - p)) + (z * z) / (4 * numRatings)) / numRatings
+        );
+
+    // Normalitza el càlcul segons la confiança estadística
+    const denominator = 1 + (z * z) / numRatings;
+
+    return numerator / denominator;
+}
 
 export default function Home() {
+  const { t } = useTranslation();
+
   const [modalOpen, setModalOpen] = useState<"login" | "register" | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [backendUser, setBackendUser] = useState<any | null>(null);
-  const [selectedTab, setSelectedTab] = useState<"recomendados" | "siguiendo">("recomendados");
+  const [selectedTab, setSelectedTab] = useState<"recommended" | "following">("recommended");
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchFilter, setSearchFilter] = useState<SearchFilter>("all");
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
@@ -37,7 +72,6 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => setCurrentUser(user));
     return () => unsubscribe();
@@ -46,7 +80,7 @@ export default function Home() {
   const handleLogout = async () => {
     await signOut(auth);
     setCurrentUser(null);
-    setSelectedTab("recomendados");
+    setSelectedTab("recommended");
   };
 
   useEffect(() => {
@@ -56,7 +90,7 @@ export default function Home() {
         const data = await getAllTrips(true);
         setTrips(data);
       } catch {
-        setError("No s'han pogut carregar les rutes");
+        setError(t('home_error_loading_routes'));
       } finally {
         setLoading(false);
       }
@@ -64,20 +98,74 @@ export default function Home() {
     fetchTrips();
   }, []);
 
-  const filteredTrips = trips.filter((t) => {
-    if (selectedTab === "recomendados") {
-      return true; // Mostrar TODAS las trips
+    const filteredTrips = trips
+        // Eliminem les rutes dels usuaris que tenim bloquejats
+        .filter((t) => {
+            const authorId = t.author?.userId;
+            const bloquejats = backendUser?.llista_bloquejats || [];
+            return !bloquejats.includes(authorId);
+        })
+
+        // Mostrem les rutes dels usuaris que no seguim
+        .filter((t) => {
+            if (selectedTab === "recommended") return true;
+
+            const seguits = backendUser?.llista_seguits || [];
+            const authorId = t.author?.userId || "";
+
+            return seguits.includes(authorId);
+        })
+
+        // Mostrem segons la funció de Wilson Score
+        .sort((a, b) => {
+            const scoreA = wilsonScore(a.avgRating || 0, a.numRatings || 0);
+            const scoreB = wilsonScore(b.avgRating || 0, b.numRatings || 0);
+            return scoreB - scoreA;
+        });
+
+  const search = searchTerm.trim().toLowerCase();
+
+  const visibleTrips = filteredTrips.filter((t) => {
+    if (!search) return true;
+
+    const title = (t.title || "").toLowerCase();
+    const city = (t.city || "").toLowerCase();
+    const country = (t.country || "").toLowerCase();
+    const userName = (t.author?.name || "").toLowerCase();
+
+    switch (searchFilter) {
+      case "user":
+        return userName.includes(search);
+      case "country":
+        return country.includes(search);
+      case "city":
+        return city.includes(search);
+      case "monument":
+        // assumim que el "monument" es correspon sobretot amb el títol
+        return title.includes(search);
+      case "all":
+      default:
+        return (
+          title.includes(search) ||
+          city.includes(search) ||
+          country.includes(search) ||
+          userName.includes(search)
+        );
     }
-
-    if (!backendUser?.llista_seguits) return false;
-
-    const authorId = t.author?.userId || "";
-    return backendUser.llista_seguits.includes(authorId);
   });
 
+  const isFiltering = search.length > 0 || searchFilter !== "all";
 
-  const normalizeId = (id: any) =>
+    const normalizeId = (id: any) =>
     typeof id === "string" ? id : id?.$oid || String(id || "");
+
+  const placeholderMap: Record<SearchFilter, string> = {
+    all: t('home_placeholder_all'),
+    user: t('home_placeholder_user'),
+    country:t('home_placeholder_country'),
+    city: t('home_placeholder_city'),
+    monument: t('home_placeholder_monument'),
+  };
 
   return (
     <Layout
@@ -87,46 +175,78 @@ export default function Home() {
       onRegister={() => setModalOpen("register")}
       variant="home"
     >
+      <div className="home">
       <Carousel />
+
       <section className="intro-text">
-        <p>Descobreix rutes d’un dia ideals per escapades exprés!</p>
+        <p>{t('home_slogan_1')}</p>
         <p>
-          Rutes guiades amb horaris, dificultat i recomanacions locals perquè
-          aprofitis al màxim cada ciutat.
+            {t('home_slogan_2')}
         </p>
       </section>
 
       {currentUser && (
         <div className="tabs-container" data-active={selectedTab}>
           <button
-            className={`tab-btn ${selectedTab === "siguiendo" ? "active" : ""}`}
-            onClick={() => setSelectedTab("siguiendo")}
+            className={`tab-btn ${selectedTab === "following" ? "active" : ""}`}
+            onClick={() => setSelectedTab("following")}
           >
-            Seguint
+              {t('home_tab_following')}
           </button>
           <button
-            className={`tab-btn ${selectedTab === "recomendados" ? "active" : ""}`}
-            onClick={() => setSelectedTab("recomendados")}
+            className={`tab-btn ${selectedTab === "recommended" ? "active" : ""}`}
+            onClick={() => setSelectedTab("recommended")}
           >
-            Recomanats
+              {t('home_tab_recommended')}
           </button>
         </div>
       )}
 
+      {/* Barra de cerca amb filtre + input + lupa (només per usuaris loguejats) */}
+      {currentUser && (
+        <div className="search-bar-container">
+          <div className="search-bar">
+            <select
+              className="search-filter-select"
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value as SearchFilter)}
+            >
+              <option value="all">{t('home_search_all')}</option>
+              <option value="user">{t('home_search_user')}</option>
+              <option value="country">{t('home_search_country')}</option>
+              <option value="city">{t('home_search_city')}</option>
+              <option value="monument">{t('home_search_monument')}</option>
+            </select>
+
+            <span className="search-divider" />
+
+            <input
+              type="text"
+              className="search-input"
+              placeholder={placeholderMap[searchFilter]}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            <Search className="search-icon" size={18} />
+          </div>
+        </div>
+      )}
+
       <section className="trip-list-section">
-        {loading && <p>Carregant rutes...</p>}
+        {loading && <p>{t('home_loading_routes')}</p>}
         {error && <p>{error}</p>}
 
-        {!loading && !error && filteredTrips.length > 0 ? (
+        {!loading && !error && visibleTrips.length > 0 ? (
           <MasonryGrid
-            items={filteredTrips.map((t) => ({
+            items={visibleTrips.map((t) => ({
               id: normalizeId(t._id),
-              title: t.title || "Sense títol",
+              title: t.title || t('general_no_title'),
               img:
                 t.coverImage ||
                 (t.gallery && t.gallery[0]) ||
                 "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-              user: t.author?.name || "Anònim",
+              user: t.author?.name || t('general_anonymous'),
               rating: typeof t.avgRating === "number" ? t.avgRating : 0,
               temps: t.duration || "—",
               dificultat: t.difficulty || "—",
@@ -143,7 +263,9 @@ export default function Home() {
             <div className="no-trips-message">
               <img
                 src={
-                  selectedTab === "recomendados"
+                  isFiltering
+                    ? "https://static.vecteezy.com/system/resources/previews/027/771/065/non_2x/reject-icon-image-vector.jpg" // icona “sense resultats”
+                    : selectedTab === "recommended"
                     ? "https://cdn-icons-png.flaticon.com/512/7112/7112926.png"
                     : "https://cdn-icons-png.flaticon.com/512/4076/4076500.png"
                 }
@@ -151,23 +273,31 @@ export default function Home() {
                 className="no-trips-icon"
               />
               <p>
-                {selectedTab === "recomendados"
-                  ? "Encara no hi ha rutes recomanades per mostrar."
-                  : "Encara no segueixes a ningú, comença a explorar!"}
+                {isFiltering
+                  ? t('home_no_results_filter')
+                  : selectedTab === "recommended"
+                  ? t('home_no_recommended_routes')
+                  : t('home_no_following')
+                }
               </p>
             </div>
           )
         )}
       </section>
 
-
-
       {modalOpen === "login" && (
-        <LoginModal onClose={() => setModalOpen(null)} openRegister={() => setModalOpen("register")} />
+        <LoginModal
+          onClose={() => setModalOpen(null)}
+          openRegister={() => setModalOpen("register")}
+        />
       )}
       {modalOpen === "register" && (
-        <RegisterModal onClose={() => setModalOpen(null)} openLogin={() => setModalOpen("login")} />
+        <RegisterModal
+          onClose={() => setModalOpen(null)}
+          openLogin={() => setModalOpen("login")}
+        />
       )}
+    </div>
     </Layout>
   );
 }

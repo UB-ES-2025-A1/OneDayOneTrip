@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { ChangeEvent } from "react";
 import type { BackendUser } from "../pages/UserProfile";
 import "../styles/EditarPerfil.css";
+import { useTranslation } from "react-i18next";
 
 interface EditarPerfilProps {
   profile: BackendUser;
@@ -10,6 +11,7 @@ interface EditarPerfilProps {
 }
 
 export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilProps) {
+  const { t } = useTranslation();
   const [nom, setNom] = useState(profile.nom_i_cognoms || "");
   const [username, setUsername] = useState(profile.username || "");
 
@@ -22,7 +24,7 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // Seleccionar archivos
+  // Seleccionar arxius
   const handleFileChange = (
     e: ChangeEvent<HTMLInputElement>,
     setFile: (f: File | null) => void,
@@ -35,7 +37,7 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
     }
   };
 
-  // Guardar cambios (PATCH multipart)
+  // Guardar canvis (PATCH multipart)
   const handleSave = async () => {
     setSaving(true);
     setError("");
@@ -48,7 +50,7 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
         username: username || null,
       };
 
-      // FastAPI requiere user_json como string
+      // FastAPI requereix user_json com string
       formData.append("user_json", JSON.stringify(jsonData));
 
       if (fotoPerfil) formData.append("foto_perfil", fotoPerfil);
@@ -64,7 +66,7 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
 
       if (!response.ok) {
         const err = await response.json();
-        throw new Error(err.detail || "Error actualitzant el perfil");
+        throw new Error(err.detail || t('profile_error_updating'));
       }
 
       const result = await response.json();
@@ -81,8 +83,8 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
       onClose();
 
     } catch (e: any) {
-      console.error("Error:", e);
-      setError(e?.message || "No s'ha pogut guardar el perfil.");
+      console.error(t('error'), e);
+      setError(e?.message || t('edit_profile_error_save'));
     } finally {
       setSaving(false);
     }
@@ -95,19 +97,19 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
           &times;
         </button>
 
-        <h2>Editar Perfil</h2>
+        <h2>{t('profile_edit_button')}</h2>
 
         {error && <p className="text-red">{error}</p>}
 
-        {/* Nombre + Username */}
+        {/* Nom + Username */}
         <div className="two-columns">
           <div className="form-group">
-            <label>Nom complet</label>
+            <label>{t('register_full_name')}</label>
             <input type="text" value={nom} onChange={(e) => setNom(e.target.value)} />
           </div>
 
           <div className="form-group">
-            <label>Username</label>
+            <label>{t('edit_profile_username')}</label>
             <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
         </div>
@@ -115,32 +117,32 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
         {/* Foto perfil + Foto portada */}
         <div className="two-columns">
           <div className="form-group">
-            <label>Foto de perfil</label>
+            <label>{t('edit_profile_profile_photo')}</label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => handleFileChange(e, setFotoPerfil, setFotoPerfilPreview)}
             />
             {fotoPerfilPreview && (
-              <img src={fotoPerfilPreview} alt="Foto perfil" className="preview-img" />
+              <img src={fotoPerfilPreview} alt={t('edit_profile_profile_photo')} className="preview-img" />
             )}
           </div>
 
           <div className="form-group">
-            <label>Foto de portada</label>
+            <label>{t('edit_profile_cover_photo')}</label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => handleFileChange(e, setFotoPanell, setFotoPanellPreview)}
             />
             {fotoPanellPreview && (
-              <img src={fotoPanellPreview} alt="Foto portada" className="preview-img" />
+              <img src={fotoPanellPreview} alt={t('edit_profile_cover_photo')} className="preview-img" />
             )}
           </div>
         </div>
 
         <button className="save-btn" onClick={handleSave} disabled={saving}>
-          {saving ? "Guardant..." : "Guardar Canvis"}
+          {saving ? t('edit_profile_saving') : t('general_save_changes')}
         </button>
       </div>
     </div>

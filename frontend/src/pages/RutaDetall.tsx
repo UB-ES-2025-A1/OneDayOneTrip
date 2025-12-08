@@ -2,9 +2,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { auth } from "../firebase";
-import "../styles/RutaDetalls.css";
+import "../styles/RutaDetall.gallery.css";
+import "../styles/RutaDetall.header-actions.css";
+import "../styles/RutaDetall.layout.css";
 import EtapesList from "../components/EtapesList";
 import Layout from "../components/Layout";
+import { MapPin } from "lucide-react";
+import { useTranslation } from 'react-i18next'; // Importa el hook
+
 
 import {
   getTripById,
@@ -33,6 +38,7 @@ const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
 const isNumericIndex = (s: string) => /^\d+$/.test(s || "");
 
 export default function RutaDetall() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -60,7 +66,7 @@ export default function RutaDetall() {
           const dbUser = await getUserById(fbUser.uid);
           setBackendUser(dbUser);
         } catch (err) {
-          console.error("Error carregant backendUser:", err);
+          console.error(t('route_detail_error_user_backend'), err);
         }
       } else {
         setBackendUser(null);
@@ -80,7 +86,7 @@ export default function RutaDetall() {
   useEffect(() => {
     const fetchTrip = async () => {
       if (!id) {
-        setError("Identificador de la ruta no informat.");
+        setError(t('route_detail_error_id_missing'));
         setLoading(false);
         return;
       }
@@ -100,10 +106,10 @@ export default function RutaDetall() {
           if (tripAtIndex?._id)
             navigate(`/ruta/${tripAtIndex._id}`, { replace: true });
         } else {
-          setError("ID invàlid.");
+          setError(t('route_detail_error_id_invalid'));
         }
       } catch {
-        setError("No s'ha pogut carregar la ruta.");
+        setError(t('route_detail_error_loading'));
       } finally {
         setLoading(false);
       }
@@ -135,7 +141,7 @@ export default function RutaDetall() {
           setIsSaved(savedTrips.includes(tripData._id));
         }
       } catch (e) {
-        console.error("Error carregant dades de l'autor", e);
+        console.error(t('route_detail_error_author_data'), e);
       }
     };
 
@@ -161,7 +167,7 @@ export default function RutaDetall() {
         setFollowersCount((v) => Math.max(0, (v ?? 0) - 1));
       }
     } catch (err) {
-      console.error("Error seguint/seguixent:", err);
+      console.error(t('route_detail_error_following'), err);
     } finally {
       setFollowLoading(false);
     }
@@ -181,7 +187,7 @@ export default function RutaDetall() {
         setIsSaved(false);
       }
     } catch (err) {
-      console.error("Error canviant estat de guardar/desguardar:", err);
+      console.error(t('route_detail_error_saving'), err);
     } finally {
       setSaveLoading(false);
     }
@@ -189,7 +195,7 @@ export default function RutaDetall() {
 
   const handleSubmitRating = async (value: number) => {
     if (!currentUser) {
-      alert("Has d'iniciar sessió per valorar.");
+      alert(t('route_detail_error_rating_login'));
       return;
     }
     if (!tripData?._id) return;
@@ -216,12 +222,12 @@ export default function RutaDetall() {
     }
   };
 
-  if (loading) return <div className="loading">Carregant ruta...</div>;
+  if (loading) return <div className="loading">{t('general_loading_route')}</div>;
   if (error || !tripData)
     return (
       <div className="error">
-        <p>{error || "No s'ha trobat la ruta"}</p>
-        <button onClick={() => navigate(-1)}>← Tornar</button>
+        <p>{error || t('route_detail_error_not_found')}</p>
+        <button onClick={() => navigate(-1)}>← {t('route_detail_back')}</button>
       </div>
     );
 
@@ -235,13 +241,13 @@ export default function RutaDetall() {
       onBack={() => navigate(-1)}
       variant="ruta"
     >
-      {/* Galería */}
+      {/* Galeria */}
       <div className="ruta-galeria-principal">
         <div className="imatge-gran">
           {mainImage ? (
-            <img src={mainImage} alt="Imatge principal" />
+            <img src={mainImage} alt={t('route_detail_gallery_main_image')} />
           ) : (
-            <div className="no-image">Sense imatge</div>
+            <div className="no-image">{t('general_no_image')}</div>
           )}
         </div>
 
@@ -252,50 +258,46 @@ export default function RutaDetall() {
         </div>
       </div>
 
-      {/* Datos */}
+      {/* Dades */}
       <div className="ruta-detall">
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "10px",
-            }}
-          >
+  
+          <div className="ruta-actions">            
             {/* Esquerra: Rating + Valorar */}
-            <div style={{ display: "flex", width: "150%" }}>
+            <div className="ruta-actions-left">
               {tripData.avgRating != null && (
-                <div className="rating-summary">
-                  <span className="rating-star">★</span>
-                  <span className="rating-value">
-                    {tripData.avgRating.toFixed(1)}
-                  </span>
-                  <span className="rating-count">
-                    ({tripData.numRatings})
-                  </span>
-                </div>
-              )}
-              <div style={{ display: "flex", gap: "10px" }}>
-                <button
-                  className="valorar-button"
-                  onClick={() => setShowRatingModal(true)}
-                >
-                  <span className="valorar-icon">★</span>
-                  Valorar
-                </button>
-
-                {/* Guardar */}
-                <button
-                  type="button"
-                  className={`guardar-button ${
-                    isSaved ? "saved" : ""
-                  }`}
-                  onClick={handleSaveTrip}
-                  disabled={saveLoading}
+              <div className="rating-summary">
+                <span className="rating-star">★</span>
+                <span className="rating-value">
+                  {tripData.avgRating.toFixed(1)}
+                </span>
+                <span className="rating-count">
+                  ({tripData.numRatings})
+                </span>
+              </div>
+            )}
+          <div className="ruta-actions-buttons">
+            <button
+              className="valorar-button"
+              onClick={() => setShowRatingModal(true)}
+            >
+              <span className="valorar-icon">★</span>
+                {t('route_detail_rate')}
+            </button>
+            {/* Dreta: Botó Guardar */}
+            <button
+              type="button"
+              className={`guardar-button ${isSaved ? "saved" : ""}`}
+              onClick={handleSaveTrip}
+              disabled={saveLoading}
+            >
+              <label className="ui-bookmark">
+                <svg
+                  className="bookmark"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
                 >
                   <label className="ui-bookmark">
                     <svg
@@ -309,28 +311,24 @@ export default function RutaDetall() {
                           c1.74 0 3.41 0.81 4.5 2.09 
                           C13.09 3.81 14.76 3 16.5 3 
                           C19.58 3 22 5.42 22 8.5 
-                          c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                    </svg>
-                  </label>
-                  <span className="guardar-text">
-                    {isSaved
-                      ? "Guardat"
-                      : saveLoading
-                      ? "Guardant..."
-                      : "Guardar"}
-                  </span>
-                </button>
-              </div>
+                          c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </label>
+              <span className="guardar-text">
+                {isSaved ? t('route_detail_saved') : saveLoading ? t('route_detail_saving') : t('route_detail_save')}
+              </span>
+            </button>
             </div>
           </div>
         </div>
 
         {/* Ubicació */}
         <div className="ubicacio">
-          <img src="/images/ubi.png" className="ubi-icon" />
+          <MapPin className="ubi-icon" />
           <span>{tripData.city}</span>
           {tripData.region && <span>, {tripData.region}</span>}
         </div>
+
 
         {/* Autor */}
         <div className="autor">
@@ -369,34 +367,31 @@ export default function RutaDetall() {
             </span>
             {followersCount !== null && (
               <span className="autor-seguidors">
-                {followersCount} seguidor
-                {followersCount === 1 ? "" : "s"}
+                {followersCount} {t(followersCount === 1 ? 'route_detail_followers' : 'route_detail_followers_plural')}
               </span>
             )}
           </div>
 
-          {currentUser &&
-            currentUser.uid !== tripData.author.userId && (
-              <button
-                className={`follow-button ${
-                  isFollowing ? "following" : ""
-                }`}
-                disabled={followLoading}
-                onClick={handleFollow}
-              >
-                {isFollowing ? "Seguint" : "Seguir"}
-              </button>
-            )}
+          {currentUser && currentUser.uid !== tripData.author.userId && (
+            <button
+              className={`follow-button ${isFollowing ? "following" : ""}`}
+              disabled={followLoading}
+              onClick={handleFollow}
+            >
+              {isFollowing ? t('route_detail_following') : t('route_detail_follow')}
+            </button>
+          )}
         </div>
+
 
         {/* Descripció */}
         <div className="ruta-descripcio">
-          <h2>Descripció</h2>
+          <h2>{t('route_detail_description_title')}</h2>
           <p>{tripData.description}</p>
         </div>
 
         {/* Etapes */}
-        <h2>Etapes de la Ruta</h2>
+        <h2>{t('route_detail_stages_title')}</h2>
         <EtapesList
           etapes={tripData.trip_points.map((p, i) => ({
             id: i,
@@ -410,10 +405,10 @@ export default function RutaDetall() {
         />
       </div>
 
-      {/* Comentaris */}
-      <Comments
-        tripId={tripData._id!}
-        currentUser={currentUser}
+      {/*comentaris */}
+      <Comments 
+        tripId={tripData._id!} 
+        currentUser={currentUser} 
         backendUser={backendUser}
       />
 

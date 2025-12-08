@@ -1,7 +1,7 @@
 def test_root_smoke(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json()["status"] == "API funcionando"
+    assert response.json()["status"] == "API funcionant"
 
 
 def test_trips_smoke(client):

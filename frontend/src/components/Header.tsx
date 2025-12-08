@@ -5,7 +5,8 @@ import { type User } from "firebase/auth";
 import AvatarFallback from "./AvatarFallback"; 
 import { useEffect, useState } from "react";
 import { getUserById } from "../api/client";
-
+import { useTranslation } from 'react-i18next';
+        
 export type BackendUser = {
   uid: string;
   nom_i_cognoms?: string;
@@ -32,6 +33,7 @@ export default function Header({
   onBack,
   variant = "home",
 }: HeaderProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<BackendUser | null>(null);
 
@@ -68,7 +70,7 @@ export default function Header({
       <div className="header-left">
         {showBackButton && (
           <button className="back-btn-header" onClick={onBack}>
-            <ArrowLeft size={22} /> <span>Tornar</span>
+            <ArrowLeft size={22} /> <span>{t('route_detail_back')}</span>
           </button>
         )}
         {variant === "perfil" && (
@@ -88,7 +90,7 @@ export default function Header({
             {/* FOTO PERFIL O AVATAR */}
             <button
               className="profile-btn"
-              title="Veure perfil"
+              title={t('header_view_profile')}
               onClick={goProfile}
               style={{
                 borderRadius: "50%",
@@ -118,16 +120,16 @@ export default function Header({
             </button>
 
             <button onClick={onLogout} className="header-btn logout">
-              Tancar sessió
+                {t('header_close_session')}
             </button>
           </>
         ) : (
           <>
             <button onClick={onLogin} className="header-btn login">
-              Iniciar sessió
+                {t('login_title')}
             </button>
             <button onClick={onRegister} className="header-btn register">
-              Registrar-se
+                {t('register_register_button')}
             </button>
           </>
         )}

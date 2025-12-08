@@ -1,0 +1,190 @@
+/* ============ GALERIA PRINCIPAL ============ */
+
+.ruta-galeria-principal {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  padding: 20px 0;
+  background: var(--bg-card);   /* 🔹 abans: white */
+  gap: 10px;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+}
+
+.imatge-gran {
+  flex: 3;
+  max-height: 520px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.imatge-gran img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.miniatures {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.miniatures img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: transform 0.3s, opacity 0.3s, border 0.2s;
+}
+
+.miniatures img:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.miniatures img.active {
+  opacity: 1;
+  border: 3px solid #2e492e;   /* 🔹 verd marca en light */
+}
+
+/* Target +X fotos */
+.mes-fotos {
+  width: 100%;
+  height: 150px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: background 0.3s, opacity 0.3s, transform 0.3s;
+}
+
+.mes-fotos:hover {
+  background: rgba(0, 0, 0, 0.7);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* ============ ZOOM ============ */
+
+.zoom-gallery {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  padding: 20px;
+  max-width: 90%;
+  overflow-x: auto;
+  background: #000;
+  border-radius: 12px;
+  position: relative;
+}
+
+.zoom-gallery img {
+  height: 400px;
+  border-radius: 10px;
+  object-fit: cover;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.close-zoom {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+/* ============ DARK MODE ESPECÍFIC ============ */
+
+/* Border de la miniatura activa amb verd clar en fosc */
+[data-theme="dark"] .miniatures img.active {
+  border-color: #8fda8f;
+}
+
+/* Fons de la galeria manté el to de targeta del tema */
+[data-theme="dark"] .ruta-galeria-principal {
+  background: var(--bg-card);
+}
+
+/* Opcional: lleugerament menys agressiu el fons del “+X fotos” en dark */
+[data-theme="dark"] .mes-fotos {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+/* Responsive específic galeria */
+@media (max-width: 992px) {
+  .ruta-galeria-principal {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .miniatures {
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .miniatures img,
+  .mes-fotos {
+    width: 120px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 600px) {
+  .ruta-galeria-principal {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .imatge-gran img {
+    height: 220px;
+  }
+
+  .miniatures {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .miniatures img {
+    width: 45%;
+    height: 100px;
+  }
+
+  .mes-fotos {
+    width: 45%;
+    height: 100px;
+    font-size: 0.9rem;
+  }
+}
