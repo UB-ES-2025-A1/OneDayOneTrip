@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import trips, comments, ratings, images, users
+from app.routers import trips, comments, ratings, images, users, notifications
 
 app = FastAPI(title="OneDayOneTrip API")
 
@@ -18,6 +18,7 @@ app.include_router(comments.router)
 app.include_router(ratings.router)
 app.include_router(images.router)
 app.include_router(users.router)
+app.include_router(notifications.router)
 
 
 @app.get("/")

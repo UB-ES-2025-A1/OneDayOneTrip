@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut, type User as FirebaseUser } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById, removePublication } from "../api/client";
+import { getUserById, deleteTripAndPublication } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { Settings } from "lucide-react";
-import { ImageOff, Pencil } from "lucide-react";
+import { ImageOff, Pencil, Mail} from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
@@ -14,8 +14,10 @@ import EditarPerfil from "../components/EditarPerfilModal";
 import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
 import UserSettings from "../components/UserSettings";
-import AvatarFallback from "../components/AvatarFallback";
 import { useTranslation } from 'react-i18next'; // Importa el hook
+import AvatarFallback from "../components/AvatarFallback"; 
+import Mailbox from "../components/Mailbox";
+import useNotifications from "../hooks/useNotifications";
 
 export type BackendUser = {
   uid: string;
@@ -65,6 +67,9 @@ export default function UserProfile() {
   // 🗑️ estat per al popup d’eliminació
   const [tripToDelete, setTripToDelete] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [mailboxOpen, setMailboxOpen] = useState(false);
+  const { notifications, loading: notifLoading, markRead } = useNotifications();
+
 
   const navigate = useNavigate();
 
@@ -179,7 +184,7 @@ export default function UserProfile() {
     if (!currentUser || !profile || !tripToDelete) return;
 
     try {
-      await removePublication(profile.uid, tripToDelete);
+      await deleteTripAndPublication(profile.uid, tripToDelete);
 
       // Treure-la de trips
       setTrips((prev) =>
@@ -240,6 +245,12 @@ export default function UserProfile() {
   const gridItems =
     selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
 
+  
+  const openMailbox = () => {
+    setMailboxOpen(true);
+  };
+
+
   // Render
   return (
     <Layout
@@ -272,6 +283,18 @@ export default function UserProfile() {
             <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}>
               <Pencil size={22} />
             </button>
+
+             <button className="mailbox-btn" onClick={openMailbox}>
+              <Mail size={24} />
+
+              {/* BADGE DE NOTIFICACIONES SIN LEER */}
+              {notifications && notifications.some((n) => !n.read) && (
+                <span className="mailbox-badge-icon">
+                  {notifications.filter((n) => !n.read).length}
+                </span>
+              )}
+            </button>
+
 
             <div className="user-photo">
               {profile.url_foto_perfil ? (
@@ -438,6 +461,26 @@ export default function UserProfile() {
             />
 
           )}
+
+          {openEdit && profile && (
+            <EditarPerfil
+              profile={profile}
+              onClose={() => setOpenEdit(false)}
+              onSave={(updated) => {
+                setProfile(updated);
+                setOpenEdit(false);
+              }}
+            />
+          )}
+
+          <Mailbox
+            open={mailboxOpen}
+            onClose={() => setMailboxOpen(false)}
+            notifications={notifications}
+            onMarkRead={markRead}
+          />
+
+
         </>
       )}
     </Layout>

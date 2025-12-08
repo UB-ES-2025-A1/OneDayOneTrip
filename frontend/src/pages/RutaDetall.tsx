@@ -208,7 +208,17 @@ export default function RutaDetall() {
       const stats = await rateTrip(tripData._id, {
         userId: currentUser.uid,
         rating: value,
+        userName:
+          backendUser?.nom_i_cognoms ||
+          backendUser?.username ||
+          currentUser.displayName ||
+          "Usuari",
+        userProfilePicture:
+          backendUser?.url_foto_perfil ||
+          currentUser.photoURL ||
+          null,
       });
+
 
       setTripData((prev) =>
         prev

@@ -1,4 +1,5 @@
 import { getAuth } from "firebase/auth";
+import { createNotification } from "../api/notifier";
 
 const API_URL = "http://127.0.0.1:8000"; // o
 
@@ -68,13 +69,56 @@ export async function getAllUsers() {
 }
 
 export async function followUser(userId: string, targetId: string) {
-  return apiPost(`/users/follow/${userId}/${targetId}`, {});
+  // 1) Ejecutar acción follow en backend
+  const res = await apiPost(`/users/follow/${userId}/${targetId}`, {});
+
+  try {
+    // 2) Obtener datos del usuario que sigue
+    const userData = await getUserById(userId);
+
+    await createNotification({
+      fromUserId: userId,
+      toUserId: targetId,
+      type: "follow",
+      message: "ha començat a seguir-te",
+      extra: {
+        fromUserName: userData.nom_i_cognoms ?? userData.username ?? "",
+        fromUserAvatar: userData.url_foto_perfil ?? "",
+      },
+    });
+  } catch (e) {
+    console.warn("⚠️ No s'ha pogut crear la notificació de follow:", e);
+  }
+
+  return res;
 }
 
-// Deixar de seguir un usuari
 export async function unfollowUser(userId: string, targetId: string) {
-  return apiPost(`/users/unfollow/${userId}/${targetId}`, {});
+  // 1) Ejecutar acción unfollow en backend
+  const res = await apiPost(`/users/unfollow/${userId}/${targetId}`, {});
+
+  try {
+    // 2) Obtener datos del usuario que deja de seguir
+    const userData = await getUserById(userId);
+
+    await createNotification({
+      fromUserId: userId,
+      toUserId: targetId,
+      type: "follow",
+      message: "ha deixat de seguir-te",
+      extra: {
+        fromUserName: userData.nom_i_cognoms ?? userData.username ?? "",
+        fromUserAvatar: userData.url_foto_perfil ?? "",
+      },
+    });
+  } catch (e) {
+    console.warn("⚠️ No s'ha pogut crear la notificació de unfollow:", e);
+  }
+
+  return res;
 }
+
+
 
 // Guardar una ruta
 export async function saveTrip(userId: string, tripId: string) {
