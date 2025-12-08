@@ -44,7 +44,9 @@
   gap: 28px;
 }
 
-/* En mòbil, una columna */
+
+
+/* En móvil, una columna */
 @media (max-width: 700px) {
   .two-columns {
     grid-template-columns: 1fr;
@@ -119,4 +121,61 @@
   font-size: 32px;
   cursor: pointer;
   color: #666;
+}
+
+/* =========================================================
+   🌙 DARK MODE — EDITAR PERFIL
+   ========================================================= */
+
+[data-theme="dark"] .editar-perfil-card {
+  background: #222425;
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+}
+
+/* Títol */
+[data-theme="dark"] .editar-perfil-card h2 {
+  color: var(--text-primary);
+}
+
+/* Labels */
+[data-theme="dark"] .editar-perfil-card .form-group label {
+  color: var(--text-primary);
+}
+
+/* Inputs */
+[data-theme="dark"] .editar-perfil-card .form-group input {
+  background: #303335;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .editar-perfil-card .form-group input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Imatge de previsualització */
+[data-theme="dark"] .editar-perfil-card .preview-img {
+  background: #303335;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Botó guardar */
+[data-theme="dark"] .editar-perfil-card .save-btn {
+  background-color: #8fda8f;
+  color: #0d0d0d;
+}
+
+[data-theme="dark"] .editar-perfil-card .save-btn:hover {
+  background-color: #a3f3a3;
+}
+
+/* Botó tancar */
+[data-theme="dark"] .editar-perfil-card .close-btn {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .editar-perfil-card .close-btn:hover {
+  color: #ffffff;
 }

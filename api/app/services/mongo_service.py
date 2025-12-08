@@ -23,6 +23,8 @@ try:
     trips_collection = db["trips"]
     comments_collection = db["comments"]
     ratings_collection = db["ratings"]
+    notifications_collection = db["notification"]
+
 
     # Índices recomendados
     # Índices recomendados
@@ -32,6 +34,8 @@ try:
     ratings_collection.create_index(
         [("tripId", ASCENDING), ("userId", ASCENDING)], unique=True
     )
+    notifications_collection.create_index([("userId", ASCENDING), ("createdAt", DESCENDING)])
+
 
     print("[INFO] ✅ Connectat correctament a MongoDB.")
 
@@ -187,3 +191,78 @@ def list_comments(trip_id: str, limit: int = 20, skip: int = 0):
     except Exception:
         print("[MOCK] list_comments() executat sense Mongo real.")
         return []
+
+
+def delete_trip(trip_id: str) -> int:
+    """Elimina una trip de MongoDB per ID i retorna quantes s'han eliminat (0 o 1)."""
+    try:
+        res = trips_collection.delete_one({"_id": ObjectId(trip_id)})
+        return res.deleted_count
+    except Exception as e:
+        print(f"[ERROR] No s'ha pogut eliminar la trip {trip_id}: {e}")
+        return 0
+
+# ============================================================
+# 🔔 NOTIFICATIONS
+# ============================================================
+
+
+def create_notification(from_user_id: str, to_user_id: str, type: str, message: str, extra: dict = None):
+    """
+    Crea una notificación completa y clara:
+      - fromUserId: quien genera la acción
+      - toUserId: destinatario
+      - type: follow_request | follow | comment | rating | ...
+      - message: texto principal
+      - extra: datos adicionales que necesita el frontend (nombre, avatar, etc.)
+    """
+    notif = {
+        "fromUserId": from_user_id,
+        "toUserId": to_user_id,
+        "type": type,
+        "message": message,
+        "extra": extra or {},
+        "read": False,
+        "createdAt": datetime.utcnow(),
+    }
+
+    res = notifications_collection.insert_one(notif)
+    return str(res.inserted_id)
+
+
+def list_notifications(user_id: str, only_unread: bool = False):
+    """
+    Devuelve notificaciones EXACTAMENTE en el formato esperado por MailBox.
+    """
+    query = {"toUserId": user_id}
+    if only_unread:
+        query["read"] = False
+
+    raw = notifications_collection.find(query).sort("createdAt", DESCENDING)
+
+    formatted = []
+    for n in raw:
+        extra = n.get("extra", {})
+        formatted.append({
+            "id": str(n["_id"]),
+            "type": n["type"],
+            "fromUserName": extra.get("fromUserName", "Algú"),
+            "fromUserAvatar": extra.get("fromUserAvatar"),
+            "tripTitle": extra.get("tripTitle"),
+            "text": n["message"],
+            "createdAt": n["createdAt"].isoformat(),
+            "read": n["read"],
+        })
+
+    return formatted
+
+
+def mark_notification_as_read(notification_id: str):
+    try:
+        res = notifications_collection.update_one(
+            {"_id": ObjectId(notification_id)},
+            {"$set": {"read": True}}
+        )
+        return res.modified_count == 1
+    except:
+        return False

@@ -1,7 +1,10 @@
+
 import { User2, ArrowLeft, Home as HomeIcon } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
 import { type User } from "firebase/auth";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface HeaderProps {
   currentUser: User | null;
@@ -22,6 +25,7 @@ export default function Header({
   onBack,
   variant = "home",
 }: HeaderProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const goHome = () => navigate("/");
@@ -32,7 +36,7 @@ export default function Header({
       <div className="header-left">
         {showBackButton && (
           <button className="back-btn-header" onClick={onBack}>
-            <ArrowLeft size={22} /> <span>Tornar</span>
+            <ArrowLeft size={22} /> <span>{t('route_detail_back')}</span>
           </button>
         )}
         {variant === "perfil" && (
@@ -51,22 +55,22 @@ export default function Header({
           <>
             <button
               className="profile-btn"
-              title="Veure perfil"
+              title={t('header_view_profile')}
               onClick={goProfile}
             >
               <User2 size={28} strokeWidth={2} color="white" />
             </button>
             <button onClick={onLogout} className="header-btn logout">
-              Tancar sessió
+                {t('header_close_session')}
             </button>
           </>
         ) : (
           <>
             <button onClick={onLogin} className="header-btn login">
-              Iniciar sessió
+                {t('login_title')}
             </button>
             <button onClick={onRegister} className="header-btn register">
-              Registrar-se
+                {t('register_register_button')}
             </button>
           </>
         )}

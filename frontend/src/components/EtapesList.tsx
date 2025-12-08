@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import '../styles/EtapesList.css';
+import { MapPin } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Etapa {
   id: number;
@@ -15,6 +17,7 @@ interface EtapesListProps {
 }
 
 const EtapesList: React.FC<EtapesListProps> = ({ etapes }) => {
+    const { t } = useTranslation();
   return (
     <div className="etapes-container">
       {etapes.map((etapa, index) => (
@@ -33,16 +36,12 @@ const EtapesList: React.FC<EtapesListProps> = ({ etapes }) => {
               <p className="etapa-descripcio">{etapa.descripcio}</p>
             )}
             <div className="etapa-ubicacio">
-              <img
-                src="/images/ubi.png"
-                alt="Ubicació"
-                className="etapa-ubi-icon"
-              />
-              <span>{etapa.ubicacio || 'Ubicació desconeguda'}</span>
+              <MapPin className="etapa-ubi-icon" />
+
+              <span>{etapa.ubicacio || t('route_detail_location_unknown')}</span>
             </div>
           </div>
-
-          {/* 🔹 Imatge moguda fora del bloc de text */}
+          
           {etapa.imatge && (
             <img
               src={etapa.imatge}

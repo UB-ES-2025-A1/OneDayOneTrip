@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Auth } from "../firebase/auth";
 import ImageCarousel from "./ImageCarousel";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface RegisterProps {
   onClose: () => void;
@@ -9,6 +10,7 @@ interface RegisterProps {
 }
 
 export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,22 +27,18 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
     setError("");
 
     if (!username || !fullName || !email || !password || !confirmPassword) {
-      setError("Tots els camps són obligatoris");
+      setError(t('register_error_all_fields_required'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Les contrasenyes no coincideixen");
+      setError(t('register_error_passwords_match'));
       return;
     }
 
     try {
       setLoading(true);
-
-      // Registrem a l'usuari amb Firebase Auth + Firestore
       await Auth.register(fullName, username, email, password);
-
-
       onClose();
       navigate("/");
     } catch (err: any) {
@@ -50,20 +48,6 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
     }
   };
 
-  const EyeIcon = ({ visible }: { visible: boolean }) => (
-    visible ? (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-      </svg>
-    ) : (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.959 9.959 0 012.478-3.446M6.223 6.223A9.953 9.953 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.953 9.953 0 01-1.68 2.942M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
-      </svg>
-    )
-  );
-
   return (
     <div className="modal-backdrop">
       <div className="register-card">
@@ -72,108 +56,123 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
         </button>
 
         <div className="login-form">
-          <h2 className="login-title">Registra't</h2>
+          <h2 className="login-title">{t('login_register_here')}</h2>
 
           <form onSubmit={handleRegister} className="auth-form">
-            <div className="input-wrapper">
+            {/* Nom d'usuari */}
+            <div className="input-wrapper floating-input-group">
               <div className="input-icon">
-                <img src="/images/person.png" alt="Usuari" />
+                <img src="/images/person.png" alt={t('general_user')} />
               </div>
               <input
                 type="text"
-                placeholder="Nom d'usuari"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="auth-input pr-10"
+                className="auth-input floating-input"
+                placeholder=" "
               />
+              <label className="floating-label">{t('register_username')}</label>
             </div>
 
-            <div className="input-wrapper">
+            {/* Nom complet */}
+            <div className="input-wrapper floating-input-group">
               <div className="input-icon">
-                <img src="/images/person.png" alt="Nom complet" />
+                <img src="/images/person.png" alt={t('register_full_name')} />
               </div>
               <input
                 type="text"
-                placeholder="Nom complet"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
-                className="auth-input pr-10"
+                className="auth-input floating-input"
+                placeholder=" "
               />
+              <label className="floating-label">{t('register_full_name')}</label>
             </div>
 
-            <div className="input-wrapper">
+            {/* Correu */}
+            <div className="input-wrapper floating-input-group">
               <div className="input-icon">
-                <img src="/images/ema.png" alt="Email" />
+                <img src="/images/ema.png" alt={t('email')} />
               </div>
               <input
                 type="email"
-                placeholder="Correu electrònic"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="auth-input pr-10"
+                className="auth-input floating-input"
+                placeholder=" "
               />
+              <label className="floating-label">{t('login_email')}</label>
             </div>
 
-            <div className="relative input-wrapper">
+            {/* Contrasenya */}
+            <div className="input-wrapper floating-input-group">
               <div className="input-icon">
-                <img src="/images/lockk.png" alt="Contrasenya" />
+                <img src="/images/lockk.png" alt={t('login_password')} />
               </div>
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Contrasenya"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="auth-input pr-10"
+                className="auth-input floating-input"
+                placeholder=" "
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-3 flex items-center"
-              >
-                <EyeIcon visible={showPassword} />
-              </button>
+              <label className="floating-label">{t('login_password')}</label>
+
+              {password.length > 0 && (
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                </button>
+              )}
             </div>
 
-            <div className="relative input-wrapper">
+            {/* Confirmar contrasenya */}
+            <div className="input-wrapper floating-input-group">
               <div className="input-icon">
-                <img src="/images/lockk.png" alt="Confirmar contrasenya" />
+                <img src="/images/lockk.png" alt={t('register_confirm_password')} />
               </div>
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirmar contrasenya"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="auth-input pr-10"
+                className="auth-input floating-input"
+                placeholder=" "
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-3 flex items-center"
-              >
-                <EyeIcon visible={showConfirmPassword} />
-              </button>
+              <label className="floating-label">{t('register_confirm_password')}</label>
+
+              {confirmPassword.length > 0 && (
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                >
+                </button>
+              )}
+
             </div>
 
             <button type="submit" className="auth-button" disabled={loading}>
-              {loading ? "Creant compte..." : "Registrar-se"}
+              {loading ? t('register_creating_account') : t('header_register')}
             </button>
           </form>
 
           {error && <p className="text-red-500 mt-4">{error}</p>}
 
           <p className="auth-footer">
-            Ja tens un compte?{" "}
+              {t('register_has_account')}{" "}
             <button
               type="button"
               onClick={() => { onClose(); openLogin(); }}
               className="auth-link"
             >
-              Inicia sessió
+                {t('register_login_here')}
             </button>
           </p>
         </div>

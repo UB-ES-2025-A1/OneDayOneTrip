@@ -26,9 +26,9 @@ class AuthService {
 
     await updateProfile(user, { displayName: fullname });
 
-
-    // ⚠️ Utilitzem registerUser() que ja adjunta el token automàticament
     await registerUser({ fullname, username, mail });
+
+    localStorage.setItem("uid", user.uid);
 
     return user;
   }
@@ -38,7 +38,10 @@ class AuthService {
    */
   async login(mail: string, password: string) {
     const userCredential = await signInWithEmailAndPassword(auth, mail, password);
-    return userCredential.user;
+    const user = userCredential.user;
+    localStorage.setItem("uid", user.uid);
+
+    return user;
   }
 
   /**
@@ -78,3 +81,8 @@ class AuthService {
 
 export const Auth = new AuthService();
 export { auth };
+
+
+//Per cridar al endpoint de elminar compte, per poder obtenir el verify token s'ha d'utilitzar el següent:
+//firebase.auth().currentUser.getIdToken(/* forceRefresh */ true), si no funciona probar el següent:
+//const tokenDelClient = await user.getIdToken(true);

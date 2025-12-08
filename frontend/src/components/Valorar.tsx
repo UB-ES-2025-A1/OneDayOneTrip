@@ -1,5 +1,6 @@
 import "../styles/Valorar.css";
 import { useState, type JSX } from "react";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface ValorarProps {
   tripId: string;
@@ -8,11 +9,12 @@ interface ValorarProps {
 }
 
 export default function Valorar({ onClose, onSubmit }: ValorarProps) {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(0);
 
   const handleSubmit = () => {
-    onSubmit(rating);  // 👈 cirdem al pare
-    onClose();         // 👈 tanquem el modal
+    onSubmit(rating); 
+    onClose();     
   };
 
   const starElements: JSX.Element[] = [];
@@ -36,7 +38,7 @@ export default function Valorar({ onClose, onSubmit }: ValorarProps) {
   return (
     <div className="valorar-container">
       <div className="valorar-header">
-        <h2 className="valorar-title">Valora aquesta ruta</h2>
+        <h2 className="valorar-title">{t('rate_modal_title')}</h2>
         <button className="valorar-close" onClick={onClose}>
           ✕
         </button>
@@ -53,7 +55,7 @@ export default function Valorar({ onClose, onSubmit }: ValorarProps) {
         disabled={rating === 0}
         onClick={handleSubmit}
       >
-        Enviar valoració
+          {t('rate_modal_submit')}
       </button>
     </div>
   );

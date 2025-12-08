@@ -1,6 +1,5 @@
-import React from "react";
 import { X, Mail, Bell, MessageCircle, Star } from "lucide-react";
-import "../styles/Mailbox.css";
+import "../styles/MailBox.css";
 
 export type NotificationType = "follow" | "comment" | "rating";
 
@@ -18,7 +17,8 @@ export type Notification = {
 type Props = {
   open: boolean;
   onClose: () => void;
-  notifications?: Notification[]; // vindrà del backend
+  notifications?: Notification[];
+  onMarkRead?: (id: string) => void; // NUEVO
 };
 
 function formatDate(dateStr: string) {
@@ -45,7 +45,7 @@ function getIcon(type: NotificationType) {
   }
 }
 
-export default function Mailbox({ open, onClose, notifications }: Props) {
+export default function Mailbox({ open, onClose, notifications, onMarkRead }: Props) {
   if (!open) return null;
 
   const items = notifications || [];
@@ -87,6 +87,9 @@ export default function Mailbox({ open, onClose, notifications }: Props) {
                 <li
                   key={n.id}
                   className={`mailbox-item ${n.read ? "read" : "unread"}`}
+                  onClick={() => {
+                    if (!n.read && onMarkRead) onMarkRead(n.id);
+                  }}
                 >
                   <div className="mailbox-icon">{getIcon(n.type)}</div>
 

@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut, type User as FirebaseUser } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById } from "../api/client";
+import { getUserById, deleteTripAndPublication } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
+import { Settings } from "lucide-react";
 import { ImageOff, Pencil, Mail} from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
@@ -12,8 +13,11 @@ import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal";
 import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
+import UserSettings from "../components/UserSettings";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 import AvatarFallback from "../components/AvatarFallback"; 
 import Mailbox from "../components/Mailbox";
+import useNotifications from "../hooks/useNotifications";
 
 export type BackendUser = {
   uid: string;
@@ -44,6 +48,7 @@ type GridItem = {
 };
 
 export default function UserProfile() {
+  const { t } = useTranslation();
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<BackendUser | null>(null);
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -56,7 +61,14 @@ export default function UserProfile() {
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+
+  // 🗑️ estat per al popup d’eliminació
+  const [tripToDelete, setTripToDelete] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [mailboxOpen, setMailboxOpen] = useState(false);
+  const { notifications, loading: notifLoading, markRead } = useNotifications();
 
 
   const navigate = useNavigate();
@@ -81,6 +93,8 @@ export default function UserProfile() {
         backendUser.llista_seguits = backendUser.llista_seguits || [];
         backendUser.publicacions = backendUser.publicacions || [];
         backendUser.guardades = backendUser.guardades || [];
+        backendUser.llista_bloquejats = backendUser.llista_bloquejats || [];
+        backendUser.llista_bloquejadors = backendUser.llista_bloquejadors || [];
 
         setProfile(backendUser as BackendUser);
 
@@ -92,8 +106,8 @@ export default function UserProfile() {
         );
         setTrips(userTrips);
       } catch (e: any) {
-        console.error("Error carregant perfil:", e);
-        setError(e?.message || "No s'ha pogut carregar el perfil.");
+        console.error(t('profile_error_loading_profile'), e);
+        setError(e?.message || t('profile_error_loading'));
       } finally {
         setLoading(false);
       }
@@ -110,7 +124,7 @@ export default function UserProfile() {
     navigate("/");
   };
 
-  const openRegister = () => alert("Has d'iniciar sessió per continuar.");
+  const openRegister = () => alert(t('profile_login'));
 
   const openSeguidorsModal = async () => {
     if (!profile) return;
@@ -120,7 +134,7 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguidoresModalOpen(true);
     } catch (err) {
-      console.error("Error recarregant seguidors:", err);
+      console.error(t('followers_modal_loading'), err);
     }
   };
 
@@ -132,7 +146,7 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguitsModalOpen(true);
     } catch (err) {
-      console.error("Error recarregant seguits:", err);
+      console.error(t('profile_reloading_following'), err);
     }
   };
 
@@ -146,12 +160,12 @@ export default function UserProfile() {
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((t) => ({
       id: String(t._id),
-      title: t.title || "Sense títol",
+      title: t.title || t('general_no_title'),
       img:
         t.coverImage ||
         (t.gallery && t.gallery[0]) ||
         "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-      user: t.author?.name || "Anònim",
+      user: t.author?.name || t('general_anonymous'),
       rating: typeof t.avgRating === "number" ? t.avgRating : 0,
       temps: t.duration || "—",
       dificultat: t.difficulty || "—",
@@ -160,6 +174,49 @@ export default function UserProfile() {
       country: t.country || "",
     }));
 
+  // 🗑️ Quan fas clic a la brossa: només obrim el popup
+  const askDeleteTrip = (tripId: string) => {
+    setTripToDelete(tripId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDeleteTrip = async () => {
+    if (!currentUser || !profile || !tripToDelete) return;
+
+    try {
+      await deleteTripAndPublication(profile.uid, tripToDelete);
+
+      // Treure-la de trips
+      setTrips((prev) =>
+        prev.filter((t) => String(t._id) !== String(tripToDelete))
+      );
+
+      // Treure-la de publicacions del perfil
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              publicacions: (prev.publicacions || []).filter(
+                (id) => String(id) !== String(tripToDelete)
+              ),
+            }
+          : prev
+      );
+    } catch (err: any) {
+      console.error(t('profile_error_deleting_route'), err);
+      alert(err?.message || t('profile_error_deleting_route'));
+    } finally {
+      setDeleteModalOpen(false);
+      setTripToDelete(null);
+    }
+  };
+
+  // ❌ Cancel·lar popup
+  const handleCancelDeleteTrip = () => {
+    setDeleteModalOpen(false);
+    setTripToDelete(null);
+  };
+
   // ---------------------------
   // Derivats visuals
   // ---------------------------
@@ -167,8 +224,7 @@ export default function UserProfile() {
     profile?.nom_i_cognoms ||
     currentUser?.displayName ||
     profile?.username ||
-    "Usuari";
-
+    t('home_search_user');
   const displayMail = profile?.mail || currentUser?.email || "";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
@@ -190,7 +246,7 @@ export default function UserProfile() {
     selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
 
   
-    const openMailbox = () => {
+  const openMailbox = () => {
     setMailboxOpen(true);
   };
 
@@ -204,7 +260,7 @@ export default function UserProfile() {
       onRegister={() => navigate("/")}
       variant="perfil"
     >
-      {loading && <div className="loading-state">Carregant perfil...</div>}
+      {loading && <div className="loading-state">{t('profile_loading')}</div>}
       {error && !loading && <div className="error-state">{error}</div>}
 
       {currentUser && profile && !loading && (
@@ -216,17 +272,33 @@ export default function UserProfile() {
               position: "relative",
             }}
           >
+          {currentUser && profile && currentUser.uid === profile.uid && (
+              <button className="settings-btn" onClick={() => setSettingsOpen(true)}>
+                <Settings size={36} />
+              </button>
+            )}
+
+            <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}> <Pencil size={22} /></button>
+          
             <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}>
               <Pencil size={22} />
             </button>
 
              <button className="mailbox-btn" onClick={openMailbox}>
               <Mail size={24} />
+
+              {/* BADGE DE NOTIFICACIONES SIN LEER */}
+              {notifications && notifications.some((n) => !n.read) && (
+                <span className="mailbox-badge-icon">
+                  {notifications.filter((n) => !n.read).length}
+                </span>
+              )}
             </button>
+
 
             <div className="user-photo">
               {profile.url_foto_perfil ? (
-                <img src={profile.url_foto_perfil} alt="Foto de perfil" />
+                <img src={profile.url_foto_perfil} alt={t('edit_profile_profile_photo')} />
               ) : (
                 <AvatarFallback name={displayName} />
               )}
@@ -241,22 +313,22 @@ export default function UserProfile() {
               <div className="user-stats">
                 <div className="stat" onClick={openSeguidorsModal}>
                   <span className="number">{seguidors}</span>
-                  <span className="label">Seguidors</span>
+                  <span className="label">{t('followers_modal_title')}</span>
                 </div>
 
                 <div className="stat" onClick={openSeguitsModal}>
                   <span className="number">{seguits}</span>
-                  <span className="label">Seguits</span>
+                  <span className="label">{t('following_modal_title')}</span>
                 </div>
 
                 <div className="stat">
                   <span className="number">{publicacionsItems.length}</span>
-                  <span className="label">Publicacions</span>
+                  <span className="label">{t('profile_tab_publications')}</span>
                 </div>
 
                 <div className="stat">
                   <span className="number">{guardadesItems.length}</span>
-                  <span className="label">Guardades</span>
+                  <span className="label">{t('profile_stat_saved')}</span>
                 </div>
               </div>
             </div>
@@ -269,16 +341,15 @@ export default function UserProfile() {
               }`}
               onClick={() => setSelectedTab("publicacions")}
             >
-              Publicacions
+                {t('profile_stat_publications')}
             </button>
-
             <button
               className={`tab-btn ${
                 selectedTab === "guardat" ? "active" : ""
               }`}
               onClick={() => setSelectedTab("guardat")}
             >
-              Guardat
+                {t('profile_tab_saved')}
             </button>
           </div>
 
@@ -289,6 +360,8 @@ export default function UserProfile() {
               currentUser={currentUser}
               showCreateButton={selectedTab === "publicacions"}
               onCreateTripClick={() => setModalOpen("createTrip")}
+              showDeleteIcon={selectedTab === "publicacions"}
+              onDeleteTrip={askDeleteTrip} 
             />
 
             {gridItems.length === 0 && (
@@ -296,13 +369,13 @@ export default function UserProfile() {
                 <ImageOff className="empty-icon" size={60} />
                 {selectedTab === "publicacions" ? (
                   <>
-                    <h3>Encara no has publicat cap ruta</h3>
-                    <p>Comparteix les teves aventures amb la comunitat!</p>
+                    <h3>{t('profile_empty_publications_title')}</h3>
+                    <p>{t('profile_empty_publications_text')}</p>
                   </>
                 ) : (
                   <>
-                    <h3>Encara no has desat cap ruta</h3>
-                    <p>Explora i desa les teves preferides per més tard.</p>
+                    <h3>{t('profile_empty_saved_title')}</h3>
+                    <p>{t('profile_empty_saved_text')}</p>
                   </>
                 )}
               </div>
@@ -316,8 +389,8 @@ export default function UserProfile() {
               />
             )}
           </section>
-          
-          {/* ---------------- Modals ---------------- */}
+
+          {/* ---------------- Modales ---------------- */}
           {seguitsModalOpen && profile && (
             <LlistaSeguits
               open={seguitsModalOpen}
@@ -333,8 +406,60 @@ export default function UserProfile() {
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
               seguidors={profile.llista_seguidors || []}
-              goToProfile={goToProfile}
+              currentUserId={currentUser.uid}
+              goToProfile={goToProfile} 
             />
+          )}
+          <UserSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+
+          {openEdit && profile && (
+            <EditarPerfil
+              profile={profile}
+              onClose={() => setOpenEdit(false)}
+              onSave={(updated) => {
+                setProfile(updated);
+                setOpenEdit(false);
+              }}
+            />
+          )}
+
+          {deleteModalOpen && ( 
+          <div className="confirm-delete-backdrop">
+            <div className="confirm-delete-modal">
+              <h3>{t('profile_confirm_delete_title')}</h3>
+              <p>
+                  {t('profile_confirm_delete_text')}
+              </p>
+
+              <div className="confirm-delete-buttons">
+                <button
+                  className="btn-secondary"
+                  onClick={handleCancelDeleteTrip}
+                >
+                    {t('general_cancel')}
+                </button>
+                <button
+                  className="btn-danger"
+                  onClick={handleConfirmDeleteTrip}
+                >
+                    {t('general_delete')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+          {openEdit && profile && (
+            <EditarPerfil
+              profile={profile}
+              onClose={() => setOpenEdit(false)}
+              onSave={(updated) => {
+                setProfile(updated);
+                setOpenEdit(false);
+              }}
+            />
+
           )}
 
           {openEdit && profile && (
@@ -348,21 +473,13 @@ export default function UserProfile() {
             />
           )}
 
-                    {openEdit && profile && (
-            <EditarPerfil
-              profile={profile}
-              onClose={() => setOpenEdit(false)}
-              onSave={(updated) => {
-                setProfile(updated);
-                setOpenEdit(false);
-              }}
-            />
-          )}
-
           <Mailbox
             open={mailboxOpen}
             onClose={() => setMailboxOpen(false)}
+            notifications={notifications}
+            onMarkRead={markRead}
           />
+
 
         </>
       )}
