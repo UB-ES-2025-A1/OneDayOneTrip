@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Auth } from "../firebase/auth";
 import ImageCarousel from "./ImageCarousel";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface RegisterProps {
   onClose: () => void;
@@ -9,6 +10,7 @@ interface RegisterProps {
 }
 
 export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,12 +29,12 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
     setError("");
 
     if (!username || !fullName || !email || !password || !confirmPassword) {
-      setError("Tots els camps són obligatoris");
+      setError(t('register_error_all_fields_required'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Les contrasenyes no coincideixen");
+      setError(t('register_error_passwords_match'));
       return;
     }
 
@@ -56,13 +58,13 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
         </button>
 
         <div className="login-form">
-          <h2 className="login-title">Registra't</h2>
+          <h2 className="login-title">{t('login_register_here')}</h2>
 
           <form onSubmit={handleRegister} className="auth-form">
             {/* Nom d'usuari */}
             <div className="input-wrapper floating-input-group">
               <div className="input-icon">
-                <img src="/images/person.png" alt="Usuari" />
+                <img src="/images/person.png" alt={t('general_user')} />
               </div>
               <input
                 type="text"
@@ -72,13 +74,13 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                 className="auth-input floating-input"
                 placeholder=" "
               />
-              <label className="floating-label">Nom d'usuari</label>
+              <label className="floating-label">{t('register_username')}</label>
             </div>
 
             {/* Nom complet */}
             <div className="input-wrapper floating-input-group">
               <div className="input-icon">
-                <img src="/images/person.png" alt="Nom complet" />
+                <img src="/images/person.png" alt={t('register_full_name')} />
               </div>
               <input
                 type="text"
@@ -88,13 +90,13 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                 className="auth-input floating-input"
                 placeholder=" "
               />
-              <label className="floating-label">Nom complet</label>
+              <label className="floating-label">{t('register_full_name')}</label>
             </div>
 
             {/* Correu */}
             <div className="input-wrapper floating-input-group">
               <div className="input-icon">
-                <img src="/images/ema.png" alt="Email" />
+                <img src="/images/ema.png" alt={t('email')} />
               </div>
               <input
                 type="email"
@@ -104,13 +106,13 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                 className="auth-input floating-input"
                 placeholder=" "
               />
-              <label className="floating-label">Correu electrònic</label>
+              <label className="floating-label">{t('login_email')}</label>
             </div>
 
             {/* Contrasenya */}
             <div className="input-wrapper floating-input-group">
               <div className="input-icon">
-                <img src="/images/lockk.png" alt="Contrasenya" />
+                <img src="/images/lockk.png" alt={t('login_password')} />
               </div>
               <input
                 type={showPassword ? "text" : "password"}
@@ -120,7 +122,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                 className="auth-input floating-input"
                 placeholder=" "
               />
-              <label className="floating-label">Contrasenya</label>
+              <label className="floating-label">{t('login_password')}</label>
 
               {password.length > 0 && (
                 <button
@@ -136,7 +138,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
             {/* Confirmar contrasenya */}
             <div className="input-wrapper floating-input-group">
               <div className="input-icon">
-                <img src="/images/lockk.png" alt="Confirmar contrasenya" />
+                <img src="/images/lockk.png" alt={t('register_confirm_password')} />
               </div>
               <input
                 type={showConfirmPassword ? "text" : "password"}
@@ -146,7 +148,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                 className="auth-input floating-input"
                 placeholder=" "
               />
-              <label className="floating-label">Confirmar contrasenya</label>
+              <label className="floating-label">{t('register_confirm_password')}</label>
 
               {confirmPassword.length > 0 && (
                 <button
@@ -188,14 +190,14 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
             </div>
 
             <button type="submit" className="auth-button" disabled={loading}>
-              {loading ? "Creant compte..." : "Registrar-se"}
+              {loading ? t('register_creating_account') : t('header_register')}
             </button>
           </form>
 
           {error && <p className="text-red-500 mt-4">{error}</p>}
 
           <p className="auth-footer">
-            Ja tens un compte?{" "}
+              {t('register_has_account')}{" "}
             <button
               type="button"
               onClick={() => {
@@ -204,7 +206,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
               }}
               className="auth-link"
             >
-              Inicia sessió
+                {t('register_login_here')}
             </button>
           </p>
         </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import '../styles/EtapesList.css';
 import { MapPin } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Etapa {
   id: number;
@@ -16,6 +17,7 @@ interface EtapesListProps {
 }
 
 const EtapesList: React.FC<EtapesListProps> = ({ etapes }) => {
+    const { t } = useTranslation();
   return (
     <div className="etapes-container">
       {etapes.map((etapa, index) => (
@@ -36,7 +38,7 @@ const EtapesList: React.FC<EtapesListProps> = ({ etapes }) => {
             <div className="etapa-ubicacio">
               <MapPin className="etapa-ubi-icon" />
 
-              <span>{etapa.ubicacio || 'Ubicació desconeguda'}</span>
+              <span>{etapa.ubicacio || t('route_detail_location_unknown')}</span>
             </div>
           </div>
           

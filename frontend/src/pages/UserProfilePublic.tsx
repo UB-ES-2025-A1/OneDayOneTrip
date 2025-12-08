@@ -1,20 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  onAuthStateChanged,
-  type User as FirebaseUser,
-  signOut,
-} from "firebase/auth";
+import { onAuthStateChanged, type User as FirebaseUser, signOut } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById, followUser, unfollowUser } from "../api/client";
+import { getUserById, followUser, unfollowUser, blockUser, unblockUser } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
-import { ImageOff } from "lucide-react";
+import { ImageOff, UserX } from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
 import LlistaSeguidorsModal from "../components/LlistaSeguidorsModal";
+import ConfirmBlockModal from "../components/ConfirmBlockModal";
+import ConfirmUnblockModal from "../components/ConfirmUnblockModal";
 import AvatarFallback from "../components/AvatarFallback";
+import { useTranslation } from 'react-i18next';
 
 export type BackendUser = {
   uid: string;
@@ -29,11 +28,14 @@ export type BackendUser = {
   url_foto_perfil?: string;
   url_foto_panell?: string;
   isPrivate?: boolean;
+  llista_bloquejats?: string[];
+  llista_bloquejadors?: string[];
 };
 
 type FollowStatus = "none" | "pending" | "following";
 
 export default function UserProfilePublic() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -46,10 +48,21 @@ export default function UserProfilePublic() {
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
 
-  // 🔹 estat follow
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [followStatus, setFollowStatus] = useState<FollowStatus>("none");
+
+  // Estats de bloqueig (Staging)
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockLoading, setBlockLoading] = useState(false);
+  const [imBlocked, setImBlocked] = useState(false);
+  const [blockStateLoaded, setBlockStateLoaded] = useState(false);
+
+  const profileHidden = isBlocked || imBlocked;
+
+  // Modals de bloqueig (Staging)
+  const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
+  const [confirmUnblockOpen, setConfirmUnblockOpen] = useState(false);
 
   // Detectar usuari loguejat
   useEffect(() => {
@@ -57,7 +70,7 @@ export default function UserProfilePublic() {
     return () => unsub();
   }, []);
 
-  // Carregar perfil públic i trips
+  // Carregar perfil
   useEffect(() => {
     if (!id) return;
 
@@ -66,15 +79,17 @@ export default function UserProfilePublic() {
       try {
         const backendUser = await getUserById(id);
         if (!backendUser) {
-          setError("Usuari no trobat");
+          setError(t('profile_public_error_not_found'));
           setProfile(null);
           setTrips([]);
           return;
         }
-
+        // Assegurar arrays
         backendUser.llista_seguidors = backendUser.llista_seguidors || [];
         backendUser.llista_seguits = backendUser.llista_seguits || [];
         backendUser.publicacions = backendUser.publicacions || [];
+        backendUser.llista_bloquejats = backendUser.llista_bloquejats || [];
+        backendUser.llista_bloquejadors = backendUser.llista_bloquejadors || [];
 
         setProfile(backendUser as BackendUser);
 
@@ -84,7 +99,7 @@ export default function UserProfilePublic() {
         setTrips(userTrips);
       } catch (err) {
         console.error(err);
-        setError("No s'ha pogut carregar el perfil.");
+        setError(t('profile_public_error_loading'));
         setProfile(null);
         setTrips([]);
       } finally {
@@ -93,7 +108,7 @@ export default function UserProfilePublic() {
     };
 
     fetchProfile();
-  }, [id]);
+  }, [id, t]);
 
   // Saber si el currentUser segueix aquest perfil
   useEffect(() => {
@@ -110,20 +125,43 @@ export default function UserProfilePublic() {
     setFollowStatus(alreadyFollowing ? "following" : "none");
   }, [currentUser, profile]);
 
-  // 🔹 Seguir / deixar de seguir (amb estat PENDENT per perfils privats)
+  // Saber si l'hem bloquejat (Staging)
+  useEffect(() => {
+    if (!currentUser || !profile) {
+      setIsBlocked(false);
+      return;
+    }
+    const blocked = profile.llista_bloquejadors || [];
+    setIsBlocked(blocked.includes(currentUser.uid));
+  }, [currentUser, profile]);
+
+  // Saber si ens ha bloquejat (Staging)
+  useEffect(() => {
+    if (!currentUser || !profile) {
+      setImBlocked(false);
+      setBlockStateLoaded(true);
+      return;
+    }
+    const blockedBy = profile.llista_bloquejats || [];
+    setImBlocked(blockedBy.includes(currentUser.uid));
+    setBlockStateLoaded(true);
+  }, [currentUser, profile]);
+
+  // Handle Follow (Fusionat)
   const handleFollow = async () => {
     if (!currentUser) {
-      alert("Has d'iniciar sessió per seguir usuaris");
+      alert(t('profile_public_login_follow_hint'));
       return;
     }
     if (!profile) return;
 
-    const userId = currentUser.uid;
-    const targetId = profile.uid;
     const isPrivateProfile = !!profile.isPrivate;
+    if (isBlocked) return alert("No pots seguir un usuari que has bloquejat."); 
 
     try {
       setFollowLoading(true);
+      const userId = currentUser.uid;
+      const targetId = profile.uid;
 
       // PERFIL PRIVAT → de moment només front-end: PENDENT
       if (isPrivateProfile) {
@@ -160,24 +198,47 @@ export default function UserProfilePublic() {
 
         setProfile((prev) =>
           prev
-            ? {
-                ...prev,
-                llista_seguidors: [...(prev.llista_seguidors || []), userId],
-              }
+            ? { ...prev, llista_seguidors: [...(prev.llista_seguidors || []), userId] }
             : prev
         );
       } else {
         await unfollowUser(userId, targetId);
         setIsFollowing(false);
         setFollowStatus("none");
+        setProfile((prev) =>
+          prev
+            ? { ...prev, llista_seguidors: (prev.llista_seguidors || []).filter((uid) => uid !== userId) }
+            : prev
+        );
+      }
+    } catch (err) {
+      console.error(t('profile_error_unfollowing'), err);
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
+  // Handle Block (Staging)
+  const handleBlock = async () => {
+    if (!currentUser || !profile) return;
+
+    try {
+      setBlockLoading(true);
+      const userId = currentUser.uid;
+      const targetId = profile.uid;
+
+      if (!isBlocked) {
+        await blockUser(userId, targetId);
+        setIsBlocked(true);
+        setIsFollowing(false);
 
         setProfile((prev) =>
           prev
             ? {
                 ...prev,
-                llista_seguidors: (prev.llista_seguidors || []).filter(
-                  (uid) => uid !== userId
-                ),
+                llista_seguidors: (prev.llista_seguidors || []).filter((uid) => uid !== userId),
+                llista_seguits: (prev.llista_seguits || []).filter((uid) => uid !== userId),
+                llista_bloquejadors: [...(prev.llista_bloquejadors || []), userId],
               }
             : prev
         );
@@ -185,7 +246,34 @@ export default function UserProfilePublic() {
     } catch (err) {
       console.error("Error seguint/deixant de seguir:", err);
     } finally {
-      setFollowLoading(false);
+      setBlockLoading(false);
+    }
+  };
+
+  // Handle Unblock (Staging)
+  const handleUnblock = async () => {
+    if (!currentUser || !profile) return;
+
+    try {
+      setBlockLoading(true);
+      const userId = currentUser.uid;
+      const targetId = profile.uid;
+
+      await unblockUser(userId, targetId);
+      setIsBlocked(false);
+
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              llista_bloquejadors: (prev.llista_bloquejadors || []).filter((uid) => uid !== userId),
+            }
+          : prev
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setBlockLoading(false);
     }
   };
 
@@ -196,12 +284,12 @@ export default function UserProfilePublic() {
       .filter((t) => pubIds.has(String(t._id)))
       .map((t) => ({
         id: String(t._id),
-        title: t.title || "Sense títol",
+        title: t.title || ('general_no_title'),
         img:
           t.coverImage ||
           (t.gallery && t.gallery[0]) ||
-          "https://placehold.co/600x400?text=Sense+Imatge",
-        user: t.author?.name || "Anònim",
+          ('general_placeholder_no_image_public'),
+        user: t.author?.name || ('general_anonymous'),
         rating: typeof t.avgRating === "number" ? t.avgRating : 0,
         temps: t.duration || "—",
         dificultat: t.difficulty || "—",
@@ -209,10 +297,14 @@ export default function UserProfilePublic() {
         city: t.city || "",
         country: t.country || "",
       }));
-  }, [trips, profile]);
+  }, [trips, profile, t]);
 
-  const displayName = profile?.nom_i_cognoms || profile?.username || "Usuari";
-  const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
+  // Variables visuals fusionades
+  const displayName = profile?.nom_i_cognoms || profile?.username || t('general_user');
+  
+  const panelUrl = profileHidden
+    ? "" 
+    : profile?.url_foto_panell || "/images/ny.jpg";
 
   const seguidors = profile?.llista_seguidors?.length ?? 0;
   const seguits = profile?.llista_seguits?.length ?? 0;
@@ -261,20 +353,57 @@ export default function UserProfilePublic() {
       onRegister={() => navigate("/")}
       variant="perfil"
     >
-      {loading && <div className="loading-state">Carregant...</div>}
+      {loading && <div className="loading-state">{t('general_loading')}</div>}
       {error && !loading && <div className="error-state">{error}</div>}
 
-      {profile && !loading && (
+      {profile && !loading && blockStateLoaded && (
         <>
           <div
             className="user-profile"
             style={{
-              background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${panelUrl}) center/cover no-repeat`,
+              background: profileHidden
+                ? "rgba(74, 73, 73, 0.67)"
+                : `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url(${panelUrl}) center/cover no-repeat`,
+              position: "relative",
             }}
           >
+            {/* Botó de bloqueig */}
+            {currentUser && currentUser.uid !== profile.uid && !imBlocked && (
+              <button
+                className={`block-button ${isBlocked ? "blocked" : ""}`}
+                onClick={() => {
+                  if (!isBlocked) setConfirmBlockOpen(true);
+                  else setConfirmUnblockOpen(true);
+                }}
+                title={isBlocked ? "Desbloquejar usuari" : "Bloquejar usuari"}
+              >
+                <UserX size={22} />
+              </button>
+            )}
+
+            <ConfirmBlockModal
+              open={confirmBlockOpen}
+              onClose={() => setConfirmBlockOpen(false)}
+              onConfirm={() => {
+                handleBlock();
+                setConfirmBlockOpen(false);
+              }}
+              username={profile?.username || profile?.nom_i_cognoms}
+            />
+
+            <ConfirmUnblockModal
+              open={confirmUnblockOpen}
+              onClose={() => setConfirmUnblockOpen(false)}
+              onConfirm={() => {
+                handleUnblock();
+                setConfirmUnblockOpen(false);
+              }}
+              username={profile?.username || profile?.nom_i_cognoms}
+            />
+
             <div className="user-photo">
               {profile.url_foto_perfil ? (
-                <img src={profile.url_foto_perfil} alt="Foto de perfil" />
+                <img src={profile.url_foto_perfil} alt={t('edit_profile_profile_photo')} />
               ) : (
                 <AvatarFallback name={displayName} />
               )}
@@ -284,129 +413,90 @@ export default function UserProfilePublic() {
               <div className="user-info">
                 <h2>{displayName}</h2>
 
-                {isPrivate && (
-                  <span className="private-badge">Perfil privat</span>
-                )}
-
-                {currentUser && currentUser.uid !== profile.uid && (
+                {currentUser && currentUser.uid !== profile.uid && !imBlocked && (
                   <button
-                    className={buttonClass}
-                    disabled={
-                      followLoading ||
-                      (isPrivate && followStatus === "pending")
-                    }
+                    className={`follow-button ${isFollowing ? "following" : ""}`}
+                    disabled={followLoading || isBlocked}
                     onClick={handleFollow}
                   >
-                    {buttonLabel}
+                    {isFollowing ? t('route_detail_following') : t('route_detail_follow')}
                   </button>
                 )}
               </div>
 
               <div className="user-stats">
                 <div
-                  className="stat"
-                  onClick={() => setSeguidoresModalOpen(true)}
+                  className={`stat ${profileHidden ? "blocked" : ""}`}
+                  onClick={() => !profileHidden && setSeguidoresModalOpen(true)}
                 >
-                  <span className="number">{seguidors}</span>
-                  <span className="label">Seguidors</span>
+                  <span className="number">{profileHidden ? "?" : seguidors}</span>
+                  <span className="label">{t('profile_stat_followers')}</span>
                 </div>
 
-                <div className="stat" onClick={() => setSeguitsModalOpen(true)}>
-                  <span className="number">{seguits}</span>
-                  <span className="label">Seguits</span>
+                <div
+                  className={`stat ${profileHidden ? "blocked" : ""}`}
+                  onClick={() => !profileHidden && setSeguitsModalOpen(true)}
+                >
+                  <span className="number">{profileHidden ? "?" : seguits}</span>
+                  <span className="label">{t('profile_stat_following')}</span>
                 </div>
 
-                <div className="stat">
-                  <span className="number">{publicacionsItems.length}</span>
-                  <span className="label">Publicacions</span>
+                <div className={`stat ${profileHidden ? "blocked" : ""}`}>
+                  <span className="number">{profileHidden ? "?" : publicacionsItems.length}</span>
+                  <span className="label">{t('profile_stat_publications')}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {canViewContent ? (
-            <>
-              <div className="tabs-container1">
-                <h2 className="tab-title">Rutes publicades</h2>
+          <div className="tabs-container1">
+            <h2 className="tab-title">{t('profile_public_title_publications')}</h2>
+          </div>
+
+          <section className="trip-list">
+            {isBlocked ? (
+              <div className="empty-state">
+                <h3>Has bloquejat aquest usuari.</h3> 
               </div>
+            ) : imBlocked ? (
+              <div className="empty-state">
+                <ImageOff className="empty-icon" size={60} />
+                <h3>{t('profile_public_empty_publications')}</h3>
+              </div>
+            ) : (
+              <MasonryGrid
+                items={publicacionsItems}
+                currentUser={currentUser}
+                openRegister={() => alert(t('profile_have_to_login'))}
+                showCreateButton={false}
+              />
+            )}
 
-              <section className="trip-list">
-                <MasonryGrid
-                  items={publicacionsItems}
-                  currentUser={currentUser}
-                  openRegister={() =>
-                    alert("Has d'iniciar sessió per interactuar")
-                  }
-                  showCreateButton={false}
-                />
-
-                {publicacionsItems.length === 0 && (
-                  <div className="empty-state">
+            {!isBlocked && !imBlocked && publicacionsItems.length === 0 && (
+                <div className="empty-state">
                     <ImageOff className="empty-icon" size={60} />
-                    <h3>No hi ha publicacions.</h3>
-                  </div>
-                )}
-              </section>
-            </>
-          ) : (
-            <section className="trip-list">
-              <div className="private-profile-box">
-                <h3>Perfil privat</h3>
-                <p>
-                  Aquest usuari només comparteix les seves rutes amb seguidors
-                  aprovats.
-                </p>
+                    <h3>{t('profile_public_empty_publications')}</h3>
+                </div>
+            )}
+          </section>
 
-                {!currentUser && (
-                  <button
-                    className="btn-primary"
-                    onClick={() =>
-                      alert("Inicia sessió per poder seguir aquest usuari.")
-                    }
-                  >
-                    Inicia sessió per seguir
-                  </button>
-                )}
-
-                {currentUser &&
-                  !isFollowing &&
-                  currentUser.uid !== profile.uid && (
-                    <button
-                      className="btn-primary"
-                      onClick={handleFollow}
-                      disabled={followLoading}
-                    >
-                      {followLoading ? "Processant..." : "Seguir usuari"}
-                    </button>
-                  )}
-
-                {currentUser &&
-                  (isFollowing || currentUser.uid === profile.uid) && (
-                    <p className="private-hint">
-                      Ja tens accés concedit. Si us plau, recarrega la pàgina si
-                      no veus les rutes.
-                    </p>
-                  )}
-              </div>
-            </section>
-          )}
-
-          {seguitsModalOpen && profile && (
+          {seguitsModalOpen && profile && !isBlocked && (
             <LlistaSeguitsModal
               open={seguitsModalOpen}
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
-              goToProfile={goToProfile}
+              goToProfile={goToProfile} 
               currentUserId={currentUser?.uid || ""}
             />
           )}
 
-          {seguidoresModalOpen && profile && (
+          {seguidoresModalOpen && profile && !isBlocked && (
             <LlistaSeguidorsModal
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
               seguidors={profile.llista_seguidors || []}
               goToProfile={goToProfile}
+              currentUserId={currentUser?.uid || ""}
             />
           )}
         </>
