@@ -70,23 +70,38 @@ export async function getAllUsers() {
 }
 
 export async function followUser(userId: string, targetId: string) {
-  // 1) Ejecutar acción follow en backend
   const res = await apiPost(`/users/follow/${userId}/${targetId}`, {});
 
   try {
-    // 2) Obtener datos del usuario que sigue
     const userData = await getUserById(userId);
+    const targetUserData = await getUserById(targetId);
 
-    await createNotification({
-      fromUserId: userId,
-      toUserId: targetId,
-      type: "follow",
-      message: "ha començat a seguir-te",
-      extra: {
-        fromUserName: userData.nom_i_cognoms ?? userData.username ?? "",
-        fromUserAvatar: userData.url_foto_perfil ?? "",
-      },
-    });
+    if (targetUserData.isPrivate) {
+      // Si l'usuari a seguir és privat, s'envia una sol·licitud de seguiment
+      await createNotification({
+        fromUserId: userId,
+        toUserId: targetId,
+        type: "follow_request",
+        message: "t'ha enviat una sol·licitud de seguiment",
+        extra: {
+          fromUserName: userData.nom_i_cognoms ?? userData.username ?? "",
+          fromUserAvatar: userData.url_foto_perfil ?? "",
+          actionButton: true,
+        },
+      });
+    } else {
+      // Si l'usuari a seguir és públic, s'envia una notificación simple
+      await createNotification({
+        fromUserId: userId,
+        toUserId: targetId,
+        type: "follow",
+        message: "ha començat a seguir-te",
+        extra: {
+          fromUserName: userData.nom_i_cognoms ?? userData.username ?? "",
+          fromUserAvatar: userData.url_foto_perfil ?? "",
+        },
+      });
+    }
   } catch (e) {
     console.warn("⚠️ No s'ha pogut crear la notificació de follow:", e);
   }
@@ -95,11 +110,9 @@ export async function followUser(userId: string, targetId: string) {
 }
 
 export async function unfollowUser(userId: string, targetId: string) {
-  // 1) Ejecutar acción unfollow en backend
   const res = await apiPost(`/users/unfollow/${userId}/${targetId}`, {});
 
   try {
-    // 2) Obtener datos del usuario que deja de seguir
     const userData = await getUserById(userId);
 
     await createNotification({
