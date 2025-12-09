@@ -1,7 +1,7 @@
 import { X, Mail, Bell, MessageCircle, Star } from "lucide-react";
 import "../styles/MailBox.css";
 
-export type NotificationType = "follow" | "comment" | "rating";
+export type NotificationType = "follow" | "follow_request" | "comment" | "rating";
 
 export type Notification = {
   id: string;
@@ -36,6 +36,8 @@ function getIcon(type: NotificationType) {
   switch (type) {
     case "follow":
       return <Bell size={18} />;
+    case "follow_request":
+      return <Mail size={18} />;
     case "comment":
       return <MessageCircle size={18} />;
     case "rating":
@@ -107,6 +109,13 @@ export default function Mailbox({ open, onClose, notifications, onMarkRead }: Pr
                       )}
                     </div>
                   </div>
+
+                  {n.type === "follow_request" && !n.read && (
+                    <div className="follow-request-actions">
+                      <button onClick={() => acceptFollowRequest(n.id)}>Acceptar</button>
+                      <button onClick={() => rejectFollowRequest(n.id)}>Rebutjar</button>
+                    </div>
+                  )}
 
                   {!n.read && <span className="mailbox-dot" />}
                 </li>
