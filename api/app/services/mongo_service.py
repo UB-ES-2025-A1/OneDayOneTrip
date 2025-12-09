@@ -25,17 +25,16 @@ try:
     ratings_collection = db["ratings"]
     notifications_collection = db["notification"]
 
-
-    # Índices recomendados
-    # Índices recomendados
+    # Índex recomanats
     comments_collection.create_index([("tripId", ASCENDING), ("createdAt", ASCENDING)])
 
     ratings_collection.create_index([("tripId", ASCENDING)])
     ratings_collection.create_index(
         [("tripId", ASCENDING), ("userId", ASCENDING)], unique=True
     )
-    notifications_collection.create_index([("userId", ASCENDING), ("createdAt", DESCENDING)])
-
+    notifications_collection.create_index(
+        [("userId", ASCENDING), ("createdAt", DESCENDING)]
+    )
 
     print("[INFO] ✅ Connectat correctament a MongoDB.")
 
@@ -202,12 +201,15 @@ def delete_trip(trip_id: str) -> int:
         print(f"[ERROR] No s'ha pogut eliminar la trip {trip_id}: {e}")
         return 0
 
+
 # ============================================================
 # 🔔 NOTIFICATIONS
 # ============================================================
 
 
-def create_notification(from_user_id: str, to_user_id: str, type: str, message: str, extra: dict = None):
+def create_notification(
+    from_user_id: str, to_user_id: str, type: str, message: str, extra: dict = None
+):
     """
     Crea una notificación completa y clara:
       - fromUserId: quien genera la acción
@@ -243,16 +245,18 @@ def list_notifications(user_id: str, only_unread: bool = False):
     formatted = []
     for n in raw:
         extra = n.get("extra", {})
-        formatted.append({
-            "id": str(n["_id"]),
-            "type": n["type"],
-            "fromUserName": extra.get("fromUserName", "Algú"),
-            "fromUserAvatar": extra.get("fromUserAvatar"),
-            "tripTitle": extra.get("tripTitle"),
-            "text": n["message"],
-            "createdAt": n["createdAt"].isoformat(),
-            "read": n["read"],
-        })
+        formatted.append(
+            {
+                "id": str(n["_id"]),
+                "type": n["type"],
+                "fromUserName": extra.get("fromUserName", "Algú"),
+                "fromUserAvatar": extra.get("fromUserAvatar"),
+                "tripTitle": extra.get("tripTitle"),
+                "text": n["message"],
+                "createdAt": n["createdAt"].isoformat(),
+                "read": n["read"],
+            }
+        )
 
     return formatted
 
@@ -260,9 +264,8 @@ def list_notifications(user_id: str, only_unread: bool = False):
 def mark_notification_as_read(notification_id: str):
     try:
         res = notifications_collection.update_one(
-            {"_id": ObjectId(notification_id)},
-            {"$set": {"read": True}}
+            {"_id": ObjectId(notification_id)}, {"$set": {"read": True}}
         )
         return res.modified_count == 1
-    except:
+    except Exception:
         return False

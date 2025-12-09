@@ -3,7 +3,7 @@ from app.models.notification_model import NotificationCreate
 from app.services.mongo_service import (
     create_notification,
     list_notifications,
-    mark_notification_as_read
+    mark_notification_as_read,
 )
 
 router = APIRouter(prefix="/notifications", tags=["Notifications"])
@@ -21,7 +21,7 @@ def add_notification(payload: NotificationCreate):
         to_user_id=payload.toUserId,
         type=payload.type,
         message=payload.message,
-        extra=payload.extra
+        extra=payload.extra,
     )
     return {"id": notif_id}
 
