@@ -58,6 +58,9 @@ export default function RutaDetall() {
   const [isSaved, setIsSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
 
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [imBlocked, setImBlocked] = useState(false);
+
 
   // 🔹 Carregar usuari Firebase + backendUser
   useEffect(() => {
@@ -149,6 +152,14 @@ export default function RutaDetall() {
           const currentUserData = await getUserById(currentUser.uid);
           const savedTrips: string[] = currentUserData.guardades || [];
           setIsSaved(savedTrips.includes(tripData._id));
+
+          // Comprovar si he bloquejat l'autor
+          const bloquejats = currentUserData.llista_bloquejats || [];
+          setIsBlocked(bloquejats.includes(tripData.author.userId));
+
+          // Comprovar si l'autor m'ha bloquejat
+          const imBlockedList = author.llista_bloquejats || [];
+          setImBlocked(imBlockedList.includes(currentUser.uid));
         }
       } catch (e) {
         console.error(t('route_detail_error_author_data'), e);
@@ -376,10 +387,10 @@ export default function RutaDetall() {
             )}
           </div>
 
-          {currentUser && currentUser.uid !== tripData.author.userId && (
+          {currentUser && currentUser.uid !== tripData.author.userId && !imBlocked && (
             <button
               className={`follow-button ${isFollowing ? "following" : isPending ? "pending" : ""}`}
-              disabled={followLoading}
+              disabled={followLoading || isBlocked}
               onClick={handleFollow}
             >
               {isFollowing ? t('route_detail_following') : isPending ? t('route_detail_pending') : t('route_detail_follow')}

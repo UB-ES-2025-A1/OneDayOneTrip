@@ -281,6 +281,15 @@ export default function UserProfilePublic() {
 
   // Convertir Trips → items de grid
   const publicacionsItems = useMemo(() => {
+    // Determinar si puc veure les publicacions del perfil
+    const isOwner = currentUser?.uid === profile?.uid;
+    const isProfilePrivate = !!profile?.isPrivate;
+    
+    // Si el perfil és privat i no sóc propietari ni segueixo, no mostrar rutes
+    if (isProfilePrivate && !isOwner && !isFollowing) {
+      return [];
+    }
+
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return trips
       .filter((t) => pubIds.has(String(t._id)))
@@ -299,7 +308,7 @@ export default function UserProfilePublic() {
         city: t.city || "",
         country: t.country || "",
       }));
-  }, [trips, profile, t]);
+  }, [trips, profile, t, currentUser?.uid, isFollowing]);
 
   // Variables visuals fusionades
   const displayName = profile?.nom_i_cognoms || profile?.username || t('general_user');
@@ -322,12 +331,7 @@ export default function UserProfilePublic() {
     navigate("/");
   };
 
-  // PRIVACITAT
-  const isOwner =
-    currentUser && profile ? currentUser.uid === profile.uid : false;
-
   const isPrivate = !!profile?.isPrivate;
-  const canViewContent = !isPrivate || isOwner || isFollowing;
 
   // Text i estil del botó segons estat
   const buttonLabel = (() => {
