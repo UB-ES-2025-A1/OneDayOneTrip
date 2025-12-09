@@ -27,6 +27,7 @@ import {
   unfollowUser,
   saveTrip,
   unsaveTrip,
+  cancel_follow_request,
 } from "../api/client";
 
 import "dayjs/locale/ca";
@@ -50,10 +51,15 @@ export default function RutaDetall() {
 
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
   const [isSaved, setIsSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [imBlocked, setImBlocked] = useState(false);
 
 
   // 🔹 Carregar usuari Firebase + backendUser
@@ -82,7 +88,7 @@ export default function RutaDetall() {
     navigate("/");
   };
 
-  // 🔹 Carregar ruta
+  // 🔹 Carregar ruta + Comprovar accés
   useEffect(() => {
     const fetchTrip = async () => {
       if (!id) {
@@ -94,28 +100,72 @@ export default function RutaDetall() {
       try {
         setLoading(true);
 
+        let tripData: Trip | null = null;
+
         if (isMongoObjectId(id)) {
           const data = await getTripById(id);
-          setTripData(data);
+          tripData = data;
           setMainImage(data.coverImage || data.gallery?.[0] || "");
         } else if (isNumericIndex(id)) {
           const trips = await getAllTrips(false);
           const idx = parseInt(id) - 1;
 
           const tripAtIndex = trips[idx];
-          if (tripAtIndex?._id)
+          if (tripAtIndex?._id) {
             navigate(`/ruta/${tripAtIndex._id}`, { replace: true });
+            return;
+          }
         } else {
           setError(t('route_detail_error_id_invalid'));
+          return;
         }
+
+        // Comprovar accés a la ruta
+        if (tripData && tripData.author?.userId) {
+          const author = await getUserById(tripData.author.userId);
+
+          // Si hi ha usuari loguejat, comprovar bloqueigs i privacitat
+          if (currentUser) {
+            const currentUserData = await getUserById(currentUser.uid);
+            const isOwner = currentUser.uid === tripData.author.userId;
+
+            // Comprovar si he bloquejat l'autor
+            const bloquejats = currentUserData.llista_bloquejats || [];
+            const amBlocked = bloquejats.includes(tripData.author.userId);
+
+            // Comprovar si l'autor m'ha bloquejat
+            const imBlockedList = author.llista_bloquejats || [];
+            const authorBlockedMe = imBlockedList.includes(currentUser.uid);
+
+            // Si jo he bloquejat o l'autor m'ha bloquejat
+            if (!isOwner && (amBlocked || authorBlockedMe)) {
+              setError(t('route_detail_error_not_found'));
+              return;
+            }
+
+            // Si el perfil és privat i no segueixo
+            const followersList: string[] = author.llista_seguidors || [];
+            const isFollowingNow = followersList.includes(currentUser.uid);
+
+            if (!isOwner && author.isPrivate && !isFollowingNow) {
+              setError(t('route_detail_error_not_found'));
+              return;
+            }
+          }
+        }
+
+        setTripData(tripData);
       } catch {
         setError(t('route_detail_error_loading'));
       } finally {
         setLoading(false);
       }
     };
-    fetchTrip();
-  }, [id, navigate]);
+    
+    if (currentUser !== undefined) {
+      fetchTrip();
+    }
+  }, [id, navigate, currentUser, t]);
 
   // 🔹 Dades de l'autor
   useEffect(() => {
@@ -131,14 +181,31 @@ export default function RutaDetall() {
           : 0;
 
         setFollowersCount(count);
+        setIsPrivate(author.isPrivate || false);
 
         if (currentUser) {
           const followersList: string[] = author.llista_seguidors || [];
-          setIsFollowing(followersList.includes(currentUser.uid));
+          const isFollowingNow = followersList.includes(currentUser.uid);
+          setIsFollowing(isFollowingNow);
+
+          // Comprovar si hi ha sol·licitud de seguiment pendent
+          const solicituds = author.llista_solicitud_seguidors || [];
+          const hasSolicited = solicituds.includes(currentUser.uid);
+          setIsPending(hasSolicited && !isFollowingNow);
 
           const currentUserData = await getUserById(currentUser.uid);
           const savedTrips: string[] = currentUserData.guardades || [];
           setIsSaved(savedTrips.includes(tripData._id));
+
+          // Comprovar si he bloquejat l'autor
+          const bloquejats = currentUserData.llista_bloquejats || [];
+          const amBlocked = bloquejats.includes(tripData.author.userId);
+          setIsBlocked(amBlocked);
+
+          // Comprovar si l'autor m'ha bloquejat
+          const imBlockedList = author.llista_bloquejats || [];
+          const authorBlockedMe = imBlockedList.includes(currentUser.uid);
+          setImBlocked(authorBlockedMe);
         }
       } catch (e) {
         console.error(t('route_detail_error_author_data'), e);
@@ -158,14 +225,26 @@ export default function RutaDetall() {
     try {
       setFollowLoading(true);
 
-      if (!isFollowing) {
+      if (!isFollowing && !isPending) {
+        // Seguir l'usuari
         await followUser(userId, targetId);
-        setIsFollowing(true);
-        setFollowersCount((v) => (v ?? 0) + 1);
-      } else {
+        
+        // Si és privat, mostrar pendent; si és públic, mostrar following
+        if (isPrivate) {
+          setIsPending(true);
+        } else {
+          setIsFollowing(true);
+          setFollowersCount((v) => (v ?? 0) + 1);
+        }
+      } else if (isFollowing) {
+        // Deixar de seguir
         await unfollowUser(userId, targetId);
         setIsFollowing(false);
         setFollowersCount((v) => Math.max(0, (v ?? 0) - 1));
+      } else if (isPending) {
+        // Cancelar sol·licitud pendent
+        await cancel_follow_request(userId, targetId);
+        setIsPending(false);
       }
     } catch (err) {
       console.error(t('route_detail_error_following'), err);
@@ -239,7 +318,7 @@ export default function RutaDetall() {
   if (loading) return <div className="loading">{t('general_loading_route')}</div>;
   if (error || !tripData)
     return (
-      <div className="error">
+      <div className="error" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', textAlign: 'center', gap: '20px' }}>
         <p>{error || t('route_detail_error_not_found')}</p>
         <button onClick={() => navigate(-1)}>← {t('route_detail_back')}</button>
       </div>
@@ -364,13 +443,13 @@ export default function RutaDetall() {
             )}
           </div>
 
-          {currentUser && currentUser.uid !== tripData.author.userId && (
+          {currentUser && currentUser.uid !== tripData.author.userId && !imBlocked && (
             <button
-              className={`follow-button ${isFollowing ? "following" : ""}`}
-              disabled={followLoading}
+              className={`follow-button ${isFollowing ? "following" : isPending ? "pending" : ""}`}
+              disabled={followLoading || isBlocked}
               onClick={handleFollow}
             >
-              {isFollowing ? t('route_detail_following') : t('route_detail_follow')}
+              {isFollowing ? t('route_detail_following') : isPending ? t('route_detail_pending') : t('route_detail_follow')}
             </button>
           )}
         </div>

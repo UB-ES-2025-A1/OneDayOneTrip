@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, type User as FirebaseUser, signOut } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById, followUser, unfollowUser, blockUser, unblockUser } from "../api/client";
+import { getUserById, followUser, unfollowUser, blockUser, unblockUser, cancel_follow_request } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { ImageOff, UserX } from "lucide-react";
@@ -27,9 +27,12 @@ export type BackendUser = {
   publicacions?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
+  isPrivate?: boolean;
   llista_bloquejats?: string[];
   llista_bloquejadors?: string[];
 };
+
+type FollowStatus = "none" | "pending" | "following";
 
 export default function UserProfilePublic() {
   const { t } = useTranslation();
@@ -47,6 +50,7 @@ export default function UserProfilePublic() {
 
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [followStatus, setFollowStatus] = useState<FollowStatus>("none");
 
   // Estats de bloqueig (Staging)
   const [isBlocked, setIsBlocked] = useState(false);
@@ -106,14 +110,19 @@ export default function UserProfilePublic() {
     fetchProfile();
   }, [id, t]);
 
-  // Saber si el seguim
+  // Saber si el currentUser segueix aquest perfil
   useEffect(() => {
     if (!currentUser || !profile) {
       setIsFollowing(false);
+      setFollowStatus("none");
       return;
     }
+
     const followers = profile.llista_seguidors || [];
-    setIsFollowing(followers.includes(currentUser.uid));
+    const alreadyFollowing = followers.includes(currentUser.uid);
+
+    setIsFollowing(alreadyFollowing);
+    setFollowStatus(alreadyFollowing ? "following" : "none");
   }, [currentUser, profile]);
 
   // Saber si l'hem bloquejat (Staging)
@@ -145,6 +154,8 @@ export default function UserProfilePublic() {
       return;
     }
     if (!profile) return;
+
+    const isPrivateProfile = !!profile.isPrivate;
     if (isBlocked) return alert("No pots seguir un usuari que has bloquejat."); 
 
     try {
@@ -152,22 +163,44 @@ export default function UserProfilePublic() {
       const userId = currentUser.uid;
       const targetId = profile.uid;
 
-      if (!isFollowing) {
+      // Si no segueix, intentar seguir
+      if (followStatus === "none") {
         await followUser(userId, targetId);
-        setIsFollowing(true);
-        setProfile((prev) =>
-          prev
-            ? { ...prev, llista_seguidors: [...(prev.llista_seguidors || []), userId] }
-            : prev
-        );
-      } else {
+        
+        // Actualitzar estat segons si el perfil és privat o públic
+        if (isPrivateProfile) {
+          // Perfil privat → estat pending
+          setFollowStatus("pending");
+        } else {
+          // Perfil públic → estat following
+          setIsFollowing(true);
+          setFollowStatus("following");
+          setProfile((prev) =>
+            prev
+              ? { ...prev, llista_seguidors: [...(prev.llista_seguidors || []), userId] }
+              : prev
+          );
+        }
+      } else if (followStatus === "following") {
+        // Si ja segueix, deixar de seguir
         await unfollowUser(userId, targetId);
         setIsFollowing(false);
+        setFollowStatus("none");
+
         setProfile((prev) =>
           prev
-            ? { ...prev, llista_seguidors: (prev.llista_seguidors || []).filter((uid) => uid !== userId) }
+            ? {
+                ...prev,
+                llista_seguidors: (prev.llista_seguidors || []).filter(
+                  (uid) => uid !== userId
+                ),
+              }
             : prev
         );
+      } else if (followStatus === "pending") {
+        // Si la sol·licitud està pending, cancel·lar-la
+        await cancel_follow_request(userId, targetId);
+        setFollowStatus("none");
       }
     } catch (err) {
       console.error(t('profile_error_unfollowing'), err);
@@ -235,7 +268,18 @@ export default function UserProfilePublic() {
     }
   };
 
+  // Convertir Trips → items de grid
   const publicacionsItems = useMemo(() => {
+
+    // Determinar si puc veure les publicacions del perfil
+    const isOwner = currentUser?.uid === profile?.uid;
+    const isProfilePrivate = !!profile?.isPrivate;
+    
+    // Si el perfil és privat i no sóc propietari ni segueixo, no mostrar rutes
+    if (isProfilePrivate && !isOwner && !isFollowing) {
+      return [];
+    }
+
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return trips
       .filter((t) => pubIds.has(String(t._id)))
@@ -276,6 +320,26 @@ export default function UserProfilePublic() {
     await signOut(auth);
     navigate("/");
   };
+  
+  const isPrivate = !!profile?.isPrivate;
+
+  // Text i estil del botó segons estat
+  const buttonLabel = (() => {
+    if (isPrivate) {
+      if (followStatus === "pending") return "Pendent";
+      if (followStatus === "following") return "Seguint";
+      return "Seguir";
+    }
+    return isFollowing ? "Seguint" : "Seguir";
+  })();
+
+  const buttonClass = `follow-button ${
+    isPrivate && followStatus === "pending"
+      ? "pending"
+      : isFollowing || followStatus === "following"
+      ? "following"
+      : ""
+  }`;
 
   return (
     <Layout
@@ -347,11 +411,11 @@ export default function UserProfilePublic() {
 
                 {currentUser && currentUser.uid !== profile.uid && !imBlocked && (
                   <button
-                    className={`follow-button ${isFollowing ? "following" : ""}`}
+                    className={buttonClass}
                     disabled={followLoading || isBlocked}
                     onClick={handleFollow}
                   >
-                    {isFollowing ? t('route_detail_following') : t('route_detail_follow')}
+                    {buttonLabel}
                   </button>
                 )}
               </div>

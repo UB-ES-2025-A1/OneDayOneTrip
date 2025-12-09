@@ -5,12 +5,15 @@ import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { deleteAccount } from "../api/client";
 import i18n from "../i18n/i18n";
-import { useTranslation } from 'react-i18next'; // Importa el hook
+import { useTranslation } from 'react-i18next';
+import type { BackendUser } from "../pages/UserProfile";
 
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  profile: BackendUser;
+  onSavePrivacy?: (updatedProfile: BackendUser) => void;
 };
 
 // Funció per decidir tema inicial (localStorage o preferència del sistema)
@@ -24,7 +27,7 @@ function getInitialTheme(): "light" | "dark" {
   return prefersDark ? "dark" : "light";
 }
 
-export default function UserSettings({ open, onClose }: Props) {
+export default function UserSettings({ open, profile, onClose, onSavePrivacy }: Props) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,14 +36,16 @@ export default function UserSettings({ open, onClose }: Props) {
 
   const [language, setLanguage] = useState(i18n.language || "ca");
 
+  const [privacyLoading, setPrivacyLoading] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(profile.isPrivate || false);
+
   const changeLanguage = (lng: string) => {
       i18n.changeLanguage(lng);
       setLanguage(lng);
       localStorage.setItem("lang", lng);
   };
 
-
-    // Cada cop que canvia el tema → actualitzem l'HTML i el guardem
+  // Cada cop que canvia el tema → actualitzem l'HTML i el guardem
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
@@ -48,6 +53,50 @@ export default function UserSettings({ open, onClose }: Props) {
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+
+  const handleChangePrivacy = async (newPrivacy: boolean) => {
+    try {
+      setPrivacyLoading(true);
+      setError("");
+
+      const formData = new FormData();
+
+      const jsonData = {
+        isPrivate: newPrivacy,
+      };
+
+      // FastAPI requereix user_json com string
+      formData.append("user_json", JSON.stringify(jsonData));
+
+      const response = await fetch(
+        `http://127.0.0.1:8000/users/update/${profile.uid}`,
+        {
+          method: "PATCH",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.detail || t('profile_error_updating'));
+      }
+
+      // Actualitzem l'estat local
+      setIsPrivate(newPrivacy);
+
+      const updatedProfile: BackendUser = {
+        ...profile,
+        isPrivate: newPrivacy,
+      };
+
+      if (onSavePrivacy) onSavePrivacy(updatedProfile);
+    } catch (e: any) {
+      console.error(t('error'), e);
+      setError(e?.message || t('profile_error_updating'));
+    } finally {
+      setPrivacyLoading(false);
+    }
   };
 
   if (!open) return null;
@@ -100,7 +149,6 @@ export default function UserSettings({ open, onClose }: Props) {
         <h2 className="settings-title">{t('profile_settings_button')}</h2>
 
         <div className="settings-content">
-          {/* 🌙 Aparença / Mode fosc */}
           <div className="settings-section">
             <h3 className="settings-subtitle">{t('settings_subtitle_appearance')}</h3>
 
@@ -131,32 +179,63 @@ export default function UserSettings({ open, onClose }: Props) {
             </div>
           </div>
 
-            <div className="settings-section">
-                <h3 className="settings-subtitle">{t('language')}</h3>
+          <div className="settings-section">
+            <h3 className="settings-subtitle">Privacitat</h3>
 
-                <div className="settings-row">
-                    <div className="settings-row-info">
-                        <span className="settings-row-label">{t('select_language')}</span>
-                    </div>
+            <div className="settings-row">
+              <div className="settings-row-info">
+                <span className="settings-row-label">
+                  Perfil {isPrivate ? "privat" : "públic"}
+                </span>
+                <span className="settings-row-helper">
+                  {isPrivate
+                    ? "Només els seguidors aprovats podran veure el teu perfil i les teves rutes."
+                    : "Qualsevol usuari podrà veure el teu perfil i les teves rutes."}
+                </span>
+              </div>
 
-                    <div className="settings-select-wrapper">
-                      <select
-                        className="settings-select"
-                        value={language}
-                        onChange={(e) => changeLanguage(e.target.value)}
-                      >
-                        <option value="ca">Català</option>
-                        <option value="es">Castellà</option>
-                        <option value="en">English</option>
-                      </select>
-                      <span className="settings-select-arrow">▾</span>
-                    </div>
-
+              {/* Toggle senzill per privacitat (reutilitza l'estil) */}
+              <label className="toggle-wrapper">
+                <input
+                  type="checkbox"
+                  className="toggle-checkbox"
+                  checked={isPrivate}
+                  onChange={(e) => handleChangePrivacy(e.target.checked)}
+                  disabled={privacyLoading}
+                />
+                <div className="toggle-slot">
+                  <div className="toggle-button" />
                 </div>
+              </label>
             </div>
+          </div>
+
+          <div className="settings-section">
+              <h3 className="settings-subtitle">{t('language')}</h3>
+
+              <div className="settings-row">
+                  <div className="settings-row-info">
+                      <span className="settings-row-label">{t('select_language')}</span>
+                  </div>
+
+                  <div className="settings-select-wrapper">
+                    <select
+                      className="settings-select"
+                      value={language}
+                      onChange={(e) => changeLanguage(e.target.value)}
+                    >
+                      <option value="ca">Català</option>
+                      <option value="es">Castellà</option>
+                      <option value="en">English</option>
+                    </select>
+                    <span className="settings-select-arrow">▾</span>
+                  </div>
+
+              </div>
+          </div>
 
 
-            {/* 🗑️ Secció eliminar compte */}
+          {/* 🗑️ Secció eliminar compte */}
           <div className="settings-section">
             <p className="settings-warning">
                 {t('settings_warning_delete')}

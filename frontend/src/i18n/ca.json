@@ -27,6 +27,7 @@
   "route_detail_followers": "seguidor",
   "route_detail_followers_plural": "seguidors",
   "route_detail_following": "Seguint",
+  "route_detail_pending": "Pendent",
   "route_detail_follow": "Seguir",
   "route_detail_description_title": "Descripció",
   "route_detail_stages_title": "Etapes de la Ruta",
@@ -71,6 +72,9 @@
   "profile_public_login_follow_hint": "Has d'iniciar sessió per seguir usuaris",
   "profile_error_unfollowing": "Error seguint/seguint deixant:",
   "profile_have_to_login": "Has de iniciar sessió per interactuar",
+  "user_profile_follow": "Seguir",
+  "user_profile_following": "Seguint",
+  "user_profile_pending": "Pendent",
 
   "general_home": "Pàgina principal",
   "general_loading": "Carregant...",
