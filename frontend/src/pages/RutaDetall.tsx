@@ -124,12 +124,6 @@ export default function RutaDetall() {
         if (tripData && tripData.author?.userId) {
           const author = await getUserById(tripData.author.userId);
 
-          // Si no hi ha usuari loguejat i el perfil és privat, no mostrar la ruta
-          if (!currentUser && author.isPrivate) {
-            setError(t('route_detail_error_not_found'));
-            return;
-          }
-
           // Si hi ha usuari loguejat, comprovar bloqueigs i privacitat
           if (currentUser) {
             const currentUserData = await getUserById(currentUser.uid);
@@ -152,10 +146,8 @@ export default function RutaDetall() {
             // Si el perfil és privat i no segueixo
             const followersList: string[] = author.llista_seguidors || [];
             const isFollowingNow = followersList.includes(currentUser.uid);
-            const solicituds = author.llista_solicitud_seguidors || [];
-            const hasSolicited = solicituds.includes(currentUser.uid);
 
-            if (!isOwner && author.isPrivate && !isFollowingNow && !hasSolicited) {
+            if (!isOwner && author.isPrivate && !isFollowingNow) {
               setError(t('route_detail_error_not_found'));
               return;
             }
