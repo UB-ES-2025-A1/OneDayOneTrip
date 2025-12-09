@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, type User as FirebaseUser, signOut } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById, followUser, unfollowUser, blockUser, unblockUser } from "../api/client";
+import { getUserById, followUser, unfollowUser, blockUser, unblockUser, cancel_follow_request } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { ImageOff, UserX } from "lucide-react";
@@ -24,6 +24,7 @@ export type BackendUser = {
   seguits?: number;
   llista_seguidors?: string[];
   llista_seguits?: string[];
+  llista_solicitud_seguidors?: string[];
   publicacions?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
@@ -110,7 +111,7 @@ export default function UserProfilePublic() {
     fetchProfile();
   }, [id, t]);
 
-  // Saber si el currentUser segueix aquest perfil
+  // Saber si el currentUser segueix aquest perfil o ha sol·licitat seguir-lo
   useEffect(() => {
     if (!currentUser || !profile) {
       setIsFollowing(false);
@@ -121,8 +122,18 @@ export default function UserProfilePublic() {
     const followers = profile.llista_seguidors || [];
     const alreadyFollowing = followers.includes(currentUser.uid);
 
+    const solicituds = profile.llista_solicitud_seguidors || [];
+    const hasSolicited = solicituds.includes(currentUser.uid);
+
     setIsFollowing(alreadyFollowing);
-    setFollowStatus(alreadyFollowing ? "following" : "none");
+    
+    if (alreadyFollowing) {
+      setFollowStatus("following");
+    } else if (hasSolicited) {
+      setFollowStatus("pending");
+    } else {
+      setFollowStatus("none");
+    }
   }, [currentUser, profile]);
 
   // Saber si l'hem bloquejat (Staging)
@@ -163,53 +174,44 @@ export default function UserProfilePublic() {
       const userId = currentUser.uid;
       const targetId = profile.uid;
 
-      // PERFIL PRIVAT → de moment només front-end: PENDENT
-      if (isPrivateProfile) {
-        if (followStatus === "none") {
-          // TODO: quan el backend tingui endpoint de sol·licitud, cridar-lo aquí
-          // await requestFollow(userId, targetId);
+      // Si no segueix, intentar seguir
+      if (followStatus === "none") {
+        await followUser(userId, targetId);
+        
+        // Actualitzar estat segons si el perfil és privat o públic
+        if (isPrivateProfile) {
+          // Perfil privat → estat pending
           setFollowStatus("pending");
-        } else if (followStatus === "following") {
-          // Si ja seguia i vol deixar de seguir en un perfil privat aprovat
-          await unfollowUser(userId, targetId);
-          setIsFollowing(false);
-          setFollowStatus("none");
-
+        } else {
+          // Perfil públic → estat following
+          setIsFollowing(true);
+          setFollowStatus("following");
           setProfile((prev) =>
             prev
-              ? {
-                  ...prev,
-                  llista_seguidors: (prev.llista_seguidors || []).filter(
-                    (uid) => uid !== userId
-                  ),
-                }
+              ? { ...prev, llista_seguidors: [...(prev.llista_seguidors || []), userId] }
               : prev
           );
         }
-        // Si està "pending", de moment no fem res (en el futur podria ser "cancel·lar sol·licitud")
-        return;
-      }
-
-      // PERFIL PÚBLIC → lògica actual de seguir / deixar de seguir
-      if (!isFollowing) {
-        await followUser(userId, targetId);
-        setIsFollowing(true);
-        setFollowStatus("following");
-
-        setProfile((prev) =>
-          prev
-            ? { ...prev, llista_seguidors: [...(prev.llista_seguidors || []), userId] }
-            : prev
-        );
-      } else {
+      } else if (followStatus === "following") {
+        // Si ja segueix, deixar de seguir
         await unfollowUser(userId, targetId);
         setIsFollowing(false);
         setFollowStatus("none");
+
         setProfile((prev) =>
           prev
-            ? { ...prev, llista_seguidors: (prev.llista_seguidors || []).filter((uid) => uid !== userId) }
+            ? {
+                ...prev,
+                llista_seguidors: (prev.llista_seguidors || []).filter(
+                  (uid) => uid !== userId
+                ),
+              }
             : prev
         );
+      } else if (followStatus === "pending") {
+        // Si la sol·licitud està pending, cancel·lar-la
+        await cancel_follow_request(userId, targetId);
+        setFollowStatus("none");
       }
     } catch (err) {
       console.error(t('profile_error_unfollowing'), err);
@@ -415,11 +417,11 @@ export default function UserProfilePublic() {
 
                 {currentUser && currentUser.uid !== profile.uid && !imBlocked && (
                   <button
-                    className={`follow-button ${isFollowing ? "following" : ""}`}
+                    className={buttonClass}
                     disabled={followLoading || isBlocked}
                     onClick={handleFollow}
                   >
-                    {isFollowing ? t('route_detail_following') : t('route_detail_follow')}
+                    {buttonLabel}
                   </button>
                 )}
               </div>
