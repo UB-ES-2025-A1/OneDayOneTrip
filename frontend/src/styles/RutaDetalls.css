@@ -574,6 +574,13 @@
   border-color: #2e7d32;
 }
 
+/* Estat quan la sol·licitud està pending (perfil privat) */
+.follow-button.pending {
+  background-color: #9e9e9e !important;
+  color: white !important;
+  border-color: #9e9e9e;
+}
+
 .follow-button:disabled {
   opacity: 0.6;
   cursor: default;
