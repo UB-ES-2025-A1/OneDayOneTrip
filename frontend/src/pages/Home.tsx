@@ -88,23 +88,82 @@ export default function Home() {
       try {
         setLoading(true);
         const data = await getAllTrips(true);
-        setTrips(data);
+        
+        // Si no hi ha usuari loguejat, mostrar només les rutes de perfils públics
+        if (!currentUser) {
+          const filteredData = await Promise.all(
+            data.map(async (trip) => {
+              const authorId = trip.author?.userId;
+              if (!authorId) return trip;
+
+              try {
+                const author = await getUserById(authorId);
+                // Si el perfil és privat, ocultar la ruta
+                if (author?.isPrivate) {
+                  return null;
+                }
+                return trip;
+              } catch {
+                return trip;
+              }
+            })
+          );
+          setTrips(filteredData.filter((trip) => trip !== null) as Trip[]);
+          return;
+        }
+
+        // Si hi ha usuari loguejat, filtrar segons bloquejats i privats
+        const filteredData = await Promise.all(
+          data.map(async (trip) => {
+            const authorId = trip.author?.userId;
+            if (!authorId) return trip;
+
+            try {
+              // Comprovar si l'usuari m'ha bloquejat
+              const bloquejatsForm = backendUser?.llista_bloquejadors || [];
+              if (bloquejatsForm.includes(authorId)) {
+                return null;
+              }
+
+              // Comprovar si jo he bloquejat l'usuari
+              const bloquejats = backendUser?.llista_bloquejats || [];
+              if (bloquejats.includes(authorId)) {
+                return null;
+              }
+
+              const author = await getUserById(authorId);
+              
+              // Si el perfil és privat i no el segueixo i no sóc jo, ocultar la ruta
+              if (author?.isPrivate) {
+                const seguits = backendUser?.llista_seguits || [];
+                const isOwner = currentUser?.uid === authorId;
+                
+                // Si no segueixo i no sóc propietari, retornar null
+                if (!isOwner && !seguits.includes(authorId)) {
+                  return null;
+                }
+              }
+              
+              return trip;
+            } catch {
+              return trip;
+            }
+          })
+        );
+        
+        // Eliminar les rutes null
+        setTrips(filteredData.filter((trip) => trip !== null) as Trip[]);
       } catch {
         setError(t('home_error_loading_routes'));
       } finally {
         setLoading(false);
       }
     };
+    
     fetchTrips();
-  }, []);
+  }, [currentUser, backendUser, t]);
 
     const filteredTrips = trips
-        // Eliminem les rutes dels usuaris que tenim bloquejats
-        .filter((t) => {
-            const authorId = t.author?.userId;
-            const bloquejats = backendUser?.llista_bloquejats || [];
-            return !bloquejats.includes(authorId);
-        })
 
         // Mostrem les rutes dels usuaris que no seguim
         .filter((t) => {
@@ -241,12 +300,12 @@ export default function Home() {
           <MasonryGrid
             items={visibleTrips.map((t) => ({
               id: normalizeId(t._id),
-              title: t.title || t('general_no_title'),
+              title: t.title || ('general_no_title'),
               img:
                 t.coverImage ||
                 (t.gallery && t.gallery[0]) ||
                 "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-              user: t.author?.name || t('general_anonymous'),
+              user: t.author?.name || ('general_anonymous'),
               rating: typeof t.avgRating === "number" ? t.avgRating : 0,
               temps: t.duration || "—",
               dificultat: t.difficulty || "—",
