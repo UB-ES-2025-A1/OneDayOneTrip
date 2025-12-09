@@ -272,64 +272,69 @@ export default function RutaDetall() {
       <div className="ruta-detall">
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
-  
-          <div className="ruta-actions">            
+
+          <div className="ruta-actions">
+
             {/* Esquerra: Rating + Valorar */}
             <div className="ruta-actions-left">
               {tripData.avgRating != null && (
-              <div className="rating-summary">
-                <span className="rating-star">★</span>
-                <span className="rating-value">
-                  {tripData.avgRating.toFixed(1)}
-                </span>
-                <span className="rating-count">
-                  ({tripData.numRatings})
-                </span>
-              </div>
-            )}
-          <div className="ruta-actions-buttons">
-            <button
-              className="valorar-button"
-              onClick={() => setShowRatingModal(true)}
-            >
-              <span className="valorar-icon">★</span>
+                <div className="rating-summary">
+                  <span className="rating-star">★</span>
+                  <span className="rating-value">
+                    {tripData.avgRating.toFixed(1)}
+                  </span>
+                  <span className="rating-count">
+                    ({tripData.numRatings})
+                  </span>
+                </div>
+              )}
+            </div>  {/* ✅ CIERRE QUE FALTABA */}
+
+            <div className="ruta-actions-buttons">
+              {/* Botón Valorar */}
+              <button
+                className="valorar-button"
+                onClick={() => setShowRatingModal(true)}
+              >
+                <span className="valorar-icon">★</span>
                 {t('route_detail_rate')}
-            </button>
-            {/* Dreta: Botó Guardar */}
-            <button
-              type="button"
-              className={`guardar-button ${isSaved ? "saved" : ""}`}
-              onClick={handleSaveTrip}
-              disabled={saveLoading}
-            >
-              <label className="ui-bookmark">
+              </button>
+
+              {/* Botón Guardar */}
+              <button
+                type="button"
+                className={`guardar-button ${isSaved ? "saved" : ""}`}
+                onClick={handleSaveTrip}
+                disabled={saveLoading}
+              >
                 <svg
                   className="bookmark"
                   viewBox="0 0 24 24"
                   width="24"
                   height="24"
                 >
-                  <label className="ui-bookmark">
-                    <svg
-                      className="bookmark"
-                      viewBox="0 0 24 24"
-                      width="24"
-                      height="24"
-                    >
-                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 
-                          2 8.5 2 5.42 4.42 3 7.5 3 
-                          c1.74 0 3.41 0.81 4.5 2.09 
-                          C13.09 3.81 14.76 3 16.5 3 
-                          C19.58 3 22 5.42 22 8.5 
-                          c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  <path
+                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 
+                      2 8.5 2 5.42 4.42 3 7.5 3 
+                      c1.74 0 3.41 0.81 4.5 2.09 
+                      C13.09 3.81 14.76 3 16.5 3 
+                      C19.58 3 22 5.42 22 8.5 
+                      c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                  />
                 </svg>
-              </label>
-              <span className="guardar-text">
-                {isSaved ? t('route_detail_saved') : saveLoading ? t('route_detail_saving') : t('route_detail_save')}
-              </span>
-            </button>
+
+                <span className="guardar-text">
+                  {isSaved
+                    ? t('route_detail_saved')
+                    : saveLoading
+                    ? t('route_detail_saving')
+                    : t('route_detail_save')}
+                </span>
+              </button>
             </div>
+
           </div>
+
         </div>
 
         {/* Ubicació */}
