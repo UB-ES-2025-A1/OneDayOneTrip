@@ -1,48 +1,91 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Configuración de Playwright para tests e2e
+ * Configuración de Playwright para tests E2E
+ * 
+ * Estos tests están diseñados para ejecutarse contra:
+ * - Backend API real con MongoDB (via Docker o local)
+ * - Frontend de desarrollo
+ * 
  * @see https://playwright.dev/docs/test-configuration
  */
+
+// URL del backend (puede ser override via env)
+const API_URL = process.env.API_URL || 'http://localhost:8001';
+const FRONTEND_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
+
 export default defineConfig({
   testDir: './e2e',
-  /* Ejecutar tests en paralelo */
+  
+  /* Configuración general */
   fullyParallel: true,
-  /* Fallar el build en CI si accidentalmente dejaste test.only en el código */
   forbidOnly: !!process.env.CI,
-  /* Reintentar en CI */
-  retries: process.env.CI ? 2 : 0,
-  /* Opciones para workers */
+  retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
-  /* Configuración del reporter */
-  reporter: 'html',
-  /* Configuración compartida para todos los proyectos */
-  use: {
-    /* URL base para usar en acciones como `await page.goto('/')`. */
-    baseURL: 'http://localhost:5173',
-    /* Recopilar trace cuando se repite un test fallido. */
-    trace: 'on-first-retry',
-    /* Screenshot solo en fallos */
-    screenshot: 'only-on-failure',
+  
+  /* Timeouts */
+  timeout: 60 * 1000, // 60 segundos por test
+  expect: {
+    timeout: 10 * 1000, // 10 segundos para assertions
   },
 
-  /* Configurar proyectos para múltiples navegadores */
+  /* Reporters */
+  reporter: process.env.CI 
+    ? [['github'], ['html', { open: 'never' }]]
+    : [['list'], ['html', { open: 'on-failure' }]],
+
+  /* Configuración compartida para todos los proyectos */
+  use: {
+    /* URL base */
+    baseURL: FRONTEND_URL,
+    
+    /* Traces y screenshots */
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'on-first-retry',
+    
+    /* Acciones más lentas para debugging */
+    actionTimeout: 15 * 1000,
+    navigationTimeout: 30 * 1000,
+    
+    /* Headers adicionales si necesitas pasar info al backend */
+    extraHTTPHeaders: {
+      'X-E2E-Test': 'true',
+    },
+  },
+
+  /* Proyectos de navegadores */
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        // Viewport consistente para tests
+        viewport: { width: 1280, height: 720 },
+      },
     },
+    // Descomentar para probar en más navegadores
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'] },
+    // },
+    // {
+    //   name: 'mobile-chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
   ],
 
-  /* Ejecutar el servidor de desarrollo local antes de iniciar los tests */
-  /* Descomentar para iniciar servidor automáticamente (puede ser lento) */
-  webServer: {
+  /* Servidor de desarrollo */
+  webServer: process.env.CI ? undefined : {
     command: 'npm run dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 180 * 1000, // 3 minutos
+    url: FRONTEND_URL,
+    reuseExistingServer: true,
+    timeout: 180 * 1000,
     stdout: 'ignore',
     stderr: 'pipe',
   },
+
+  /* Output de tests */
+  outputDir: 'test-results/',
 });
 

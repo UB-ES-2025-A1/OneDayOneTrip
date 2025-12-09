@@ -1,0 +1,303 @@
+# ============================================================
+# 🎭 E2E Tests - GitHub Actions Workflow
+# ============================================================
+# 
+# Este workflow ejecuta tests E2E con Playwright usando una
+# base de datos MongoDB real en Docker para pruebas de integración.
+#
+# Se ejecuta en:
+# - Pull Requests a main/develop
+# - Push a main/develop (opcional)
+# - Manualmente via workflow_dispatch
+
+name: E2E Tests
+
+on:
+  pull_request:
+    branches: [main, develop, master]
+    paths:
+      - 'frontend/**'
+      - 'api/**'
+      - 'docker-compose.e2e.yml'
+      - '.github/workflows/e2e-tests.yml'
+  
+  push:
+    branches: [main, develop, master]
+    paths:
+      - 'frontend/**'
+      - 'api/**'
+  
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run with debug logging'
+        required: false
+        default: false
+
+# Cancelar ejecuciones anteriores del mismo PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
+  # URLs para E2E
+  API_URL: 'http://localhost:8001'
+  FRONTEND_URL: 'http://localhost:5173'
+
+jobs:
+  # ============================================================
+  # 📋 Job 1: Preparación y validación
+  # ============================================================
+  prepare:
+    name: 🔍 Validar cambios
+    runs-on: ubuntu-latest
+    outputs:
+      should_run_e2e: ${{ steps.check.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check if E2E tests should run
+        id: check
+        run: |
+          # Siempre ejecutar si es workflow_dispatch
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Verificar si hay archivos de test E2E
+          if [ -d "frontend/e2e" ] && [ "$(ls -A frontend/e2e/flows/*.spec.ts 2>/dev/null)" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+            echo "⚠️ No E2E test files found, skipping"
+          fi
+
+  # ============================================================
+  # 🐳 Job 2: Levantar infraestructura y ejecutar tests
+  # ============================================================
+  e2e-tests:
+    name: 🎭 E2E Tests
+    needs: prepare
+    if: needs.prepare.outputs.should_run_e2e == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    services:
+      # MongoDB para tests E2E
+      mongo:
+        image: mongo:7.0
+        ports:
+          - 27018:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # ────────────────────────────────────────────────────────
+      # 📥 Checkout y setup
+      # ────────────────────────────────────────────────────────
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: api/requirements.txt
+
+      # ────────────────────────────────────────────────────────
+      # 📦 Instalar dependencias
+      # ────────────────────────────────────────────────────────
+      - name: 📦 Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: 📦 Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install chromium --with-deps
+
+      - name: 📦 Install backend dependencies
+        working-directory: api
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest httpx  # Para tests
+
+      # ────────────────────────────────────────────────────────
+      # 🔧 Configurar entorno de tests
+      # ────────────────────────────────────────────────────────
+      - name: 🔧 Create E2E environment files
+        run: |
+          # Frontend .env para E2E
+          cat > frontend/.env.e2e << EOF
+          VITE_API_URL=http://localhost:8001
+          VITE_E2E_MODE=true
+          EOF
+          
+          # Backend .env para E2E
+          cat > api/.env << EOF
+          MONGO_URI=mongodb://localhost:27018/OneDayOneTrip_E2E
+          E2E_MODE=true
+          FIREBASE_CREDENTIALS=${{ secrets.FIREBASE_CREDENTIALS_E2E }}
+          EOF
+
+      # ────────────────────────────────────────────────────────
+      # 🚀 Iniciar servicios
+      # ────────────────────────────────────────────────────────
+      - name: 🚀 Start backend API
+        working-directory: api
+        run: |
+          # Iniciar API en background
+          uvicorn app.main:app --host 0.0.0.0 --port 8001 &
+          echo "API_PID=$!" >> $GITHUB_ENV
+          
+          # Esperar a que la API esté lista
+          echo "⏳ Waiting for API to be ready..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8001/ > /dev/null; then
+              echo "✅ API is ready!"
+              break
+            fi
+            echo "Attempt $i/30..."
+            sleep 2
+          done
+        env:
+          MONGO_URI: mongodb://localhost:27018/OneDayOneTrip_E2E
+
+      - name: 🚀 Start frontend dev server
+        working-directory: frontend
+        run: |
+          # Iniciar frontend en background
+          npm run dev &
+          echo "FRONTEND_PID=$!" >> $GITHUB_ENV
+          
+          # Esperar a que el frontend esté listo
+          echo "⏳ Waiting for frontend to be ready..."
+          for i in {1..30}; do
+            if curl -s http://localhost:5173/ > /dev/null; then
+              echo "✅ Frontend is ready!"
+              break
+            fi
+            echo "Attempt $i/30..."
+            sleep 2
+          done
+
+      # ────────────────────────────────────────────────────────
+      # 🧪 Ejecutar tests E2E
+      # ────────────────────────────────────────────────────────
+      - name: 🎭 Run E2E tests
+        working-directory: frontend
+        run: |
+          npx playwright test --reporter=github,html
+        env:
+          CI: true
+          PLAYWRIGHT_BASE_URL: http://localhost:5173
+          API_URL: http://localhost:8001
+
+      # ────────────────────────────────────────────────────────
+      # 📊 Subir artefactos
+      # ────────────────────────────────────────────────────────
+      - name: 📊 Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
+      - name: 📸 Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-screenshots
+          path: frontend/test-results/
+          retention-days: 7
+
+      # ────────────────────────────────────────────────────────
+      # 🧹 Cleanup
+      # ────────────────────────────────────────────────────────
+      - name: 🧹 Cleanup processes
+        if: always()
+        run: |
+          # Matar procesos de fondo
+          kill ${{ env.API_PID }} 2>/dev/null || true
+          kill ${{ env.FRONTEND_PID }} 2>/dev/null || true
+
+  # ============================================================
+  # 📝 Job 3: Comentar resultados en PR
+  # ============================================================
+  comment-results:
+    name: 📝 Report Results
+    needs: e2e-tests
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Download test report
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+        continue-on-error: true
+
+      - name: 📝 Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            const status = '${{ needs.e2e-tests.result }}';
+            const statusEmoji = status === 'success' ? '✅' : status === 'failure' ? '❌' : '⚠️';
+            
+            let comment = `## ${statusEmoji} E2E Test Results\n\n`;
+            comment += `**Status:** ${status}\n`;
+            comment += `**Workflow:** [View Details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})\n\n`;
+            
+            if (status === 'success') {
+              comment += '🎉 All E2E tests passed!\n';
+            } else if (status === 'failure') {
+              comment += '❌ Some E2E tests failed. Please check the [workflow logs](';
+              comment += `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}).\n\n`;
+              comment += 'Download the **playwright-report** artifact to see detailed results.\n';
+            }
+            
+            // Buscar comentario existente para actualizarlo
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(c => 
+              c.user.type === 'Bot' && c.body.includes('E2E Test Results')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
