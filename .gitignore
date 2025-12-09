@@ -93,6 +93,11 @@ frontend/dist
 frontend/dist-ssr
 frontend/*.local
 
+# Playwright
+frontend/test-results/
+frontend/playwright-report/
+frontend/playwright/.cache/
+
 # -----------------------------------
 # IDE y SO - Reglas generales (sin prefijo de carpeta)
 # -----------------------------------
