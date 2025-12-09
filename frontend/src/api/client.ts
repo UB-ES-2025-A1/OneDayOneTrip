@@ -77,6 +77,11 @@ export async function unfollowUser(userId: string, targetId: string) {
   return apiPost(`/users/unfollow/${userId}/${targetId}`, {});
 }
 
+// Eliminar sol·licitud de seguiment
+export async function cancel_follow_request(userId: string, targetId: string) {
+  return apiPost(`/users/cancel_follow_request/${userId}/${targetId}`, {});
+}
+
 // Guardar una ruta
 export async function saveTrip(userId: string, tripId: string) {
   return apiPost(`/users/save/${userId}/${tripId}`, {});
