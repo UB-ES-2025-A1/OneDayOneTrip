@@ -332,11 +332,11 @@ export default function UserProfilePublic() {
   // Text i estil del botó segons estat
   const buttonLabel = (() => {
     if (isPrivate) {
-      if (followStatus === "pending") return "Pendent";
-      if (followStatus === "following") return "Seguint";
-      return "Seguir";
+      if (followStatus === "pending") return t('user_profile_pending');
+      if (followStatus === "following") return t('user_profile_following');
+      return t('user_profile_follow');
     }
-    return isFollowing ? "Seguint" : "Seguir";
+    return isFollowing ? t('user_profile_following') : t('user_profile_follow');
   })();
 
   const buttonClass = `follow-button ${

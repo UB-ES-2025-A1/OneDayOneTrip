@@ -27,6 +27,7 @@
   "route_detail_followers": "follower",
   "route_detail_followers_plural": "followers",
   "route_detail_following": "Following",
+  "route_detail_pending": "Pending",
   "route_detail_follow": "Follow",
   "route_detail_description_title": "Description",
   "route_detail_stages_title": "Route Stages",
@@ -64,6 +65,9 @@
   "profile_public_error_not_found": "User not found",
   "profile_public_error_loading": "Could not load profile.",
   "profile_public_login_follow_hint": "You must log in to follow users",
+  "user_profile_follow": "Follow",
+  "user_profile_following": "Following",
+  "user_profile_pending": "Pending",
 
   "general_home": "Home Page",
   "general_loading": "Loading...",

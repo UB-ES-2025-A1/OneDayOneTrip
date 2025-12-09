@@ -27,6 +27,7 @@ import {
   unfollowUser,
   saveTrip,
   unsaveTrip,
+  cancel_follow_request,
 } from "../api/client";
 
 import "dayjs/locale/ca";
@@ -50,6 +51,8 @@ export default function RutaDetall() {
 
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
   const [isSaved, setIsSaved] = useState(false);
@@ -131,10 +134,17 @@ export default function RutaDetall() {
           : 0;
 
         setFollowersCount(count);
+        setIsPrivate(author.isPrivate || false);
 
         if (currentUser) {
           const followersList: string[] = author.llista_seguidors || [];
-          setIsFollowing(followersList.includes(currentUser.uid));
+          const isFollowingNow = followersList.includes(currentUser.uid);
+          setIsFollowing(isFollowingNow);
+
+          // Comprovar si hi ha sol·licitud de seguiment pendent
+          const solicituds = author.llista_solicitud_seguidors || [];
+          const hasSolicited = solicituds.includes(currentUser.uid);
+          setIsPending(hasSolicited && !isFollowingNow);
 
           const currentUserData = await getUserById(currentUser.uid);
           const savedTrips: string[] = currentUserData.guardades || [];
@@ -158,14 +168,26 @@ export default function RutaDetall() {
     try {
       setFollowLoading(true);
 
-      if (!isFollowing) {
+      if (!isFollowing && !isPending) {
+        // Seguir l'usuari
         await followUser(userId, targetId);
-        setIsFollowing(true);
-        setFollowersCount((v) => (v ?? 0) + 1);
-      } else {
+        
+        // Si és privat, mostrar pendent; si és públic, mostrar following
+        if (isPrivate) {
+          setIsPending(true);
+        } else {
+          setIsFollowing(true);
+          setFollowersCount((v) => (v ?? 0) + 1);
+        }
+      } else if (isFollowing) {
+        // Deixar de seguir
         await unfollowUser(userId, targetId);
         setIsFollowing(false);
         setFollowersCount((v) => Math.max(0, (v ?? 0) - 1));
+      } else if (isPending) {
+        // Cancelar sol·licitud pendent
+        await cancel_follow_request(userId, targetId);
+        setIsPending(false);
       }
     } catch (err) {
       console.error(t('route_detail_error_following'), err);
@@ -356,11 +378,11 @@ export default function RutaDetall() {
 
           {currentUser && currentUser.uid !== tripData.author.userId && (
             <button
-              className={`follow-button ${isFollowing ? "following" : ""}`}
+              className={`follow-button ${isFollowing ? "following" : isPending ? "pending" : ""}`}
               disabled={followLoading}
               onClick={handleFollow}
             >
-              {isFollowing ? t('route_detail_following') : t('route_detail_follow')}
+              {isFollowing ? t('route_detail_following') : isPending ? t('route_detail_pending') : t('route_detail_follow')}
             </button>
           )}
         </div>
