@@ -25,9 +25,7 @@ try:
     ratings_collection = db["ratings"]
     notifications_collection = db["notification"]
 
-
-    # Índices recomendados
-    # Índices recomendados
+    # Índex recomanats
     comments_collection.create_index([("tripId", ASCENDING), ("createdAt", ASCENDING)])
 
     ratings_collection.create_index([("tripId", ASCENDING)])
@@ -35,7 +33,6 @@ try:
         [("tripId", ASCENDING), ("userId", ASCENDING)], unique=True
     )
     notifications_collection.create_index([("userId", ASCENDING), ("createdAt", DESCENDING)])
-
 
     print("[INFO] ✅ Connectat correctament a MongoDB.")
 
@@ -264,5 +261,5 @@ def mark_notification_as_read(notification_id: str):
             {"$set": {"read": True}}
         )
         return res.modified_count == 1
-    except:
+    except Exception:
         return False

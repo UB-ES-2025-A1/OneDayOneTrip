@@ -337,6 +337,7 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
         "publicacions": list(publicacions),
     }
 
+
 @router.post("/removefollower/{user_id}/{target_id}")
 async def remove_follower(user_id: str, target_id: str):
     """
@@ -370,6 +371,7 @@ async def remove_follower(user_id: str, target_id: str):
     target_ref.update({"llista_seguits": firestore.ArrayRemove([user_id])})
 
     return {"message": "Seguidor eliminat correctament"}
+
 
 @router.delete("/delete/{user_id}")
 async def delete_account(
