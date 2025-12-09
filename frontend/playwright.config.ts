@@ -17,6 +17,9 @@ const FRONTEND_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
 export default defineConfig({
   testDir: './e2e',
   
+  /* Global Setup - crea datos de prueba antes de los tests */
+  globalSetup: './e2e/global-setup.ts',
+  
   /* Configuración general */
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

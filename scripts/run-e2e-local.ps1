@@ -65,3 +65,4 @@ Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "`n🧹 Para limpiar cuando termines:" -ForegroundColor Yellow
 Write-Host "   docker-compose -f docker-compose.e2e.yml down -v" -ForegroundColor Gray
 
+

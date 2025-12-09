@@ -65,10 +65,19 @@ export async function waitForPageLoad(page: Page) {
  * Limpia el estado de autenticación
  */
 export async function clearAuthState(page: Page) {
-  await page.evaluate(() => {
-    localStorage.clear();
-    sessionStorage.clear();
-  });
+  try {
+    // Solo limpiar si la página está en un estado que lo permita
+    await page.evaluate(() => {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {
+        // Ignorar errores de acceso a storage
+      }
+    });
+  } catch {
+    // Ignorar errores si la página no está lista
+  }
 }
 
 /**

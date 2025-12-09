@@ -17,9 +17,9 @@ test.describe('Autenticación - Flujo de Login', () => {
 
   test('debería mostrar errores de validación con campos vacíos', async ({ page }) => {
     // Abrir modal de login
-    await page.getByRole('button', { name: /login|iniciar/i }).click();
+    await page.locator('.header-btn.login, button:has-text("Log in"), button:has-text("Iniciar")').first().click();
     
-    const loginModal = page.locator('.login-card, .modal-backdrop');
+    const loginModal = page.locator('.login-card');
     await expect(loginModal).toBeVisible();
 
     // Intentar enviar formulario vacío
@@ -34,7 +34,7 @@ test.describe('Autenticación - Flujo de Login', () => {
 
   test('debería mostrar error con credenciales inválidas', async ({ page }) => {
     // Abrir modal de login
-    await page.getByRole('button', { name: /login|iniciar/i }).click();
+    await page.locator('.header-btn.login, button:has-text("Log in"), button:has-text("Iniciar")').first().click();
     
     // Rellenar con credenciales inválidas
     await page.fill('input[type="email"]', 'fake@notexist.com');
@@ -53,7 +53,7 @@ test.describe('Autenticación - Flujo de Login', () => {
   });
 
   test('debería validar formato de email', async ({ page }) => {
-    await page.getByRole('button', { name: /login|iniciar/i }).click();
+    await page.locator('.header-btn.login, button:has-text("Log in"), button:has-text("Iniciar")').first().click();
     
     const emailInput = page.locator('input[type="email"]');
     await emailInput.fill('invalid-email');
@@ -67,7 +67,7 @@ test.describe('Autenticación - Flujo de Login', () => {
   });
 
   test('debería mostrar/ocultar contraseña si hay toggle', async ({ page }) => {
-    await page.getByRole('button', { name: /login|iniciar/i }).click();
+    await page.locator('.header-btn.login, button:has-text("Log in"), button:has-text("Iniciar")').first().click();
     
     const passwordInput = page.locator('input[type="password"]');
     await passwordInput.fill('TestPassword123');
@@ -85,7 +85,7 @@ test.describe('Autenticación - Flujo de Login', () => {
   });
 
   test('debería poder abrir modal de recuperar contraseña', async ({ page }) => {
-    await page.getByRole('button', { name: /login|iniciar/i }).click();
+    await page.locator('.header-btn.login, button:has-text("Log in"), button:has-text("Iniciar")').first().click();
     
     // Buscar link de "olvidé mi contraseña"
     const forgotPasswordLink = page.locator('button:has-text("olvidat"), button:has-text("forgot"), .auth-link').first();
@@ -112,9 +112,9 @@ test.describe('Autenticación - Flujo de Registro', () => {
   });
 
   test('debería abrir el formulario de registro correctamente', async ({ page }) => {
-    await page.getByRole('button', { name: /regist/i }).click();
+    await page.locator('.header-btn.register, button:has-text("Sign up"), button:has-text("Regist")').first().click();
     
-    const registerModal = page.locator('.modal-backdrop, .register-card');
+    const registerModal = page.locator('.register-card');
     await expect(registerModal).toBeVisible();
 
     // Verificar que hay campos específicos de registro
@@ -127,7 +127,7 @@ test.describe('Autenticación - Flujo de Registro', () => {
   });
 
   test('debería validar campos requeridos en registro', async ({ page }) => {
-    await page.getByRole('button', { name: /regist/i }).click();
+    await page.locator('.header-btn.register, button:has-text("Sign up"), button:has-text("Regist")').first().click();
     
     // Intentar enviar formulario vacío
     const submitButton = page.locator('button[type="submit"], .auth-button').first();
@@ -142,7 +142,7 @@ test.describe('Autenticación - Flujo de Registro', () => {
   });
 
   test('debería mostrar requisitos de contraseña', async ({ page }) => {
-    await page.getByRole('button', { name: /regist/i }).click();
+    await page.locator('.header-btn.register, button:has-text("Sign up"), button:has-text("Regist")').first().click();
     
     const passwordInput = page.locator('input[type="password"]').first();
     await passwordInput.fill('weak');
@@ -156,7 +156,7 @@ test.describe('Autenticación - Flujo de Registro', () => {
   });
 
   test('debería navegar de registro a login', async ({ page }) => {
-    await page.getByRole('button', { name: /regist/i }).click();
+    await page.locator('.header-btn.register, button:has-text("Sign up"), button:has-text("Regist")').first().click();
     
     // Buscar link "Ya tienes cuenta? Inicia sesión"
     const loginLink = page.locator('button.auth-link:has-text("inicia"), button:has-text("login"), a:has-text("inicia")').first();
@@ -172,7 +172,7 @@ test.describe('Autenticación - Flujo de Registro', () => {
   });
 
   test('debería validar que las contraseñas coinciden', async ({ page }) => {
-    await page.getByRole('button', { name: /regist/i }).click();
+    await page.locator('.header-btn.register, button:has-text("Sign up"), button:has-text("Regist")').first().click();
     
     const passwordInputs = page.locator('input[type="password"]');
     const passwordCount = await passwordInputs.count();
@@ -203,7 +203,7 @@ test.describe('Autenticación - Persistencia de Sesión', () => {
     await waitForPageLoad(page);
     
     // Verificar estado inicial (no logueado)
-    const loginButton = page.getByRole('button', { name: /login|iniciar/i });
+    const loginButton = page.locator('.header-btn.login, button:has-text("Log in"), button:has-text("Iniciar")').first();
     
     // Si el botón de login está visible, el usuario no está logueado
     if (await loginButton.isVisible()) {
@@ -226,14 +226,14 @@ test.describe('Autenticación - Persistencia de Sesión', () => {
     await waitForPageLoad(page);
     
     // Buscar botón de logout (solo visible si hay sesión)
-    const logoutButton = page.locator('button:has-text("Tancar"), button:has-text("logout"), button:has-text("Cerrar")');
+    const logoutButton = page.locator('.header-btn.logout, button:has-text("Log out"), button:has-text("Tancar"), button:has-text("Cerrar")');
     
     if (await logoutButton.isVisible()) {
       await logoutButton.click();
       await page.waitForTimeout(1000);
       
       // Después del logout, debería verse el botón de login
-      const loginButton = page.getByRole('button', { name: /login|iniciar/i });
+      const loginButton = page.locator('.header-btn.login, button:has-text("Log in"), button:has-text("Iniciar")').first();
       await expect(loginButton).toBeVisible();
     }
   });
@@ -249,7 +249,7 @@ test.describe('Autenticación - Reset de Contraseña', () => {
 
   test('debería mostrar formulario de reset password', async ({ page }) => {
     // Abrir login primero
-    await page.getByRole('button', { name: /login|iniciar/i }).click();
+    await page.locator('.header-btn.login, button:has-text("Log in"), button:has-text("Iniciar")').first().click();
     
     // Buscar y hacer clic en "olvidé contraseña"
     const forgotLink = page.locator('.auth-link, button:has-text("olvidat"), button:has-text("forgot")').first();
@@ -265,7 +265,7 @@ test.describe('Autenticación - Reset de Contraseña', () => {
   });
 
   test('debería validar email en reset password', async ({ page }) => {
-    await page.getByRole('button', { name: /login|iniciar/i }).click();
+    await page.locator('.header-btn.login, button:has-text("Log in"), button:has-text("Iniciar")').first().click();
     
     const forgotLink = page.locator('.auth-link, button:has-text("olvidat")').first();
     
@@ -287,7 +287,7 @@ test.describe('Autenticación - Reset de Contraseña', () => {
   });
 
   test('debería poder volver al login desde reset password', async ({ page }) => {
-    await page.getByRole('button', { name: /login|iniciar/i }).click();
+    await page.locator('.header-btn.login, button:has-text("Log in"), button:has-text("Iniciar")').first().click();
     
     const forgotLink = page.locator('.auth-link, button:has-text("olvidat")').first();
     
@@ -310,4 +310,5 @@ test.describe('Autenticación - Reset de Contraseña', () => {
     }
   });
 });
+
 

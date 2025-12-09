@@ -73,3 +73,4 @@ echo ""
 echo "🧹 Para limpiar cuando termines:"
 echo "   docker-compose -f docker-compose.e2e.yml down -v"
 
+
