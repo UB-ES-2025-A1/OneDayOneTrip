@@ -1,5 +1,21 @@
 import { vi } from 'vitest';
 
+// Mock react-i18next to return the key as the translation (for testing)
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      changeLanguage: vi.fn(),
+      language: 'ca'
+    }
+  }),
+  Trans: ({ children }: { children: React.ReactNode }) => children,
+  initReactI18next: {
+    type: '3rdParty',
+    init: vi.fn()
+  }
+}));
+
 // Mock global de fetch para evitar unhandled rejections en tests
 // En lugar de rechazar siempre, devolvemos una respuesta por defecto
 // Los tests individuales pueden sobrescribir esto si necesitan comportamiento específico

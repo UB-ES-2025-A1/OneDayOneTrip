@@ -2,16 +2,22 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut, type User as FirebaseUser } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById } from "../api/client";
+import { getUserById, deleteTripAndPublication } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
-import { ImageOff, Pencil } from "lucide-react"; 
+import { Settings } from "lucide-react";
+import { ImageOff, Pencil, Mail} from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
 import LlistaSeguits from "../components/LlistaSeguitsModal";
 import EditarPerfil from "../components/EditarPerfilModal";
 import LlistaSeguidors from "../components/LlistaSeguidorsModal";
 import CreateTripForm from "../components/CreateTripForm";
+import UserSettings from "../components/UserSettings";
+import { useTranslation } from 'react-i18next'; // Importa el hook
+import AvatarFallback from "../components/AvatarFallback"; 
+import Mailbox from "../components/Mailbox";
+import useNotifications from "../hooks/useNotifications";
 
 export type BackendUser = {
   uid: string;
@@ -22,10 +28,15 @@ export type BackendUser = {
   seguits?: number;
   llista_seguidors?: string[];
   llista_seguits?: string[];
+  llista_solicitud_seguidors?: string[];
+  llista_solicitud_seguits?: string[];
+  llista_bloquejats?: string[];
+  llista_bloquejadors?: string[];
   publicacions?: string[];
   guardades?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
+  isPrivate?: boolean;
 };
 
 type GridItem = {
@@ -42,21 +53,54 @@ type GridItem = {
 };
 
 export default function UserProfile() {
+  const { t } = useTranslation();
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<BackendUser | null>(null);
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [selectedTab, setSelectedTab] = useState<"publicacions" | "guardat">("publicacions");
+  const [selectedTab, setSelectedTab] = useState<"publicacions" | "guardat">(
+    "publicacions"
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [openEdit, setOpenEdit] = useState(false);
   const [modalOpen, setModalOpen] = useState<"createTrip" | null>(null);
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [tripToDelete, setTripToDelete] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [mailboxOpen, setMailboxOpen] = useState(false);
+  const {
+    notifications,
+    markRead,
+    refreshNotifications,
+    removeLocal,
+  } = useNotifications();
+
 
   const navigate = useNavigate();
 
+  const refreshProfile = async () => {
+    if (!currentUser) return;
+    try {
+      const updatedProfile = await getUserById(currentUser.uid);
+      updatedProfile.llista_seguidors = updatedProfile.llista_seguidors || [];
+      updatedProfile.llista_seguits = updatedProfile.llista_seguits || [];
+      updatedProfile.llista_solicitud_seguidors = updatedProfile.llista_solicitud_seguidors || [];
+      updatedProfile.llista_solicitud_seguits = updatedProfile.llista_solicitud_seguits || [];
+      updatedProfile.publicacions = updatedProfile.publicacions || [];
+      updatedProfile.guardades = updatedProfile.guardades || [];
+      updatedProfile.llista_bloquejats = updatedProfile.llista_bloquejats || [];
+      updatedProfile.llista_bloquejadors = updatedProfile.llista_bloquejadors || [];
+
+      setProfile(updatedProfile as BackendUser);
+    } catch (err) {
+      console.error("Error refrescant el perfil", err);
+    }
+  };
+
   // ---------------------------
-  // Cargar usuario y trips
+  // Carregar usuari i trips
   // ---------------------------
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
@@ -73,19 +117,25 @@ export default function UserProfile() {
         const backendUser = await getUserById(fbUser.uid);
         backendUser.llista_seguidors = backendUser.llista_seguidors || [];
         backendUser.llista_seguits = backendUser.llista_seguits || [];
+        backendUser.llista_solicitud_seguidors = backendUser.llista_solicitud_seguidors || [];
+        backendUser.llista_solicitud_seguits = backendUser.llista_solicitud_seguits || [];
         backendUser.publicacions = backendUser.publicacions || [];
         backendUser.guardades = backendUser.guardades || [];
+        backendUser.llista_bloquejats = backendUser.llista_bloquejats || [];
+        backendUser.llista_bloquejadors = backendUser.llista_bloquejadors || [];
 
         setProfile(backendUser as BackendUser);
 
-        const allTrips = await getAllTrips(true);
+        const allTrips = await getAllTrips(true, t);
         const pubIds = new Set(backendUser.publicacions.map(String));
         const guardIds = new Set(backendUser.guardades.map(String));
-        const userTrips = allTrips.filter(t => pubIds.has(String(t._id)) || guardIds.has(String(t._id)));
+        const userTrips = allTrips.filter(
+          (t) => pubIds.has(String(t._id)) || guardIds.has(String(t._id))
+        );
         setTrips(userTrips);
       } catch (e: any) {
-        console.error("Error carregant perfil:", e);
-        setError(e?.message || "No s'ha pogut carregar el perfil.");
+        console.error(t('profile_error_loading_profile'), e);
+        setError(e?.message || t('profile_error_loading'));
       } finally {
         setLoading(false);
       }
@@ -95,14 +145,14 @@ export default function UserProfile() {
   }, []);
 
   // ---------------------------
-  // Funciones
+  // Funcions
   // ---------------------------
   const handleLogout = async () => {
     await signOut(auth);
     navigate("/");
   };
 
-  const openRegister = () => alert("Has d'iniciar sessió per continuar.");
+  const openRegister = () => alert(t('profile_login'));
 
   const openSeguidorsModal = async () => {
     if (!profile) return;
@@ -112,7 +162,7 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguidoresModalOpen(true);
     } catch (err) {
-      console.error("Error recargando seguidors:", err);
+      console.error(t('followers_modal_loading'), err);
     }
   };
 
@@ -124,11 +174,11 @@ export default function UserProfile() {
       setProfile(updatedProfile as BackendUser);
       setSeguitsModalOpen(true);
     } catch (err) {
-      console.error("Error recargando seguits:", err);
+      console.error(t('profile_reloading_following'), err);
     }
   };
 
-  // 🔹 Función para navegar a otro perfil
+  // 🔹 Funció per navegar a altre perfil
   const goToProfile = (uid: string) => {
     navigate(`/user/${uid}`);
     setSeguidoresModalOpen(false);
@@ -136,28 +186,75 @@ export default function UserProfile() {
   };
 
   const toGridItems = (trips: Trip[]): GridItem[] =>
-    trips.map((t) => ({
-      id: String(t._id),
-      title: t.title || "Sense títol",
-      img: t.coverImage || (t.gallery && t.gallery[0]) || "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-      user: t.author?.name || "Anònim",
-      rating: typeof t.avgRating === "number" ? t.avgRating : 0,
-      temps: t.duration || "—",
-      dificultat: t.difficulty || "—",
-      authorPic: t.author?.profilePic || "",
-      city: t.city || "",
-      country: t.country || "",
+    trips.map((trip) => ({
+      id: String(trip._id),
+      title: trip.title || t('general_no_title'),
+      img:
+        trip.coverImage ||
+        (trip.gallery && trip.gallery[0]) ||
+        "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
+      user: trip.author?.name || t('general_anonymous'),
+      rating: typeof trip.avgRating === "number" ? trip.avgRating : 0,
+      temps: trip.duration || "—",
+      dificultat: trip.difficulty || "—",
+      authorPic: trip.author?.profilePic || "",
+      city: trip.city || "",
+      country: trip.country || "",
     }));
 
+  const askDeleteTrip = (tripId: string) => {
+    setTripToDelete(tripId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDeleteTrip = async () => {
+    if (!currentUser || !profile || !tripToDelete) return;
+
+    try {
+      await deleteTripAndPublication(profile.uid, tripToDelete);
+
+      // Treure-la de trips
+      setTrips((prev) =>
+        prev.filter((t) => String(t._id) !== String(tripToDelete))
+      );
+
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              publicacions: (prev.publicacions || []).filter(
+                (id) => String(id) !== String(tripToDelete)
+              ),
+            }
+          : prev
+      );
+    } catch (err: any) {
+      console.error(t('profile_error_deleting_route'), err);
+      alert(err?.message || t('profile_error_deleting_route'));
+    } finally {
+      setDeleteModalOpen(false);
+      setTripToDelete(null);
+    }
+  };
+
+  const handleCancelDeleteTrip = () => {
+    setDeleteModalOpen(false);
+    setTripToDelete(null);
+  };
+
   // ---------------------------
-  // Derivados visuales
+  // Derivats visuals
   // ---------------------------
-  const displayName = profile?.nom_i_cognoms || currentUser?.displayName || profile?.username || "Usuari";
+  const displayName =
+    profile?.nom_i_cognoms ||
+    currentUser?.displayName ||
+    profile?.username ||
+    t('home_search_user');
   const displayMail = profile?.mail || currentUser?.email || "";
-  const photoUrl = profile?.url_foto_perfil || "/images/person.png";
   const panelUrl = profile?.url_foto_panell || "/images/ny.jpg";
 
-  const seguidors = profile?.llista_seguidors?.length ?? profile?.seguidors ?? 0;
+  const seguidors =
+    profile?.llista_seguidors?.length ?? profile?.seguidors ?? 0;
   const seguits = profile?.llista_seguits?.length ?? profile?.seguits ?? 0;
 
   const publicacionsItems = useMemo(() => {
@@ -170,11 +267,27 @@ export default function UserProfile() {
     return toGridItems(trips.filter((t) => guardIds.has(String(t._id))));
   }, [trips, profile?.guardades]);
 
-  const gridItems = selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
+  const gridItems =
+    selectedTab === "publicacions" ? publicacionsItems : guardadesItems;
 
-  // ---------------------------
+  
+  const openMailbox = () => {
+    setMailboxOpen(true);
+  };
+
+  const handleAfterAcceptNotification = async (notificationId: string) => {
+    removeLocal(notificationId);
+    await refreshNotifications();
+    await refreshProfile();
+  };
+
+  const handleAfterRejectNotification = async (notificationId: string) => {
+    removeLocal(notificationId);
+    await refreshNotifications();
+  };
+
+
   // Render
-  // ---------------------------
   return (
     <Layout
       currentUser={currentUser}
@@ -183,7 +296,7 @@ export default function UserProfile() {
       onRegister={() => navigate("/")}
       variant="perfil"
     >
-      {loading && <div className="loading-state">Carregant perfil...</div>}
+      {loading && <div className="loading-state">{t('profile_loading')}</div>}
       {error && !loading && <div className="error-state">{error}</div>}
 
       {currentUser && profile && !loading && (
@@ -192,13 +305,39 @@ export default function UserProfile() {
             className="user-profile"
             style={{
               background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${panelUrl}) center/cover no-repeat`,
-              position:"relative",
+              position: "relative",
             }}
           >
+          {currentUser && profile && currentUser.uid === profile.uid && (
+              <button className="settings-btn" onClick={() => setSettingsOpen(true)}>
+                <Settings size={36} />
+              </button>
+            )}
+
             <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}> <Pencil size={22} /></button>
           
+            <button className="edit-profile-btn" onClick={() => setOpenEdit(true)}>
+              <Pencil size={22} />
+            </button>
+
+             <button className="mailbox-btn" onClick={openMailbox}>
+              <Mail size={24} />
+
+              {/* BADGE DE NOTIFICACIONES SIN LEER */}
+              {notifications && notifications.some((n) => !n.read) && (
+                <span className="mailbox-badge-icon">
+                  {notifications.filter((n) => !n.read).length}
+                </span>
+              )}
+            </button>
+
+
             <div className="user-photo">
-              <img src={photoUrl} alt="Foto de perfil" />
+              {profile.url_foto_perfil ? (
+                <img src={profile.url_foto_perfil} alt={t('edit_profile_profile_photo')} />
+              ) : (
+                <AvatarFallback name={displayName} size={160}/>
+              )}
             </div>
 
             <div className="user-details">
@@ -206,30 +345,48 @@ export default function UserProfile() {
                 <h2>{displayName}</h2>
                 <h3>{displayMail}</h3>
               </div>
+
               <div className="user-stats">
                 <div className="stat" onClick={openSeguidorsModal}>
                   <span className="number">{seguidors}</span>
-                  <span className="label">Seguidors</span>
+                  <span className="label">{t('followers_modal_title')}</span>
                 </div>
+
                 <div className="stat" onClick={openSeguitsModal}>
                   <span className="number">{seguits}</span>
-                  <span className="label">Seguits</span>
+                  <span className="label">{t('following_modal_title')}</span>
                 </div>
+
                 <div className="stat">
                   <span className="number">{publicacionsItems.length}</span>
-                  <span className="label">Publicacions</span>
+                  <span className="label">{t('profile_tab_publications')}</span>
                 </div>
+
                 <div className="stat">
                   <span className="number">{guardadesItems.length}</span>
-                  <span className="label">Guardades</span>
+                  <span className="label">{t('profile_stat_saved')}</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="tabs-container" data-active={selectedTab}>
-            <button className={`tab-btn ${selectedTab === "publicacions" ? "active" : ""}`} onClick={() => setSelectedTab("publicacions")}>Publicacions</button>
-            <button className={`tab-btn ${selectedTab === "guardat" ? "active" : ""}`} onClick={() => setSelectedTab("guardat")}>Guardat</button>
+            <button
+              className={`tab-btn ${
+                selectedTab === "publicacions" ? "active" : ""
+              }`}
+              onClick={() => setSelectedTab("publicacions")}
+            >
+                {t('profile_stat_publications')}
+            </button>
+            <button
+              className={`tab-btn ${
+                selectedTab === "guardat" ? "active" : ""
+              }`}
+              onClick={() => setSelectedTab("guardat")}
+            >
+                {t('profile_tab_saved')}
+            </button>
           </div>
 
           <section className="trip-list">
@@ -239,6 +396,8 @@ export default function UserProfile() {
               currentUser={currentUser}
               showCreateButton={selectedTab === "publicacions"}
               onCreateTripClick={() => setModalOpen("createTrip")}
+              showDeleteIcon={selectedTab === "publicacions"}
+              onDeleteTrip={askDeleteTrip} 
             />
 
             {gridItems.length === 0 && (
@@ -246,13 +405,13 @@ export default function UserProfile() {
                 <ImageOff className="empty-icon" size={60} />
                 {selectedTab === "publicacions" ? (
                   <>
-                    <h3>Encara no has publicat cap ruta</h3>
-                    <p>Comparteix les teves aventures amb la comunitat!</p>
+                    <h3>{t('profile_empty_publications_title')}</h3>
+                    <p>{t('profile_empty_publications_text')}</p>
                   </>
                 ) : (
                   <>
-                    <h3>Encara no has desat cap ruta</h3>
-                    <p>Explora i desa les teves preferides per més tard.</p>
+                    <h3>{t('profile_empty_saved_title')}</h3>
+                    <p>{t('profile_empty_saved_text')}</p>
                   </>
                 )}
               </div>
@@ -266,7 +425,7 @@ export default function UserProfile() {
               />
             )}
           </section>
-          
+
           {/* ---------------- Modales ---------------- */}
           {seguitsModalOpen && profile && (
             <LlistaSeguits
@@ -274,7 +433,7 @@ export default function UserProfile() {
               onClose={() => setSeguitsModalOpen(false)}
               seguits={profile.llista_seguits || []}
               currentUserId={currentUser.uid}
-              goToProfile={goToProfile} // ✅ AHORA FUNCIONA NAVEGACIÓN
+              goToProfile={goToProfile}
             />
           )}
 
@@ -283,20 +442,88 @@ export default function UserProfile() {
               open={seguidoresModalOpen}
               onClose={() => setSeguidoresModalOpen(false)}
               seguidors={profile.llista_seguidors || []}
-              goToProfile={goToProfile} // ✅ Navegación también aquí
+              currentUserId={currentUser.uid}
+              goToProfile={goToProfile} 
             />
           )}
+          <UserSettings 
+            open={settingsOpen} 
+            onClose={() => setSettingsOpen(false)}
+            profile={profile}
+            onSavePrivacy={(updatedProfile) => setProfile(updatedProfile)}
+          />
 
           {openEdit && profile && (
-            <EditarPerfil 
-              profile={profile} 
+            <EditarPerfil
+              profile={profile}
               onClose={() => setOpenEdit(false)}
               onSave={(updated) => {
-                setProfile(updated);     
-                setOpenEdit(false);       
+                setProfile(updated);
+                setOpenEdit(false);
               }}
             />
           )}
+
+          {deleteModalOpen && ( 
+          <div className="confirm-delete-backdrop">
+            <div className="confirm-delete-modal">
+              <h3>{t('profile_confirm_delete_title')}</h3>
+              <p>
+                  {t('profile_confirm_delete_text')}
+              </p>
+
+              <div className="confirm-delete-buttons">
+                <button
+                  className="btn-secondary"
+                  onClick={handleCancelDeleteTrip}
+                >
+                    {t('general_cancel')}
+                </button>
+                <button
+                  className="btn-danger"
+                  onClick={handleConfirmDeleteTrip}
+                >
+                    {t('general_delete')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+          {openEdit && profile && (
+            <EditarPerfil
+              profile={profile}
+              onClose={() => setOpenEdit(false)}
+              onSave={(updated) => {
+                setProfile(updated);
+                setOpenEdit(false);
+              }}
+            />
+
+          )}
+
+          {openEdit && profile && (
+            <EditarPerfil
+              profile={profile}
+              onClose={() => setOpenEdit(false)}
+              onSave={(updated) => {
+                setProfile(updated);
+                setOpenEdit(false);
+              }}
+            />
+          )}
+
+          <Mailbox
+            open={mailboxOpen}
+            onClose={() => setMailboxOpen(false)}
+            notifications={notifications}
+            onMarkRead={markRead}
+            onAfterAccept={handleAfterAcceptNotification}
+            onAfterReject={handleAfterRejectNotification}
+          />
+
+
         </>
       )}
     </Layout>

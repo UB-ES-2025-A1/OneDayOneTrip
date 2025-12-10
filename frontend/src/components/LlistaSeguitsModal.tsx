@@ -1,7 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
 import { getUserById, followUser, unfollowUser } from "../api/client";
-import "../styles/SeguidoresModal.css";
+import "../styles/LlistaSeguits.css";
+import AvatarFallback from "../components/AvatarFallback";
+import { useTranslation } from 'react-i18next'; // Importa el hook
+
 
 interface BackendUser {
   uid: string;
@@ -25,17 +28,18 @@ export default function LlistaSeguitsModal({
   currentUserId,
   goToProfile
 }: Props) {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<BackendUser[]>([]);
   const [loading, setLoading] = useState(false);
   const [localSeguits, setLocalSeguits] = useState<string[]>(seguits);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // 🔄 Sync al actualizar seguits desde fuera
+  // Sync al actualitzar seguits des de fora
   useEffect(() => {
     setLocalSeguits(seguits);
   }, [seguits]);
 
-  // 🔍 Cargar datos de los usuarios
+  // Carregar dades dels usuaris
   useEffect(() => {
     if (!open) return;
 
@@ -53,7 +57,7 @@ export default function LlistaSeguitsModal({
 
         setUsers(fetchedUsers.filter(Boolean) as BackendUser[]);
       } catch (err) {
-        console.error("Error carregant seguits:", err);
+        console.error(t('error_loading_followed'), err);
         setUsers([]);
       } finally {
         setLoading(false);
@@ -63,7 +67,7 @@ export default function LlistaSeguitsModal({
     fetchUsers();
   }, [open, localSeguits]);
 
-  // ✨ Animaciones
+  // Animacions
   useEffect(() => {
     if (!users || users.length === 0) return;
     const items = gsap.utils.toArray<HTMLElement>(".seguidor-item");
@@ -83,19 +87,19 @@ export default function LlistaSeguitsModal({
           ×
         </button>
 
-        <h2 className="seguidores-title">Seguits</h2>
+        <h2 className="seguidores-title">{t('profile_stat_following')}</h2>
 
         {loading ? (
-          <p className="seguidores-empty">Carregant...</p>
+          <p className="seguidores-empty">{t('general_loading')}</p>
         ) : users.length === 0 ? (
-          <p className="seguidores-empty">No segueixes a ningú.</p>
+          <p className="seguidores-empty">{t('following_modal_empty')}</p>
         ) : (
           <div className="seguidores-list">
             {users.map((u) => {
               const isFollowing = localSeguits.includes(u.uid);
 
               const handleToggleFollow = async (e: React.MouseEvent) => {
-                e.stopPropagation(); // ❗ Evita abrir el perfil al pulsar el botón
+                e.stopPropagation(); // Evitar obrir el perfil al pulsar el botó
 
                 try {
                   if (isFollowing) {
@@ -108,7 +112,7 @@ export default function LlistaSeguitsModal({
                     );
                   }
                 } catch (err) {
-                  console.error("Error canviant estat de seguir:", err);
+                  console.error(t('error_changing_state'), err);
                 }
               };
 
@@ -118,18 +122,21 @@ export default function LlistaSeguitsModal({
                   className="seguidor-item"
                   onClick={() => goToProfile?.(u.uid)}
                 >
-                  <img
-                    src={u.url_foto_perfil || "/images/default-profile.png"}
-                    className="seguidor-foto"
-                    alt={u.username || "usuari"}
-                  />
+                  
+                  <div className="seguidor-foto">
+                    {u.url_foto_perfil ? (
+                      <img src={u.url_foto_perfil} alt={u.username || t('home_search_user')} />
+                      ) : (
+                      <AvatarFallback name={u.nom_i_cognoms || u.username || "?"} />
+                    )}
+                  </div>
 
                   <div className="seguidor-info">
-                    <p className="seguidor-nom">{u.nom_i_cognoms || "Usuari"}</p>
+                    <p className="seguidor-nom">{u.nom_i_cognoms || t('home_search_user')}</p>
                     <p className="seguidor-username">@{u.username || "unknown"}</p>
                   </div>
 
-                  {/* 🔘 BOTÓN SEGUIR / DEJAR DE SEGUIR */}
+                  {/* BOTÓ SEGUIR / DEIXAR DE SEGUIR */}
                   <button
                     className={
                       isFollowing
@@ -138,7 +145,7 @@ export default function LlistaSeguitsModal({
                     }
                     onClick={handleToggleFollow}
                   >
-                    {isFollowing ? "Deixar de seguir" : "Seguir"}
+                    {isFollowing ? t('following_modal_unfollow') : t('following_modal_follow')}
                   </button>
                 </div>
               );

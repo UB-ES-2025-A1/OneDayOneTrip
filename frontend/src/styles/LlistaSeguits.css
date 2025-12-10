@@ -1,0 +1,150 @@
+/* ---------- MODAL BACKDROP ---------- */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* ---------- TARJETA PRINCIPAL ---------- */
+.seguidores-card {
+  background: #fff;
+  border-radius: 12px;
+  width: 400px;
+  max-height: 80%;
+  overflow-y: auto;
+  padding: 20px;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- BOTÓN CERRAR ---------- */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* ---------- TÍTULO ---------- */
+.seguidores-title {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* ---------- MENSAJE VACÍO ---------- */
+.seguidores-empty {
+  text-align: center;
+  color: #888;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+/* ---------- LISTA ---------- */
+.seguidores-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- ITEM DE USUARIO ---------- */
+.seguidor-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #eee;
+}
+
+.seguidor-item:last-child {
+  border-bottom: none;
+}
+
+.seguidor-item:hover {
+  background: #f9f9f9;
+}
+
+/* ---------- FOTO DEL USUARIO ---------- */
+.seguidor-foto {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 10px;
+}
+
+.seguidor-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.seguidor-foto > div {
+  width: 50px !important;
+  height: 50px !important;
+  font-size: 22px !important;
+  border-width: 2px !important;
+}
+
+/* ---------- INFO DEL USUARIO ---------- */
+.seguidor-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.seguidor-nom {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 0;
+}
+
+.seguidor-username {
+  color: #666;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ---------- BOTÓN SEGUIR / SIGUIENDO ---------- */
+.seguidor-toggle-btn {
+  margin-left: auto;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid #2e492e;
+  background-color: white;
+  color: #2e492e;
+  transition: all 0.25s ease-in-out;
+}
+
+/* Hover solo cuando NO estás siguiendo */
+.seguidor-toggle-btn:not(.following):hover {
+  background-color: #2e492e; /* verde oscuro */
+  color: white;
+}
+
+/* Estado siguiendo */
+.seguidor-toggle-btn.following {
+  background-color: #ffffff; /* blanco */
+  color: #c62828; /* rojo */
+  border-color: #c62828;
+}
+
+/* Hover cuando estás siguiendo */
+.seguidor-toggle-btn.following:hover {
+  background-color: #c62828; /* rojo de fondo */
+  color: white;
+}

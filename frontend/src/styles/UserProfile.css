@@ -1,10 +1,11 @@
 
-/* ---------- CONTENEDOR PRINCIPAL ---------- */
+/* CONTENIDOR PRINCIPAL */
 .user-profile {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  flex-wrap: wrap; /* ✅ asegura que se adapte en móvil */
+  flex-wrap: wrap; 
   padding: 3rem 2rem;
   gap: 2rem;
   min-height: 220px;
@@ -17,9 +18,10 @@
     url("/images/ny.jpg") center/cover no-repeat;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   margin-top: 1rem;
+  position: relative;
 }
 
-/* ---------- FOTO DEL USUARIO ---------- */
+/* ---------- IMATGE DE L'USUARI ---------- */
 .user-photo img {
   width: 180px;
   height: 180px;
@@ -29,7 +31,7 @@
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
 }
 
-/* ---------- DETALLES DEL USUARIO ---------- */
+/* ---------- DETALLS DE L'USUARI ---------- */
 .user-details {
   flex: 1;
   display: flex;
@@ -38,7 +40,7 @@
   min-width: 250px;
 }
 
-/* ---------- INFO DE NOMBRE / EMAIL ---------- */
+/* ---------- INFO DE NOM / EMAIL ---------- */
 .user-info h2 {
   font-size: 2rem;
   margin: 0 0 0.3rem 0;
@@ -52,7 +54,7 @@
   font-weight: 400;
 }
 
-/* ---------- ESTADÍSTICAS ---------- */
+/* ---------- ESTADÍSTIQUES ---------- */
 .user-stats {
   display: flex;
   flex-wrap: wrap;
@@ -74,6 +76,12 @@
   transform: translateY(-3px);
   background-color: rgba(255, 255, 255, 0.12);
   cursor: pointer;
+}
+
+.user-stats .stat.blocked:hover {
+  transform: none;
+  background-color: rgba(26, 25, 25, 0.65);
+  cursor: default;
 }
 
 .user-stats .number {
@@ -124,7 +132,6 @@
   align-items: center;
 }
 
-
 .tab-btn {
   flex: 1;
   z-index: 2;
@@ -160,7 +167,7 @@
   transform: translateX(100%);
 }
 
-/* ---------- GRID DE PUBLICACIONES ---------- */
+/* ---------- GRID DE PUBLICACIONS ---------- */
 .trip-list {
   margin-top: 2rem;
   display: flex;
@@ -168,7 +175,7 @@
   align-items: center;
 }
 
-/* ---------- ESTADOS (loading / error) ---------- */
+/* ---------- ESTATS (loading / error) ---------- */
 .loading-state,
 .error-state {
   text-align: center;
@@ -180,7 +187,7 @@
 .error-state {
   color: #c62828;
 }
-/* ---------- ESTADO VACÍO (sin publicaciones/guardadas) ---------- */
+/* ESTAT BUIT (sense publicacione/guardades) */
 .empty-state {
   text-align: center;
   margin: 4rem 1rem;
@@ -210,7 +217,7 @@
   margin: 0;
 }
 
-/* Botón de editar perfil (icono redondo arriba derecha) */
+/* Botó d'editar perfil (icona rodó adalt dreta) */
 .edit-profile-btn {
   position: absolute;
   top: 16px;
@@ -220,12 +227,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  
   background: rgba(255, 255, 255, 0.8);
   border: none;
   border-radius: 50%;
   cursor: pointer;
-
   backdrop-filter: blur(4px);
   transition: all 0.2s ease;
 }
@@ -239,6 +244,82 @@
   transform: scale(1.08);
 }
 
+.settings-btn {
+  position: absolute;
+  top: 50%;              /* mig d’alçada */
+  right: 16px;           /* enganxat a la dreta, com l'edit */
+  transform: translateY(-50%); /* centrat verticalment */
+
+  width: 42px;           /* mateix tamany que .edit-profile-btn */
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.settings-btn svg {
+  color: #333;
+}
+
+.settings-btn:hover {
+  background: #ffffff;
+  transform: translateY(-50%) scale(1.08);
+}
+
+
+
+.mailbox-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.mailbox-btn svg {
+  color: #333;
+}
+
+.mailbox-btn:hover {
+  background: #ffffff;
+  transform: scale(1.08);
+}
+
+.mailbox-badge-icon {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ff3b30;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .tab-title {
   color: #2e492e;
   font-size: 1.2rem;
@@ -246,10 +327,118 @@
   text-align: center;
   width: 100%;
 }
+.confirm-delete-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
 
-/* =========================================================
-   📱 RESPONSIVE
-   ========================================================= */
+.confirm-delete-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 28px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+  animation: popIn 0.18s ease-out;
+}
+
+.confirm-delete-modal h3 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+}
+
+.confirm-delete-modal p {
+  margin: 0 0 20px;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.confirm-delete-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-secondary {
+  border: 1px solid #d4d4d4;
+  background: #f5f5f5;
+  color: #333;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-danger {
+  border: none;
+  background: #e11d48;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-secondary:hover {
+  background: #e4e4e4;
+}
+
+.btn-danger:hover {
+  background: #be123c;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* BOTÓN BLOQUEAR ARRIBA DERECHA (ICONO REDONDO) */
+.block-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.block-button svg {
+  color: #fff;
+}
+
+.block-button:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.08);
+}
+
+.block-button.blocked {
+  background: rgba(255, 0, 0, 0.2);
+}
+
+.block-button.blocked:hover {
+  background: rgba(255, 0, 0, 0.35);
+}
    
 /* Versión responsive */
 @media (max-width: 600px) {
@@ -271,7 +460,6 @@
     font-size: 0.9rem;
   }
 }
-
 
 /* Tablets (≤ 992px) */
 @media (max-width: 992px) {
@@ -301,7 +489,7 @@
   }
 }
 
-/* Móviles (≤ 600px) */
+/* Mòbils (≤ 600px) */
 @media (max-width: 600px) {
   .user-profile {
     padding: 2rem 1rem;
@@ -340,5 +528,146 @@
   .tab-btn {
     font-size: 0.9rem;
   }
+}
 
+/* ---------- MODAL OVERLAY ---------- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5); /* semi-transparente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  animation: fadeInOverlay 0.3s forwards;
+}
+
+/* ---------- ANIMACIÓN DE APARICIÓN ---------- */
+@keyframes fadeInOverlay {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUpModal {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ---------- MODAL CONTENT ---------- */
+.modal-content {
+  background: rgba(255, 255, 255, 0.95); /* semi-transparente */
+  border-radius: 12px; /* opcional: puedes poner 0 si quieres sin esquinas redondeadas */
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  text-align: center;
+  color: #111; /* texto profesional */
+  font-family: "Inter", "Segoe UI", Tahoma, sans-serif; /* tipografía moderna */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3); /* sombra para separar del fondo */
+  backdrop-filter: blur(5px);
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideUpModal 0.3s forwards;
+  transition: all 0.2s ease;
+  border: none; /* quitamos cualquier borde */
+}
+
+/* Intensificar al pasar el ratón */
+.modal-content:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+/* ---------- BOTÓN CERRAR ---------- */
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: rgba(0,0,0,0.05);
+  border-radius: 50%;
+  padding: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+/* ---------- BOTONES ACCIÓN ---------- */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Inter", "Segoe UI", Tahoma, sans-serif;
+  border: none; /* quitamos borde */
+}
+
+/* CANCELAR */
+.btn-cancel {
+  background: rgba(224,224,224,0.8);
+  color: #333;
+}
+
+.btn-cancel:hover {
+  background: rgba(224,224,224,1);
+}
+
+/* CONFIRMAR */
+.btn-confirm {
+  background: rgba(198, 40, 40, 0.85);
+  color: white;
+}
+
+.btn-confirm:hover {
+  background: rgba(198, 40, 40, 1);
+}
+
+
+/* CONFIRMAR DESBLOQUEO */
+.btn-confirm-unblock {
+  background: rgba(30, 136, 229, 0.85); /* azul elegante */
+  color: white;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-confirm-unblock:hover {
+  background: rgba(30, 136, 229, 1);
+}
+
+.user-initials {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #858484;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+  margin: auto;
 }

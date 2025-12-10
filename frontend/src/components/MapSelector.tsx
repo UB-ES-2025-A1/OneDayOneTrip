@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
-// ICONO OFICIAL LEAFLET USANDO CDN
+// ICONA OFICIAL LEAFLET UTILITZANT CDN
 const markerIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -21,6 +22,7 @@ interface MapSelectorProps {
 }
 
 export default function MapSelector({ lat, lng, onSelect }: MapSelectorProps) {
+  const { t } = useTranslation();
   const [internalLat, setInternalLat] = useState(lat ?? 41.3851);
   const [internalLng, setInternalLng] = useState(lng ?? 2.1734);
   const [query, setQuery] = useState("");
@@ -32,7 +34,7 @@ export default function MapSelector({ lat, lng, onSelect }: MapSelectorProps) {
     }
   }, [lat, lng]);
 
-  // Detectar clics en el mapa
+  // Detectar clics al mapa
   function MapClickHandler() {
     useMapEvents({
       click(e) {
@@ -44,14 +46,14 @@ export default function MapSelector({ lat, lng, onSelect }: MapSelectorProps) {
     return null;
   }
 
-  // Mover el mapa cuando cambian coords
+  // Moure el mapa quan canviïn les coords
   function ChangeView({ lat, lng }: { lat: number; lng: number }) {
     const map = useMap();
     map.setView([lat, lng], 14);
     return null;
   }
 
-  // Buscar ubicación
+  // Buscar ubicació
   const runSearch = async () => {
     if (!query.trim()) return;
 
@@ -72,11 +74,11 @@ export default function MapSelector({ lat, lng, onSelect }: MapSelectorProps) {
         setInternalLng(lngNum);
         onSelect(latNum, lngNum);
       } else {
-        alert("No s'ha trobat cap ubicació.");
+        alert(t('map_selector_search_not_found'));
       }
     } catch (err) {
-      console.error("Error cercant ubicació:", err);
-      alert("Hi ha hagut un problema cercant la ubicació.");
+      console.error(t('error_searching_location'), err);
+      alert(t('map_selector_search_error'));
     }
   };
 
@@ -86,7 +88,7 @@ export default function MapSelector({ lat, lng, onSelect }: MapSelectorProps) {
       <div style={{ marginBottom: "8px", display: "flex", gap: "8px" }}>
         <input
           type="text"
-          placeholder="Escriu una adreça o lloc"
+          placeholder={t('map_selector_search_placeholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => {
@@ -116,10 +118,9 @@ export default function MapSelector({ lat, lng, onSelect }: MapSelectorProps) {
             borderRadius: "6px",
             border: "1px solid #ccc",
             cursor: "pointer",
-            background: "white",
           }}
         >
-          Cercar
+            {t('map_selector_search_button')}
         </button>
       </div>
 

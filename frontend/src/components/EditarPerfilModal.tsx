@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { ChangeEvent } from "react";
 import type { BackendUser } from "../pages/UserProfile";
 import "../styles/EditarPerfil.css";
+import { useTranslation } from "react-i18next";
+import { updateUser } from "../api/client"; // ⭐ Importante
 
 interface EditarPerfilProps {
   profile: BackendUser;
@@ -10,6 +12,8 @@ interface EditarPerfilProps {
 }
 
 export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilProps) {
+  const { t } = useTranslation();
+
   const [nom, setNom] = useState(profile.nom_i_cognoms || "");
   const [username, setUsername] = useState(profile.username || "");
 
@@ -22,7 +26,6 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // Seleccionar archivos
   const handleFileChange = (
     e: ChangeEvent<HTMLInputElement>,
     setFile: (f: File | null) => void,
@@ -35,39 +38,24 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
     }
   };
 
-  // Guardar cambios (PATCH multipart)
   const handleSave = async () => {
     setSaving(true);
     setError("");
 
     try {
-      const formData = new FormData();
-
+      // Datos en formato JSON que FastAPI espera dentro de user_json
       const jsonData = {
         nom_i_cognoms: nom || null,
         username: username || null,
       };
 
-      // FastAPI requiere user_json como string
-      formData.append("user_json", JSON.stringify(jsonData));
-
-      if (fotoPerfil) formData.append("foto_perfil", fotoPerfil);
-      if (fotoPanell) formData.append("foto_panell", fotoPanell);
-
-      const response = await fetch(
-        `http://127.0.0.1:8000/users/update/${profile.uid}`,
-        {
-          method: "PATCH",
-          body: formData,
-        }
+      // 🚀 Llamamos directamente a client.updateUser()
+      const result = await updateUser(
+        profile.uid,
+        jsonData,
+        fotoPerfil,
+        fotoPanell
       );
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail || "Error actualitzant el perfil");
-      }
-
-      const result = await response.json();
 
       const updatedUser: BackendUser = {
         ...profile,
@@ -79,10 +67,9 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
       if (onSave) onSave(updatedUser);
 
       onClose();
-
     } catch (e: any) {
-      console.error("Error:", e);
-      setError(e?.message || "No s'ha pogut guardar el perfil.");
+      console.error("❌ Error updating user", e);
+      setError(e?.message || t("edit_profile_error_save"));
     } finally {
       setSaving(false);
     }
@@ -95,52 +82,57 @@ export default function EditarPerfil({ profile, onClose, onSave }: EditarPerfilP
           &times;
         </button>
 
-        <h2>Editar Perfil</h2>
-
+        <h2>{t("profile_edit_button")}</h2>
         {error && <p className="text-red">{error}</p>}
 
-        {/* Nombre + Username */}
         <div className="two-columns">
           <div className="form-group">
-            <label>Nom complet</label>
-            <input type="text" value={nom} onChange={(e) => setNom(e.target.value)} />
+            <label>{t("register_full_name")}</label>
+            <input
+              type="text"
+              value={nom}
+              onChange={(e) => setNom(e.target.value)}
+            />
           </div>
 
           <div className="form-group">
-            <label>Username</label>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <label>{t("edit_profile_username")}</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
           </div>
         </div>
 
-        {/* Foto perfil + Foto portada */}
         <div className="two-columns">
           <div className="form-group">
-            <label>Foto de perfil</label>
+            <label>{t("edit_profile_profile_photo")}</label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => handleFileChange(e, setFotoPerfil, setFotoPerfilPreview)}
             />
             {fotoPerfilPreview && (
-              <img src={fotoPerfilPreview} alt="Foto perfil" className="preview-img" />
+              <img src={fotoPerfilPreview} className="preview-img" alt="profile" />
             )}
           </div>
 
           <div className="form-group">
-            <label>Foto de portada</label>
+            <label>{t("edit_profile_cover_photo")}</label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => handleFileChange(e, setFotoPanell, setFotoPanellPreview)}
             />
             {fotoPanellPreview && (
-              <img src={fotoPanellPreview} alt="Foto portada" className="preview-img" />
+              <img src={fotoPanellPreview} className="preview-img" alt="cover" />
             )}
           </div>
         </div>
 
         <button className="save-btn" onClick={handleSave} disabled={saving}>
-          {saving ? "Guardant..." : "Guardar Canvis"}
+          {saving ? t("edit_profile_saving") : t("general_save_changes")}
         </button>
       </div>
     </div>
