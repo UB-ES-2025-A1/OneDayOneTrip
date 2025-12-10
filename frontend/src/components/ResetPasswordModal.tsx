@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Auth } from "../firebase/auth";
+import { useTranslation } from 'react-i18next'; // Importa el hook
 
 interface ResetPasswordProps {
   onClose: () => void;
@@ -7,6 +8,7 @@ interface ResetPasswordProps {
 }
 
 export default function ResetPasswordModal({ onClose, openLogin }: ResetPasswordProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -16,7 +18,7 @@ export default function ResetPasswordModal({ onClose, openLogin }: ResetPassword
     e.preventDefault();
 
     if (!email) {
-      setError("Introdueix el teu correu electrònic.");
+      setError(t('reset_password_error_enter_email'));
       return;
     }
 
@@ -27,9 +29,9 @@ export default function ResetPasswordModal({ onClose, openLogin }: ResetPassword
 
       
       await Auth.resetPassword(email); 
-      setMessage("S'ha enviat un correu amb l'enllaç de recuperació.");
+      setMessage(t('reset_password_sent_message'));
     } catch (err: any) {
-      console.error("Error al recuperar contrasenya:", err);
+      console.error(t('error_reset_password'), err);
       setError("Error: " + err.message);
     } finally {
       setLoading(false);
@@ -44,19 +46,19 @@ export default function ResetPasswordModal({ onClose, openLogin }: ResetPassword
         </button>
 
         <div className="login-form">
-          <h2 className="login-title">Recuperar contrasenya</h2>
+          <h2 className="login-title">{t('reset_password_title')}</h2>
           <p className="reset-password-description">
-            Introdueix el teu correu electrònic i t'enviarem un enllaç per restablir la contrasenya.
+              {t('reset_password_description')}
           </p>
           
           <form onSubmit={handleResetPassword} className="auth-form">
             <div className="input-wrapper">
               <div className="input-icon">
-                <img src="/images/person.png" alt="Correu" />
+                <img src="/images/person.png" alt={t('correu')} />
               </div>
               <input
                 type="email"
-                placeholder="Correu electrònic"
+                placeholder={t('login_email')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -65,7 +67,7 @@ export default function ResetPasswordModal({ onClose, openLogin }: ResetPassword
             </div>
 
             <button type="submit" className="auth-button" disabled={loading}>
-              {loading ? "Enviant..." : "Enviar enllaç de recuperació"}
+              {loading ? t('general_sending') : t('reset_password_send_link')}
             </button>
           </form>
 
@@ -78,7 +80,7 @@ export default function ResetPasswordModal({ onClose, openLogin }: ResetPassword
             className="auth-link"
             style={{ marginTop: "16px" }}
           >
-            Tornar al login
+              {t('reset_password_back_to_login')}
           </button>
         </div>
       </div>

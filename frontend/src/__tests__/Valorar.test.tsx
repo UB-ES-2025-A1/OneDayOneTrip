@@ -12,7 +12,7 @@ describe("Valorar component", () => {
 
     render(<Valorar tripId="t1" onClose={onClose} onSubmit={onSubmit} />);
 
-    const submitButton = screen.getByRole("button", { name: /Enviar valoració/i });
+    const submitButton = screen.getByRole("button", { name: "rate_modal_submit" });
     expect(submitButton).toBeDisabled();
 
     const thirdStar = screen.getByDisplayValue("3");

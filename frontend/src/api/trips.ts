@@ -1,5 +1,9 @@
+import { createNotification } from "../api/notifier"; 
+import { getUserById } from "../api/client";
+import type { TFunction } from 'i18next';
+
 // ==========================================================
-// 📌 Interfaces base (Trip, TripPoint, Comment…)
+// Interfaces base (Trip, TripPoint, Comment…)
 // ==========================================================
 
 export interface Coordinates {
@@ -48,60 +52,77 @@ export interface Comment {
   tripId: string;
   userId: string;
   userName: string;
-  userProfilePicture?: string | null;  // opcional / puede ser null
+  userProfilePicture?: string | null;  // opcional / pot ser null
   text: string;
-  createdAt: string;                   // ISO string desde el backend
+  createdAt: string;                   // ISO string des de el backend
 }
 
 
 
 // ==========================================================
-// 🌍 Base URL
+// Base URL
 // ==========================================================
 
-const RAW_BASE_URL = "https://onedayonetrip-api.onrender.com";
+const RAW_BASE_URL = "https://onedayonetrip-api.onrender.com"; // Production
+
+//const RAW_BASE_URL = "https://onedayonetrip.onrender.com"; // PreProduction
+
+//const RAW_BASE_URL = "http://127.0.0.1:8000"; // Local
+
+
 const BASE_URL = RAW_BASE_URL.replace(/\/+$/, "");
+export const fallbackT: TFunction = ((key: string) => key) as any;
 
 // ==========================================================
-// 🔍 Obtener todas las trips
+// Obtenir totes les trips
 // ==========================================================
 
-export async function getAllTrips(includeStats: boolean = false): Promise<Trip[]> {
+export async function getAllTrips(
+  includeStats: boolean = false,
+  t: TFunction = fallbackT
+): Promise<Trip[]> {
+
   const res = await fetch(`${BASE_URL}/trips?include_stats=${includeStats}`);
-  if (!res.ok) throw new Error(`Error carregant les rutes: ${res.status}`);
+  if (!res.ok) throw new Error(`${t('error_loading_routes')} ${res.status}`);
   return await res.json();
 }
 
 // ==========================================================
-// 🔍 Obtener trip por ID
+// Obtenir trip per ID
 // ==========================================================
 
-export async function getTripById(tripId: string): Promise<Trip> {
+export async function getTripById(
+  tripId: string,
+  t: TFunction = fallbackT
+): Promise<Trip> {
+
   const res = await fetch(`${BASE_URL}/trips/${encodeURIComponent(tripId)}`);
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Ruta no trobada o id invàlid: ${tripId}. ${text}`);
+    throw new Error(`${t('error_id_not_found')} ${tripId}. ${text}`);
   }
   return await res.json();
 }
 
 
 // ==========================================================
-// 🔍 Obtener comentarios de una trip
+// Obtenir comentaris d'una trip
 // ==========================================================
 
 export async function getTripComments(
   tripId: string,
   limit: number = 20,
-  skip: number = 0
+  skip: number = 0,
+  t: TFunction = fallbackT
 ): Promise<Comment[]> {
+
   const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments?limit=${limit}&skip=${skip}`;
   const res = await fetch(url);
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(
-      `Error carregant comentaris de la ruta: ${tripId}. ${text}`
+      `${t('error_loading_comments')} ${tripId}. ${text}`
     );
   }
 
@@ -115,7 +136,7 @@ export async function getTripComments(
 
 
 // ==========================================================
-// 📝 Crear un comentari per una trip
+// Crear un comentari per una trip
 // ==========================================================
 export async function createTripComment(
   tripId: string,
@@ -124,43 +145,59 @@ export async function createTripComment(
     userName: string;
     userProfilePicture?: string;
     text: string;
-  }
+  },
+  t: TFunction = fallbackT
 ): Promise<Comment> {
+
+
+  const trip = await getTripById(tripId, t);
+  const toUserId = trip.author.userId;
+
   const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments`;
 
   const payload = {
-    tripId,                    // coincide con CommentModel.tripId
+    tripId,
     userId: data.userId,
     userName: data.userName,
     userProfilePicture: data.userProfilePicture ?? "",
     text: data.text,
-    // ❌ ya no mandamos createdAt: lo genera el backend
   };
 
   const res = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Error creant comentari (${tripId}): ${text}`);
+    throw new Error(`${t('error_commenting_route')} (${tripId}): ${text}`);
   }
 
-  // El backend devuelve:
-  // { "comment": { ... } }
   const dataRes = await res.json();
-  return dataRes.comment as Comment;
+  const comment = dataRes.comment as Comment;
+
+  if (data.userId !== toUserId) {
+    await createNotification({
+      fromUserId: data.userId,
+      toUserId,
+      type: "comment",
+      message: t('comment_route'),
+      extra: {
+        fromUserName: data.userName,
+        fromUserAvatar: data.userProfilePicture,
+        tripTitle: trip.title,
+      },
+    });
+  }
+
+  return comment;
 }
 
 
 
-
 // ==========================================================
-// ✨ Payload para crear trips (TripCreateIn)
+// Payload per crear trips (TripCreateIn)
 // ==========================================================
 
 export interface TripCreatePayload {
@@ -170,7 +207,7 @@ export interface TripCreatePayload {
   tags: string[];
 
   author: {
-    userId: string;                     // <-- corregido
+    userId: string;
     name: string | null | undefined;
     profilePic?: string | null | undefined;
   };
@@ -179,7 +216,7 @@ export interface TripCreatePayload {
   region?: string;
   country?: string;
 
-  routeMap: Coordinates[];             // <-- DEBE ser array
+  routeMap: Coordinates[];
 
   trip_points: {
     title: string;
@@ -187,38 +224,37 @@ export interface TripCreatePayload {
     coordinates: { lat: number; lng: number };
   }[];
 
-  distance?: number;                   // <-- corregido (número)
+  distance?: number;
   duration?: string;
   difficulty?: string;
   recommendedSeason?: string;
 }
 
 // ==========================================================
-// 🚀 Crear trip (multipart/form-data)
+// Crear trip (multipart/form-data)
 // ==========================================================
 
 export async function createTripMultipart(
   tripPayload: TripCreatePayload,
   cover: File | null,
   gallery: File[],
-  pointImages: (File | null)[]
+  pointImages: (File | null)[],
+  t: TFunction
 ) {
+
   const formData = new FormData();
 
-  // JSON requerido por FastAPI
+  // JSON requerit per FastAPI
   formData.append("trip_json", JSON.stringify(tripPayload));
 
-  // portada
   if (cover) {
     formData.append("cover", cover);
   }
 
-  // galería
   gallery.forEach((file) => {
     formData.append("gallery", file);
   });
 
-  // imágenes de cada punto
   pointImages.forEach((file) => {
     if (file) formData.append("point_images", file);
   });
@@ -230,15 +266,38 @@ export async function createTripMultipart(
 
   if (!res.ok) {
     const errMsg = await res.text().catch(() => "");
-    throw new Error(errMsg || "Error creant la ruta");
+    throw new Error(errMsg || t('error_creating_route'));
   }
 
-  return await res.json();
+  const tripData = await res.json(); // contiene trip creada con _id
+
+  const authorId = tripPayload.author.userId;
+  const authorName = tripPayload.author.name ?? "";
+  const authorPic = tripPayload.author.profilePic ?? "";
+
+  const authorBackendUser = await getUserById(authorId);
+  const followers: string[] = authorBackendUser.llista_seguidors ?? [];
+
+  for (const followerId of followers) {
+    await createNotification({
+      fromUserId: authorId,
+      toUserId: followerId,
+      type: "publication",
+      message: t('posted_route'),
+      extra: {
+        fromUserName: authorName,
+        fromUserAvatar: authorPic,
+        tripTitle: tripPayload.title,
+      },
+    });
+  }
+
+  return tripData;
 }
 
 
 // ==========================================================
-// ⭐ Valorar una trip
+// Valorar una trip
 // ==========================================================
 
 export interface TripRatingStats {
@@ -249,33 +308,50 @@ export interface TripRatingStats {
 
 export interface RateTripPayload {
   userId: string;
-  rating: number;      // por ejemplo 1-5
-  date?: string;       // ISO string opcional
+  rating: number;
+  date?: string;
 }
 
 export async function rateTrip(
   tripId: string,
-  payload: RateTripPayload
+  payload: RateTripPayload & { userName?: string; userProfilePicture?: string },
+  t: TFunction = fallbackT
 ): Promise<TripRatingStats> {
+
+  
+  const trip = await getTripById(tripId, t);
+  const toUserId = trip.author.userId;
+
   const res = await fetch(`${BASE_URL}/ratings/trip/${encodeURIComponent(tripId)}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       userId: payload.userId,
       rating: payload.rating,
-      // si no viene date, mandamos la fecha actual
       date: payload.date ?? new Date().toISOString(),
     }),
   });
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Error valorant la ruta: ${res.status}. ${text}`);
+    throw new Error(`${t('error_rating_route')} ${res.status}. ${text}`);
   }
 
-  // 👇 aquí el backend devuelve lo que saque get_trip_rating_stats(trip_id)
-  const data = await res.json();
-  return data as TripRatingStats;
+  const stats = await res.json();
+
+  if (payload.userId !== toUserId) {
+    await createNotification({
+      fromUserId: payload.userId,
+      toUserId,
+      type: "rating",
+      message: `${t('rated_route')} ${payload.rating} ★`,
+      extra: {
+        fromUserName: payload.userName,
+        fromUserAvatar: payload.userProfilePicture,
+        tripTitle: trip.title,
+      },
+    });
+  }
+
+  return stats;
 }
