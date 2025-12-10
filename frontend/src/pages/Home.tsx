@@ -265,6 +265,23 @@ export default function Home() {
     monument: t('home_placeholder_monument'),
   };
 
+  const handleSearchFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const nextFilter = e.target.value as SearchFilter;
+  setSearchFilter(nextFilter);
+
+  // Si el filtre és "user", entrem en mode "users" (UserCards)
+  // Si no, tornem a "trips"
+  if (nextFilter === "user") {
+    setSearchMode("users");
+  } else {
+    setSearchMode("trips");
+  }
+
+  // Opcional: netejar el text de cerca quan canvies de mode
+  // setSearchTerm("");
+};
+
+
   return (
     <Layout
       currentUser={currentUser}
@@ -300,52 +317,26 @@ export default function Home() {
         </div>
       )}
 
-      {/* Slider per canviar entre cercar publicacions i usuaris */}
-      {currentUser && (
-        <div className="search-mode-toggle">
-          <button
-            className={`mode-btn ${searchMode === "trips" ? "active" : ""}`}
-            onClick={() => {
-              setSearchMode("trips");
-              setSearchTerm("");
-            }}
-          >
-            Cercar Publicacions
-          </button>
-          <button
-            className={`mode-btn ${searchMode === "users" ? "active" : ""}`}
-            onClick={() => {
-              setSearchMode("users");
-              setSearchTerm("");
-              setSearchFilter("all");
-            }}
-          >
-            Cercar Usuaris
-          </button>
-        </div>
-      )}
+    
 
-      {/* Barra de cerca amb filtre + input + lupa (només per usuaris loguejats) */}
       {currentUser && (
-        <div className="search-bar-container">
-          <div className="search-bar">
-            {searchMode === "trips" && (
-              <>
-                <select
-                  className="search-filter-select"
-                  value={searchFilter}
-                  onChange={(e) => setSearchFilter(e.target.value as SearchFilter)}
-                >
-                  <option value="all">{t('home_search_all')}</option>
-                  <option value="user">{t('home_search_user')}</option>
-                  <option value="country">{t('home_search_country')}</option>
-                  <option value="city">{t('home_search_city')}</option>
-                  <option value="monument">{t('home_search_monument')}</option>
-                </select>
+  <div className="search-bar-container">
+    <div className="search-bar">
+      <>
+        <select
+          className="search-filter-select"
+          value={searchFilter}
+          onChange={handleSearchFilterChange}
+        >
+          <option value="all">{t('home_search_all')}</option>
+          <option value="user">{t('home_search_user')}</option>
+          <option value="country">{t('home_search_country')}</option>
+          <option value="city">{t('home_search_city')}</option>
+          <option value="monument">{t('home_search_monument')}</option>
+        </select>
 
-                <span className="search-divider" />
-              </>
-            )}
+        <span className="search-divider" />
+            </>
 
             <input
               type="text"
@@ -363,6 +354,7 @@ export default function Home() {
           </div>
         </div>
       )}
+
 
       <section className="trip-list-section">
         {(searchMode === "users" ? usersLoading : loading) && (
