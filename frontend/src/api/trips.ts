@@ -63,9 +63,9 @@ export interface Comment {
 // Base URL
 // ==========================================================
 
-//const RAW_BASE_URL = "https://onedayonetrip-api.onrender.com"; // Production
+const RAW_BASE_URL = "https://onedayonetrip-api.onrender.com"; // Production
 
-const RAW_BASE_URL = "https://onedayonetrip.onrender.com"; // PreProduction
+//const RAW_BASE_URL = "https://onedayonetrip.onrender.com"; // PreProduction
 
 //const RAW_BASE_URL = "http://127.0.0.1:8000"; // Local
 
