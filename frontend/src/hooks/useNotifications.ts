@@ -1,34 +1,46 @@
 import { useEffect, useState } from "react";
 import { getNotifications, markNotificationAsRead } from "../api/notifier";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import type { Notification } from "../components/Mailbox";
 
 export default function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const auth = getAuth();
+
+  const fetchNotifications = async (userId?: string) => {
+    const uid = userId || auth.currentUser?.uid;
+
+    if (!uid) {
+      setNotifications([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const data = await getNotifications(uid);
+      setNotifications(data);
+    } catch (err) {
+      console.error("Error carregant notificacions:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      const user = getAuth().currentUser;
-
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
         setNotifications([]);
         setLoading(false);
         return;
       }
 
-      try {
-        const data = await getNotifications(user.uid);
-        setNotifications(data);
-      } catch (err) {
-        console.error("Error carregant notificacions:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
+      setLoading(true);
+      fetchNotifications(user.uid);
+    });
 
-    fetchData();
-  }, []);
+    return () => unsubscribe();
+  }, [auth]);
 
   const markRead = async (id: string) => {
     try {
@@ -41,5 +53,14 @@ export default function useNotifications() {
     }
   };
 
-  return { notifications, loading, markRead };
+  const refreshNotifications = async () => {
+    setLoading(true);
+    await fetchNotifications();
+  };
+
+  const removeLocal = (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  return { notifications, loading, markRead, refreshNotifications, removeLocal };
 }

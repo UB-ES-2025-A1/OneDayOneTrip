@@ -55,6 +55,7 @@ export async function registerUser(data: {
   fullname: string;
   username: string;
   mail: string;
+  isPrivate?: boolean;
 }) {
   return apiPost("/users/register", data);
 }
@@ -129,6 +130,35 @@ export async function followUser(userId: string, targetId: string) {
   return res;
 }
 
+// Enviar sol·licitud de seguiment
+export async function askToFollowUser(userId: string, targetId: string) {
+  const res = await apiPost(`/users/askToFollowUser/${userId}/${targetId}`, {});
+
+  try {
+    const userData = await getUserById(userId);
+    const targetUserData = await getUserById(targetId);
+
+    if (targetUserData.isPrivate) {
+      await createNotification({
+        fromUserId: userId,
+        toUserId: targetId,
+        type: "follow_request",
+        message: "t'ha enviat una sol·licitud de seguiment",
+        extra: {
+          fromUserName: userData.nom_i_cognoms ?? userData.username ?? "",
+          fromUserAvatar: userData.url_foto_perfil ?? "",
+          actionButton: true,
+        },
+      });
+    }
+  } catch (e) {
+    console.warn("⚠️ No s'ha pogut crear la sol·licitud de follow:", e);
+  }
+
+  return res;
+}
+
+// Deixar de seguir un usuari
 export async function unfollowUser(userId: string, targetId: string) {
   const res = await apiPost(`/users/unfollow/${userId}/${targetId}`, {});
 
@@ -151,6 +181,22 @@ export async function unfollowUser(userId: string, targetId: string) {
 
   return res;
 }
+
+// Eliminar sol·licitud de seguiment
+export async function cancel_follow_request(userId: string, targetId: string) {
+  return apiPost(`/users/cancel_follow_request/${userId}/${targetId}`, {});
+}
+
+// Acceptar sol·licitud de seguiment
+export async function accept_follow_request(userId: string, targetId: string) {
+  return apiPost(`/users/accept_follow_request/${userId}/${targetId}`, {});
+}
+
+// Rebutjar sol·licitud de seguiment
+export async function reject_follow_request(userId: string, targetId: string) {
+  return apiPost(`/users/reject_follow_request/${userId}/${targetId}`, {});
+}
+
 
 // ------------------------------
 // Saves, blocks y más

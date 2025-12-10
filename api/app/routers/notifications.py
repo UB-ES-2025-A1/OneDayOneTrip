@@ -4,6 +4,7 @@ from app.services.mongo_service import (
     create_notification,
     list_notifications,
     mark_notification_as_read,
+    delete_notification,
 )
 
 router = APIRouter(prefix="/notifications", tags=["Notifications"])
@@ -32,3 +33,11 @@ def mark_as_read(notification_id: str):
     if not ok:
         raise HTTPException(status_code=404, detail="Notification not found")
     return {"status": "ok"}
+
+
+@router.delete("/{notification_id}")
+def delete_notif(notification_id: str):
+    ok = delete_notification(notification_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    return {"status": "deleted"}
