@@ -14,7 +14,7 @@ name: E2E Tests
 
 on:
   pull_request:
-    branches: [main, develop, master]
+    branches: [main, develop, master, staging]
     paths:
       - 'frontend/**'
       - 'api/**'
@@ -22,7 +22,7 @@ on:
       - '.github/workflows/e2e-tests.yml'
   
   push:
-    branches: [main, develop, master]
+    branches: [main, develop, master, staging]
     paths:
       - 'frontend/**'
       - 'api/**'

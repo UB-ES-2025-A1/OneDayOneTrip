@@ -1,4 +1,4 @@
-import { test, expect, waitForPageLoad, waitForTripsAPI, SELECTORS, assertElementVisible, assertMinimumCount } from '../fixtures/test-fixtures';
+import { test, expect, waitForPageLoad, waitForTripsAPI, SELECTORS, assertElementVisible, assertMinimumCount, clearAuthState } from '../fixtures/test-fixtures';
 import { loginAsTestUser } from '../fixtures/auth-helpers';
 
 /**
