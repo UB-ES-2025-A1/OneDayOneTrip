@@ -74,7 +74,7 @@ async def get_all_users():
 async def search_users(
     query: str = "",
     current_user_id: Optional[str] = None,
-    blocked_by_me: Optional[str] = None
+    blocked_by_me: Optional[str] = None,
 ):
     """
     Cerca usuaris per nom, cognoms o username.
@@ -88,7 +88,8 @@ async def search_users(
     search_term = query.lower().strip()
     if search_term:
         all_users = [
-            u for u in all_users
+            u
+            for u in all_users
             if search_term in (u.get("nom_i_cognoms", "") or "").lower()
             or search_term in (u.get("username", "") or "").lower()
         ]
@@ -96,9 +97,11 @@ async def search_users(
     # Excloure usuaris que m'han bloquejat i excloure'm a mi mateix
     if current_user_id:
         all_users = [
-            u for u in all_users
+            u
+            for u in all_users
             if u.get("uid") != current_user_id  # No mostrar-me a mi mateix
-            and current_user_id not in (u.get("llista_bloquejats", []) or [])  # No m'han bloquejat
+            and current_user_id
+            not in (u.get("llista_bloquejats", []) or [])  # No m'han bloquejat
         ]
 
     return all_users
