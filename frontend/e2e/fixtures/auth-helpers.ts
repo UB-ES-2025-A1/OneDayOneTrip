@@ -142,17 +142,43 @@ export async function loginAsTestUser(page: Page): Promise<boolean> {
       return false;
     }
     
-    // Primero verificar si ya estamos autenticados (gracias al storageState)
+    // Primero verificar localStorage (storageState puede tener uid guardado)
     await page.goto('/');
     await waitForPageLoad(page);
+    
+    // Verificar localStorage primero (más rápido y confiable que UI)
+    const uid = await page.evaluate(() => localStorage.getItem('uid'));
+    if (uid && uid !== 'null' && uid !== 'undefined') {
+      // Verificar que la UI también muestra sesión activa
+      const logoutButton = page.locator('button:has-text("Log out"), button:has-text("Logout"), button:has-text("Tancar"), button.logout').first();
+      const profileButton = page.locator('button.profile-btn, .header-profile-pic').first();
+      
+      const hasUISession = await logoutButton.isVisible({ timeout: 2000 }).catch(() => false) ||
+                            await profileButton.isVisible({ timeout: 2000 }).catch(() => false);
+      
+      if (hasUISession) {
+        console.log('✅ Usuario ya autenticado (vía storageState/localStorage)');
+        return true;
+      }
+      
+      // Si hay uid pero no UI, esperar un poco más para que Firebase hydrate
+      await page.waitForTimeout(1000);
+      const hasUISessionAfterWait = await logoutButton.isVisible({ timeout: 2000 }).catch(() => false) ||
+                                     await profileButton.isVisible({ timeout: 2000 }).catch(() => false);
+      
+      if (hasUISessionAfterWait) {
+        console.log('✅ Usuario ya autenticado (vía storageState/localStorage - después de espera)');
+        return true;
+      }
+    }
 
-    // Verificar si ya hay sesión (buscar botón de logout o perfil) - timeout reducido
+    // Verificar si ya hay sesión en la UI (por si acaso no hay localStorage pero sí sesión)
     const logoutButton = page.locator('button:has-text("Log out"), button:has-text("Logout"), button:has-text("Tancar"), button.logout').first();
     const profileButton = page.locator('button.profile-btn, .header-profile-pic').first();
 
     if (await logoutButton.isVisible({ timeout: 1000 }).catch(() => false) ||
         await profileButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-      console.log('✅ Usuario ya autenticado (vía storageState)');
+      console.log('✅ Usuario ya autenticado (vía UI)');
       return true;
     }
 

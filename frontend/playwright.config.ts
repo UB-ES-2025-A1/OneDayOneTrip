@@ -72,8 +72,11 @@ export default defineConfig({
       name: 'setup',
       testMatch: /.*\.setup\.ts/,
     },
+    // Tests que requieren autenticación (usan storageState del setup)
     {
-      name: 'chromium',
+      name: 'chromium-authenticated',
+      testMatch: /.*\.spec\.ts$/,
+      testIgnore: /.*auth-flow\.spec\.ts$/,
       use: { 
         ...devices['Desktop Chrome'],
         // Viewport consistente para tests
@@ -82,6 +85,16 @@ export default defineConfig({
         storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
+    },
+    // Tests que NO requieren autenticación (como auth-flow.spec.ts)
+    {
+      name: 'chromium-unauthenticated',
+      testMatch: /.*auth-flow\.spec\.ts$/,
+      use: { 
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+        // NO usar storageState - estos tests necesitan empezar sin sesión
+      },
     },
     // Descomentar para probar en más navegadores
     // {

@@ -122,6 +122,40 @@ setup('authenticate', async ({ page }) => {
       return;
     }
 
+    // Asegurar que el uid esté en localStorage antes de guardar storageState
+    // Firebase puede guardar el estado en IndexedDB, pero storageState solo captura localStorage
+    // Esperar un poco más para que Firebase termine de inicializar y guarde el uid
+    await page.waitForTimeout(2000);
+    
+    // Verificar si el uid ya está en localStorage (Firebase puede guardarlo automáticamente)
+    let uid = await page.evaluate(() => localStorage.getItem('uid'));
+    
+    if (!uid || uid === 'null' || uid === 'undefined') {
+      // Si no está en localStorage, intentar obtenerlo del usuario actual de Firebase
+      uid = await page.evaluate(() => {
+        try {
+          // @ts-ignore - Firebase puede estar disponible globalmente
+          const auth = (window as any).auth || (window as any).firebase?.auth();
+          if (auth?.currentUser?.uid) {
+            const firebaseUid = auth.currentUser.uid;
+            localStorage.setItem('uid', firebaseUid);
+            return firebaseUid;
+          }
+        } catch (e) {
+          // Ignorar errores
+        }
+        return null;
+      });
+      
+      if (uid) {
+        console.log('🔑 UID obtenido de Firebase Auth y guardado:', uid);
+      } else {
+        console.log('⚠️ No se pudo obtener UID de Firebase, pero continuando...');
+      }
+    } else {
+      console.log('🔑 UID ya presente en localStorage:', uid);
+    }
+
     // Guardar estado de autenticación (cookies, localStorage, etc.)
     await page.context().storageState({ path: authFile });
     console.log('✅ Auth storageState guardado');
