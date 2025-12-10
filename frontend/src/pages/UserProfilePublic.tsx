@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, type User as FirebaseUser, signOut } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../firebase";
-import { getUserById, followUser, unfollowUser, blockUser, unblockUser, cancel_follow_request } from "../api/client";
+import { getUserById, followUser, unfollowUser, blockUser, unblockUser, cancel_follow_request, askToFollowUser } from "../api/client";
 import { getAllTrips, type Trip } from "../api/trips";
 import "../styles/UserProfile.css";
 import { ImageOff, UserX } from "lucide-react";
@@ -30,6 +30,8 @@ export type BackendUser = {
   isPrivate?: boolean;
   llista_bloquejats?: string[];
   llista_bloquejadors?: string[];
+  llista_solicitud_seguidors?: string[];
+  llista_solicitud_seguits?: string[];
 };
 
 type FollowStatus = "none" | "pending" | "following";
@@ -90,6 +92,8 @@ export default function UserProfilePublic() {
         backendUser.publicacions = backendUser.publicacions || [];
         backendUser.llista_bloquejats = backendUser.llista_bloquejats || [];
         backendUser.llista_bloquejadors = backendUser.llista_bloquejadors || [];
+        backendUser.llista_solicitud_seguidors = backendUser.llista_solicitud_seguidors || [];
+        backendUser.llista_solicitud_seguits = backendUser.llista_solicitud_seguits || [];
 
         setProfile(backendUser as BackendUser);
 
@@ -110,7 +114,7 @@ export default function UserProfilePublic() {
     fetchProfile();
   }, [id, t]);
 
-  // Saber si el currentUser segueix aquest perfil
+  // Saber si el currentUser segueix aquest perfil o ha solicitat seguir-lo
   useEffect(() => {
     if (!currentUser || !profile) {
       setIsFollowing(false);
@@ -119,10 +123,18 @@ export default function UserProfilePublic() {
     }
 
     const followers = profile.llista_seguidors || [];
-    const alreadyFollowing = followers.includes(currentUser.uid);
+    const pendingRequests = profile.llista_solicitud_seguidors || [];
 
-    setIsFollowing(alreadyFollowing);
-    setFollowStatus(alreadyFollowing ? "following" : "none");
+    if (followers.includes(currentUser.uid)) {
+      setIsFollowing(true);
+      setFollowStatus("following");
+    } else if (pendingRequests.includes(currentUser.uid)) {
+      setIsFollowing(false);
+      setFollowStatus("pending");
+    } else {
+      setIsFollowing(false);
+      setFollowStatus("none");
+    }
   }, [currentUser, profile]);
 
   // Saber si l'hem bloquejat (Staging)
@@ -165,15 +177,15 @@ export default function UserProfilePublic() {
 
       // Si no segueix, intentar seguir
       if (followStatus === "none") {
-        await followUser(userId, targetId);
         
         // Actualitzar estat segons si el perfil és privat o públic
         if (isPrivateProfile) {
           // Perfil privat → estat pending
+          await askToFollowUser(userId, targetId);
           setFollowStatus("pending");
         } else {
           // Perfil públic → estat following
-          setIsFollowing(true);
+          await followUser(userId, targetId);
           setFollowStatus("following");
           setProfile((prev) =>
             prev

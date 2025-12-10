@@ -249,6 +249,8 @@ def list_notifications(user_id: str, only_unread: bool = False):
             {
                 "id": str(n["_id"]),
                 "type": n["type"],
+                "fromUserId": n.get("fromUserId"),
+                "toUserId": n.get("toUserId"),
                 "fromUserName": extra.get("fromUserName", "Algú"),
                 "fromUserAvatar": extra.get("fromUserAvatar"),
                 "tripTitle": extra.get("tripTitle"),

@@ -212,14 +212,90 @@ async def cancel_follow_request(user_id: str, target_id: str):
     return {"message": "Sol·licitud de seguiment cancel·lada correctament"}
 
 
+@router.post("/accept_follow_request/{user_id}/{follower_id}")
+async def accept_follow_request(user_id: str, follower_id: str):
+    """
+    Accepta una sol·licitud de seguiment.
+    Afegeix follower_id a la llista de seguidors del user_id.
+    Afegeix user_id a la llista de seguits del follower_id.
+    Elimina les sol·licituds pendents.
+    """
+    user_ref = db.collection("users").document(user_id)
+    follower_ref = db.collection("users").document(follower_id)
+
+    user_doc = user_ref.get()
+    follower_doc = follower_ref.get()
+
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="L'usuari no existeix")
+    if not follower_doc.exists:
+        raise HTTPException(status_code=404, detail="L'usuari seguidor no existeix")
+
+    # Afegir follower a seguidors de user
+    user_ref.update({"llista_seguidors": firestore.ArrayUnion([follower_id])})
+    # Afegir user a seguits de follower
+    follower_ref.update({"llista_seguits": firestore.ArrayUnion([user_id])})
+
+    # Eliminar de les llistes de sol·licituds pendents
+    user_ref.update({"llista_solicitud_seguidors": firestore.ArrayRemove([follower_id])})
+    follower_ref.update({"llista_solicitud_seguits": firestore.ArrayRemove([user_id])})
+
+    return {"message": "Sol·licitud de seguiment acceptada correctament"}
+
+
+@router.post("/reject_follow_request/{user_id}/{follower_id}")
+async def reject_follow_request(user_id: str, follower_id: str):
+    """
+    Rebutja una sol·licitud de seguiment.
+    Simplement elimina la sol·licitud pendent sense afegir a seguidors.
+    """
+    user_ref = db.collection("users").document(user_id)
+    follower_ref = db.collection("users").document(follower_id)
+
+    user_doc = user_ref.get()
+    follower_doc = follower_ref.get()
+
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="L'usuari no existeix")
+    if not follower_doc.exists:
+        raise HTTPException(status_code=404, detail="L'usuari seguidor no existeix")
+
+    # Eliminar de les llistes de sol·licituds pendents
+    user_ref.update({"llista_solicitud_seguidors": firestore.ArrayRemove([follower_id])})
+    follower_ref.update({"llista_solicitud_seguits": firestore.ArrayRemove([user_id])})
+
+    return {"message": "Sol·licitud de seguiment rebutjada correctament"}
+
+
 @router.post("/follow/{user_id}/{target_id}")
 async def follow_user(user_id: str, target_id: str):
     """
     Afegeix el target_id a la llista 'llista_seguits' del user_id,
     i afegeix el user_id a la llista 'llista_seguidors' del target_id.
-    
-    Si el target té perfil privat, crea una sol·licitud de seguiment.
-    Si el target té perfil públic, segueix directament.
+    """
+    if user_id == target_id:
+        raise HTTPException(status_code=400, detail="No et pots seguir a tu mateix")
+
+    user_ref = db.collection("users").document(user_id)
+    target_ref = db.collection("users").document(target_id)
+
+    # Comprovació que l'usuari a seguir existeix
+    target_doc = target_ref.get()
+    if not target_doc.exists:
+        raise HTTPException(
+            status_code=404, detail="L'usuari que vols seguir no existeix"
+        )
+
+    user_ref.update({"llista_seguits": firestore.ArrayUnion([target_id])})
+    target_ref.update({"llista_seguidors": firestore.ArrayUnion([user_id])})
+    return {"message": "Usuari seguit correctament"}
+
+
+@router.post("/askToFollowUser/{user_id}/{target_id}")
+async def ask_to_follow_user(user_id: str, target_id: str):
+    """
+    Afegeix el target_id a la llista 'llista_solicitud_seguidors' del user_id,
+    i afegeix el user_id a la llista 'llista_solicitud_seguits' del target_id.
     """
     if user_id == target_id:
         raise HTTPException(status_code=400, detail="No et pots seguir a tu mateix")
@@ -238,16 +314,9 @@ async def follow_user(user_id: str, target_id: str):
     target_data = target_doc.to_dict()
     is_private = target_data.get("isPrivate", False)
 
-    if is_private:
-        # Si és privat, crear una sol·licitud de seguiment
-        target_ref.update({"llista_solicitud_seguidors": firestore.ArrayUnion([user_id])})
-        user_ref.update({"llista_solicitud_seguits": firestore.ArrayUnion([target_id])})
-        return {"message": "Sol·licitud de seguiment enviada correctament"}
-    else:
-        # Si és públic, seguir directament
-        user_ref.update({"llista_seguits": firestore.ArrayUnion([target_id])})
-        target_ref.update({"llista_seguidors": firestore.ArrayUnion([user_id])})
-        return {"message": "Usuari seguit correctament"}
+    target_ref.update({"llista_solicitud_seguidors": firestore.ArrayUnion([user_id])})
+    user_ref.update({"llista_solicitud_seguits": firestore.ArrayUnion([target_id])})
+    return {"message": "Sol·licitud de seguiment enviada correctament"}
 
 
 @router.post("/save/{user_id}/{trip_id}")
