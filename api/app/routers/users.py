@@ -83,16 +83,14 @@ async def search_users(
     """
     docs = db.collection("users").get()
     all_users = [d.to_dict() for d in docs]
-    
+
     # Parsejar la llista d'usuaris bloquejats per mi
     blocked_by_me_list = []
     if blocked_by_me:
         try:
             import json
             blocked_by_me_list = json.loads(blocked_by_me)
-        except:
-            blocked_by_me_list = []
-    
+
     # Filtrar per query si existeix
     search_term = query.lower().strip()
     if search_term:
@@ -101,7 +99,7 @@ async def search_users(
             if search_term in (u.get("nom_i_cognoms", "") or "").lower()
             or search_term in (u.get("username", "") or "").lower()
         ]
-    
+
     # Excloure usuaris que m'han bloquejat i excloure'm a mi mateix
     if current_user_id:
         all_users = [
@@ -109,7 +107,7 @@ async def search_users(
             if u.get("uid") != current_user_id  # No mostrar-me a mi mateix
             and current_user_id not in (u.get("llista_bloquejats", []) or [])  # No m'han bloquejat
         ]
-    
+
     return all_users
 
 
