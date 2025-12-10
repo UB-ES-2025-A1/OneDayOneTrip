@@ -268,8 +268,8 @@ export async function loginAsTestUser(page: Page): Promise<boolean> {
     }
 
     // Verificar localStorage como último recurso
-    const uid = await page.evaluate(() => localStorage.getItem('uid'));
-    if (uid) {
+    const storedUid = await page.evaluate(() => localStorage.getItem('uid'));
+    if (storedUid) {
       console.log('✅ Sesión activa en localStorage');
       return true;
     }
