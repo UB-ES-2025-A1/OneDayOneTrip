@@ -28,6 +28,10 @@ export type BackendUser = {
   seguits?: number;
   llista_seguidors?: string[];
   llista_seguits?: string[];
+  llista_solicitud_seguidors?: string[];
+  llista_solicitud_seguits?: string[];
+  llista_bloquejats?: string[];
+  llista_bloquejadors?: string[];
   publicacions?: string[];
   guardades?: string[];
   url_foto_perfil?: string;
@@ -89,6 +93,8 @@ export default function UserProfile() {
         const backendUser = await getUserById(fbUser.uid);
         backendUser.llista_seguidors = backendUser.llista_seguidors || [];
         backendUser.llista_seguits = backendUser.llista_seguits || [];
+        backendUser.llista_solicitud_seguidors = backendUser.llista_solicitud_seguidors || [];
+        backendUser.llista_solicitud_seguits = backendUser.llista_solicitud_seguits || [];
         backendUser.publicacions = backendUser.publicacions || [];
         backendUser.guardades = backendUser.guardades || [];
         backendUser.llista_bloquejats = backendUser.llista_bloquejats || [];

@@ -271,3 +271,14 @@ def mark_notification_as_read(notification_id: str):
         return res.modified_count == 1
     except Exception:
         return False
+
+
+def delete_notification(notification_id: str):
+    """Elimina una notificació per ID"""
+    try:
+        res = notifications_collection.delete_one(
+            {"_id": ObjectId(notification_id)}
+        )
+        return res.deleted_count == 1
+    except Exception:
+        return False
