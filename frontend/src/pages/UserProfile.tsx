@@ -70,10 +70,34 @@ export default function UserProfile() {
   const [tripToDelete, setTripToDelete] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [mailboxOpen, setMailboxOpen] = useState(false);
-  const { notifications, loading: notifLoading, markRead } = useNotifications();
+  const {
+    notifications,
+    markRead,
+    refreshNotifications,
+    removeLocal,
+  } = useNotifications();
 
 
   const navigate = useNavigate();
+
+  const refreshProfile = async () => {
+    if (!currentUser) return;
+    try {
+      const updatedProfile = await getUserById(currentUser.uid);
+      updatedProfile.llista_seguidors = updatedProfile.llista_seguidors || [];
+      updatedProfile.llista_seguits = updatedProfile.llista_seguits || [];
+      updatedProfile.llista_solicitud_seguidors = updatedProfile.llista_solicitud_seguidors || [];
+      updatedProfile.llista_solicitud_seguits = updatedProfile.llista_solicitud_seguits || [];
+      updatedProfile.publicacions = updatedProfile.publicacions || [];
+      updatedProfile.guardades = updatedProfile.guardades || [];
+      updatedProfile.llista_bloquejats = updatedProfile.llista_bloquejats || [];
+      updatedProfile.llista_bloquejadors = updatedProfile.llista_bloquejadors || [];
+
+      setProfile(updatedProfile as BackendUser);
+    } catch (err) {
+      console.error("Error refrescant el perfil", err);
+    }
+  };
 
   // ---------------------------
   // Carregar usuari i trips
@@ -162,20 +186,20 @@ export default function UserProfile() {
   };
 
   const toGridItems = (trips: Trip[]): GridItem[] =>
-    trips.map((t) => ({
-      id: String(t._id),
-      title: t.title || t('general_no_title'),
+    trips.map((trip) => ({
+      id: String(trip._id),
+      title: trip.title || t('general_no_title'),
       img:
-        t.coverImage ||
-        (t.gallery && t.gallery[0]) ||
+        trip.coverImage ||
+        (trip.gallery && trip.gallery[0]) ||
         "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-      user: t.author?.name || t('general_anonymous'),
-      rating: typeof t.avgRating === "number" ? t.avgRating : 0,
-      temps: t.duration || "—",
-      dificultat: t.difficulty || "—",
-      authorPic: t.author?.profilePic || "",
-      city: t.city || "",
-      country: t.country || "",
+      user: trip.author?.name || t('general_anonymous'),
+      rating: typeof trip.avgRating === "number" ? trip.avgRating : 0,
+      temps: trip.duration || "—",
+      dificultat: trip.difficulty || "—",
+      authorPic: trip.author?.profilePic || "",
+      city: trip.city || "",
+      country: trip.country || "",
     }));
 
   const askDeleteTrip = (tripId: string) => {
@@ -249,6 +273,17 @@ export default function UserProfile() {
   
   const openMailbox = () => {
     setMailboxOpen(true);
+  };
+
+  const handleAfterAcceptNotification = async (notificationId: string) => {
+    removeLocal(notificationId);
+    await refreshNotifications();
+    await refreshProfile();
+  };
+
+  const handleAfterRejectNotification = async (notificationId: string) => {
+    removeLocal(notificationId);
+    await refreshNotifications();
   };
 
 
@@ -484,6 +519,8 @@ export default function UserProfile() {
             onClose={() => setMailboxOpen(false)}
             notifications={notifications}
             onMarkRead={markRead}
+            onAfterAccept={handleAfterAcceptNotification}
+            onAfterReject={handleAfterRejectNotification}
           />
 
 
