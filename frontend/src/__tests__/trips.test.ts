@@ -56,7 +56,7 @@ describe("trips API", () => {
         status: 500,
       });
 
-      await expect(getAllTrips()).rejects.toThrow("Error carregant les rutes");
+      await expect(getAllTrips()).rejects.toThrow("error_loading_routes");
     });
   });
 
@@ -98,7 +98,7 @@ describe("trips API", () => {
       });
 
       await expect(getTripById("invalid")).rejects.toThrow(
-        "Ruta no trobada o id invàlid"
+        "error_id_not_found"
       );
     });
   });
@@ -156,7 +156,7 @@ describe("trips API", () => {
       });
 
       await expect(getTripComments("trip-1")).rejects.toThrow(
-        "Error carregant comentaris"
+        "error_loading_comments"
       );
     });
   });
@@ -290,7 +290,7 @@ describe("trips API", () => {
           userName: "User 1",
           text: "Comment",
         })
-      ).rejects.toThrow(/Error creant comentari/);
+      ).rejects.toThrow(/error_commenting_route/);
     });
   });
 
@@ -468,7 +468,7 @@ describe("trips API", () => {
 
       await expect(
         rateTrip("trip-1", { userId: "user-1", rating: 5 })
-      ).rejects.toThrow(/Error valorant la ruta/);
+      ).rejects.toThrow(/error_rating_route/);
     });
   });
 });
