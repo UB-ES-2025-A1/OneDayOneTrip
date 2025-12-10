@@ -91,7 +91,7 @@ async def search_users(
         try:
             blocked_by_me_list = json.loads(blocked_by_me)
         except json.JSONDecodeError:
-            blocked_by_me_list = []
+            pass
 
     # Filtrar per query si existeix
     search_term = query.lower().strip()
