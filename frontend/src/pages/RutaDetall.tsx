@@ -32,6 +32,9 @@ import {
 
 import "dayjs/locale/ca";
 
+// ⭐ IMPORTANTE: avatar
+import AvatarFallback from "../components/AvatarFallback";
+
 const isMongoObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s || "");
 const isNumericIndex = (s: string) => /^\d+$/.test(s || "");
 
@@ -48,13 +51,11 @@ export default function RutaDetall() {
 
   const [mainImage, setMainImage] = useState<string>("");
   const [showRatingModal, setShowRatingModal] = useState(false);
-
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
-
   const [isSaved, setIsSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
 
@@ -167,7 +168,7 @@ export default function RutaDetall() {
     }
   }, [id, navigate, currentUser, t]);
 
-  // 🔹 Dades de l'autor
+  // Datos del autor
   useEffect(() => {
     const loadAuthor = async () => {
       if (!tripData?.author?.userId || !tripData?._id) return;
@@ -215,7 +216,6 @@ export default function RutaDetall() {
     loadAuthor();
   }, [tripData, currentUser]);
 
-  // 🔹 Seguir / Deixar de seguir
   const handleFollow = async () => {
     if (!currentUser || !tripData?.author?.userId) return;
 
@@ -253,13 +253,12 @@ export default function RutaDetall() {
     }
   };
 
-
   const handleSaveTrip = async () => {
     if (!currentUser || !tripData?._id) return;
-    
+
     try {
       setSaveLoading(true);
-      
+
       if (!isSaved) {
         await saveTrip(currentUser.uid, tripData._id);
         setIsSaved(true);
@@ -274,8 +273,6 @@ export default function RutaDetall() {
     }
   };
 
-
-  // 🔹 Valorar ruta
   const handleSubmitRating = async (value: number) => {
     if (!currentUser) {
       alert(t('route_detail_error_rating_login'));
@@ -310,8 +307,8 @@ export default function RutaDetall() {
       );
 
       setShowRatingModal(false);
-    } catch{
-      alert(t('route_detail_error_send_rating'));
+    } catch {
+      alert("No s'ha pogut enviar la valoració.");
     }
   };
 
@@ -355,60 +352,72 @@ export default function RutaDetall() {
       <div className="ruta-detall">
         <div className="ruta-header-line">
           <h1 className="ruta-titol">{tripData.title}</h1>
-  
-          <div className="ruta-actions">            
+
+          <div className="ruta-actions">
+
             {/* Esquerra: Rating + Valorar */}
             <div className="ruta-actions-left">
               {tripData.avgRating != null && (
-              <div className="rating-summary">
-                <span className="rating-star">★</span>
-                <span className="rating-value">
-                  {tripData.avgRating.toFixed(1)}
-                </span>
-                <span className="rating-count">
-                  ({tripData.numRatings})
-                </span>
-              </div>
-            )}
-          <div className="ruta-actions-buttons">
-            <button
-              className="valorar-button"
-              onClick={() => setShowRatingModal(true)}
-            >
-              <span className="valorar-icon">★</span>
+                <div className="rating-summary">
+                  <span className="rating-star">★</span>
+                  <span className="rating-value">
+                    {tripData.avgRating.toFixed(1)}
+                  </span>
+                  <span className="rating-count">
+                    ({tripData.numRatings})
+                  </span>
+                </div>
+              )}
+            </div>  {/* ✅ CIERRE QUE FALTABA */}
+
+            <div className="ruta-actions-buttons">
+              {/* Botón Valorar */}
+              <button
+                className="valorar-button"
+                onClick={() => setShowRatingModal(true)}
+              >
+                <span className="valorar-icon">★</span>
                 {t('route_detail_rate')}
-            </button>
-            {/* Dreta: Botó Guardar */}
-            <button
-              type="button"
-              className={`guardar-button ${isSaved ? "saved" : ""}`}
-              onClick={handleSaveTrip}
-              disabled={saveLoading}
-            >
-              <label className="ui-bookmark">
+              </button>
+
+              {/* Botón Guardar */}
+              <button
+                type="button"
+                className={`guardar-button ${isSaved ? "saved" : ""}`}
+                onClick={handleSaveTrip}
+                disabled={saveLoading}
+              >
                 <svg
                   className="bookmark"
                   viewBox="0 0 24 24"
                   width="24"
                   height="24"
                 >
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 
-                          2 8.5 2 5.42 4.42 3 7.5 3 
-                          c1.74 0 3.41 0.81 4.5 2.09 
-                          C13.09 3.81 14.76 3 16.5 3 
-                          C19.58 3 22 5.42 22 8.5 
-                          c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  <path
+                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 
+                      2 8.5 2 5.42 4.42 3 7.5 3 
+                      c1.74 0 3.41 0.81 4.5 2.09 
+                      C13.09 3.81 14.76 3 16.5 3 
+                      C19.58 3 22 5.42 22 8.5 
+                      c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                  />
                 </svg>
-              </label>
-              <span className="guardar-text">
-                {isSaved ? t('route_detail_saved') : saveLoading ? t('route_detail_saving') : t('route_detail_save')}
-              </span>
-            </button>
+
+                <span className="guardar-text">
+                  {isSaved
+                    ? t('route_detail_saved')
+                    : saveLoading
+                    ? t('route_detail_saving')
+                    : t('route_detail_save')}
+                </span>
+              </button>
             </div>
+
           </div>
+
         </div>
-        </div>
-        
+
+        {/* Ubicació */}
         <div className="ubicacio">
           <MapPin className="ubi-icon" />
           <span>{tripData.city}</span>
@@ -420,22 +429,37 @@ export default function RutaDetall() {
         <div className="autor">
           <div
             className="autor-icon"
-            onClick={() => tripData?.author?.userId && navigate(`/user/${tripData.author.userId}`)}
+            onClick={() =>
+              tripData?.author?.userId &&
+              navigate(`/user/${tripData.author.userId}`)
+            }
             style={{ cursor: "pointer" }}
           >
-            <img
-              src={tripData.author?.profilePic || "/images/person.png"}
-              alt={tripData.author?.name || t('general_user')}
-              className="autor-foto"
-            />
+            {tripData.author?.profilePic ? (
+              <img
+                src={tripData.author.profilePic}
+                alt={tripData.author?.name || "Autor"}
+                className="autor-foto"
+              />
+            ) : (
+              <AvatarFallback
+                name={tripData.author?.name || "?"}
+                size={45}
+              />
+            )}
           </div>
 
           <div
             className="autor-info"
-            onClick={() => tripData?.author?.userId && navigate(`/user/${tripData.author.userId}`)}
+            onClick={() =>
+              tripData?.author?.userId &&
+              navigate(`/user/${tripData.author.userId}`)
+            }
             style={{ cursor: "pointer" }}
           >
-            <span className="autor-nombre">{tripData.author?.name}</span>
+            <span className="autor-nombre">
+              {tripData.author?.name}
+            </span>
             {followersCount !== null && (
               <span className="autor-seguidors">
                 {followersCount} {t(followersCount === 1 ? 'route_detail_followers' : 'route_detail_followers_plural')}
@@ -468,7 +492,9 @@ export default function RutaDetall() {
             id: i,
             titol: p.title,
             descripcio: p.description,
-            ubicacio: p.location_name || `${p.coordinates?.lat}, ${p.coordinates?.lng}`,
+            ubicacio:
+              p.location_name ||
+              `${p.coordinates?.lat}, ${p.coordinates?.lng}`,
             imatge: p.image,
           }))}
         />
@@ -482,8 +508,14 @@ export default function RutaDetall() {
       />
 
       {showRatingModal && (
-        <div className="valorar-overlay" onClick={() => setShowRatingModal(false)}>
-          <div className="valorar-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="valorar-overlay"
+          onClick={() => setShowRatingModal(false)}
+        >
+          <div
+            className="valorar-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Valorar
               tripId={tripData._id!}
               onClose={() => setShowRatingModal(false)}

@@ -1,15 +1,10 @@
 import { getAuth } from "firebase/auth";
 import { createNotification } from "../api/notifier";
 
-const API_URL = "http://127.0.0.1:8000"; // o
-
-// url production = https://onedayonetrip-api.onrender.com
-
-// url preproduction = https://onedayonetrip.onrender.com
-
+const API_URL = "http://127.0.0.1:8000";
 
 // ------------------------------
-// Funcions base genèriques
+// Funciones base genéricas
 // ------------------------------
 export async function apiGet(path: string) {
   const user = getAuth().currentUser;
@@ -40,11 +35,22 @@ export async function apiPost(path: string, body: object) {
   return res.json();
 }
 
-// ------------------------------
-// Endpoints d'usuaris
-// ------------------------------
+export async function apiDelete(path: string) {
+  const user = getAuth().currentUser;
+  const token = user ? await user.getIdToken() : null;
 
-// Registrar usuari (nou endpoint FastAPI)
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+
+  if (!res.ok) throw new Error(`API Error ${res.status}`);
+  return res.json();
+}
+
+// ------------------------------
+// Usuarios
+// ------------------------------
 export async function registerUser(data: {
   fullname: string;
   username: string;
@@ -54,22 +60,53 @@ export async function registerUser(data: {
   return apiPost("/users/register", data);
 }
 
-// Obtenir l'usuari autenticat
 export async function getCurrentUser() {
   return apiGet("/users/me");
 }
 
-// Obtenir un usuari pel seu ID (públic o autenticat)
 export async function getUserById(userId: string) {
   return apiGet(`/users/${userId}`);
 }
 
-// Obtenir tots els usuaris (només si està autenticat)
 export async function getAllUsers() {
   return apiGet("/users");
 }
 
-// Seguir un usuari
+// ------------------------------
+// 🔥 NUEVO: actualizar perfil (multipart)
+// ------------------------------
+export async function updateUser(
+  userId: string,
+  jsonData: Record<string, any>,
+  fotoPerfil?: File | null,
+  fotoPanell?: File | null
+) {
+  const user = getAuth().currentUser;
+  const token = user ? await user.getIdToken() : null;
+
+  const formData = new FormData();
+  formData.append("user_json", JSON.stringify(jsonData));
+
+  if (fotoPerfil) formData.append("foto_perfil", fotoPerfil);
+  if (fotoPanell) formData.append("foto_panell", fotoPanell);
+
+  const res = await fetch(`${API_URL}/users/update/${userId}`, {
+    method: "PATCH",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+
+  if (!res.ok) {
+    let err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Error updating user");
+  }
+
+  return res.json();
+}
+
+// ------------------------------
+// Follows
+// ------------------------------
 export async function followUser(userId: string, targetId: string) {
   const res = await apiPost(`/users/follow/${userId}/${targetId}`, {});
 
@@ -139,7 +176,7 @@ export async function unfollowUser(userId: string, targetId: string) {
       },
     });
   } catch (e) {
-    console.warn("⚠️ No s'ha pogut crear la notificació de unfollow:", e);
+    console.warn("⚠️ No s'ha pogut crear notificació d'unfollow:", e);
   }
 
   return res;
@@ -160,58 +197,38 @@ export async function reject_follow_request(userId: string, targetId: string) {
   return apiPost(`/users/reject_follow_request/${userId}/${targetId}`, {});
 }
 
-// Guardar una ruta
+
+// ------------------------------
+// Saves, blocks y más
+// ------------------------------
 export async function saveTrip(userId: string, tripId: string) {
   return apiPost(`/users/save/${userId}/${tripId}`, {});
 }
 
-// Deixar de guardar una ruta
 export async function unsaveTrip(userId: string, tripId: string) {
   return apiPost(`/users/unsave/${userId}/${tripId}`, {});
 }
 
-// Bloquejar un usuari
 export async function blockUser(userId: string, targetId: string) {
   return apiPost(`/users/block/${userId}/${targetId}`, {});
 }
-// Deixar de bloquejar un usuari
+
 export async function unblockUser(userId: string, targetId: string) {
   return apiPost(`/users/unblock/${userId}/${targetId}`, {});
 }
 
-// 📌 Añadir una publicación al usuario
 export async function addPublicationToUser(userId: string, tripId: string) {
   return apiPost(`/users/${userId}/publicacions/${tripId}`, {});
 }
 
-// Eliminar un follower
 export async function removeFollower(userId: string, targetId: string) {
   return apiPost(`/users/removefollower/${userId}/${targetId}`, {});
 }
 
-// ------------------------------
-// DELETE helpers
-// ------------------------------
-export async function apiDelete(path: string) {
-  const user = getAuth().currentUser;
-  const token = user ? await user.getIdToken() : null;
-
-  const res = await fetch(`${API_URL}${path}`, {
-    method: "DELETE",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-
-  if (!res.ok) throw new Error(`API Error ${res.status}`);
-  return res.json();
-}
-
-// Eliminar una trip (backend: DELETE /trips/{trip_id})
 export async function deleteTripById(tripId: string) {
   return apiDelete(`/trips/${tripId}`);
 }
 
-// Eliminar una publicació de l’usuari
-// backend: DELETE /users/{user_id}/publicacions/{trip_id}
 export async function removePublication(userId: string, tripId: string) {
   return apiDelete(`/users/${userId}/publicacions/${tripId}`);
 }
@@ -221,7 +238,6 @@ export async function deleteTripAndPublication(userId: string, tripId: string) {
   await removePublication(userId, tripId);
 }
 
-// eliminar compte completament (backend: DELETE /users/delete/{user_id})
 export async function deleteAccount(userId: string) {
   return apiDelete(`/users/delete/${userId}`);
 }
