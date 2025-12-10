@@ -3,6 +3,7 @@ import "../styles/MailBox.css";
 import { accept_follow_request, reject_follow_request } from "../api/client";
 import { auth } from "../firebase";
 import { deleteNotification } from "../api/notifier";
+import { useTranslation } from 'react-i18next';
 
 export type NotificationType = "follow" | "follow_request" | "comment" | "rating";
 
@@ -55,7 +56,8 @@ function getIcon(type: NotificationType) {
 }
 
 export default function Mailbox({ open, onClose, notifications, onMarkRead, onAfterAccept, onAfterReject }: Props) {
-  if (!open) return null;
+    const { t } = useTranslation();
+    if (!open) return null;
 
   const items = notifications || [];
   const unreadCount = items.filter((n) => !n.read).length;
@@ -68,20 +70,20 @@ export default function Mailbox({ open, onClose, notifications, onMarkRead, onAf
 
     try {
       if (!fromUserId) {
-        alert("No es pot acceptar la sol·licitud: manca l'ID de l'usuari.");
+        alert(t('error_accepting'));
       } else {
         await accept_follow_request(currentUserId, fromUserId);
       }
     } catch (err) {
       console.error(err);
-      alert("Error al acceptar la sol·licitud de seguiment.");
+      alert();
     } finally {
       await deleteNotification(notification.id);
       if (onAfterAccept) {
         try {
           await onAfterAccept(notification.id);
         } catch (cbErr) {
-          console.error("Error després d'acceptar:", cbErr);
+          console.error(t('error_after_accept'), cbErr);
         }
       }
     }
@@ -95,20 +97,20 @@ const handleReject = async (notification: Notification) => {
 
   try {
     if (!fromUserId) {
-      alert("No es pot rebutjar la sol·licitud: manca l'ID de l'usuari.");
+      alert(t('error_rejecting'));
     } else {
       await reject_follow_request(currentUserId, fromUserId); // rebutjar la sol·licitud
     }
   } catch (err) {
     console.error(err);
-    alert("Error al rebuthar la sol·licitud de seguiment.");
+    alert(t('error_rejecting_request'));
   } finally {
     await deleteNotification(notification.id);  // eliminar la notificació
     if (onAfterReject) {
       try {
         await onAfterReject(notification.id);
       } catch (cbErr) {
-        console.error("Error després de rebutjar:", cbErr);
+        console.error(t('error_after_reject'), cbErr);
       }
     }
   }
@@ -125,7 +127,7 @@ const handleReject = async (notification: Notification) => {
         <header className="mailbox-header">
           <div className="mailbox-title">
             <Mail size={20} />
-            <span>Notificacions</span>
+            <span>{t('notifications')}</span>
             {unreadCount > 0 && (
               <span className="mailbox-badge">{unreadCount}</span>
             )}
@@ -139,9 +141,9 @@ const handleReject = async (notification: Notification) => {
         <div className="mailbox-body">
           {items.length === 0 ? (
             <div className="mailbox-empty">
-              <p>No tens notificacions encara.</p>
+              <p>{t('no_notifications')}</p>
               <span>
-                Quan algú et segueixi, comenti o valori una ruta, ho veuràs aquí.
+                {t('info_mailbox')}
               </span>
             </div>
           ) : (
@@ -173,8 +175,8 @@ const handleReject = async (notification: Notification) => {
 
                   {n.type === "follow_request" && !n.read && (
                     <div className="follow-request-actions">
-                      <button onClick={() => handleAccept(n)}>Acceptar</button>
-                      <button onClick={() => handleReject(n)}>Rebutjar</button>
+                      <button onClick={() => handleAccept(n)}>{t('accept')}</button>
+                      <button onClick={() => handleReject(n)}>{t('reject')}</button>
                     </div>
                   )}
 

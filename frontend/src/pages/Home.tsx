@@ -87,7 +87,7 @@ export default function Home() {
     const fetchTrips = async () => {
       try {
         setLoading(true);
-        const data = await getAllTrips(true);
+        const data = await getAllTrips(true, t);
         
         // Si no hi ha usuari loguejat, mostrar només les rutes de perfils públics
         if (!currentUser) {

@@ -359,5 +359,39 @@
 
   "error_deleting_account": "Error deleting account:",
   "language": "Language",
-  "select_language": "Select language"
+  "select_language": "Select language",
+
+  "privacy": "Privacy",
+  "only_followers_see_route": "Only approved followers will be able to see your profile and routes.",
+  "all_users_see_route": "Any user will be able to see your profile and routes.",
+
+
+  "error_accepting": "No se puede aceptar la solicitud: falta el ID del usuario.",
+  "error_accepting_request": "Error al aceptar la solicitud de seguimiento.",
+  "error_after_accept": "Error después de aceptar:",
+
+  "error_rejecting": "No se puede rechazar la solicitud: falta el ID del usuario.",
+  "error_rejecting_request": "Error al rechazar la solicitud de seguimiento.",
+  "error_after_reject": "Error después de rechazar:",
+
+
+  "info_mailbox": "Cuando alguien te siga, comente o valore una ruta, lo verás aquí.",
+  "accept": "Aceptar",
+  "reject": "Rechazar",
+
+  "posted_route": "posted a new route",
+  "error_creating_route": "posted a new route",
+  "comment_route": "commented your route",
+  "error_commenting_route": "Error creating comment",
+  "rated_route": "rated your route with",
+  "error_rating_route": "Error rating route:",
+  "error_loading_routes": "Error loading routes",
+  "error_id_not_found": "Route not found or invalid id:",
+  "error_loading_comments": "Error loading route comments:",
+
+  "profile": "Profile",
+  "private": "private",
+  "public": "public",
+  "notifications": "Notifications",
+  "no_notifications": "You don't have any notifications yet."
 }
