@@ -243,7 +243,20 @@ export default function Home() {
     }
   });
 
-  const visibleUsers = users.filter((u) => {
+
+  const followingIds = backendUser?.llista_seguits || [];
+
+  const usersByTab = users.filter((u) => {
+    if (selectedTab === "following") {
+      // Només els usuaris que segueixo
+      return followingIds.includes(u.uid);
+    }
+
+    // En "recommended" de moment mostrem tots (pots canviar la lògica si vols)
+    return true;
+  });
+
+  const visibleUsers = usersByTab.filter((u) => {
     if (!search) return true;
 
     const name = (u.nom_i_cognoms || "").toLowerCase();
@@ -251,6 +264,7 @@ export default function Home() {
 
     return name.includes(search) || username.includes(search);
   });
+
 
   const isFiltering = search.length > 0 || searchFilter !== "all";
 
