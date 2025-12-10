@@ -56,7 +56,7 @@ export default function UserProfilePublic() {
 
   // Estats de bloqueig (Staging)
   const [isBlocked, setIsBlocked] = useState(false);
-  const [blockLoading, setBlockLoading] = useState(false);
+  const [, setBlockLoading] = useState(false);
   const [imBlocked, setImBlocked] = useState(false);
   const [blockStateLoaded, setBlockStateLoaded] = useState(false);
 
