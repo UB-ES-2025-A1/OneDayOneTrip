@@ -345,10 +345,6 @@ async def ask_to_follow_user(user_id: str, target_id: str):
             status_code=404, detail="L'usuari que vols seguir no existeix"
         )
 
-    # Verificar si el target té perfil privat
-    target_data = target_doc.to_dict()
-    is_private = target_data.get("isPrivate", False)
-
     target_ref.update({"llista_solicitud_seguidors": firestore.ArrayUnion([user_id])})
     user_ref.update({"llista_solicitud_seguits": firestore.ArrayUnion([target_id])})
     return {"message": "Sol·licitud de seguiment enviada correctament"}
@@ -490,39 +486,6 @@ async def add_publicacio(user_id: str, trip_id: str, user=Depends(verify_token))
         "publicacions": list(publicacions),
     }
 
-@router.post("/removefollower/{user_id}/{target_id}")
-async def remove_follower(user_id: str, target_id: str):
-    """
-    Elimina el target_id de la llista de seguidors de user_id.
-    A més, elimina user_id de la llista de seguits del target_id
-    per mantenir la coherència.
-    """
-
-    user_ref = db.collection("users").document(user_id)
-    target_ref = db.collection("users").document(target_id)
-
-    user_doc = user_ref.get()
-    target_doc = target_ref.get()
-
-    if not user_doc.exists:
-        raise HTTPException(
-            status_code=404,
-            detail="L'usuari que rep el seguidor no existeix"
-        )
-
-    if not target_doc.exists:
-        raise HTTPException(
-            status_code=404,
-            detail="L'usuari que vols eliminar de seguidors no existeix"
-        )
-
-    # Eliminar target_id de la llista de seguidors
-    user_ref.update({"llista_seguidors": firestore.ArrayRemove([target_id])})
-
-    # Eliminar user_id de la llista de seguits del target
-    target_ref.update({"llista_seguits": firestore.ArrayRemove([user_id])})
-
-    return {"message": "Seguidor eliminat correctament"}
 
 @router.post("/removefollower/{user_id}/{target_id}")
 async def remove_follower(user_id: str, target_id: str):
