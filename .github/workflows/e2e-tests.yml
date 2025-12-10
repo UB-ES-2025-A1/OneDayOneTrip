@@ -143,24 +143,23 @@ jobs:
       - name: 🔧 Create E2E environment files
         run: |
           # Frontend .env para E2E (Vite reads .env by default)
-          cat > frontend/.env << EOF
-          VITE_API_URL=http://localhost:8001
-          VITE_E2E_MODE=true
-          VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_DISABLE_APP_CHECK=true
-          EOF
+          echo "VITE_API_URL=http://localhost:8001" > frontend/.env
+          echo "VITE_E2E_MODE=true" >> frontend/.env
+          echo "VITE_DISABLE_APP_CHECK=true" >> frontend/.env
+          echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}" >> frontend/.env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}" >> frontend/.env
+          echo "VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}" >> frontend/.env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}" >> frontend/.env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}" >> frontend/.env
+          echo "VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}" >> frontend/.env
+          
+          # Debug: show .env content (secrets will be masked)
+          echo "📄 Frontend .env created with $(wc -l < frontend/.env) lines"
           
           # Backend .env para E2E
-          cat > api/.env << EOF
-          MONGO_URI=mongodb://localhost:27018/OneDayOneTrip_E2E
-          E2E_MODE=true
-          FIREBASE_CREDENTIALS=${{ secrets.FIREBASE_CREDENTIALS_E2E }}
-          EOF
+          echo "MONGO_URI=mongodb://localhost:27018/OneDayOneTrip_E2E" > api/.env
+          echo "E2E_MODE=true" >> api/.env
+          echo "FIREBASE_CREDENTIALS=${{ secrets.FIREBASE_CREDENTIALS_E2E }}" >> api/.env
 
       # ────────────────────────────────────────────────────────
       # 🚀 Iniciar servicios
