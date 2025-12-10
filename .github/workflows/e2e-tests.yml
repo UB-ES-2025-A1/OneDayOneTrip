@@ -164,6 +164,17 @@ jobs:
       # ────────────────────────────────────────────────────────
       # 🚀 Iniciar servicios
       # ────────────────────────────────────────────────────────
+      - name: 🔐 Setup Firebase credentials
+        run: |
+          # Decode base64-encoded Firebase credentials and write to file
+          echo '${{ secrets.FIREBASE_CREDENTIALS_E2E_BASE64 }}' | base64 -d > /tmp/firebase-credentials.json
+          # Set env var with the JSON content for the backend
+          FIREBASE_CREDS=$(cat /tmp/firebase-credentials.json)
+          echo "FIREBASE_CREDENTIALS<<EOF" >> $GITHUB_ENV
+          echo "$FIREBASE_CREDS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          echo "✅ Firebase credentials configured"
+          
       - name: 🚀 Start backend API
         working-directory: api
         run: |
@@ -183,7 +194,6 @@ jobs:
           done
         env:
           MONGO_URI: mongodb://localhost:27018/OneDayOneTrip_E2E
-          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS_E2E }}
 
       - name: 🚀 Start frontend dev server
         working-directory: frontend
