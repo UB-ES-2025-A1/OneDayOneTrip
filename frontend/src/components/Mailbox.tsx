@@ -70,7 +70,6 @@ export default function Mailbox({ open, onClose, notifications, onMarkRead }: Pr
       alert("No es pot acceptar la sol·licitud: manca l'ID de l'usuari.");
     } else {
       await accept_follow_request(currentUserId, fromUserId); // acceptar la sol·licitud
-      await followUser(fromUserId, currentUserId);  // fer que ens segueixi l'usuari
     }
   } catch (err) {
     console.error(err);

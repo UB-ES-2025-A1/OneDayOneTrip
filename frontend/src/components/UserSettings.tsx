@@ -3,7 +3,8 @@ import "../styles/UserSettings.css";
 import { X } from "lucide-react";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
-import { deleteAccount } from "../api/client";
+import { deleteAccount, accept_follow_request } from "../api/client";
+import { getNotifications, deleteNotification } from "../api/notifier";
 import i18n from "../i18n/i18n";
 import { useTranslation } from 'react-i18next';
 import type { BackendUser } from "../pages/UserProfile";
@@ -89,6 +90,42 @@ export default function UserSettings({ open, profile, onClose, onSavePrivacy }: 
         ...profile,
         isPrivate: newPrivacy,
       };
+
+      // Si canvia a públic (newPrivacy === false)
+      if (!newPrivacy) {
+        try {
+          // 1. Acceptar totes les sol·licituds pendents
+          if (profile.llista_solicitud_seguidors && profile.llista_solicitud_seguidors.length > 0) {
+            const pendingRequests = profile.llista_solicitud_seguidors;
+            
+            for (const fromUserId of pendingRequests) {
+              await accept_follow_request(profile.uid, fromUserId);
+            }
+            console.log(`✅ S'han acceptat ${pendingRequests.length} sol·licituds pendents`);
+          }
+
+          // 2. Eliminar TOTES les notificacions de sol·licitud de seguiment (independentment del seu origen)
+          try {
+            const notifications = await getNotifications(profile.uid, false);
+            const followRequestNotifs = notifications.filter(
+              (n: any) => n.type === "follow_request"
+            );
+
+            for (const notif of followRequestNotifs) {
+              await deleteNotification(notif.id);
+            }
+
+            if (followRequestNotifs.length > 0) {
+              console.log(`🗑️ S'han eliminat ${followRequestNotifs.length} notificacions de sol·licitud de seguiment`);
+            }
+          } catch (err) {
+            console.error("⚠️ Error eliminant notificacions:", err);
+          }
+        } catch (err) {
+          console.error("⚠️ Error acceptant sol·licituds pendents:", err);
+          // No aturem l'execució, ja que el perfil s'ha canviat correctament
+        }
+      }
 
       if (onSavePrivacy) onSavePrivacy(updatedProfile);
     } catch (e: any) {
