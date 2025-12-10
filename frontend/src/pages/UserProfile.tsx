@@ -185,13 +185,8 @@ export default function UserProfile() {
     setSeguitsModalOpen(false);
   };
 
-<<<<<<< HEAD
-  const toGridItems = (tripsList: Trip[]): GridItem[] =>
-    tripsList.map((trip) => ({
-=======
   const toGridItems = (trips: Trip[]): GridItem[] =>
     trips.map((trip) => ({
->>>>>>> origin/staging
       id: String(trip._id),
       title: trip.title || t('general_no_title'),
       img:

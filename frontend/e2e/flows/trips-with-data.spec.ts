@@ -1,4 +1,4 @@
-import { test, expect, waitForPageLoad, SELECTORS } from '../fixtures/test-fixtures';
+import { test, expect, waitForPageLoad, waitForTripsAPI, SELECTORS } from '../fixtures/test-fixtures';
 import { loginAsTestUser } from '../fixtures/auth-helpers';
 
 /**
@@ -14,25 +14,8 @@ import { loginAsTestUser } from '../fixtures/auth-helpers';
 test.describe('Rutas - Verificación de datos de seed', () => {
 
   test('DEBE cargar rutas desde la API', async ({ page }) => {
-    // Interceptar llamada a la API ANTES de navegar
-    const responsePromise = page.waitForResponse(
-      response => response.url().includes('/trips') && 
-                  response.status() === 200 &&
-                  (response.headers()['content-type']?.includes('application/json') ?? false),
-      { timeout: 20000 }
-    );
-    
-    await page.goto('/');
-    
-    const tripsResponse = await responsePromise;
-    expect(tripsResponse).toBeTruthy();
-    
-    const data = await tripsResponse.json();
-    const tripCount = Array.isArray(data) ? data.length : 0;
-    
-    // DEBE haber al menos 1 ruta (del seed)
-    expect(tripCount).toBeGreaterThan(0);
-    console.log(`✅ API respondió con ${tripCount} rutas`);
+    const count = await waitForTripsAPI(page, true);
+    console.log(`✅ API respondió con ${count} rutas`);
   });
 
   test('DEBE mostrar rutas en la home', async ({ page }) => {

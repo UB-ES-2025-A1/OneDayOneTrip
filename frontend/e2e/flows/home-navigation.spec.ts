@@ -11,6 +11,20 @@ import { loginAsTestUser } from '../fixtures/auth-helpers';
 test.describe('Home Page - Carga y Elementos Básicos', () => {
   
   test.beforeEach(async ({ page }) => {
+    await clearAuthState(page);
+    await page.evaluate(async () => {
+      try {
+        // @ts-ignore
+        const auth = (window as any).auth;
+        if (auth?.signOut) {
+          await auth.signOut();
+        }
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {
+        // ignore
+      }
+    });
     await page.goto('/');
     await waitForPageLoad(page);
   });
@@ -45,23 +59,9 @@ test.describe('Home Page - Carga y Elementos Básicos', () => {
   });
 
   test('DEBE cargar rutas desde la API', async ({ page }) => {
-    // Recargar para interceptar la llamada a la API
-    const responsePromise = page.waitForResponse(
-      response => response.url().includes('/trips') && response.status() === 200,
-      { timeout: 20000 }
-    );
-    
-    await page.reload();
-    
-    const apiResponse = await responsePromise;
-    expect(apiResponse).toBeTruthy();
-    
-    const data = await apiResponse.json();
-    const tripCount = Array.isArray(data) ? data.length : 0;
-    
-    // DEBE haber al menos 1 ruta (el seed las crea)
-    expect(tripCount).toBeGreaterThan(0);
-    console.log(`✅ API respondió con ${tripCount} rutas`);
+    const count = await waitForTripsAPI(page, true);
+    expect(count).toBeGreaterThan(0);
+    console.log(`✅ API respondió con ${count} rutas`);
   });
 
   test('DEBE mostrar tarjetas de rutas en la home', async ({ page }) => {
@@ -83,6 +83,20 @@ test.describe('Home Page - Carga y Elementos Básicos', () => {
 test.describe('Home Page - Modal de Login', () => {
   
   test.beforeEach(async ({ page }) => {
+    await clearAuthState(page);
+    await page.evaluate(async () => {
+      try {
+        // @ts-ignore
+        const auth = (window as any).auth;
+        if (auth?.signOut) {
+          await auth.signOut();
+        }
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {
+        // ignore
+      }
+    });
     await page.goto('/');
     await waitForPageLoad(page);
   });

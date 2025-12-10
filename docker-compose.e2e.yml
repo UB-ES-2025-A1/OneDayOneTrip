@@ -31,7 +31,10 @@ services:
       - "8000:8000"  # Mismo puerto que espera el frontend (127.0.0.1:8000)
     environment:
       - MONGO_URI=mongodb://mongo-e2e:27017/OneDayOneTrip_E2E
-      - FIREBASE_CREDENTIALS=${FIREBASE_CREDENTIALS_E2E:-}
+      # Credenciales del servicio de Firebase (JSON en una sola línea).
+      # Defínelo en el .env de la raíz como:
+      # FIREBASE_CREDENTIALS_E2E={"type":"service_account",...}
+      - FIREBASE_CREDENTIALS=${FIREBASE_CREDENTIALS_E2E}
       - E2E_MODE=true
     depends_on:
       mongo-e2e:

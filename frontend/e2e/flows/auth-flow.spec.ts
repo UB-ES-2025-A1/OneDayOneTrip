@@ -1,5 +1,33 @@
 import { test, expect, waitForPageLoad, clearAuthState, SELECTORS, fillAndSubmitLoginForm, TEST_USERS } from '../fixtures/test-fixtures';
 
+async function ensureLoggedOut(page: any) {
+  await clearAuthState(page);
+  await page.goto('/');
+  await waitForPageLoad(page);
+  const logoutBtn = page.locator(SELECTORS.logoutButton).first();
+  const isLoggedIn = await logoutBtn.isVisible({ timeout: 2000 }).catch(() => false);
+  if (isLoggedIn) {
+    await logoutBtn.click().catch(() => {});
+    await waitForPageLoad(page);
+  }
+  // Forzar signOut en Firebase si está disponible
+  await page.evaluate(async () => {
+    try {
+      // @ts-ignore
+      const auth = (window as any).auth;
+      if (auth?.signOut) {
+        await auth.signOut();
+      }
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch {
+      // ignorar
+    }
+  });
+  await page.reload();
+  await waitForPageLoad(page);
+}
+
 /**
  * 🔐 Tests E2E: Flujo completo de autenticación
  * 
@@ -10,9 +38,7 @@ import { test, expect, waitForPageLoad, clearAuthState, SELECTORS, fillAndSubmit
 test.describe('Autenticación - Flujo de Login', () => {
 
   test.beforeEach(async ({ page }) => {
-    await clearAuthState(page);
-    await page.goto('/');
-    await waitForPageLoad(page);
+    await ensureLoggedOut(page);
   });
 
   test('DEBE abrir modal de login al hacer clic en el botón', async ({ page }) => {
