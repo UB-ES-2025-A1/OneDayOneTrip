@@ -63,7 +63,7 @@ export interface Comment {
 // Base URL
 // ==========================================================
 
-const RAW_BASE_URL = "http://127.0.0.1:8000";
+const RAW_BASE_URL = "https://onedayonetrip-api.onrender.com";
 const BASE_URL = RAW_BASE_URL.replace(/\/+$/, "");
 export const fallbackT: TFunction = ((key: string) => key) as any;
 

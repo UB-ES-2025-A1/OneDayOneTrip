@@ -1,7 +1,8 @@
 import { getAuth } from "firebase/auth";
 import { createNotification } from "../api/notifier";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://onedayonetrip-api.onrender.com";
+//const API_URL = "http://127.0.0.1:8000";
 
 // ------------------------------
 // Funciones base genéricas
