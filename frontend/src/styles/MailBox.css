@@ -184,6 +184,53 @@
   color: #777;
 }
 
+/* Contenidor */
+.follow-request-actions {
+  display: flex;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* Botons enganxats */
+.follow-request-actions button {
+  padding: 3px 9px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+
+  border-radius: 4px;
+  border: 2px solid #7b7b7b;          
+  background: #f9f9f9;
+  color: #222;
+
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+/* Esquerra */
+.follow-request-actions button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Dreta */
+.follow-request-actions button:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -2px; 
+}
+
+/* Hover Light */
+.follow-request-actions button:hover {
+  background: #ececec;
+  border-color: #5c5c5c;              
+}
+
+/* Active */
+.follow-request-actions button:active {
+  transform: scale(0.96);
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .mailbox-panel {
@@ -193,6 +240,7 @@
     border-radius: 14px;
   }
 }
+
 
 /* =========================================================
    DARK MODE — MAILBOX 
@@ -291,3 +339,23 @@
   color: var(--text-secondary);
 }
 
+[data-theme="dark"] .follow-request-actions button {
+  background: #2b2b2c;
+  border-color: #4a4a4a;              /* borde més definit en dark */
+  color: #e5e5e5;
+}
+
+[data-theme="dark"] .follow-request-actions button:hover {
+  background: #353536;
+  border-color: #5c5c5c;
+}
+
+[data-theme="dark"] .follow-request-actions button:first-child:hover {
+  border-color: #8fda8f;
+  background: rgba(143, 218, 143, 0.15);
+  color: #c7f5c7;
+}
+
+[data-theme="dark"] .follow-request-actions button:last-child:hover {
+  border-color: #888;
+}

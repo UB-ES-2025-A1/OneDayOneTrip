@@ -368,7 +368,7 @@ export default function RutaDetall() {
                   </span>
                 </div>
               )}
-            </div>  {/* ✅ CIERRE QUE FALTABA */}
+            </div>  
 
             <div className="ruta-actions-buttons">
               {/* Botón Valorar */}
