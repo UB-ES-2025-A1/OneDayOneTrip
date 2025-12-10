@@ -257,6 +257,24 @@ async def accept_follow_request(user_id: str, follower_id: str):
     except Exception as e:
         print(f"[WARN] No s'ha pogut crear la notificació de follow en acceptar la sol·licitud: {e}")
 
+    # Crear notificació al sol·licitant informant que se li ha acceptat la sol·licitud
+    try:
+        user_data = user_doc.to_dict() or {}
+        extra_accepted = {
+            "fromUserName": user_data.get("nom_i_cognoms") or user_data.get("username") or "",
+            "fromUserAvatar": user_data.get("url_foto_perfil", ""),
+        }
+
+        create_notification(
+            from_user_id=user_id,
+            to_user_id=follower_id,
+            type="follow",
+            message="ha acceptat la teva sol·licitud de seguiment",
+            extra=extra_accepted,
+        )
+    except Exception as e:
+        print(f"[WARN] No s'ha pogut crear la notificació d'acceptació al sol·licitant: {e}")
+
     return {"message": "Sol·licitud de seguiment acceptada correctament"}
 
 
