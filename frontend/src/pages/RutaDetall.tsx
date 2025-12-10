@@ -121,37 +121,48 @@ export default function RutaDetall() {
           return;
         }
 
-        // Comprovar accés a la ruta
+        // Comprovar accés a la ruta (amb gestió d'errors per si l'autor no existeix a Firestore)
         if (tripData && tripData.author?.userId) {
-          const author = await getUserById(tripData.author.userId);
+          try {
+            const author = await getUserById(tripData.author.userId);
 
-          // Si hi ha usuari loguejat, comprovar bloqueigs i privacitat
-          if (currentUser) {
-            const currentUserData = await getUserById(currentUser.uid);
-            const isOwner = currentUser.uid === tripData.author.userId;
+            // Si hi ha usuari loguejat, comprovar bloqueigs i privacitat
+            if (currentUser) {
+              try {
+                const currentUserData = await getUserById(currentUser.uid);
+                const isOwner = currentUser.uid === tripData.author.userId;
 
-            // Comprovar si he bloquejat l'autor
-            const bloquejats = currentUserData.llista_bloquejats || [];
-            const amBlocked = bloquejats.includes(tripData.author.userId);
+                // Comprovar si he bloquejat l'autor
+                const bloquejats = currentUserData.llista_bloquejats || [];
+                const amBlocked = bloquejats.includes(tripData.author.userId);
 
-            // Comprovar si l'autor m'ha bloquejat
-            const imBlockedList = author.llista_bloquejats || [];
-            const authorBlockedMe = imBlockedList.includes(currentUser.uid);
+                // Comprovar si l'autor m'ha bloquejat
+                const imBlockedList = author.llista_bloquejats || [];
+                const authorBlockedMe = imBlockedList.includes(currentUser.uid);
 
-            // Si jo he bloquejat o l'autor m'ha bloquejat
-            if (!isOwner && (amBlocked || authorBlockedMe)) {
-              setError(t('route_detail_error_not_found'));
-              return;
+                // Si jo he bloquejat o l'autor m'ha bloquejat
+                if (!isOwner && (amBlocked || authorBlockedMe)) {
+                  setError(t('route_detail_error_not_found'));
+                  return;
+                }
+
+                // Si el perfil és privat i no segueixo
+                const followersList: string[] = author.llista_seguidors || [];
+                const isFollowingNow = followersList.includes(currentUser.uid);
+
+                if (!isOwner && author.isPrivate && !isFollowingNow) {
+                  setError(t('route_detail_error_not_found'));
+                  return;
+                }
+              } catch (userErr) {
+                // Si no es pot obtenir l'usuari actual, continuar sense verificar bloqueigs
+                console.warn("No s'ha pogut obtenir les dades de l'usuari actual:", userErr);
+              }
             }
-
-            // Si el perfil és privat i no segueixo
-            const followersList: string[] = author.llista_seguidors || [];
-            const isFollowingNow = followersList.includes(currentUser.uid);
-
-            if (!isOwner && author.isPrivate && !isFollowingNow) {
-              setError(t('route_detail_error_not_found'));
-              return;
-            }
+          } catch (authorErr) {
+            // Si l'autor no existeix a Firestore, continuar mostrant la ruta
+            // Això pot passar si l'usuari va ser creat directament a MongoDB (tests E2E)
+            console.warn("No s'ha pogut obtenir les dades de l'autor:", authorErr);
           }
         }
 

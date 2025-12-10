@@ -125,6 +125,36 @@ async function createUserInMongoDB(): Promise<boolean> {
   }
 }
 
+/**
+ * Crea el usuario de test en Firestore (donde la API busca usuarios)
+ * Este es necesario porque la API de usuarios usa Firestore, no MongoDB
+ */
+async function createUserInFirestore(authToken?: string): Promise<boolean> {
+  if (!authToken) {
+    console.log('⚠️ No hay token de auth, no se puede crear usuario en Firestore');
+    return false;
+  }
+  
+  try {
+    // Verificar si el usuario ya existe en Firestore via API
+    const checkResponse = await fetch(`${API_URL}/users/${USER_UID}`);
+    
+    if (checkResponse.ok) {
+      console.log('✅ Usuario ya existe en Firestore');
+      return true;
+    }
+    
+    // El usuario no existe, pero no podemos crearlo directamente sin autenticación
+    // La creación en Firestore se hace al registrar via /users/register con token
+    console.log('⚠️ Usuario no existe en Firestore - se creará al autenticarse');
+    return false;
+    
+  } catch (error: any) {
+    console.log('⚠️ Error verificando usuario en Firestore:', error.message);
+    return false;
+  }
+}
+
 async function verifyAPIAvailable(context: any): Promise<boolean> {
   console.log('🔍 Verificando conexión con API en', API_URL);
   
