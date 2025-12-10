@@ -27,6 +27,7 @@
   "route_detail_followers": "seguidor",
   "route_detail_followers_plural": "seguidores",
   "route_detail_following": "Siguiendo",
+  "route_detail_pending": "Pendiente",
   "route_detail_follow": "Seguir",
   "route_detail_description_title": "Descripción",
   "route_detail_stages_title": "Etapas de la Ruta",
@@ -64,6 +65,9 @@
   "profile_public_error_not_found": "Usuario no encontrado",
   "profile_public_error_loading": "No se ha podido cargar el perfil.",
   "profile_public_login_follow_hint": "Debes iniciar sesión para seguir usuarios",
+  "user_profile_follow": "Seguir",
+  "user_profile_following": "Siguiendo",
+  "user_profile_pending": "Pendiente",
 
   "general_home": "Página principal",
   "general_loading": "Cargando...",

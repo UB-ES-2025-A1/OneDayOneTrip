@@ -20,6 +20,8 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false); // false = públic per defecte
+
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -38,7 +40,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
 
     try {
       setLoading(true);
-      await Auth.register(fullName, username, email, password);
+      await Auth.register(fullName, username, email, password, isPrivate);
       onClose();
       navigate("/");
     } catch (err: any) {
@@ -128,6 +130,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                   className="password-toggle"
                   onClick={() => setShowPassword((prev) => !prev)}
                 >
+                  {/* aquí l'icona de l'ull si la tens */}
                 </button>
               )}
             </div>
@@ -153,9 +156,37 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                   className="password-toggle"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
                 >
+                  {/* icona */}
                 </button>
               )}
+            </div>
 
+            {/* 🔐 Privacitat del perfil */}
+            <div className="privacy-section">
+
+              <div className="privacy-options">
+                <label className="privacy-option">
+                  <input
+                    type="radio"
+                    name="privacy"
+                    value="public"
+                    checked={!isPrivate}
+                    onChange={() => setIsPrivate(false)}
+                  />
+                  <span>Perfil públic</span>
+                </label>
+
+                <label className="privacy-option">
+                  <input
+                    type="radio"
+                    name="privacy"
+                    value="private"
+                    checked={isPrivate}
+                    onChange={() => setIsPrivate(true)}
+                  />
+                  <span>Perfil privat</span>
+                </label>
+              </div>
             </div>
 
             <button type="submit" className="auth-button" disabled={loading}>
@@ -169,7 +200,10 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
               {t('register_has_account')}{" "}
             <button
               type="button"
-              onClick={() => { onClose(); openLogin(); }}
+              onClick={() => {
+                onClose();
+                openLogin();
+              }}
               className="auth-link"
             >
                 {t('register_login_here')}

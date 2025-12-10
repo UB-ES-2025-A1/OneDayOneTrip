@@ -28,10 +28,15 @@ export type BackendUser = {
   seguits?: number;
   llista_seguidors?: string[];
   llista_seguits?: string[];
+  llista_solicitud_seguidors?: string[];
+  llista_solicitud_seguits?: string[];
+  llista_bloquejats?: string[];
+  llista_bloquejadors?: string[];
   publicacions?: string[];
   guardades?: string[];
   url_foto_perfil?: string;
   url_foto_panell?: string;
+  isPrivate?: boolean;
 };
 
 type GridItem = {
@@ -62,16 +67,37 @@ export default function UserProfile() {
   const [seguitsModalOpen, setSeguitsModalOpen] = useState(false);
   const [seguidoresModalOpen, setSeguidoresModalOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-
-
-  // 🗑️ estat per al popup d’eliminació
   const [tripToDelete, setTripToDelete] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [mailboxOpen, setMailboxOpen] = useState(false);
-  const { notifications, loading: notifLoading, markRead } = useNotifications();
+  const {
+    notifications,
+    markRead,
+    refreshNotifications,
+    removeLocal,
+  } = useNotifications();
 
 
   const navigate = useNavigate();
+
+  const refreshProfile = async () => {
+    if (!currentUser) return;
+    try {
+      const updatedProfile = await getUserById(currentUser.uid);
+      updatedProfile.llista_seguidors = updatedProfile.llista_seguidors || [];
+      updatedProfile.llista_seguits = updatedProfile.llista_seguits || [];
+      updatedProfile.llista_solicitud_seguidors = updatedProfile.llista_solicitud_seguidors || [];
+      updatedProfile.llista_solicitud_seguits = updatedProfile.llista_solicitud_seguits || [];
+      updatedProfile.publicacions = updatedProfile.publicacions || [];
+      updatedProfile.guardades = updatedProfile.guardades || [];
+      updatedProfile.llista_bloquejats = updatedProfile.llista_bloquejats || [];
+      updatedProfile.llista_bloquejadors = updatedProfile.llista_bloquejadors || [];
+
+      setProfile(updatedProfile as BackendUser);
+    } catch (err) {
+      console.error("Error refrescant el perfil", err);
+    }
+  };
 
   // ---------------------------
   // Carregar usuari i trips
@@ -91,6 +117,8 @@ export default function UserProfile() {
         const backendUser = await getUserById(fbUser.uid);
         backendUser.llista_seguidors = backendUser.llista_seguidors || [];
         backendUser.llista_seguits = backendUser.llista_seguits || [];
+        backendUser.llista_solicitud_seguidors = backendUser.llista_solicitud_seguidors || [];
+        backendUser.llista_solicitud_seguits = backendUser.llista_solicitud_seguits || [];
         backendUser.publicacions = backendUser.publicacions || [];
         backendUser.guardades = backendUser.guardades || [];
         backendUser.llista_bloquejats = backendUser.llista_bloquejats || [];
@@ -158,23 +186,22 @@ export default function UserProfile() {
   };
 
   const toGridItems = (trips: Trip[]): GridItem[] =>
-    trips.map((t) => ({
-      id: String(t._id),
-      title: t.title || t('general_no_title'),
+    trips.map((trip) => ({
+      id: String(trip._id),
+      title: trip.title || t('general_no_title'),
       img:
-        t.coverImage ||
-        (t.gallery && t.gallery[0]) ||
+        trip.coverImage ||
+        (trip.gallery && trip.gallery[0]) ||
         "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-      user: t.author?.name || t('general_anonymous'),
-      rating: typeof t.avgRating === "number" ? t.avgRating : 0,
-      temps: t.duration || "—",
-      dificultat: t.difficulty || "—",
-      authorPic: t.author?.profilePic || "",
-      city: t.city || "",
-      country: t.country || "",
+      user: trip.author?.name || t('general_anonymous'),
+      rating: typeof trip.avgRating === "number" ? trip.avgRating : 0,
+      temps: trip.duration || "—",
+      dificultat: trip.difficulty || "—",
+      authorPic: trip.author?.profilePic || "",
+      city: trip.city || "",
+      country: trip.country || "",
     }));
 
-  // 🗑️ Quan fas clic a la brossa: només obrim el popup
   const askDeleteTrip = (tripId: string) => {
     setTripToDelete(tripId);
     setDeleteModalOpen(true);
@@ -191,7 +218,6 @@ export default function UserProfile() {
         prev.filter((t) => String(t._id) !== String(tripToDelete))
       );
 
-      // Treure-la de publicacions del perfil
       setProfile((prev) =>
         prev
           ? {
@@ -211,7 +237,6 @@ export default function UserProfile() {
     }
   };
 
-  // ❌ Cancel·lar popup
   const handleCancelDeleteTrip = () => {
     setDeleteModalOpen(false);
     setTripToDelete(null);
@@ -248,6 +273,17 @@ export default function UserProfile() {
   
   const openMailbox = () => {
     setMailboxOpen(true);
+  };
+
+  const handleAfterAcceptNotification = async (notificationId: string) => {
+    removeLocal(notificationId);
+    await refreshNotifications();
+    await refreshProfile();
+  };
+
+  const handleAfterRejectNotification = async (notificationId: string) => {
+    removeLocal(notificationId);
+    await refreshNotifications();
   };
 
 
@@ -410,7 +446,12 @@ export default function UserProfile() {
               goToProfile={goToProfile} 
             />
           )}
-          <UserSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+          <UserSettings 
+            open={settingsOpen} 
+            onClose={() => setSettingsOpen(false)}
+            profile={profile}
+            onSavePrivacy={(updatedProfile) => setProfile(updatedProfile)}
+          />
 
           {openEdit && profile && (
             <EditarPerfil
@@ -478,6 +519,8 @@ export default function UserProfile() {
             onClose={() => setMailboxOpen(false)}
             notifications={notifications}
             onMarkRead={markRead}
+            onAfterAccept={handleAfterAcceptNotification}
+            onAfterReject={handleAfterRejectNotification}
           />
 
 

@@ -13,7 +13,8 @@ from firebase_admin import auth
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.services.mongo_service import (
     delete_trip,
-)  # 👈 AFEGIT: funció que esborra la trip a Mongo
+    create_notification,
+)
 
 security = HTTPBearer()
 
@@ -24,7 +25,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 async def register_user(data: dict, user=Depends(verify_token)):
     """
     Desa un nou usuari al Firestore després de registre al Firebase Auth.
-    El frontend envia fullname, username, mail, i el backend completa els defaults.
+    El frontend envia fullname, username, mail i isPrivate, i el backend completa els defaults.
     """
     uid = user.get("uid")
     if not uid:
@@ -42,9 +43,12 @@ async def register_user(data: dict, user=Depends(verify_token)):
         "guardades": data.get("guardades", []),
         "llista_seguidors": data.get("lista_seguidores", []),
         "llista_seguits": data.get("lista_seguidos", []),
+        "llista_solicitud_seguidors": data.get("llista_solicitud_seguidor", []),
+        "llista_solicitud_seguits": data.get("llista_solicitud_seguits", []),
         "url_foto_perfil": data.get("url_foto_perfil", ""),
         "url_foto_panell": data.get("url_foto_panell", ""),
         "premium": data.get("premium", False),
+        "isPrivate": data.get("isPrivate", False),
         "llista_bloquejats": data.get("llista_bloquejats", []),
         "llista_bloquejadors": data.get("llista_bloquejadors", []),
     }
@@ -95,6 +99,7 @@ class UserEditIn(BaseModel):
     username: Optional[str] = None
     url_foto_perfil: Optional[str] = None
     url_foto_panell: Optional[str] = None
+    isPrivate: Optional[bool] = None
 
 
 # (PATCH = modificació parcial)
@@ -174,6 +179,140 @@ async def unfollow_user(user_id: str, target_id: str):
     return {"message": "Has deixat de seguir l'usuari correctament"}
 
 
+@router.post("/cancel_follow_request/{user_id}/{target_id}")
+async def cancel_follow_request(user_id: str, target_id: str):
+    """
+    Cancel·la una sol·licitud de seguiment pendent.
+    Elimina user_id de llista_solicitud_seguidors del target_id.
+    Elimina target_id de llista_solicitud_seguits del user_id.
+    """
+    user_ref = db.collection("users").document(user_id)
+    target_ref = db.collection("users").document(target_id)
+
+    user_doc = user_ref.get()
+    target_doc = target_ref.get()
+
+    # Comprovem que l'usuari existeix
+    if not user_doc.exists:
+        raise HTTPException(
+            status_code=404,
+            detail="L'usuari que intenta cancel·lar la sol·licitud no existeix",
+        )
+
+    # Comprovem que l'usuari target existeix
+    if not target_doc.exists:
+        raise HTTPException(status_code=404, detail="L'usuari target no existeix")
+
+    # Eliminar de la llista de sol·licituds enviades
+    user_ref.update({"llista_solicitud_seguits": firestore.ArrayRemove([target_id])})
+
+    # Eliminar de la llista de sol·licituds rebudes
+    target_ref.update({"llista_solicitud_seguidors": firestore.ArrayRemove([user_id])})
+
+    return {"message": "Sol·licitud de seguiment cancel·lada correctament"}
+
+
+@router.post("/accept_follow_request/{user_id}/{follower_id}")
+async def accept_follow_request(user_id: str, follower_id: str):
+    """
+    Accepta una sol·licitud de seguiment.
+    Afegeix follower_id a la llista de seguidors del user_id.
+    Afegeix user_id a la llista de seguits del follower_id.
+    Elimina les sol·licituds pendents.
+    """
+    user_ref = db.collection("users").document(user_id)
+    follower_ref = db.collection("users").document(follower_id)
+
+    user_doc = user_ref.get()
+    follower_doc = follower_ref.get()
+
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="L'usuari no existeix")
+    if not follower_doc.exists:
+        raise HTTPException(status_code=404, detail="L'usuari seguidor no existeix")
+
+    # Reutilitzar la lògica de follow per assegurar consistència
+    await follow_user(follower_id, user_id)
+
+    # Eliminar de les llistes de sol·licituds pendents
+    user_ref.update(
+        {"llista_solicitud_seguidors": firestore.ArrayRemove([follower_id])}
+    )
+    follower_ref.update({"llista_solicitud_seguits": firestore.ArrayRemove([user_id])})
+
+    # Crear notificació de nou seguidor (mateix format que client.ts)
+    try:
+        follower_data = follower_doc.to_dict() or {}
+        extra = {
+            "fromUserName": follower_data.get("nom_i_cognoms")
+            or follower_data.get("username")
+            or "",
+            "fromUserAvatar": follower_data.get("url_foto_perfil", ""),
+        }
+
+        create_notification(
+            from_user_id=follower_id,
+            to_user_id=user_id,
+            type="follow",
+            message="ha començat a seguir-te",
+            extra=extra,
+        )
+    except Exception as e:
+        print(
+            f"[WARN] No s'ha pogut crear la notificació de follow en acceptar la sol·licitud: {e}"
+        )
+
+    # Crear notificació al sol·licitant informant que se li ha acceptat la sol·licitud
+    try:
+        user_data = user_doc.to_dict() or {}
+        extra_accepted = {
+            "fromUserName": user_data.get("nom_i_cognoms")
+            or user_data.get("username")
+            or "",
+            "fromUserAvatar": user_data.get("url_foto_perfil", ""),
+        }
+
+        create_notification(
+            from_user_id=user_id,
+            to_user_id=follower_id,
+            type="follow",
+            message="ha acceptat la teva sol·licitud de seguiment",
+            extra=extra_accepted,
+        )
+    except Exception as e:
+        print(
+            f"[WARN] No s'ha pogut crear la notificació d'acceptació al sol·licitant: {e}"
+        )
+
+    return {"message": "Sol·licitud de seguiment acceptada correctament"}
+
+
+@router.post("/reject_follow_request/{user_id}/{follower_id}")
+async def reject_follow_request(user_id: str, follower_id: str):
+    """
+    Rebutja una sol·licitud de seguiment.
+    Simplement elimina la sol·licitud pendent sense afegir a seguidors.
+    """
+    user_ref = db.collection("users").document(user_id)
+    follower_ref = db.collection("users").document(follower_id)
+
+    user_doc = user_ref.get()
+    follower_doc = follower_ref.get()
+
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="L'usuari no existeix")
+    if not follower_doc.exists:
+        raise HTTPException(status_code=404, detail="L'usuari seguidor no existeix")
+
+    # Eliminar de les llistes de sol·licituds pendents
+    user_ref.update(
+        {"llista_solicitud_seguidors": firestore.ArrayRemove([follower_id])}
+    )
+    follower_ref.update({"llista_solicitud_seguits": firestore.ArrayRemove([user_id])})
+
+    return {"message": "Sol·licitud de seguiment rebutjada correctament"}
+
+
 @router.post("/follow/{user_id}/{target_id}")
 async def follow_user(user_id: str, target_id: str):
     """
@@ -187,18 +326,39 @@ async def follow_user(user_id: str, target_id: str):
     target_ref = db.collection("users").document(target_id)
 
     # Comprovació que l'usuari a seguir existeix
-    if not target_ref.get().exists:
+    target_doc = target_ref.get()
+    if not target_doc.exists:
         raise HTTPException(
             status_code=404, detail="L'usuari que vols seguir no existeix"
         )
 
-    # Afegir a la llista de seguits
     user_ref.update({"llista_seguits": firestore.ArrayUnion([target_id])})
-
-    # Afegir a la llista de seguidors
     target_ref.update({"llista_seguidors": firestore.ArrayUnion([user_id])})
-
     return {"message": "Usuari seguit correctament"}
+
+
+@router.post("/askToFollowUser/{user_id}/{target_id}")
+async def ask_to_follow_user(user_id: str, target_id: str):
+    """
+    Afegeix el target_id a la llista 'llista_solicitud_seguidors' del user_id,
+    i afegeix el user_id a la llista 'llista_solicitud_seguits' del target_id.
+    """
+    if user_id == target_id:
+        raise HTTPException(status_code=400, detail="No et pots seguir a tu mateix")
+
+    user_ref = db.collection("users").document(user_id)
+    target_ref = db.collection("users").document(target_id)
+
+    # Comprovació que l'usuari a seguir existeix
+    target_doc = target_ref.get()
+    if not target_doc.exists:
+        raise HTTPException(
+            status_code=404, detail="L'usuari que vols seguir no existeix"
+        )
+
+    target_ref.update({"llista_solicitud_seguidors": firestore.ArrayUnion([user_id])})
+    user_ref.update({"llista_solicitud_seguits": firestore.ArrayUnion([target_id])})
+    return {"message": "Sol·licitud de seguiment enviada correctament"}
 
 
 @router.post("/save/{user_id}/{trip_id}")
