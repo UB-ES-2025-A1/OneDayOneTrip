@@ -31,7 +31,8 @@ export default defineConfig({
   fullyParallel: true, // Habilitar paralelismo completo
   forbidOnly: !!process.env.CI,
   retries: 0, // Sin retries para detección rápida de fallos
-  workers: 8, // Usar 8 workers para mayor velocidad
+  // Reducir workers en CI para evitar quota exceeded de Firebase
+  workers: process.env.CI ? 2 : 8,
   
   /* Timeouts */
   timeout: 60 * 1000, // 60 segundos por test

@@ -54,19 +54,32 @@ setup('authenticate', async ({ page }) => {
   };
 
   try {
-    // Realizar login
+    // Realizar login con más tiempo de espera para CI
+    console.log('🔐 Iniciando setup de autenticación...');
     await page.goto('/');
+    
+    // Esperar a que la página esté completamente cargada
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
     await waitForPageLoad(page);
+    
+    // Dar tiempo extra para que React renderice
+    await page.waitForTimeout(2000);
 
     const loginButton = page.locator(SELECTORS.loginButton).first();
 
-    const loginVisible = await loginButton.isVisible({ timeout: 10000 }).catch(() => false);
+    // Intentar encontrar el botón de login con más tiempo
+    const loginVisible = await loginButton.isVisible({ timeout: 15000 }).catch(() => false);
     if (!loginVisible) {
-      console.log('⚠️ Botón de login no visible, usando fallback de mock auth');
+      console.log('⚠️ Botón de login no visible después de 15s, verificando página...');
+      const pageContent = await page.content();
+      console.log('📄 Página contiene header:', pageContent.includes('header'));
+      console.log('📄 Página contiene login:', pageContent.includes('login') || pageContent.includes('Login'));
       await page.screenshot({ path: 'test-results/login-button-missing.png', fullPage: true }).catch(() => undefined);
       await fallbackMockAuth();
       return;
     }
+    
+    console.log('✅ Botón de login encontrado');
 
     await loginButton.click();
     
