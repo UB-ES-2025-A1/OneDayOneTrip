@@ -12,8 +12,12 @@ describe("Valorar component", () => {
 
     render(<Valorar tripId="t1" onClose={onClose} onSubmit={onSubmit} />);
 
+<<<<<<< HEAD
     // El texto del botón será la clave i18n ya que el mock devuelve la clave
     const submitButton = screen.getByRole("button", { name: /rate_modal_submit/i });
+=======
+    const submitButton = screen.getByRole("button", { name: "rate_modal_submit" });
+>>>>>>> origin/staging
     expect(submitButton).toBeDisabled();
 
     const thirdStar = screen.getByDisplayValue("3");
