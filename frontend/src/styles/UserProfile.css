@@ -403,15 +403,7 @@
   }
 }
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-=======
->>>>>>> US-4.1.1
 /* BOTÓN BLOQUEAR ARRIBA DERECHA (ICONO REDONDO) */
 .block-button {
   position: absolute;
@@ -447,12 +439,6 @@
 .block-button.blocked:hover {
   background: rgba(255, 0, 0, 0.35);
 }
-
-/* RESPONSIVE*/
-<<<<<<< HEAD
-=======
->>>>>>> staging
->>>>>>> US-4.1.1
    
 /* Versión responsive */
 @media (max-width: 600px) {

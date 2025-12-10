@@ -139,6 +139,39 @@ ter-select:focus {
   border-color: #2e492e;
 }
 
+/* ---------- SEARCH MODE TOGGLE ---------- */
+.search-mode-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 1.5rem auto 1rem;
+  padding: 0 1rem;
+}
+
+.mode-btn {
+  padding: 10px 24px;
+  border: 2px solid var(--search-border);
+  background: var(--search-bg);
+  color: var(--text-primary);
+  border-radius: 24px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mode-btn:hover {
+  border-color: #4fa64f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, #2e492e, #56a856);
+  color: white;
+  border-color: #2e492e;
+}
+
 /* ---------- SEARCH BAR CONTAINER ---------- */
 .search-bar-container {
   display: flex;

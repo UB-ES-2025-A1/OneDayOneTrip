@@ -8,15 +8,17 @@ import Carousel from "../components/Carousel";
 import LoginModal from "../components/LoginModal";
 import RegisterModal from "../components/RegisterModal";
 import MasonryGrid from "../components/MasonryGrid";
+import UserCard from "../components/UserCard";
 import Layout from "../components/Layout";
 
 import { getAllTrips, type Trip } from "../api/trips";
-import { getUserById } from "../api/client";
+import { getUserById, searchUsers } from "../api/client";
 import { Search } from "lucide-react";
 
 import { useTranslation } from 'react-i18next'; // Importa el hook
 
 type SearchFilter = "all" | "user" | "country" | "city" | "monument";
+type SearchMode = "trips" | "users";
 
 function wilsonScore(avgRating: number, numRatings: number): number {
     // Si no hi ha rating o no hi ha valoracions → score = 0
@@ -56,6 +58,9 @@ export default function Home() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchFilter, setSearchFilter] = useState<SearchFilter>("all");
+  const [searchMode, setSearchMode] = useState<SearchMode>("trips");
+  const [users, setUsers] = useState<any[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -87,7 +92,7 @@ export default function Home() {
     const fetchTrips = async () => {
       try {
         setLoading(true);
-        const data = await getAllTrips(true);
+        const data = await getAllTrips(true, t);
         
         // Si no hi ha usuari loguejat, mostrar només les rutes de perfils públics
         if (!currentUser) {
@@ -163,34 +168,59 @@ export default function Home() {
     fetchTrips();
   }, [currentUser, backendUser, t]);
 
-    const filteredTrips = trips
+  // Carregar usuaris quan el mode és "users"
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (searchMode !== "users" || !currentUser) {
+        setUsersLoading(false);
+        return;
+      }
+      
+      try {
+        setUsersLoading(true);
+        const blockedByMe = backendUser?.llista_bloquejats || [];
+        const data = await searchUsers("", currentUser.uid, blockedByMe);
+        setUsers(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error loading users:', err);
+        setError("Error carregant usuaris");
+      } finally {
+        setUsersLoading(false);
+      }
+    };
 
-        // Mostrem les rutes dels usuaris que no seguim
-        .filter((t) => {
-            if (selectedTab === "recommended") return true;
+    fetchUsers();
+  }, [searchMode, currentUser, backendUser]);
 
-            const seguits = backendUser?.llista_seguits || [];
-            const authorId = t.author?.userId || "";
+  const filteredTrips = trips
 
-            return seguits.includes(authorId);
-        })
+    // Mostrem les rutes dels usuaris que no seguim
+    .filter((t) => {
+      if (selectedTab === "recommended") return true;
 
-        // Mostrem segons la funció de Wilson Score
-        .sort((a, b) => {
-            const scoreA = wilsonScore(a.avgRating || 0, a.numRatings || 0);
-            const scoreB = wilsonScore(b.avgRating || 0, b.numRatings || 0);
-            return scoreB - scoreA;
-        });
+      const seguits = backendUser?.llista_seguits || [];
+      const authorId = t.author?.userId || "";
+
+      return seguits.includes(authorId);
+    })
+
+    // Mostrem segons la funció de Wilson Score
+    .sort((a, b) => {
+      const scoreA = wilsonScore(a.avgRating || 0, a.numRatings || 0);
+      const scoreB = wilsonScore(b.avgRating || 0, b.numRatings || 0);
+      return scoreB - scoreA;
+    });
 
   const search = searchTerm.trim().toLowerCase();
 
-  const visibleTrips = filteredTrips.filter((t) => {
+  const visibleTrips = filteredTrips.filter((trip) => {
     if (!search) return true;
 
-    const title = (t.title || "").toLowerCase();
-    const city = (t.city || "").toLowerCase();
-    const country = (t.country || "").toLowerCase();
-    const userName = (t.author?.name || "").toLowerCase();
+    const title = (trip.title || "").toLowerCase();
+    const city = (trip.city || "").toLowerCase();
+    const country = (trip.country || "").toLowerCase();
+    const userName = (trip.author?.name || "").toLowerCase();
 
     switch (searchFilter) {
       case "user":
@@ -213,6 +243,29 @@ export default function Home() {
     }
   });
 
+
+  const followingIds = backendUser?.llista_seguits || [];
+
+  const usersByTab = users.filter((u) => {
+    if (selectedTab === "following") {
+      // Només els usuaris que segueixo
+      return followingIds.includes(u.uid);
+    }
+
+    // En "recommended" de moment mostrem tots (pots canviar la lògica si vols)
+    return true;
+  });
+
+  const visibleUsers = usersByTab.filter((u) => {
+    if (!search) return true;
+
+    const name = (u.nom_i_cognoms || "").toLowerCase();
+    const username = (u.username || "").toLowerCase();
+
+    return name.includes(search) || username.includes(search);
+  });
+
+
   const isFiltering = search.length > 0 || searchFilter !== "all";
 
     const normalizeId = (id: any) =>
@@ -225,6 +278,23 @@ export default function Home() {
     city: t('home_placeholder_city'),
     monument: t('home_placeholder_monument'),
   };
+
+  const handleSearchFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const nextFilter = e.target.value as SearchFilter;
+  setSearchFilter(nextFilter);
+
+  // Si el filtre és "user", entrem en mode "users" (UserCards)
+  // Si no, tornem a "trips"
+  if (nextFilter === "user") {
+    setSearchMode("users");
+  } else {
+    setSearchMode("trips");
+  }
+
+  // Opcional: netejar el text de cerca quan canvies de mode
+  // setSearchTerm("");
+};
+
 
   return (
     <Layout
@@ -261,28 +331,35 @@ export default function Home() {
         </div>
       )}
 
-      {/* Barra de cerca amb filtre + input + lupa (només per usuaris loguejats) */}
-      {currentUser && (
-        <div className="search-bar-container">
-          <div className="search-bar">
-            <select
-              className="search-filter-select"
-              value={searchFilter}
-              onChange={(e) => setSearchFilter(e.target.value as SearchFilter)}
-            >
-              <option value="all">{t('home_search_all')}</option>
-              <option value="user">{t('home_search_user')}</option>
-              <option value="country">{t('home_search_country')}</option>
-              <option value="city">{t('home_search_city')}</option>
-              <option value="monument">{t('home_search_monument')}</option>
-            </select>
+    
 
-            <span className="search-divider" />
+      {currentUser && (
+  <div className="search-bar-container">
+    <div className="search-bar">
+      <>
+        <select
+          className="search-filter-select"
+          value={searchFilter}
+          onChange={handleSearchFilterChange}
+        >
+          <option value="all">{t('home_search_all')}</option>
+          <option value="user">{t('home_search_user')}</option>
+          <option value="country">{t('home_search_country')}</option>
+          <option value="city">{t('home_search_city')}</option>
+          <option value="monument">{t('home_search_monument')}</option>
+        </select>
+
+        <span className="search-divider" />
+            </>
 
             <input
               type="text"
               className="search-input"
-              placeholder={placeholderMap[searchFilter]}
+              placeholder={
+                searchMode === "users"
+                  ? "Cercar per nom o username..."
+                  : placeholderMap[searchFilter]
+              }
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -292,11 +369,26 @@ export default function Home() {
         </div>
       )}
 
+
       <section className="trip-list-section">
-        {loading && <p>{t('home_loading_routes')}</p>}
+        {(searchMode === "users" ? usersLoading : loading) && (
+          <p>{searchMode === "users" ? "Carregant usuaris..." : t('home_loading_routes')}</p>
+        )}
         {error && <p>{error}</p>}
 
-        {!loading && !error && visibleTrips.length > 0 ? (
+        {!usersLoading && !error && searchMode === "users" && visibleUsers.length > 0 ? (
+          <div className="users-grid">
+            {visibleUsers.map((u) => (
+              <UserCard
+                key={u.uid}
+                uid={u.uid}
+                name={u.nom_i_cognoms || ""}
+                username={u.username}
+                profilePic={u.url_foto_perfil}
+              />
+            ))}
+          </div>
+        ) : !loading && !error && searchMode === "trips" && visibleTrips.length > 0 ? (
           <MasonryGrid
             items={visibleTrips.map((trip) => ({
               id: normalizeId(trip._id),
@@ -317,22 +409,26 @@ export default function Home() {
             currentUser={currentUser}
           />
         ) : (
-          !loading &&
+          !(searchMode === "users" ? usersLoading : loading) &&
           !error && (
             <div className="no-trips-message">
               <img
                 src={
-                  isFiltering
-                    ? "https://static.vecteezy.com/system/resources/previews/027/771/065/non_2x/reject-icon-image-vector.jpg" // icona “sense resultats”
+                  searchMode === "users"
+                    ? "https://cdn-icons-png.flaticon.com/512/1077/1077114.png"
+                    : isFiltering
+                    ? "https://static.vecteezy.com/system/resources/previews/027/771/065/non_2x/reject-icon-image-vector.jpg"
                     : selectedTab === "recommended"
                     ? "https://cdn-icons-png.flaticon.com/512/7112/7112926.png"
                     : "https://cdn-icons-png.flaticon.com/512/4076/4076500.png"
                 }
-                alt="Sense rutes"
+                alt={searchMode === "users" ? "Sense usuaris" : "Sense rutes"}
                 className="no-trips-icon"
               />
               <p>
-                {isFiltering
+                {searchMode === "users"
+                  ? "No s'han trobat usuaris"
+                  : isFiltering
                   ? t('home_no_results_filter')
                   : selectedTab === "recommended"
                   ? t('home_no_recommended_routes')

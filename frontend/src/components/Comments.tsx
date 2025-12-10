@@ -25,7 +25,7 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
         try {
         setLoading(true);
 
-        const data = await getTripComments(tripId);
+        const data = await getTripComments(tripId,20, 0, t);
 
         // 🔥 Assegurem ordre: més nou primer
         const sorted = (Array.isArray(data) ? data : []).sort(
@@ -73,7 +73,7 @@ export default function Comments({ tripId, currentUser, backendUser }: CommentsP
         text: newComment.trim(),
       };
 
-      const created = await createTripComment(tripId, payload);
+      const created = await createTripComment(tripId, payload, t);
 
       setComments((prev) => [created, ...prev]);
       setNewComment("");

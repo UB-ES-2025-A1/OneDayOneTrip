@@ -72,6 +72,17 @@ export async function getAllUsers() {
   return apiGet("/users");
 }
 
+export async function searchUsers(query: string, currentUserId?: string, blockedByMe?: string[]) {
+  const params = new URLSearchParams();
+  if (query) params.append("query", query);
+  if (currentUserId) params.append("current_user_id", currentUserId);
+  if (blockedByMe && blockedByMe.length > 0) {
+    params.append("blocked_by_me", JSON.stringify(blockedByMe));
+  }
+  
+  return apiGet(`/users/search?${params.toString()}`);
+}
+
 // ------------------------------
 // 🔥 NUEVO: actualizar perfil (multipart)
 // ------------------------------

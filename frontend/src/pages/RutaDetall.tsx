@@ -104,11 +104,11 @@ export default function RutaDetall() {
         let tripData: Trip | null = null;
 
         if (isMongoObjectId(id)) {
-          const data = await getTripById(id);
+          const data = await getTripById(id, t);
           tripData = data;
           setMainImage(data.coverImage || data.gallery?.[0] || "");
         } else if (isNumericIndex(id)) {
-          const trips = await getAllTrips(false);
+          const trips = await getAllTrips(false, t);
           const idx = parseInt(id) - 1;
 
           const tripAtIndex = trips[idx];
@@ -293,7 +293,7 @@ export default function RutaDetall() {
           backendUser?.url_foto_perfil ||
           currentUser.photoURL ||
           null,
-      });
+      }, t);
 
 
       setTripData((prev) =>
@@ -368,7 +368,7 @@ export default function RutaDetall() {
                   </span>
                 </div>
               )}
-            </div>  {/* ✅ CIERRE QUE FALTABA */}
+            </div>  
 
             <div className="ruta-actions-buttons">
               {/* Botón Valorar */}
