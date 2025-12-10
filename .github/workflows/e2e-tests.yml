@@ -44,7 +44,7 @@ env:
   NODE_VERSION: '20'
   PYTHON_VERSION: '3.11'
   # URLs para E2E
-  API_URL: 'http://localhost:8001'
+  API_URL: 'http://127.0.0.1:8000'
   FRONTEND_URL: 'http://localhost:5173'
 
 jobs:
@@ -143,7 +143,7 @@ jobs:
       - name: 🔧 Create E2E environment files
         run: |
           # Frontend .env para E2E (Vite reads .env by default)
-          echo "VITE_API_URL=http://localhost:8001" > frontend/.env
+          echo "VITE_API_URL=http://127.0.0.1:8000" > frontend/.env
           echo "VITE_E2E_MODE=true" >> frontend/.env
           echo "VITE_DISABLE_APP_CHECK=true" >> frontend/.env
           echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}" >> frontend/.env
@@ -199,14 +199,14 @@ jobs:
       - name: 🚀 Start backend API
         working-directory: api
         run: |
-          # Iniciar API en background
-          uvicorn app.main:app --host 0.0.0.0 --port 8001 &
+          # Iniciar API en background (puerto 8000 para coincidir con frontend hardcodeado)
+          uvicorn app.main:app --host 0.0.0.0 --port 8000 &
           echo "API_PID=$!" >> $GITHUB_ENV
           
           # Esperar a que la API esté lista
           echo "⏳ Waiting for API to be ready..."
           for i in {1..30}; do
-            if curl -s http://localhost:8001/ > /dev/null; then
+            if curl -s http://127.0.0.1:8000/ > /dev/null; then
               echo "✅ API is ready!"
               break
             fi
@@ -244,7 +244,7 @@ jobs:
         env:
           CI: true
           PLAYWRIGHT_BASE_URL: http://localhost:5173
-          API_URL: http://localhost:8001
+          API_URL: http://127.0.0.1:8000
           E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
