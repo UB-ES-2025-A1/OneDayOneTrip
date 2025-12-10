@@ -1,3 +1,4 @@
+/* ---------- MODAL BACKDROP ---------- */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -11,7 +12,7 @@
   z-index: 999;
 }
 
-/* Tarjeta principal */
+/* ---------- TARJETA PRINCIPAL ---------- */
 .seguidores-card {
   background: #fff;
   border-radius: 12px;
@@ -23,7 +24,7 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Botón cerrar */
+/* ---------- BOTÓN CERRAR ---------- */
 .close-btn {
   position: absolute;
   top: 10px;
@@ -34,7 +35,7 @@
   cursor: pointer;
 }
 
-/* Título */
+/* ---------- TÍTULO ---------- */
 .seguidores-title {
   text-align: center;
   margin-bottom: 15px;
@@ -42,6 +43,7 @@
   font-weight: bold;
 }
 
+/* ---------- MENSAJE VACÍO ---------- */
 .seguidores-empty {
   text-align: center;
   color: #888;
@@ -49,13 +51,13 @@
   font-size: 14px;
 }
 
-/* Lista */
+/* ---------- LISTA ---------- */
 .seguidores-list {
   display: flex;
   flex-direction: column;
 }
 
-/* Item */
+/* ---------- ITEM DE USUARIO ---------- */
 .seguidor-item {
   display: flex;
   align-items: center;
@@ -73,7 +75,7 @@
   background: #f9f9f9;
 }
 
-/* FOTO DEL USUARIO */
+/* ---------- FOTO DEL USUARIO ---------- */
 .seguidor-foto {
   width: 50px;
   height: 50px;
@@ -82,14 +84,12 @@
   margin-right: 10px;
 }
 
-/* Foto normal (img) */
 .seguidor-foto img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* ← IMPORTANTE, evita zoom raro */
+  object-fit: cover;
 }
 
-/* AvatarFallback (div interno) */
 .seguidor-foto > div {
   width: 50px !important;
   height: 50px !important;
@@ -97,7 +97,7 @@
   border-width: 2px !important;
 }
 
-/* Info */
+/* ---------- INFO DEL USUARIO ---------- */
 .seguidor-info {
   display: flex;
   flex-direction: column;
@@ -116,7 +116,7 @@
   margin: 0;
 }
 
-/* Botón seguir / dejar de seguir */
+/* ---------- BOTÓN SEGUIR / SIGUIENDO ---------- */
 .seguidor-toggle-btn {
   margin-left: auto;
   padding: 6px 14px;
@@ -130,18 +130,21 @@
   transition: all 0.25s ease-in-out;
 }
 
-.seguidor-toggle-btn:hover {
-  background-color: #2e492e;
+/* Hover solo cuando NO estás siguiendo */
+.seguidor-toggle-btn:not(.following):hover {
+  background-color: #2e492e; /* verde oscuro */
   color: white;
 }
 
+/* Estado siguiendo */
 .seguidor-toggle-btn.following {
-  background-color: #ffffff;
-  color: #c62828;
+  background-color: #ffffff; /* blanco */
+  color: #c62828; /* rojo */
   border-color: #c62828;
 }
 
+/* Hover cuando estás siguiendo */
 .seguidor-toggle-btn.following:hover {
-  background-color: #c62828;
+  background-color: #c62828; /* rojo de fondo */
   color: white;
 }

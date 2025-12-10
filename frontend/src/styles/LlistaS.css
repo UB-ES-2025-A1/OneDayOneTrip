@@ -1,0 +1,35 @@
+/* BOTÓN SEGUIR / SIGUIENDO DENTRO DEL MODAL */
+.seguidor-item .seguidor-toggle-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  min-width: 90px;
+  text-align: center;
+}
+
+/* ESTADO: SEGUIR (verde oscuro con letras blancas) */
+.seguidor-item .seguidor-toggle-btn:not(.following) {
+  background-color: #2e492e; /* verde oscuro */
+  color: white;
+}
+
+.seguidor-item .seguidor-toggle-btn:not(.following):hover {
+  background-color: #3c613c; /* verde un poco más claro al pasar el ratón */
+  transform: scale(1.05);
+}
+
+/* ESTADO: SIGUIENDO (blanco con letras verdes) */
+.seguidor-item .seguidor-toggle-btn.following {
+  background-color: white;
+  color: #2e492e; /* letras verdes */
+  border: 1px solid #2e492e;
+}
+
+.seguidor-item .seguidor-toggle-btn.following:hover {
+  background-color: #f0f9f0; /* verde muy clarito al pasar el ratón */
+  transform: scale(1.05);
+}

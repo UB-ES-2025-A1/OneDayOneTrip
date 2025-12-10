@@ -8,8 +8,8 @@ import "../styles/UserProfile.css";
 import { ImageOff, UserX } from "lucide-react";
 import MasonryGrid from "../components/MasonryGrid";
 import Layout from "../components/Layout";
-import LlistaSeguitsModal from "../components/LlistaSeguitsModal";
-import LlistaSeguidorsModal from "../components/LlistaSeguidorsModal";
+import LlistaSeguitsModal from "../components/LlistaSeguitsModalPublic";
+import LlistaSeguidorsModal from "../components/LlistaSeguidorsModalPublic";
 import ConfirmBlockModal from "../components/ConfirmBlockModal";
 import ConfirmUnblockModal from "../components/ConfirmUnblockModal";
 import AvatarFallback from "../components/AvatarFallback";
@@ -337,7 +337,7 @@ export default function UserProfilePublic() {
               {profile.url_foto_perfil ? (
                 <img src={profile.url_foto_perfil} alt={t('edit_profile_profile_photo')} />
               ) : (
-                <AvatarFallback name={displayName} />
+                <AvatarFallback name={displayName} size={160}/>
               )}
             </div>
 
