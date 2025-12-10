@@ -276,9 +276,7 @@ def mark_notification_as_read(notification_id: str):
 def delete_notification(notification_id: str):
     """Elimina una notificació per ID"""
     try:
-        res = notifications_collection.delete_one(
-            {"_id": ObjectId(notification_id)}
-        )
+        res = notifications_collection.delete_one({"_id": ObjectId(notification_id)})
         return res.deleted_count == 1
     except Exception:
         return False

@@ -195,14 +195,13 @@ async def cancel_follow_request(user_id: str, target_id: str):
     # Comprovem que l'usuari existeix
     if not user_doc.exists:
         raise HTTPException(
-            status_code=404, detail="L'usuari que intenta cancel·lar la sol·licitud no existeix"
+            status_code=404,
+            detail="L'usuari que intenta cancel·lar la sol·licitud no existeix",
         )
 
     # Comprovem que l'usuari target existeix
     if not target_doc.exists:
-        raise HTTPException(
-            status_code=404, detail="L'usuari target no existeix"
-        )
+        raise HTTPException(status_code=404, detail="L'usuari target no existeix")
 
     # Eliminar de la llista de sol·licituds enviades
     user_ref.update({"llista_solicitud_seguits": firestore.ArrayRemove([target_id])})
@@ -236,14 +235,18 @@ async def accept_follow_request(user_id: str, follower_id: str):
     await follow_user(follower_id, user_id)
 
     # Eliminar de les llistes de sol·licituds pendents
-    user_ref.update({"llista_solicitud_seguidors": firestore.ArrayRemove([follower_id])})
+    user_ref.update(
+        {"llista_solicitud_seguidors": firestore.ArrayRemove([follower_id])}
+    )
     follower_ref.update({"llista_solicitud_seguits": firestore.ArrayRemove([user_id])})
 
     # Crear notificació de nou seguidor (mateix format que client.ts)
     try:
         follower_data = follower_doc.to_dict() or {}
         extra = {
-            "fromUserName": follower_data.get("nom_i_cognoms") or follower_data.get("username") or "",
+            "fromUserName": follower_data.get("nom_i_cognoms")
+            or follower_data.get("username")
+            or "",
             "fromUserAvatar": follower_data.get("url_foto_perfil", ""),
         }
 
@@ -255,13 +258,17 @@ async def accept_follow_request(user_id: str, follower_id: str):
             extra=extra,
         )
     except Exception as e:
-        print(f"[WARN] No s'ha pogut crear la notificació de follow en acceptar la sol·licitud: {e}")
+        print(
+            f"[WARN] No s'ha pogut crear la notificació de follow en acceptar la sol·licitud: {e}"
+        )
 
     # Crear notificació al sol·licitant informant que se li ha acceptat la sol·licitud
     try:
         user_data = user_doc.to_dict() or {}
         extra_accepted = {
-            "fromUserName": user_data.get("nom_i_cognoms") or user_data.get("username") or "",
+            "fromUserName": user_data.get("nom_i_cognoms")
+            or user_data.get("username")
+            or "",
             "fromUserAvatar": user_data.get("url_foto_perfil", ""),
         }
 
@@ -273,7 +280,9 @@ async def accept_follow_request(user_id: str, follower_id: str):
             extra=extra_accepted,
         )
     except Exception as e:
-        print(f"[WARN] No s'ha pogut crear la notificació d'acceptació al sol·licitant: {e}")
+        print(
+            f"[WARN] No s'ha pogut crear la notificació d'acceptació al sol·licitant: {e}"
+        )
 
     return {"message": "Sol·licitud de seguiment acceptada correctament"}
 
@@ -296,7 +305,9 @@ async def reject_follow_request(user_id: str, follower_id: str):
         raise HTTPException(status_code=404, detail="L'usuari seguidor no existeix")
 
     # Eliminar de les llistes de sol·licituds pendents
-    user_ref.update({"llista_solicitud_seguidors": firestore.ArrayRemove([follower_id])})
+    user_ref.update(
+        {"llista_solicitud_seguidors": firestore.ArrayRemove([follower_id])}
+    )
     follower_ref.update({"llista_solicitud_seguits": firestore.ArrayRemove([user_id])})
 
     return {"message": "Sol·licitud de seguiment rebutjada correctament"}
@@ -424,7 +435,9 @@ async def unblock_user(user_id: str, target_id: str):
     i elimina el user_id de la llista 'llista_bloquejadors' del target_id.
     """
     if user_id == target_id:
-        raise HTTPException(status_code=400, detail="No pots desbloquejar-te a tu mateix")
+        raise HTTPException(
+            status_code=400, detail="No pots desbloquejar-te a tu mateix"
+        )
 
     user_ref = db.collection("users").document(user_id)
     target_ref = db.collection("users").document(target_id)
