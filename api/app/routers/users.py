@@ -15,6 +15,7 @@ from app.services.mongo_service import (
     delete_trip,
     create_notification,
 )
+import json
 
 security = HTTPBearer()
 
@@ -88,8 +89,9 @@ async def search_users(
     blocked_by_me_list = []
     if blocked_by_me:
         try:
-            import json
             blocked_by_me_list = json.loads(blocked_by_me)
+        except json.JSONDecodeError:
+            blocked_by_me_list = []
 
     # Filtrar per query si existeix
     search_term = query.lower().strip()
