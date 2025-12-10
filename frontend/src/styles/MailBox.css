@@ -183,6 +183,45 @@
   font-size: 0.85rem;
   color: #777;
 }
+.follow-request-actions {
+  display: flex;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.follow-request-actions button {
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 4px;      /* ja no són rodons */
+  border: 1px solid #c8c8c8;
+  background: #f3f3f3;
+  color: #333;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.follow-request-actions button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.follow-request-actions button:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px; /* elimina el buit entre bordes */
+}
+
+.follow-request-actions button:hover {
+  background: #e7e7e7;
+  border-color: #bdbdbd;
+}
+
+.follow-request-actions button:active {
+  transform: scale(0.97);
+}
+
 
 /* Responsive */
 @media (max-width: 600px) {
@@ -193,6 +232,7 @@
     border-radius: 14px;
   }
 }
+
 
 /* =========================================================
    DARK MODE — MAILBOX 
