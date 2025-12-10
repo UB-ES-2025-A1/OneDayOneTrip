@@ -73,3 +73,18 @@ export async function createNotification(data: {
 export async function markNotificationAsRead(notificationId: string) {
   return apiPut(`/notifications/read/${notificationId}`);
 }
+
+export async function deleteNotification(notificationId: string) {
+  const user = getAuth().currentUser;
+  const token = user ? await user.getIdToken() : null;
+
+  const res = await fetch(`${API_URL}/notifications/${notificationId}`, {
+    method: "DELETE",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) throw new Error(`API Error ${res.status}`);
+  return res.json();
+}

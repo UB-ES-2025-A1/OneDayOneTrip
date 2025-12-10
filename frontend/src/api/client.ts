@@ -69,15 +69,39 @@ export async function getAllUsers() {
   return apiGet("/users");
 }
 
+// Seguir un usuari
 export async function followUser(userId: string, targetId: string) {
   const res = await apiPost(`/users/follow/${userId}/${targetId}`, {});
+
+  try {
+    const userData = await getUserById(userId);
+
+    await createNotification({
+      fromUserId: userId,
+      toUserId: targetId,
+      type: "follow",
+      message: "ha començat a seguir-te",
+      extra: {
+        fromUserName: userData.nom_i_cognoms ?? userData.username ?? "",
+        fromUserAvatar: userData.url_foto_perfil ?? "",
+      },
+    });
+  } catch (e) {
+    console.warn("⚠️ No s'ha pogut crear la notificació de follow:", e);
+  }
+
+  return res;
+}
+
+// Enviar sol·licitud de seguiment
+export async function askToFollowUser(userId: string, targetId: string) {
+  const res = await apiPost(`/users/askToFollowUser/${userId}/${targetId}`, {});
 
   try {
     const userData = await getUserById(userId);
     const targetUserData = await getUserById(targetId);
 
     if (targetUserData.isPrivate) {
-      // Si l'usuari a seguir és privat, s'envia una sol·licitud de seguiment
       await createNotification({
         fromUserId: userId,
         toUserId: targetId,
@@ -89,26 +113,15 @@ export async function followUser(userId: string, targetId: string) {
           actionButton: true,
         },
       });
-    } else {
-      // Si l'usuari a seguir és públic, s'envia una notificación simple
-      await createNotification({
-        fromUserId: userId,
-        toUserId: targetId,
-        type: "follow",
-        message: "ha començat a seguir-te",
-        extra: {
-          fromUserName: userData.nom_i_cognoms ?? userData.username ?? "",
-          fromUserAvatar: userData.url_foto_perfil ?? "",
-        },
-      });
     }
   } catch (e) {
-    console.warn("⚠️ No s'ha pogut crear la notificació de follow:", e);
+    console.warn("⚠️ No s'ha pogut crear la sol·licitud de follow:", e);
   }
 
   return res;
 }
 
+// Deixar de seguir un usuari
 export async function unfollowUser(userId: string, targetId: string) {
   const res = await apiPost(`/users/unfollow/${userId}/${targetId}`, {});
 
@@ -135,6 +148,16 @@ export async function unfollowUser(userId: string, targetId: string) {
 // Eliminar sol·licitud de seguiment
 export async function cancel_follow_request(userId: string, targetId: string) {
   return apiPost(`/users/cancel_follow_request/${userId}/${targetId}`, {});
+}
+
+// Acceptar sol·licitud de seguiment
+export async function accept_follow_request(userId: string, targetId: string) {
+  return apiPost(`/users/accept_follow_request/${userId}/${targetId}`, {});
+}
+
+// Rebutjar sol·licitud de seguiment
+export async function reject_follow_request(userId: string, targetId: string) {
+  return apiPost(`/users/reject_follow_request/${userId}/${targetId}`, {});
 }
 
 // Guardar una ruta
@@ -193,13 +216,12 @@ export async function removePublication(userId: string, tripId: string) {
   return apiDelete(`/users/${userId}/publicacions/${tripId}`);
 }
 
-// (opcional) si ja no el fas servir, pots BORRAR aquesta funció
 export async function deleteTripAndPublication(userId: string, tripId: string) {
   await deleteTripById(tripId);
   await removePublication(userId, tripId);
 }
 
-// 🔻 NOVA: eliminar compte completament (backend: DELETE /users/delete/{user_id})
+// eliminar compte completament (backend: DELETE /users/delete/{user_id})
 export async function deleteAccount(userId: string) {
   return apiDelete(`/users/delete/${userId}`);
 }

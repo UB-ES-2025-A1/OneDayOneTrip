@@ -1,11 +1,16 @@
 import { X, Mail, Bell, MessageCircle, Star } from "lucide-react";
 import "../styles/MailBox.css";
+import { accept_follow_request, reject_follow_request, followUser } from "../api/client";
+import { auth } from "../firebase";
+import { deleteNotification } from "../api/notifier";
 
 export type NotificationType = "follow" | "follow_request" | "comment" | "rating";
 
 export type Notification = {
   id: string;
   type: NotificationType;
+  fromUserId: string;
+  toUserId: string;
   fromUserName: string;
   fromUserAvatar?: string;
   tripTitle?: string;
@@ -18,7 +23,7 @@ type Props = {
   open: boolean;
   onClose: () => void;
   notifications?: Notification[];
-  onMarkRead?: (id: string) => void; // NUEVO
+  onMarkRead?: (id: string) => void;
 };
 
 function formatDate(dateStr: string) {
@@ -52,6 +57,48 @@ export default function Mailbox({ open, onClose, notifications, onMarkRead }: Pr
 
   const items = notifications || [];
   const unreadCount = items.filter((n) => !n.read).length;
+
+  const handleAccept = async (notification: Notification) => {
+  if (!auth.currentUser) return;
+
+  const currentUserId = auth.currentUser.uid;
+  const fromUserId = notification.fromUserId;
+
+  
+  try {
+    if (!fromUserId) {
+      alert("No es pot acceptar la sol·licitud: manca l'ID de l'usuari.");
+    } else {
+      await accept_follow_request(currentUserId, fromUserId); // acceptar la sol·licitud
+      await followUser(fromUserId, currentUserId);  // fer que ens segueixi l'usuari
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error al acceptar la sol·licitud de seguiment.");
+  } finally {
+    await deleteNotification(notification.id);  // eliminar la notificació
+  }
+};
+
+const handleReject = async (notification: Notification) => {
+  if (!auth.currentUser) return;
+
+  const currentUserId = auth.currentUser.uid;
+  const fromUserId = notification.fromUserId;
+
+  try {
+    if (!fromUserId) {
+      alert("No es pot rebutjar la sol·licitud: manca l'ID de l'usuari.");
+    } else {
+      await reject_follow_request(currentUserId, fromUserId); // rebutjar la sol·licitud
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error al rebuthar la sol·licitud de seguiment.");
+  } finally {
+    await deleteNotification(notification.id);  // eliminar la notificació
+  }
+};
 
   return (
     <div
@@ -112,8 +159,8 @@ export default function Mailbox({ open, onClose, notifications, onMarkRead }: Pr
 
                   {n.type === "follow_request" && !n.read && (
                     <div className="follow-request-actions">
-                      <button onClick={() => acceptFollowRequest(n.id)}>Acceptar</button>
-                      <button onClick={() => rejectFollowRequest(n.id)}>Rebutjar</button>
+                      <button onClick={() => handleAccept(n)}>Acceptar</button>
+                      <button onClick={() => handleReject(n)}>Rebutjar</button>
                     </div>
                   )}
 
