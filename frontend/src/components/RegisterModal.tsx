@@ -51,9 +51,9 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
   };
 
   return (
-    <div className="modal-backdrop">
+    <div className="modal-backdrop" data-testid="register-modal">
       <div className="register-card">
-        <button className="close-btn-reg" onClick={onClose}>
+        <button className="close-btn-reg" data-testid="close-modal" onClick={onClose}>
           &times;
         </button>
 
@@ -67,6 +67,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                 <img src="/images/person.png" alt={t('general_user')} />
               </div>
               <input
+                data-testid="username-input"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -83,6 +84,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                 <img src="/images/person.png" alt={t('register_full_name')} />
               </div>
               <input
+                data-testid="full-name-input"
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -99,6 +101,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                 <img src="/images/ema.png" alt={t('email')} />
               </div>
               <input
+                data-testid="email-input"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -115,6 +118,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                 <img src="/images/lockk.png" alt={t('login_password')} />
               </div>
               <input
+                data-testid="password-input"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -125,11 +129,11 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
               <label className="floating-label">{t('login_password')}</label>
 
               {password.length > 0 && (
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                >
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
                   {/* aquí l'icona de l'ull si la tens */}
                 </button>
               )}
@@ -141,6 +145,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
                 <img src="/images/lockk.png" alt={t('register_confirm_password')} />
               </div>
               <input
+                data-testid="confirm-password-input"
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -151,11 +156,11 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
               <label className="floating-label">{t('register_confirm_password')}</label>
 
               {confirmPassword.length > 0 && (
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowConfirmPassword((prev) => !prev)}
-                >
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+              >
                   {/* icona */}
                 </button>
               )}
@@ -189,7 +194,7 @@ export default function RegisterModal({ onClose, openLogin }: RegisterProps) {
               </div>
             </div>
 
-            <button type="submit" className="auth-button" disabled={loading}>
+            <button data-testid="submit-btn" type="submit" className="auth-button" disabled={loading}>
               {loading ? t('register_creating_account') : t('header_register')}
             </button>
           </form>

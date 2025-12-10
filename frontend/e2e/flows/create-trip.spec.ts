@@ -124,39 +124,18 @@ test.describe('Crear Trip - Formulario (cuando disponible)', () => {
   });
 
   test('DEBE verificar que existen rutas creadas por el seed', async ({ page }) => {
-    // Este test verifica que las rutas creadas en global-setup están disponibles
-    const responsePromise = page.waitForResponse(
-      res => res.url().includes('/trips') &&
-             res.status() === 200 &&
-             (res.headers()['content-type']?.includes('application/json') ?? false),
-      { timeout: 20000 }
-    );
-    
     await page.goto('/');
-    
-    // Esperar a que la API responda (solo JSON)
-    const response = await responsePromise;
-    const contentType = response.headers()['content-type'] || '';
-    
-    if (!contentType.includes('application/json')) {
-      test.skip(true, `Respuesta /trips no es JSON (content-type=${contentType})`);
-      return;
-    }
-    
-    const data = await response.json();
-    const tripCount = Array.isArray(data) ? data.length : 0;
-    
-    // DEBE haber rutas (creadas por el seed)
+    await waitForPageLoad(page);
+
+    // Esperar a que /trips responda y devuelva datos
+    const tripCount = await waitForTripsAPI(page, true);
     expect(tripCount).toBeGreaterThan(0);
     console.log(`✅ ${tripCount} rutas disponibles (creadas por seed)`);
-    
-    // Esperar carga completa
-    await waitForPageLoad(page);
-    
+
     // Verificar que aparecen en la UI
     const tripCards = page.locator(SELECTORS.tripCard);
-    await expect(tripCards.first()).toBeVisible({ timeout: 10000 });
-    
+    await expect(tripCards.first()).toBeVisible({ timeout: 15000 });
+
     const cardCount = await tripCards.count();
     expect(cardCount).toBeGreaterThan(0);
     console.log(`✅ ${cardCount} tarjetas de rutas visibles en la UI`);

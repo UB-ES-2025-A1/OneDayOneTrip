@@ -59,9 +59,9 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
   }
 
   return (
-    <div className="modal-backdrop">
+    <div className="modal-backdrop" data-testid="login-modal">
       <div className="login-card">
-        <button className="close-btn-login" onClick={onClose}>
+        <button className="close-btn-login" data-testid="close-modal" onClick={onClose}>
           &times;
         </button>
 
@@ -87,6 +87,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
                 </div>
 
                 <input
+                  data-testid="email-input"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -104,6 +105,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
                 </div>
 
                 <input
+                  data-testid="password-input"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -115,7 +117,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
               </div>
 
 
-              <button type="submit" className="auth-button" disabled={loading}>
+              <button data-testid="submit-btn" type="submit" className="auth-button" disabled={loading}>
                 {loading ? t('login_logging_in') : t('header_start_session')}
               </button>
             </form>
@@ -123,6 +125,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
             {error && <p className="text-red-500 mt-4">{error}</p>}
             
             <button
+              data-testid="reset-password-link"
               type="button"
               onClick={() => setShowResetPassword(true)}
               className="auth-link"
@@ -134,6 +137,7 @@ export default function LoginModal({ onClose, openRegister }: LoginProps) {
             <p className="auth-footer">
                 {t('login_no_account')}{" "}
               <button
+                data-testid="login-register-link"
                 type="button"
                 onClick={() => {
                   onClose();

@@ -71,7 +71,7 @@ export default function MasonryGrid({
   };
 
   return (
-    <div ref={containerRef} className="masonry-container">
+    <div ref={containerRef} className="masonry-container" data-testid="trip-grid">
         {showCreateButton && (
           <ButtonNewTrip
             onClick={() => {
@@ -87,6 +87,7 @@ export default function MasonryGrid({
         <div
           key={item.id}
           className="masonry-item"
+          data-testid="trip-card"
           onClick={() => handleClick(item.id)}
         >
           <div

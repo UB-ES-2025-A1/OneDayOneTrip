@@ -15,17 +15,17 @@ if ! docker info > /dev/null 2>&1; then
 fi
 
 echo ""
-echo "📦 Levantando MongoDB con Docker..."
+echo "📦 Levantando MongoDB + API con Docker..."
 
-# Levantar MongoDB
-docker-compose -f docker-compose.e2e.yml up mongo-e2e -d
+# Levantar MongoDB + API
+docker-compose -f docker-compose.e2e.yml up api-e2e -d
 
 if [ $? -ne 0 ]; then
-    echo "❌ Error levantando MongoDB"
+    echo "❌ Error levantando infraestructura E2E (mongo/api)"
     exit 1
 fi
 
-echo "✅ MongoDB iniciado en puerto 27018"
+echo "✅ MongoDB iniciado en puerto 27018 y API en 8000"
 
 # Esperar a que MongoDB esté listo
 echo ""
@@ -34,8 +34,11 @@ max_attempts=30
 attempt=0
 
 while [ $attempt -lt $max_attempts ]; do
-    if docker exec onedayonetrip-mongo-e2e mongosh --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
-        echo "✅ MongoDB está listo!"
+    mongo_ready=$(docker exec onedayonetrip-mongo-e2e mongosh --eval "db.adminCommand('ping')" > /dev/null 2>&1 && echo "ok" || echo "")
+    api_ready=$(curl -s http://127.0.0.1:8000/ > /dev/null && echo "ok" || echo "")
+    
+    if [ -n "$mongo_ready" ] && [ -n "$api_ready" ]; then
+        echo "✅ MongoDB y API están listos!"
         break
     fi
     sleep 1
@@ -43,20 +46,13 @@ while [ $attempt -lt $max_attempts ]; do
 done
 
 if [ $attempt -ge $max_attempts ]; then
-    echo "❌ MongoDB no respondió a tiempo"
+    echo "❌ Infraestructura E2E no respondió a tiempo"
     exit 1
 fi
 
 echo ""
 echo "============================================"
-echo "📋 Siguiente paso: Inicia el backend API"
-echo ""
-echo "   En una terminal nueva, ejecuta:"
-echo "   cd api"
-echo "   export MONGO_URI='mongodb://localhost:27018/OneDayOneTrip_E2E'"
-echo "   python -m uvicorn app.main:app --port 8001"
-echo ""
-echo "📋 Luego: Inicia el frontend"
+echo "📋 Inicia el frontend"
 echo ""
 echo "   En otra terminal:"
 echo "   cd frontend"

@@ -12,17 +12,17 @@ if (-not $dockerRunning) {
     exit 1
 }
 
-Write-Host "`n📦 Levantando MongoDB con Docker..." -ForegroundColor Yellow
+Write-Host "`n📦 Levantando MongoDB + API con Docker..." -ForegroundColor Yellow
 
-# Levantar MongoDB
-docker-compose -f docker-compose.e2e.yml up mongo-e2e -d
+# Levantar MongoDB + API
+docker-compose -f docker-compose.e2e.yml up api-e2e -d
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Error levantando MongoDB" -ForegroundColor Red
+    Write-Host "❌ Error levantando infraestructura E2E (mongo/api)" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ MongoDB iniciado en puerto 27018" -ForegroundColor Green
+Write-Host "✅ MongoDB en 27018 y API en 8000" -ForegroundColor Green
 
 # Esperar a que MongoDB esté listo
 Write-Host "`n⏳ Esperando a que MongoDB esté listo..." -ForegroundColor Yellow
@@ -31,25 +31,19 @@ $attempt = 0
 do {
     Start-Sleep -Seconds 1
     $attempt++
-    $healthy = docker exec onedayonetrip-mongo-e2e mongosh --eval "db.adminCommand('ping')" 2>$null
-} while (-not $healthy -and $attempt -lt $maxAttempts)
+    $mongoHealthy = docker exec onedayonetrip-mongo-e2e mongosh --eval "db.adminCommand('ping')" 2>$null
+    $apiHealthy = (curl -s http://127.0.0.1:8000/) 2>$null
+} while ((-not $mongoHealthy -or -not $apiHealthy) -and $attempt -lt $maxAttempts)
 
 if ($attempt -ge $maxAttempts) {
-    Write-Host "❌ MongoDB no respondió a tiempo" -ForegroundColor Red
+    Write-Host "❌ Infraestructura E2E no respondió a tiempo" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ MongoDB está listo!" -ForegroundColor Green
+Write-Host "✅ MongoDB y API están listos!" -ForegroundColor Green
 
 Write-Host "`n============================================" -ForegroundColor Cyan
-Write-Host "📋 Siguiente paso: Inicia el backend API" -ForegroundColor White
-Write-Host ""
-Write-Host "   En una terminal nueva, ejecuta:" -ForegroundColor Gray
-Write-Host "   cd api" -ForegroundColor White
-Write-Host "   `$env:MONGO_URI='mongodb://localhost:27018/OneDayOneTrip_E2E'" -ForegroundColor White
-Write-Host "   python -m uvicorn app.main:app --port 8001" -ForegroundColor White
-Write-Host ""
-Write-Host "📋 Luego: Inicia el frontend" -ForegroundColor White
+Write-Host "📋 Inicia el frontend" -ForegroundColor White
 Write-Host ""
 Write-Host "   En otra terminal:" -ForegroundColor Gray
 Write-Host "   cd frontend" -ForegroundColor White

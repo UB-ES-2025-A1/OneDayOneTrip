@@ -86,18 +86,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     
-    services:
-      # MongoDB para tests E2E
-      mongo:
-        image: mongo:7.0
-        ports:
-          - 27018:27017
-        options: >-
-          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       # ────────────────────────────────────────────────────────
       # 📥 Checkout y setup
@@ -189,32 +177,30 @@ jobs:
             exit 1
           fi
           
-          # Set env var with the JSON content for the backend
+          # Set env var with the JSON content for docker-compose (backend)
           FIREBASE_CREDS=$(cat /tmp/firebase-credentials.json)
-          echo "FIREBASE_CREDENTIALS<<EOF" >> $GITHUB_ENV
+          echo "FIREBASE_CREDENTIALS_E2E<<EOF" >> $GITHUB_ENV
           echo "$FIREBASE_CREDS" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
           echo "✅ Firebase credentials configured"
           
-      - name: 🚀 Start backend API
-        working-directory: api
+      - name: 🐳 Start MongoDB + API (Docker)
         run: |
-          # Iniciar API en background (puerto 8000 para coincidir con frontend hardcodeado)
-          uvicorn app.main:app --host 0.0.0.0 --port 8000 &
-          echo "API_PID=$!" >> $GITHUB_ENV
+          # Levantar MongoDB y API via docker compose
+          docker compose -f docker-compose.e2e.yml up --build -d api-e2e
           
-          # Esperar a que la API esté lista
-          echo "⏳ Waiting for API to be ready..."
-          for i in {1..30}; do
+          echo "⏳ Waiting for API health..."
+          for i in {1..40}; do
             if curl -s http://127.0.0.1:8000/ > /dev/null; then
               echo "✅ API is ready!"
               break
             fi
-            echo "Attempt $i/30..."
-            sleep 2
+            echo "Attempt $i/40..."
+            sleep 3
           done
-        env:
-          MONGO_URI: mongodb://localhost:27018/OneDayOneTrip_E2E
+          
+          # Mostrar estado de los contenedores
+          docker compose -f docker-compose.e2e.yml ps
 
       - name: 🚀 Start frontend dev server
         working-directory: frontend
@@ -275,8 +261,10 @@ jobs:
         if: always()
         run: |
           # Matar procesos de fondo
-          kill ${{ env.API_PID }} 2>/dev/null || true
           kill ${{ env.FRONTEND_PID }} 2>/dev/null || true
+          
+          # Parar contenedores Docker
+          docker compose -f docker-compose.e2e.yml down -v || true
 
   # ============================================================
   # 📝 Job 3: Comentar resultados en PR

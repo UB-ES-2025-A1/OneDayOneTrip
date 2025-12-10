@@ -89,6 +89,7 @@ export default function Header({
           <>
             {/* FOTO PERFIL O AVATAR */}
             <button
+              data-testid="profile-btn"
               className="profile-btn"
               title={t('header_view_profile')}
               onClick={goProfile}
@@ -119,16 +120,16 @@ export default function Header({
               )}
             </button>
 
-            <button onClick={onLogout} className="header-btn logout">
+            <button data-testid="logout-btn" onClick={onLogout} className="header-btn logout">
                 {t('header_close_session')}
             </button>
           </>
         ) : (
           <>
-            <button onClick={onLogin} className="header-btn login">
+            <button data-testid="login-btn" onClick={onLogin} className="header-btn login">
                 {t('login_title')}
             </button>
-            <button onClick={onRegister} className="header-btn register">
+            <button data-testid="register-btn" onClick={onRegister} className="header-btn register">
                 {t('register_register_button')}
             </button>
           </>

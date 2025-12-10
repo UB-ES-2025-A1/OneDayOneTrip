@@ -68,19 +68,14 @@ await assertElementVisible(page, SELECTORS.tripCard, 'tarjeta de ruta');
 
 ### Prerrequisitos
 
-1. **MongoDB corriendo** (via Docker):
+1. **MongoDB + API en Docker**:
    ```bash
-   docker-compose -f docker-compose.e2e.yml up mongo-e2e -d
+   # Necesitas definir FIREBASE_CREDENTIALS_E2E con el JSON de service account (o exportarlo en shell)
+   export FIREBASE_CREDENTIALS_E2E='{"type":"service_account",...}'
+   docker-compose -f docker-compose.e2e.yml up api-e2e -d
    ```
 
-2. **Backend API corriendo**:
-   ```bash
-   cd api
-   export MONGO_URI=mongodb://localhost:27018/OneDayOneTrip_E2E
-   uvicorn app.main:app --port 8000
-   ```
-
-3. **Frontend corriendo**:
+2. **Frontend corriendo**:
    ```bash
    cd frontend
    npm run dev
