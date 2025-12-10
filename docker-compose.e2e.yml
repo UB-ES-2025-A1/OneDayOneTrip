@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile.e2e
     container_name: onedayonetrip-api-e2e
     ports:
-      - "8001:8000"  # Puerto diferente para no colisionar con desarrollo
+      - "8000:8000"  # Mismo puerto que espera el frontend (127.0.0.1:8000)
     environment:
       - MONGO_URI=mongodb://mongo-e2e:27017/OneDayOneTrip_E2E
       - FIREBASE_CREDENTIALS=${FIREBASE_CREDENTIALS_E2E:-}

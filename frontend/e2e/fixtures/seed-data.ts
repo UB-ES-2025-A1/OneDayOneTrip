@@ -10,7 +10,7 @@ import { APIRequestContext } from '@playwright/test';
 const API_URL =
   process.env.API_URL ||
   process.env.VITE_API_URL ||
-  'http://localhost:8000';
+  'http://127.0.0.1:8000';
 
 /**
  * Obtiene un idToken de Firebase Auth usando REST.
@@ -96,12 +96,12 @@ export interface TestUser {
   email: string;
 }
 
-// Usuario de prueba para E2E
+// Usuario de prueba para E2E (debe coincidir con el usuario real de Firebase)
 export const TEST_USER: TestUser = {
-  userId: 'e2e-test-user-001',
-  username: 'e2e_tester',
-  fullName: 'E2E Test User',
-  email: 'e2e-test@onedayonetrip.com'
+  userId: 'Cc2ug8QS2mTfoaQs48zTTL89QOi1',  // UID real del usuario testuser@testuser.com en Firebase
+  username: 'testuser',
+  fullName: 'Test User E2E',
+  email: 'testuser@testuser.com'  // Email real del usuario de Firebase
 };
 
 // Ruta de prueba para E2E
@@ -219,7 +219,7 @@ export async function seedTestTrip(
   request: APIRequestContext,
   trip: TestTrip = TEST_TRIP,
   verbose = false
-): Promise<string | null> {
+): Promise<string> {
   try {
     // Crear la ruta usando el endpoint de trips
     const tripData = {
@@ -247,22 +247,23 @@ export async function seedTestTrip(
     
     if (response.ok()) {
       const data = await response.json();
+      const tripId = data._id || data.id;
       if (verbose) {
-        console.log('✅ Ruta creada:', trip.title);
+        console.log('✅ Ruta creada:', trip.title, `(ID: ${tripId})`);
       }
-      return data._id || data.id || null;
+      return tripId;
     } else {
       if (verbose) {
         const errorText = await response.text();
         console.log('⚠️ Error creando ruta:', response.status(), errorText);
       }
-      return null;
+      throw new Error(`Failed to create trip: ${response.status()}`);
     }
   } catch (error) {
     if (verbose) {
       console.log('⚠️ Error en seedTestTrip:', error);
     }
-    return null;
+    throw error;
   }
 }
 
@@ -274,15 +275,22 @@ export async function seedDatabase(
   request: APIRequestContext,
   verbose = true,
   authToken?: string
-): Promise<void> {
+): Promise<string[]> {
   if (verbose) console.log('🌱 Iniciando seed de base de datos E2E...');
-  
+
+  const createdTripIds: string[] = [];
+
   // Crear usuario de prueba
   await seedTestUser(request, verbose, authToken);
-  
+
   // Crear ruta principal
-  await seedTestTrip(request, TEST_TRIP, verbose);
-  
+  try {
+    const mainTripId = await seedTestTrip(request, TEST_TRIP, verbose);
+    if (mainTripId) createdTripIds.push(mainTripId);
+  } catch (error) {
+    console.log('⚠️ Error creando ruta principal, continuando...');
+  }
+
   // Crear rutas adicionales
   for (const tripPartial of ADDITIONAL_TEST_TRIPS) {
     const fullTrip: TestTrip = {
@@ -293,10 +301,17 @@ export async function seedDatabase(
       routeMap: [],
       trip_points: TEST_TRIP.trip_points
     };
-    await seedTestTrip(request, fullTrip, verbose);
+    try {
+      const tripId = await seedTestTrip(request, fullTrip, verbose);
+      if (tripId) createdTripIds.push(tripId);
+    } catch (error) {
+      console.log(`⚠️ Error creando ruta adicional "${tripPartial.title}", continuando...`);
+    }
   }
-  
-  if (verbose) console.log('✅ Seed completado');
+
+  if (verbose) console.log(`✅ Seed completado - ${createdTripIds.length} rutas creadas`);
+
+  return createdTripIds;
 }
 
 /**

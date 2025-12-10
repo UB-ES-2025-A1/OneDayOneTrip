@@ -19,7 +19,7 @@ const firebaseConfig = {
 
 export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-if (typeof window !== "undefined" && !window._appCheckInitialized) {
+if (typeof window !== "undefined" && !window._appCheckInitialized && !import.meta.env.VITE_DISABLE_APP_CHECK) {
   initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY),
     isTokenAutoRefreshEnabled: true,

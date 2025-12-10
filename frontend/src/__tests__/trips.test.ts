@@ -166,9 +166,22 @@ describe("trips API", () => {
         text: "Great trip!",
         userId: "user-1",
       };
-      mockFetch.mockResolvedValue({
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          _id: "trip-1",
+          title: "Trip 1",
+          author: { userId: "author-1", name: "Author" },
+        }),
+      });
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ comment: mockComment }),
+      });
+      // Respuesta por defecto (notificación)
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({}),
       });
 
       const result = await createTripComment("trip-1", {
@@ -191,9 +204,21 @@ describe("trips API", () => {
 
     it("incluye userProfilePicture cuando está disponible", async () => {
       const mockComment = { id: "1", text: "Comment" };
-      mockFetch.mockResolvedValue({
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          _id: "trip-1",
+          title: "Trip 1",
+          author: { userId: "author-1", name: "Author" },
+        }),
+      });
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ comment: mockComment }),
+      });
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({}),
       });
 
       await createTripComment("trip-1", {
@@ -203,16 +228,28 @@ describe("trips API", () => {
         text: "Comment",
       });
 
-      const callArgs = mockFetch.mock.calls[0];
+      const callArgs = mockFetch.mock.calls[1]; // segunda llamada: POST comentario
       const body = JSON.parse(callArgs[1].body);
       expect(body.userProfilePicture).toBe("pic.jpg");
     });
 
     it("usa string vacío para userProfilePicture cuando no está disponible", async () => {
       const mockComment = { id: "1", text: "Comment" };
-      mockFetch.mockResolvedValue({
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          _id: "trip-1",
+          title: "Trip 1",
+          author: { userId: "author-1", name: "Author" },
+        }),
+      });
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ comment: mockComment }),
+      });
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({}),
       });
 
       await createTripComment("trip-1", {
@@ -221,16 +258,28 @@ describe("trips API", () => {
         text: "Comment",
       });
 
-      const callArgs = mockFetch.mock.calls[0];
+      const callArgs = mockFetch.mock.calls[1]; // segunda llamada: POST comentario
       const body = JSON.parse(callArgs[1].body);
       expect(body.userProfilePicture).toBe("");
     });
 
     it("lanza error cuando la creación falla", async () => {
-      mockFetch.mockResolvedValue({
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          _id: "trip-1",
+          title: "Trip 1",
+          author: { userId: "author-1", name: "Author" },
+        }),
+      });
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 400,
         text: async () => "Bad request",
+      });
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({}),
       });
 
       await expect(
@@ -239,7 +288,7 @@ describe("trips API", () => {
           userName: "User 1",
           text: "Comment",
         })
-      ).rejects.toThrow("Error creant comentari");
+      ).rejects.toThrow(/Error creant comentari/);
     });
   });
 
@@ -361,9 +410,21 @@ describe("trips API", () => {
   describe("rateTrip", () => {
     it("valora una trip correctamente", async () => {
       const mockRating = { avgRating: 5, numRatings: 1, tripId: "trip-1" };
-      mockFetch.mockResolvedValue({
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          _id: "trip-1",
+          title: "Trip 1",
+          author: { userId: "author-1", name: "Author" },
+        }),
+      });
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockRating,
+      });
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({}),
       });
 
       const result = await rateTrip("trip-1", {
@@ -384,15 +445,27 @@ describe("trips API", () => {
     });
 
     it("lanza error cuando la valoración falla", async () => {
-      mockFetch.mockResolvedValue({
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          _id: "trip-1",
+          title: "Trip 1",
+          author: { userId: "author-1", name: "Author" },
+        }),
+      });
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 400,
         text: async () => "Invalid rating",
       });
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({}),
+      });
 
       await expect(
         rateTrip("trip-1", { userId: "user-1", rating: 5 })
-      ).rejects.toThrow("Error valorant la ruta");
+      ).rejects.toThrow(/Error valorant la ruta/);
     });
   });
 });

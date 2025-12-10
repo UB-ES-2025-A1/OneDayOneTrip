@@ -36,7 +36,7 @@ export const MOCK_BACKEND_USER = {
  * Esto intercepta las llamadas a la API y simula un usuario autenticado
  */
 export async function setupAuthMocks(page: Page): Promise<void> {
-  const API_URL = process.env.VITE_API_URL || 'http://localhost:8000';
+  const API_URL = process.env.VITE_API_URL || 'http://127.0.0.1:8000';
   
   // Interceptar llamadas al backend para el usuario
   await page.route(`${API_URL}/users/${MOCK_USER.uid}`, async (route) => {

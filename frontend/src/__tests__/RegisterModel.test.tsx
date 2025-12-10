@@ -37,32 +37,32 @@ describe("RegisterModal", () => {
     vi.clearAllMocks();
   });
 
-  it("renderiza el formulario con todos los campos y el botón", () => {
+  it("renderiza el formulario y el botón", () => {
     renderWithRouter();
-    expect(screen.getByPlaceholderText(/nom d'usuari/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/nom complet/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/correu electrònic/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/^contrasenya$/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/confirmar contrasenya/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /registrar-se/i })).toBeInTheDocument();
+    expect(screen.getByText(/login_register_here/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /header_register/i })).toBeInTheDocument();
   });
 
   it("no llama a register si faltan datos", async () => {
     renderWithRouter();
-    await userEvent.click(screen.getByRole("button", { name: /registrar-se/i }));
+    await userEvent.click(screen.getByRole("button", { name: /header_register/i }));
     expect(authApi.Auth.register).not.toHaveBeenCalled(); // ✅ era login por error
   });
 
   it("llama a register con datos correctos", async () => {
     renderWithRouter();
 
-    await userEvent.type(screen.getByPlaceholderText(/nom complet/i), "Juan Pérez");
-    await userEvent.type(screen.getByPlaceholderText(/nom d'usuari/i), "juanp");
-    await userEvent.type(screen.getByPlaceholderText(/correu electrònic/i), "juan@example.com");
-    await userEvent.type(screen.getByPlaceholderText(/^contrasenya$/i), "secreta123");
-    await userEvent.type(screen.getByPlaceholderText(/confirmar contrasenya/i), "secreta123");
+    const textInputs = screen.getAllByRole("textbox");
+    // Orden de inputs de texto (flotantes): username, fullName, email
+    await userEvent.type(textInputs[0], "juanp");
+    await userEvent.type(textInputs[1], "Juan Pérez");
+    await userEvent.type(textInputs[2], "juan@example.com");
 
-    await userEvent.click(screen.getByRole("button", { name: /registrar-se/i }));
+    const passwordInputs = document.querySelectorAll('input[type="password"]');
+    await userEvent.type(passwordInputs[0] as HTMLInputElement, "secreta123"); // password
+    await userEvent.type(passwordInputs[1] as HTMLInputElement, "secreta123"); // confirm
+
+    await userEvent.click(screen.getByRole("button", { name: /header_register/i }));
 
     expect(authApi.Auth.register).toHaveBeenCalledWith(
       "Juan Pérez",

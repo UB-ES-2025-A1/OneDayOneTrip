@@ -157,21 +157,21 @@ export default function UserProfile() {
     setSeguitsModalOpen(false);
   };
 
-  const toGridItems = (trips: Trip[]): GridItem[] =>
-    trips.map((t) => ({
-      id: String(t._id),
-      title: t.title || t('general_no_title'),
+  const toGridItems = (tripsList: Trip[]): GridItem[] =>
+    tripsList.map((trip) => ({
+      id: String(trip._id),
+      title: trip.title || t('general_no_title'),
       img:
-        t.coverImage ||
-        (t.gallery && t.gallery[0]) ||
+        trip.coverImage ||
+        (trip.gallery && trip.gallery[0]) ||
         "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-      user: t.author?.name || t('general_anonymous'),
-      rating: typeof t.avgRating === "number" ? t.avgRating : 0,
-      temps: t.duration || "—",
-      dificultat: t.difficulty || "—",
-      authorPic: t.author?.profilePic || "",
-      city: t.city || "",
-      country: t.country || "",
+      user: trip.author?.name || t('general_anonymous'),
+      rating: typeof trip.avgRating === "number" ? trip.avgRating : 0,
+      temps: trip.duration || "—",
+      dificultat: trip.difficulty || "—",
+      authorPic: trip.author?.profilePic || "",
+      city: trip.city || "",
+      country: trip.country || "",
     }));
 
   // 🗑️ Quan fas clic a la brossa: només obrim el popup
@@ -188,7 +188,7 @@ export default function UserProfile() {
 
       // Treure-la de trips
       setTrips((prev) =>
-        prev.filter((t) => String(t._id) !== String(tripToDelete))
+        prev.filter((trip) => String(trip._id) !== String(tripToDelete))
       );
 
       // Treure-la de publicacions del perfil
@@ -234,12 +234,12 @@ export default function UserProfile() {
 
   const publicacionsItems = useMemo(() => {
     const pubIds = new Set((profile?.publicacions || []).map(String));
-    return toGridItems(trips.filter((t) => pubIds.has(String(t._id))));
+    return toGridItems(trips.filter((trip) => pubIds.has(String(trip._id))));
   }, [trips, profile?.publicacions]);
 
   const guardadesItems = useMemo(() => {
     const guardIds = new Set((profile?.guardades || []).map(String));
-    return toGridItems(trips.filter((t) => guardIds.has(String(t._id))));
+    return toGridItems(trips.filter((trip) => guardIds.has(String(trip._id))));
   }, [trips, profile?.guardades]);
 
   const gridItems =

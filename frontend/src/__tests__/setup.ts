@@ -11,6 +11,22 @@ global.fetch = vi.fn(() =>
   } as Response)
 ) as typeof fetch;
 
+// Mock de react-i18next - devuelve la clave de traducción tal cual
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      language: 'es',
+      changeLanguage: vi.fn(),
+    },
+  }),
+  Trans: ({ children }: { children: React.ReactNode }) => children,
+  initReactI18next: {
+    type: '3rdParty',
+    init: vi.fn(),
+  },
+}));
+
 // Mock de URL.createObjectURL y URL.revokeObjectURL (APIs del navegador)
 // Estas no existen en el entorno de test de JSDOM
 global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');

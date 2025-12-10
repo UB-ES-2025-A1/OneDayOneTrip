@@ -75,7 +75,7 @@ describe("EtapesList", () => {
     expect(screen.getByText("Barcelona")).toBeInTheDocument();
   });
 
-  it("muestra 'Ubicació desconeguda' cuando no hay ubicación", () => {
+  it("muestra texto de ubicación desconocida cuando no hay ubicación", () => {
     const etapes = [
       {
         id: 0,
@@ -84,7 +84,7 @@ describe("EtapesList", () => {
     ];
 
     render(<EtapesList etapes={etapes} />);
-    expect(screen.getByText("Ubicació desconeguda")).toBeInTheDocument();
+    expect(screen.getByText(/route_detail_location_unknown/i)).toBeInTheDocument();
   });
 
   it("muestra imagen cuando está disponible", () => {
@@ -111,9 +111,8 @@ describe("EtapesList", () => {
     ];
 
     render(<EtapesList etapes={etapes} />);
-    const images = screen.queryAllByRole("img");
-    // Solo debería haber la imagen de ubicación
-    expect(images.length).toBe(1);
+    const etapaImg = screen.queryByAltText("Etapa 1");
+    expect(etapaImg).not.toBeInTheDocument();
   });
 
   it("muestra números de etapa correctamente", () => {

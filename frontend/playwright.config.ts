@@ -11,10 +11,11 @@ import { defineConfig, devices } from '@playwright/test';
  */
 
 // URL del backend (puede ser override via env)
+// Usamos 127.0.0.1 en lugar de localhost para evitar problemas con IPv6
 const API_URL =
   process.env.API_URL ||
   process.env.VITE_API_URL ||
-  'http://localhost:8000';
+  'http://127.0.0.1:8000';
 const FRONTEND_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
 
 export default defineConfig({
@@ -27,10 +28,10 @@ export default defineConfig({
   globalTeardown: './e2e/global-teardown.ts',
   
   /* Configuración general */
-  fullyParallel: false, // evitamos condiciones de carrera sobre datos compartidos
+  fullyParallel: true, // Habilitar paralelismo completo
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 1,
-  workers: process.env.CI ? 1 : 1, // un único worker para no pisar el seed
+  retries: 0, // Sin retries para detección rápida de fallos
+  workers: 8, // Usar 8 workers para mayor velocidad
   
   /* Timeouts */
   timeout: 60 * 1000, // 60 segundos por test
@@ -57,21 +58,29 @@ export default defineConfig({
     actionTimeout: 15 * 1000,
     navigationTimeout: 30 * 1000,
     
-    /* Headers adicionales si necesitas pasar info al backend */
-    extraHTTPHeaders: {
-      'X-E2E-Test': 'true',
-    },
+    /* Headers adicionales deshabilitados - causan problemas con reCAPTCHA */
+    // extraHTTPHeaders: {
+    //   'X-E2E-Test': 'true',
+    // },
   },
 
   /* Proyectos de navegadores */
   projects: [
+    // Setup project para autenticación
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
     {
       name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
         // Viewport consistente para tests
         viewport: { width: 1280, height: 720 },
+        // Usar estado de autenticación guardado
+        storageState: 'playwright/.auth/user.json',
       },
+      dependencies: ['setup'],
     },
     // Descomentar para probar en más navegadores
     // {
@@ -92,6 +101,9 @@ export default defineConfig({
     timeout: 180 * 1000,
     stdout: 'ignore',
     stderr: 'pipe',
+    env: {
+      VITE_DISABLE_APP_CHECK: 'true',
+    },
   },
 
   /* Output de tests */

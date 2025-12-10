@@ -215,7 +215,8 @@ describe("RutaDetall page", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/No s'ha pogut carregar la ruta/i)).toBeInTheDocument();
+      // El mock de i18n devuelve las claves de traducción
+      expect(screen.getByText(/route_detail_error_loading/i)).toBeInTheDocument();
     });
   });
 
@@ -233,7 +234,8 @@ describe("RutaDetall page", () => {
 
     // Verificar que se maneja el error
     await waitFor(() => {
-      expect(screen.getByText(/ID invàlid/i)).toBeInTheDocument();
+      // El mock de i18n devuelve las claves de traducción
+      expect(screen.getByText(/route_detail_error_id_invalid/i)).toBeInTheDocument();
     });
   });
 
@@ -495,7 +497,8 @@ describe("RutaDetall page", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/No s'ha pogut carregar la ruta/i)).toBeInTheDocument();
+      // El mock de i18n devuelve las claves de traducción
+      expect(screen.getByText(/route_detail_error_loading/i)).toBeInTheDocument();
     });
   });
 });

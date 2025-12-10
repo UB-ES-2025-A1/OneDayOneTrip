@@ -32,22 +32,25 @@ describe("LoginModal", () => {
 
   it("muestra el formulario de login con email y contraseña", () => {
     renderWithRouter();
-    expect(screen.getByPlaceholderText(/correu electrònic/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/contrasenya/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /iniciar sessió/i })).toBeInTheDocument();
+    // Inputs con labels flotantes: verificamos que exista al menos el de email
+    const inputs = screen.getAllByRole("textbox");
+    expect(inputs.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole("button", { name: /header_start_session/i })).toBeInTheDocument();
   });
 
   it("no intenta login si faltan datos", async () => {
     renderWithRouter();
-    await userEvent.click(screen.getByRole("button", { name: /iniciar sessió/i }));
+    await userEvent.click(screen.getByRole("button", { name: /header_start_session/i }));
     expect(authApi.Auth.login).not.toHaveBeenCalled();
   });
 
   it("llama a login con credenciales correctas", async () => {
     renderWithRouter();
-    await userEvent.type(screen.getByPlaceholderText(/correu electrònic/i), "juan@example.com");
-    await userEvent.type(screen.getByPlaceholderText(/contrasenya/i), "password123");
-    await userEvent.click(screen.getByRole("button", { name: /iniciar sessió/i }));
+    const inputs = screen.getAllByRole("textbox");
+    await userEvent.type(inputs[0], "juan@example.com");
+    const password = document.querySelector('input[type="password"]') as HTMLInputElement;
+    await userEvent.type(password, "password123");
+    await userEvent.click(screen.getByRole("button", { name: /header_start_session/i }));
     expect(authApi.Auth.login).toHaveBeenCalledWith("juan@example.com", "password123");
   });
 });

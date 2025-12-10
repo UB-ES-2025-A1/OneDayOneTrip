@@ -11,9 +11,24 @@ describe("rateTrip API helper", () => {
   });
 
   it("envía la petición POST con el payload correcto", async () => {
-    mockFetch.mockResolvedValue({
+    // 1a: getTripById
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        _id: "507f1f77bcf86cd799439011",
+        title: "Trip",
+        author: { userId: "author-1", name: "Author" },
+      }),
+    });
+    // 2a: rateTrip POST
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ avgRating: 4.5, numRatings: 2 }),
+    });
+    // Resto llamadas (notificación)
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
     });
 
     const result = await rateTrip("507f1f77bcf86cd799439011", {
@@ -24,7 +39,7 @@ describe("rateTrip API helper", () => {
 
     expect(result).toEqual({ avgRating: 4.5, numRatings: 2 });
 
-    const [url, options] = mockFetch.mock.calls[0];
+    const [url, options] = mockFetch.mock.calls[1]; // segunda llamada: POST rating
     expect(url).toContain("/ratings/trip/507f1f77bcf86cd799439011");
     expect(options.method).toBe("POST");
 
@@ -37,10 +52,24 @@ describe("rateTrip API helper", () => {
   });
 
   it("si no hay fecha la genera automáticamente y lanza error en HTTP != 200", async () => {
-    mockFetch.mockResolvedValue({
+    // 1a: getTripById
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        _id: "trip-1",
+        title: "Trip",
+        author: { userId: "author-1", name: "Author" },
+      }),
+    });
+    // 2a: rateTrip POST falla
+    mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 500,
       text: async () => "ups",
+    });
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
     });
 
     await expect(
@@ -50,7 +79,7 @@ describe("rateTrip API helper", () => {
       })
     ).rejects.toThrow(/500/);
 
-    const [, options] = mockFetch.mock.calls[0];
+    const [, options] = mockFetch.mock.calls[1]; // segunda llamada: POST rating
     const body = JSON.parse(options.body as string);
     expect(body.userId).toBe("user-2");
     expect(body.rating).toBe(3);

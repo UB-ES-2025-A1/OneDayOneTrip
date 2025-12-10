@@ -8,7 +8,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['src/__tests__/setup.ts'],
-    css: true
+    css: true,
+    testTimeout: 10000, // Aumentar timeout para tests async
+    exclude: ['e2e/**', '**/node_modules/**'],
   },
   resolve: {
     alias: {

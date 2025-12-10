@@ -75,9 +75,10 @@ describe("Comments component", () => {
   it("envía un comentario y limpia el textarea", async () => {
     render(<Comments tripId="t1" currentUser={currentUser} backendUser={backendUser} />);
 
-    const textarea = await screen.findByPlaceholderText(/Afegeix un comentari/i);
+    // El mock de i18n devuelve las claves de traducción
+    const textarea = await screen.findByPlaceholderText(/comments_add_placeholder/i);
     await userEvent.type(textarea, "   Hola món   ");
-    await userEvent.click(screen.getByRole("button", { name: /Enviar/i }));
+    await userEvent.click(screen.getByRole("button", { name: /general_send/i }));
 
     await waitFor(() => {
       expect(mockCreateTripComment).toHaveBeenCalledWith(
@@ -94,4 +95,3 @@ describe("Comments component", () => {
     expect(screen.getByText(/Nou comentari/)).toBeInTheDocument();
   });
 });
-

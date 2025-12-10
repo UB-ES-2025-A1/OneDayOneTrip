@@ -239,20 +239,20 @@ export default function Home() {
 
         {!loading && !error && visibleTrips.length > 0 ? (
           <MasonryGrid
-            items={visibleTrips.map((t) => ({
-              id: normalizeId(t._id),
-              title: t.title || t('general_no_title'),
+            items={visibleTrips.map((trip) => ({
+              id: normalizeId(trip._id),
+              title: trip.title || t('general_no_title'),
               img:
-                t.coverImage ||
-                (t.gallery && t.gallery[0]) ||
+                trip.coverImage ||
+                (trip.gallery && trip.gallery[0]) ||
                 "https://placehold.co/600x400?text=Ruta+Sense+Imatge",
-              user: t.author?.name || t('general_anonymous'),
-              rating: typeof t.avgRating === "number" ? t.avgRating : 0,
-              temps: t.duration || "—",
-              dificultat: t.difficulty || "—",
-              authorPic: t.author?.profilePic || undefined,
-              city: t.city || "",
-              country: t.country || "",
+              user: trip.author?.name || t('general_anonymous'),
+              rating: typeof trip.avgRating === "number" ? trip.avgRating : 0,
+              temps: trip.duration || "—",
+              dificultat: trip.difficulty || "—",
+              authorPic: trip.author?.profilePic || undefined,
+              city: trip.city || "",
+              country: trip.country || "",
             }))}
             openRegister={() => setModalOpen("register")}
             currentUser={currentUser}
