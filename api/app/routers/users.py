@@ -70,6 +70,49 @@ async def get_all_users():
     return [d.to_dict() for d in docs]
 
 
+@router.get("/search")
+async def search_users(
+    query: str = "",
+    current_user_id: Optional[str] = None,
+    blocked_by_me: Optional[str] = None
+):
+    """
+    Cerca usuaris per nom, cognoms o username.
+    Exclou els usuaris que m'han bloquejat EXCEPTE si jo també els he bloquejat.
+    Inclou tots els altres (privats, bloquejats per mi, etc.)
+    """
+    docs = db.collection("users").get()
+    all_users = [d.to_dict() for d in docs]
+    
+    # Parsejar la llista d'usuaris bloquejats per mi
+    blocked_by_me_list = []
+    if blocked_by_me:
+        try:
+            import json
+            blocked_by_me_list = json.loads(blocked_by_me)
+        except:
+            blocked_by_me_list = []
+    
+    # Filtrar per query si existeix
+    search_term = query.lower().strip()
+    if search_term:
+        all_users = [
+            u for u in all_users
+            if search_term in (u.get("nom_i_cognoms", "") or "").lower()
+            or search_term in (u.get("username", "") or "").lower()
+        ]
+    
+    # Excloure usuaris que m'han bloquejat i excloure'm a mi mateix
+    if current_user_id:
+        all_users = [
+            u for u in all_users
+            if u.get("uid") != current_user_id  # No mostrar-me a mi mateix
+            and current_user_id not in (u.get("llista_bloquejats", []) or [])  # No m'han bloquejat
+        ]
+    
+    return all_users
+
+
 @router.get("/me")
 async def get_current_user(user=Depends(verify_token)):
     """
