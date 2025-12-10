@@ -159,7 +159,7 @@ jobs:
           # Backend .env para E2E
           echo "MONGO_URI=mongodb://localhost:27018/OneDayOneTrip_E2E" > api/.env
           echo "E2E_MODE=true" >> api/.env
-          echo "FIREBASE_CREDENTIALS=${{ secrets.FIREBASE_CREDENTIALS_E2E }}" >> api/.env
+          # FIREBASE_CREDENTIALS is passed as env var to uvicorn (JSON needs special handling)
 
       # ────────────────────────────────────────────────────────
       # 🚀 Iniciar servicios
@@ -183,6 +183,7 @@ jobs:
           done
         env:
           MONGO_URI: mongodb://localhost:27018/OneDayOneTrip_E2E
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS_E2E }}
 
       - name: 🚀 Start frontend dev server
         working-directory: frontend
