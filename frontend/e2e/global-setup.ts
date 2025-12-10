@@ -82,11 +82,16 @@ async function createUserInMongoDB(): Promise<boolean> {
     const existing = await usersCollection.findOne({ userId: USER_UID });
     
     if (existing) {
-      console.log('✅ Usuario ya existe en MongoDB');
+      // Asegurar que el perfil es público para que las rutas sean visibles
+      await usersCollection.updateOne(
+        { userId: USER_UID },
+        { $set: { isPrivate: false } }
+      );
+      console.log('✅ Usuario ya existe en MongoDB (perfil público verificado)');
       return true;
     }
     
-    // Crear el usuario
+    // Crear el usuario con perfil público para que las rutas sean visibles
     const user = {
       userId: USER_UID,
       username: 'testuser',
@@ -94,6 +99,7 @@ async function createUserInMongoDB(): Promise<boolean> {
       email: 'testuser@testuser.com',
       bio: 'Usuario de prueba para tests E2E',
       profilePicture: 'https://api.dicebear.com/7.x/avataaars/svg?seed=testuser',
+      isPrivate: false, // Perfil público para que las rutas sean visibles sin autenticación
       llista_seguidors: [],
       llista_seguits: [],
       publicacions: [],
