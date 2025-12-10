@@ -56,7 +56,7 @@ export default function UserProfilePublic() {
 
   // Estats de bloqueig (Staging)
   const [isBlocked, setIsBlocked] = useState(false);
-  const [blockLoading, setBlockLoading] = useState(false);
+  const [, setBlockLoading] = useState(false);
   const [imBlocked, setImBlocked] = useState(false);
   const [blockStateLoaded, setBlockStateLoaded] = useState(false);
 
@@ -294,21 +294,21 @@ export default function UserProfilePublic() {
 
     const pubIds = new Set((profile?.publicacions || []).map(String));
     return trips
-      .filter((t) => pubIds.has(String(t._id)))
-      .map((t) => ({
-        id: String(t._id),
-        title: t.title || t('general_no_title'),
+      .filter((trip) => pubIds.has(String(trip)))
+      .map((trip) => ({
+        id: String(trip._id),
+        title: trip.title || t('general_no_title'),
         img:
-          t.coverImage ||
-          (t.gallery && t.gallery[0]) ||
+            trip.coverImage ||
+          (trip.gallery && trip.gallery[0]) ||
           t('general_placeholder_no_image_public'),
-        user: t.author?.name || t('general_anonymous'),
-        rating: typeof t.avgRating === "number" ? t.avgRating : 0,
-        temps: t.duration || "—",
-        dificultat: t.difficulty || "—",
-        authorPic: t.author?.profilePic || "",
-        city: t.city || "",
-        country: t.country || "",
+        user: trip.author?.name || t('general_anonymous'),
+        rating: typeof trip.avgRating === "number" ? trip.avgRating : 0,
+        temps: trip.duration || "—",
+        dificultat: trip.difficulty || "—",
+        authorPic: trip.author?.profilePic || "",
+        city: trip.city || "",
+        country: trip.country || "",
       }));
   }, [trips, profile, t]);
 
