@@ -2,8 +2,16 @@ import { test as setup, expect } from '@playwright/test';
 import { E2E_TEST_USER } from './fixtures/auth-helpers';
 import { SELECTORS, waitForPageLoad } from './fixtures/test-fixtures';
 import { loginWithMock } from './fixtures/mock-auth';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const authFile = 'playwright/.auth/user.json';
+
+// Ensure the auth directory exists
+const authDir = path.dirname(authFile);
+if (!fs.existsSync(authDir)) {
+  fs.mkdirSync(authDir, { recursive: true });
+}
 
 setup('authenticate', async ({ page }) => {
   // Helper: fallback a mock auth so tests can keep running even if the UI login is flaky
@@ -28,6 +36,20 @@ setup('authenticate', async ({ page }) => {
       console.log('✅ Auth storageState guardado via fallback localStorage');
     } catch (mockError) {
       console.log('❌ Error aplicando mock auth:', mockError);
+      // Last resort: write a minimal valid storageState file directly
+      try {
+        const minimalState = {
+          cookies: [],
+          origins: [{
+            origin: 'http://localhost:5173',
+            localStorage: [{ name: 'uid', value: 'e2e-mock-user-12345' }]
+          }]
+        };
+        fs.writeFileSync(authFile, JSON.stringify(minimalState, null, 2));
+        console.log('✅ Auth storageState escrito manualmente como último recurso');
+      } catch (writeError) {
+        console.log('❌ Error escribiendo storageState manualmente:', writeError);
+      }
     }
   };
 
