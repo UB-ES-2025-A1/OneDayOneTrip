@@ -207,6 +207,9 @@ jobs:
           CI: true
           PLAYWRIGHT_BASE_URL: http://localhost:5173
           API_URL: http://localhost:8001
+          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
 
       # ────────────────────────────────────────────────────────
       # 📊 Subir artefactos
