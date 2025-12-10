@@ -76,6 +76,8 @@ export interface TestTrip {
   distance: number;
   duration: string;
   tags: string[];
+  coverImage?: string;
+  gallery?: string[];
   author: {
     userId: string;
     name: string;
@@ -86,6 +88,7 @@ export interface TestTrip {
     title: string;
     description: string;
     coordinates?: { lat: number; lng: number };
+    image?: string;
   }>;
 }
 
@@ -117,6 +120,13 @@ export const TEST_TRIP: TestTrip = {
   distance: 12.5,
   duration: '5h',
   tags: ['Muntanya', 'Natura', 'Cultura'],
+  // Imágenes de placeholder para tests E2E
+  coverImage: 'https://picsum.photos/seed/montserrat1/800/600',
+  gallery: [
+    'https://picsum.photos/seed/montserrat1/800/600',
+    'https://picsum.photos/seed/montserrat2/800/600',
+    'https://picsum.photos/seed/montserrat3/800/600'
+  ],
   author: {
     userId: TEST_USER.userId,
     name: TEST_USER.fullName,
@@ -127,17 +137,20 @@ export const TEST_TRIP: TestTrip = {
     {
       title: 'Inicio - Monasterio',
       description: 'Punto de partida desde el monasterio de Montserrat',
-      coordinates: { lat: 41.5933, lng: 1.8375 }
+      coordinates: { lat: 41.5933, lng: 1.8375 },
+      image: 'https://picsum.photos/seed/montserrat-point1/800/600'
     },
     {
       title: 'Mirador Sant Joan',
       description: 'Vistas espectaculares del valle',
-      coordinates: { lat: 41.6000, lng: 1.8400 }
+      coordinates: { lat: 41.6000, lng: 1.8400 },
+      image: 'https://picsum.photos/seed/montserrat-point2/800/600'
     },
     {
       title: 'Cima - Sant Jeroni',
       description: 'Punto más alto de Montserrat a 1236m',
-      coordinates: { lat: 41.6050, lng: 1.8350 }
+      coordinates: { lat: 41.6050, lng: 1.8350 },
+      image: 'https://picsum.photos/seed/montserrat-point3/800/600'
     }
   ]
 };
@@ -156,6 +169,11 @@ export const ADDITIONAL_TEST_TRIPS: Partial<TestTrip>[] = [
     distance: 8,
     duration: '3h',
     tags: ['Platja', 'Mar', 'Natura'],
+    coverImage: 'https://picsum.photos/seed/costabrava1/800/600',
+    gallery: [
+      'https://picsum.photos/seed/costabrava1/800/600',
+      'https://picsum.photos/seed/costabrava2/800/600'
+    ],
   },
   {
     title: 'Pirineos - Valle de Arán',
@@ -169,6 +187,11 @@ export const ADDITIONAL_TEST_TRIPS: Partial<TestTrip>[] = [
     distance: 18,
     duration: '8h',
     tags: ['Muntanya', 'Neu', 'Aventura'],
+    coverImage: 'https://picsum.photos/seed/pirineos1/800/600',
+    gallery: [
+      'https://picsum.photos/seed/pirineos1/800/600',
+      'https://picsum.photos/seed/pirineos2/800/600'
+    ],
   }
 ];
 

@@ -98,20 +98,20 @@ export const SELECTORS = {
   // Trips/Rutas
   tripCard: '[data-testid="trip-card"], .masonry-item, .trip-card',
   tripGrid: '[data-testid="trip-grid"], .masonry-container, [class*="masonry"], .trip-list',
-  tripTitle: '[data-testid="trip-title"], h1, h2, [class*="title"]',
-  tripDescription: '[data-testid="trip-description"], .description, p',
-  tripAuthor: '[data-testid="trip-author"], [class*="author"]',
+  tripTitle: '[data-testid="trip-title"], h1, h2, .ruta-titol, [class*="title"]',
+  tripDescription: '[data-testid="trip-description"], .ruta-descripcio, .description, p',
+  tripAuthor: '[data-testid="trip-author"], .autor, .autor-info, .autor-icon, [class*="author"]',
   
-  // Comentarios
-  commentsSection: '[data-testid="comments-section"], .ruta-comentaris, [class*="comment"]',
+  // Comentarios (incluir variantes en catalán)
+  commentsSection: '[data-testid="comments-section"], .ruta-comentaris, .comentaris-llista, [class*="comentari"], [class*="comment"]',
   commentInput: '[data-testid="comment-input"], .comentari-nou-input, textarea[placeholder*="coment"]',
-  commentSubmitButton: '[data-testid="comment-submit"], .comentari-submit-btn, button:has-text("Enviar")',
-  commentItem: '[data-testid="comment-item"], .comentari-item, [class*="comment-item"]',
+  commentSubmitButton: '[data-testid="comment-submit"], .comentari-submit-btn, button:has-text("Enviar"), button:has-text("Envia")',
+  commentItem: '[data-testid="comment-item"], .comentari-item, [class*="comentari-item"], [class*="comment-item"]',
   
   // Valoraciones
-  ratingDisplay: '[data-testid="rating-display"], [class*="rating"], .valoracio, .stars',
-  rateButton: '[data-testid="rate-btn"], button:has-text("Valorar"), button:has-text("Rate")',
-  ratingModal: '[data-testid="rating-modal"], .valorar-container',
+  ratingDisplay: '[data-testid="rating-display"], .rating-summary, [class*="rating"], .valoracio, .stars',
+  rateButton: '[data-testid="rate-btn"], .valorar-button, button:has-text("Valorar"), button:has-text("Puntua"), button:has-text("Rate")',
+  ratingModal: '[data-testid="rating-modal"], .valorar-container, .valorar-modal',
   starInput: '[data-testid="star-input"], .rating input[type="radio"], input[name="rating"]',
   starLabel: '[data-testid="star-label"], label[for^="estrella-"], .rating label',
   ratingSubmitButton: '[data-testid="rating-submit"], .valorar-submit, button:has-text("Enviar")',
