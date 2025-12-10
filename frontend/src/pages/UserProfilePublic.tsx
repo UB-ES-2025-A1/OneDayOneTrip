@@ -97,7 +97,7 @@ export default function UserProfilePublic() {
 
         setProfile(backendUser as BackendUser);
 
-        const allTrips = await getAllTrips(true);
+        const allTrips = await getAllTrips(true, t);
         const pubIds = new Set((backendUser.publicacions || []).map(String));
         const userTrips = allTrips.filter((t) => pubIds.has(String(t._id)));
         setTrips(userTrips);

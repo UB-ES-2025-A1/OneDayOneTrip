@@ -234,17 +234,17 @@ export default function UserSettings({ open, profile, onClose, onSavePrivacy }: 
           </div>
 
           <div className="settings-section">
-            <h3 className="settings-subtitle">Privacitat</h3>
+            <h3 className="settings-subtitle">{t('privacy')}</h3>
 
             <div className="settings-row">
               <div className="settings-row-info">
                 <span className="settings-row-label">
-                  Perfil {isPrivate ? "privat" : "públic"}
+                  {t('profile')} {isPrivate ? t('private') : t('public')}
                 </span>
                 <span className="settings-row-helper">
                   {isPrivate
-                    ? "Només els seguidors aprovats podran veure el teu perfil i les teves rutes."
-                    : "Qualsevol usuari podrà veure el teu perfil i les teves rutes."}
+                    ? t('only_followers_see_route')
+                    : t('all_users_see_route')}
                 </span>
               </div>
 

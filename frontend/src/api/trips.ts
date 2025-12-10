@@ -1,5 +1,6 @@
 import { createNotification } from "../api/notifier"; 
 import { getUserById } from "../api/client";
+import type { TFunction } from 'i18next';
 
 // ==========================================================
 // 📌 Interfaces base (Trip, TripPoint, Comment…)
@@ -69,9 +70,9 @@ const BASE_URL = RAW_BASE_URL.replace(/\/+$/, "");
 // 🔍 Obtenir totes les trips
 // ==========================================================
 
-export async function getAllTrips(includeStats: boolean = false): Promise<Trip[]> {
+export async function getAllTrips(includeStats: boolean = false, t: TFunction): Promise<Trip[]> {
   const res = await fetch(`${BASE_URL}/trips?include_stats=${includeStats}`);
-  if (!res.ok) throw new Error(`Error carregant les rutes: ${res.status}`);
+  if (!res.ok) throw new Error(`${t('error_loading_routes')} ${res.status}`);
   return await res.json();
 }
 
@@ -79,11 +80,11 @@ export async function getAllTrips(includeStats: boolean = false): Promise<Trip[]
 // 🔍 Obtenir trip per ID
 // ==========================================================
 
-export async function getTripById(tripId: string): Promise<Trip> {
+export async function getTripById(tripId: string, t: TFunction): Promise<Trip> {
   const res = await fetch(`${BASE_URL}/trips/${encodeURIComponent(tripId)}`);
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Ruta no trobada o id invàlid: ${tripId}. ${text}`);
+    throw new Error(`${t('error_id_not_found')} ${tripId}. ${text}`);
   }
   return await res.json();
 }
@@ -96,7 +97,8 @@ export async function getTripById(tripId: string): Promise<Trip> {
 export async function getTripComments(
   tripId: string,
   limit: number = 20,
-  skip: number = 0
+  skip: number = 0,
+  t: TFunction
 ): Promise<Comment[]> {
   const url = `${BASE_URL}/trips/${encodeURIComponent(tripId)}/comments?limit=${limit}&skip=${skip}`;
   const res = await fetch(url);
@@ -104,7 +106,7 @@ export async function getTripComments(
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(
-      `Error carregant comentaris de la ruta: ${tripId}. ${text}`
+      `${t('error_loading_comments')} ${tripId}. ${text}`
     );
   }
 
@@ -127,11 +129,12 @@ export async function createTripComment(
     userName: string;
     userProfilePicture?: string;
     text: string;
-  }
+  },
+  t: TFunction
 ): Promise<Comment> {
 
   // 1️⃣ Obtenemos la trip para saber quién es el autor
-  const trip = await getTripById(tripId);
+  const trip = await getTripById(tripId, t);
   const toUserId = trip.author.userId;
 
   // 2️⃣ Creamos el comentario en backend
@@ -153,7 +156,7 @@ export async function createTripComment(
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Error creant comentari (${tripId}): ${text}`);
+    throw new Error(`${t('error_commenting_route')} (${tripId}): ${text}`);
   }
 
   const dataRes = await res.json();
@@ -165,7 +168,7 @@ export async function createTripComment(
       fromUserId: data.userId,
       toUserId,
       type: "comment",
-      message: "ha comentat la teva ruta",
+      message: t('comment_route'),
       extra: {
         fromUserName: data.userName,
         fromUserAvatar: data.userProfilePicture,
@@ -221,7 +224,8 @@ export async function createTripMultipart(
   tripPayload: TripCreatePayload,
   cover: File | null,
   gallery: File[],
-  pointImages: (File | null)[]
+  pointImages: (File | null)[],
+  t: TFunction
 ) {
   const formData = new FormData();
 
@@ -248,7 +252,7 @@ export async function createTripMultipart(
 
   if (!res.ok) {
     const errMsg = await res.text().catch(() => "");
-    throw new Error(errMsg || "Error creant la ruta");
+    throw new Error(errMsg || t('error_creating_route'));
   }
 
   const tripData = await res.json(); // contiene trip creada con _id
@@ -267,7 +271,7 @@ export async function createTripMultipart(
       fromUserId: authorId,
       toUserId: followerId,
       type: "publication",
-      message: "ha publicat una nova ruta",
+      message: t('posted_route'),
       extra: {
         fromUserName: authorName,
         fromUserAvatar: authorPic,
@@ -298,11 +302,12 @@ export interface RateTripPayload {
 
 export async function rateTrip(
   tripId: string,
-  payload: RateTripPayload & { userName?: string; userProfilePicture?: string }
+  payload: RateTripPayload & { userName?: string; userProfilePicture?: string },
+  t: TFunction
 ): Promise<TripRatingStats> {
   
   // 1️⃣ Obtener info del autor para notificar
-  const trip = await getTripById(tripId);
+  const trip = await getTripById(tripId, t);
   const toUserId = trip.author.userId;
 
   // 2️⃣ Enviar rating al backend
@@ -318,7 +323,7 @@ export async function rateTrip(
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Error valorant la ruta: ${res.status}. ${text}`);
+    throw new Error(`${t('error_rating_route')} ${res.status}. ${text}`);
   }
 
   const stats = await res.json();
@@ -329,7 +334,7 @@ export async function rateTrip(
       fromUserId: payload.userId,
       toUserId,
       type: "rating",
-      message: `ha valorat la teva ruta amb ${payload.rating} ★`,
+      message: `${t('rated_route')} ${payload.rating} ★`,
       extra: {
         fromUserName: payload.userName,
         fromUserAvatar: payload.userProfilePicture,

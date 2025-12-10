@@ -327,7 +327,7 @@ export default function CreateTripForm({
                 recommendedSeason,
             };
 
-            const result = await createTripMultipart(payload, cover, gallery, pointImages);
+            const result = await createTripMultipart(payload, cover, gallery, pointImages, t);
             await addPublicationToUser(currentUser.uid, result.trip_id);
 
             setSuccess(t('create_trip_success'));
