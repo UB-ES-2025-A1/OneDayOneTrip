@@ -166,8 +166,29 @@ jobs:
       # ────────────────────────────────────────────────────────
       - name: 🔐 Setup Firebase credentials
         run: |
-          # Decode base64-encoded Firebase credentials and write to file
-          echo '${{ secrets.FIREBASE_CREDENTIALS_E2E_BASE64 }}' | base64 -d > /tmp/firebase-credentials.json
+          # Handle both base64-encoded and raw JSON formats
+          CRED_SECRET='${{ secrets.FIREBASE_CREDENTIALS_E2E_BASE64 }}'
+          
+          # Check if it starts with '{' (raw JSON) or base64 (starts with 'eyJ')
+          if [[ "$CRED_SECRET" == {* ]]; then
+            echo "⚠️ Secret appears to be raw JSON, not base64. Using directly..."
+            echo "$CRED_SECRET" > /tmp/firebase-credentials.json
+          else
+            echo "📦 Decoding base64-encoded credentials..."
+            echo "$CRED_SECRET" | base64 -d > /tmp/firebase-credentials.json || {
+              echo "❌ Error: Failed to decode base64. Make sure FIREBASE_CREDENTIALS_E2E_BASE64 contains base64-encoded JSON."
+              echo "💡 Tip: The secret should start with 'eyJ' (base64 for '{\"type\"')"
+              exit 1
+            }
+          fi
+          
+          # Verify it's valid JSON
+          if ! python3 -m json.tool /tmp/firebase-credentials.json > /dev/null 2>&1; then
+            echo "❌ Error: Decoded content is not valid JSON"
+            echo "First 100 chars: $(head -c 100 /tmp/firebase-credentials.json)"
+            exit 1
+          fi
+          
           # Set env var with the JSON content for the backend
           FIREBASE_CREDS=$(cat /tmp/firebase-credentials.json)
           echo "FIREBASE_CREDENTIALS<<EOF" >> $GITHUB_ENV
