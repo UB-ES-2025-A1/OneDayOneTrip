@@ -13,6 +13,7 @@ from firebase_admin import auth
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.services.mongo_service import (
     delete_trip,
+    create_notification,
 )
 
 security = HTTPBearer()
@@ -231,14 +232,30 @@ async def accept_follow_request(user_id: str, follower_id: str):
     if not follower_doc.exists:
         raise HTTPException(status_code=404, detail="L'usuari seguidor no existeix")
 
-    # Afegir follower a seguidors de user
-    user_ref.update({"llista_seguidors": firestore.ArrayUnion([follower_id])})
-    # Afegir user a seguits de follower
-    follower_ref.update({"llista_seguits": firestore.ArrayUnion([user_id])})
+    # Reutilitzar la lògica de follow per assegurar consistència
+    await follow_user(follower_id, user_id)
 
     # Eliminar de les llistes de sol·licituds pendents
     user_ref.update({"llista_solicitud_seguidors": firestore.ArrayRemove([follower_id])})
     follower_ref.update({"llista_solicitud_seguits": firestore.ArrayRemove([user_id])})
+
+    # Crear notificació de nou seguidor (mateix format que client.ts)
+    try:
+        follower_data = follower_doc.to_dict() or {}
+        extra = {
+            "fromUserName": follower_data.get("nom_i_cognoms") or follower_data.get("username") or "",
+            "fromUserAvatar": follower_data.get("url_foto_perfil", ""),
+        }
+
+        create_notification(
+            from_user_id=follower_id,
+            to_user_id=user_id,
+            type="follow",
+            message="ha començat a seguir-te",
+            extra=extra,
+        )
+    except Exception as e:
+        print(f"[WARN] No s'ha pogut crear la notificació de follow en acceptar la sol·licitud: {e}")
 
     return {"message": "Sol·licitud de seguiment acceptada correctament"}
 

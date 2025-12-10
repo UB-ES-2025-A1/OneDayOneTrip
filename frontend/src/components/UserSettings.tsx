@@ -3,7 +3,7 @@ import "../styles/UserSettings.css";
 import { X } from "lucide-react";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
-import { deleteAccount, accept_follow_request } from "../api/client";
+import { deleteAccount, accept_follow_request, getUserById } from "../api/client";
 import { getNotifications, deleteNotification } from "../api/notifier";
 import i18n from "../i18n/i18n";
 import { useTranslation } from 'react-i18next';
@@ -83,10 +83,9 @@ export default function UserSettings({ open, profile, onClose, onSavePrivacy }: 
         throw new Error(err.detail || t('profile_error_updating'));
       }
 
-      // Actualitzem l'estat local
       setIsPrivate(newPrivacy);
 
-      const updatedProfile: BackendUser = {
+      let updatedProfile: BackendUser = {
         ...profile,
         isPrivate: newPrivacy,
       };
@@ -125,6 +124,24 @@ export default function UserSettings({ open, profile, onClose, onSavePrivacy }: 
           console.error("⚠️ Error acceptant sol·licituds pendents:", err);
           // No aturem l'execució, ja que el perfil s'ha canviat correctament
         }
+      }
+
+      try {
+        const refreshedProfile = await getUserById(profile.uid);
+        updatedProfile = {
+          ...refreshedProfile,
+          llista_seguidors: refreshedProfile.llista_seguidors || [],
+          llista_seguits: refreshedProfile.llista_seguits || [],
+          llista_solicitud_seguidors: refreshedProfile.llista_solicitud_seguidors || [],
+          llista_solicitud_seguits: refreshedProfile.llista_solicitud_seguits || [],
+          publicacions: refreshedProfile.publicacions || [],
+          guardades: refreshedProfile.guardades || [],
+          llista_bloquejats: refreshedProfile.llista_bloquejats || [],
+          llista_bloquejadors: refreshedProfile.llista_bloquejadors || [],
+        } as BackendUser;
+        setIsPrivate(updatedProfile.isPrivate || false);
+      } catch (err) {
+        console.error("⚠️ Error refrescant el perfil després del canvi de privacitat:", err);
       }
 
       if (onSavePrivacy) onSavePrivacy(updatedProfile);
