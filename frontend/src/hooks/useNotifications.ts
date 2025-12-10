@@ -1,23 +1,24 @@
 import { useEffect, useState } from "react";
 import { getNotifications, markNotificationAsRead } from "../api/notifier";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import type { Notification } from "../components/Mailbox";
 
 export default function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const auth = getAuth();
 
-  const fetchNotifications = async () => {
-    const user = getAuth().currentUser;
+  const fetchNotifications = async (userId?: string) => {
+    const uid = userId || auth.currentUser?.uid;
 
-    if (!user) {
+    if (!uid) {
       setNotifications([]);
       setLoading(false);
       return;
     }
 
     try {
-      const data = await getNotifications(user.uid);
+      const data = await getNotifications(uid);
       setNotifications(data);
     } catch (err) {
       console.error("Error carregant notificacions:", err);
@@ -27,8 +28,19 @@ export default function useNotifications() {
   };
 
   useEffect(() => {
-    fetchNotifications();
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        setNotifications([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      fetchNotifications(user.uid);
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
 
   const markRead = async (id: string) => {
     try {
@@ -42,6 +54,7 @@ export default function useNotifications() {
   };
 
   const refreshNotifications = async () => {
+    setLoading(true);
     await fetchNotifications();
   };
 
