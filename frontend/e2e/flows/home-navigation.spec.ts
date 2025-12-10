@@ -33,53 +33,78 @@ test.describe('Home Page - Navegación y Exploración', () => {
   test('debería mostrar el carrusel de imágenes y hacer transiciones', async ({ page }) => {
     const carousel = page.locator('.carousel');
     
-    if (await carousel.isVisible()) {
+    if (await carousel.isVisible({ timeout: 5000 })) {
+      await expect(carousel).toBeVisible();
+      
       // Verificar que hay imágenes en el carrusel
       const images = carousel.locator('img');
       const imageCount = await images.count();
       expect(imageCount).toBeGreaterThan(0);
       
       // Esperar una transición del carrusel (si tiene autoplay)
-      await page.waitForTimeout(4000);
+      // Esperar a que cambie alguna propiedad del carrusel o que pase tiempo suficiente
+      await page.waitForFunction(
+        () => {
+          const carouselEl = document.querySelector('.carousel');
+          if (!carouselEl) return false;
+          // Verificar que el carrusel está activo (puede tener clase active o transform)
+          return carouselEl.classList.contains('active') || 
+                 window.getComputedStyle(carouselEl).transform !== 'none';
+        },
+        { timeout: 5000 }
+      ).catch(() => null);
+    } else {
+      // Si no hay carrusel, verificar que la página cargó
+      await expect(page.locator('body')).toBeVisible();
     }
   });
 
-  test('debería cargar y mostrar la lista de rutas', async ({ page }) => {
-    // Esperar a que las rutas se carguen desde la API
-    const apiResponse = await page.waitForResponse(
+  test('DEBE cargar rutas desde la API', async ({ page }) => {
+    // Configurar interceptor ANTES de navegar
+    const responsePromise = page.waitForResponse(
       response => response.url().includes('/trips') && response.status() === 200,
-      { timeout: 15000 }
-    ).catch(() => null);
+      { timeout: 20000 }
+    );
+    
+    // Navegar (la página ya está en / por beforeEach, pero reload para interceptar)
+    await page.reload();
+    
+    // Esperar respuesta de la API
+    const apiResponse = await responsePromise;
 
-    if (apiResponse) {
-      const data = await apiResponse.json();
-      const tripCount = Array.isArray(data) ? data.length : 0;
-      console.log(`📊 API respondió con ${tripCount} rutas`);
-    } else {
-      console.log('ℹ️ API no respondió - verificando UI');
-    }
+    // ESTRICTO: La API DEBE responder
+    expect(apiResponse).toBeTruthy();
+    
+    const data = await apiResponse.json();
+    const tripCount = Array.isArray(data) ? data.length : 0;
+    console.log(`📊 API respondió con ${tripCount} rutas`);
+    
+    // ESTRICTO: DEBE haber rutas (el seed las crea)
+    expect(tripCount).toBeGreaterThan(0);
 
-    // Verificar que hay una sección de rutas (puede estar vacía)
+    // Verificar que la sección de rutas está visible
     const tripsSection = page.locator('.trip-list-section, .trip-list, [class*="masonry"]');
     await expect(tripsSection.first()).toBeVisible({ timeout: 10000 });
   });
 
-  test('debería mostrar rutas o mensaje de vacío según el estado de la BD', async ({ page }) => {
-    // Esperar a que cargue la página completamente
-    await page.waitForTimeout(2000);
+  test('DEBE mostrar tarjetas de rutas en la home', async ({ page }) => {
+    // Esperar a que se carguen las rutas desde la API
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
-    // Verificar que hay una sección de rutas o un mensaje de "no hay rutas"
-    const tripsSection = page.locator('.trip-list-section, .trip-list, [class*="masonry"]');
-    const noTripsMessage = page.locator('.no-trips-message, [class*="empty"]');
-    const tripCards = page.locator('[class*="trip-card"], [class*="masonry-item"]');
+    // Buscar tarjetas de rutas
+    const tripCards = page.locator('[class*="masonry"] a, .trip-card, [class*="masonry-item"]');
+    const cardCount = await tripCards.count();
     
-    // Al menos uno de estos debe estar presente
-    const hasTripSection = await tripsSection.count() > 0;
-    const hasEmptyMessage = await noTripsMessage.count() > 0;
-    const hasCards = await tripCards.count() > 0;
+    console.log(`🎴 Tarjetas de rutas visibles: ${cardCount}`);
     
-    // Debe haber rutas o mensaje de vacío
-    expect(hasTripSection || hasEmptyMessage || hasCards).toBeTruthy();
+    // ESTRICTO: DEBE haber tarjetas de rutas (el seed las crea)
+    expect(cardCount).toBeGreaterThan(0);
+    
+    // Verificar que al menos la primera es visible
+    await expect(tripCards.first()).toBeVisible({ timeout: 5000 });
   });
 
   test('debería abrir modal de login al hacer clic en el botón', async ({ page }) => {
@@ -150,12 +175,19 @@ test.describe('Home Page - Navegación y Exploración', () => {
   test('debería hacer scroll y mostrar más contenido', async ({ page }) => {
     // Hacer scroll hacia abajo
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
-    await page.waitForTimeout(500);
+    
+    // Esperar a que se complete el scroll
+    await page.waitForLoadState('networkidle', { timeout: 2000 }).catch(() => null);
 
     // Verificar que el footer o contenido inferior está visible o se acerca
     const footer = page.locator('footer, .footer');
     if (await footer.count() > 0) {
       await footer.scrollIntoViewIfNeeded();
+      await expect(footer.first()).toBeVisible({ timeout: 3000 });
+    } else {
+      // Si no hay footer, verificar que el scroll funcionó
+      const scrollY = await page.evaluate(() => window.scrollY);
+      expect(scrollY).toBeGreaterThan(0);
     }
   });
 
@@ -182,39 +214,58 @@ test.describe('Home Page - Interacción con Rutas', () => {
   });
 
   test('debería navegar al detalle de una ruta al hacer clic', async ({ page }) => {
-    // Esperar a que las rutas se carguen
-    await page.waitForTimeout(2000);
+    // Esperar a que se carguen las rutas desde la API
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     // Buscar una tarjeta de ruta
     const tripCard = page.locator('[class*="trip-card"], [class*="masonry"] > div > a, .trip-item').first();
     
-    if (await tripCard.isVisible()) {
+    if (await tripCard.isVisible({ timeout: 5000 })) {
       // Hacer clic en la tarjeta
       await tripCard.click();
       
-      // Verificar navegación (la URL debería cambiar o aparecer contenido de detalle)
-      await page.waitForTimeout(1000);
+      // Esperar a que navegue
+      await waitForPageLoad(page);
       
       // Verificar que estamos en una página de detalle o que se abre algo
+      await page.waitForURL(/\/(ruta|trip|detail)/, { timeout: 5000 });
       const isDetailPage = page.url().includes('/ruta/') || 
                           page.url().includes('/trip/') ||
-                          await page.locator('[class*="detail"], [class*="ruta"]').isVisible();
+                          await page.locator('[class*="detail"], [class*="ruta"]').isVisible({ timeout: 2000 }).catch(() => false);
       
       expect(isDetailPage).toBeTruthy();
+    } else {
+      // Si no hay tarjetas, verificar que la página cargó
+      await expect(page.locator('body')).toBeVisible();
     }
   });
 
   test('debería mostrar información básica en las tarjetas de rutas', async ({ page }) => {
-    await page.waitForTimeout(2000);
+    // Esperar a que se carguen las rutas desde la API
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripCard = page.locator('[class*="masonry"] > div, .trip-card').first();
     
-    if (await tripCard.isVisible()) {
+    if (await tripCard.isVisible({ timeout: 5000 })) {
+      await expect(tripCard).toBeVisible();
+      
       // Las tarjetas deberían tener imagen
       const cardImage = tripCard.locator('img');
       if (await cardImage.count() > 0) {
         await expect(cardImage.first()).toBeVisible();
+      } else {
+        // Si no hay imagen, verificar que la tarjeta está visible
+        await expect(tripCard).toBeVisible();
       }
+    } else {
+      // Si no hay tarjetas, verificar que la página cargó
+      await expect(page.locator('body')).toBeVisible();
     }
   });
 });

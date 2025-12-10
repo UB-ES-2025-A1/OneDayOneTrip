@@ -19,7 +19,10 @@ test.describe('Comentarios - Visualización', () => {
 
   test('debería mostrar sección de comentarios en detalle de ruta', async ({ page }) => {
     // Esperar a que carguen las rutas
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     // Navegar a una ruta
     const tripLink = page.locator('[class*="masonry"] a, .trip-card a').first();
@@ -45,7 +48,10 @@ test.describe('Comentarios - Visualización', () => {
   });
 
   test('debería mostrar lista de comentarios existentes', async ({ page }) => {
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
@@ -54,7 +60,7 @@ test.describe('Comentarios - Visualización', () => {
       await waitForPageLoad(page);
       
       // Esperar a que carguen los comentarios
-      await page.waitForTimeout(1500);
+      await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => null);
       
       // Buscar lista de comentarios
       const commentsList = page.locator('.comentaris-llista, [class*="comments-list"]');
@@ -86,14 +92,17 @@ test.describe('Comentarios - Visualización', () => {
   });
 
   test('debería mostrar avatar del autor en cada comentario', async ({ page }) => {
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
     if (await tripLink.isVisible()) {
       await tripLink.click();
       await waitForPageLoad(page);
-      await page.waitForTimeout(1500);
+      await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => null);
       
       const commentItems = page.locator('.comentari-item, [class*="comment-item"]');
       
@@ -109,14 +118,17 @@ test.describe('Comentarios - Visualización', () => {
   });
 
   test('debería mostrar fecha de cada comentario', async ({ page }) => {
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
     if (await tripLink.isVisible()) {
       await tripLink.click();
       await waitForPageLoad(page);
-      await page.waitForTimeout(1500);
+      await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => null);
       
       const commentItems = page.locator('.comentari-item, [class*="comment-item"]');
       
@@ -132,7 +144,10 @@ test.describe('Comentarios - Visualización', () => {
   });
 
   test('debería mostrar contador de comentarios', async ({ page }) => {
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
@@ -161,7 +176,10 @@ test.describe('Comentarios - Sin autenticación', () => {
   });
 
   test('debería mostrar mensaje de login requerido para comentar', async ({ page }) => {
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
@@ -180,11 +198,15 @@ test.describe('Comentarios - Sin autenticación', () => {
   });
 
   test('no debería mostrar formulario de comentario sin auth', async ({ page }) => {
-    await page.waitForTimeout(2000);
+    // Esperar a que se carguen las rutas
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
-    if (await tripLink.isVisible()) {
+    if (await tripLink.isVisible({ timeout: 5000 })) {
       await tripLink.click();
       await waitForPageLoad(page);
       
@@ -193,12 +215,25 @@ test.describe('Comentarios - Sin autenticación', () => {
       
       // Si hay un formulario, probablemente está oculto o deshabilitado
       if (await commentInput.count() > 0) {
-        const isVisible = await commentInput.first().isVisible();
-        // Si es visible, probablemente hay un usuario logueado
+        const isVisible = await commentInput.first().isVisible({ timeout: 2000 }).catch(() => false);
+        const isDisabled = await commentInput.first().isDisabled().catch(() => false);
+        
+        // Si es visible, debería estar deshabilitado sin auth
+        if (isVisible) {
+          expect(isDisabled).toBeTruthy();
+        } else {
+          // No visible sin auth - correcto
+          expect(isVisible).toBeFalsy();
+        }
       } else {
         // Correcto - no hay formulario sin login
-        expect(true).toBeTruthy();
+        // Verificar que estamos en la página de detalle
+        const title = page.locator('h1, h2, [class*="title"]').first();
+        await expect(title).toBeVisible({ timeout: 5000 });
       }
+    } else {
+      // Si no hay links, verificar que la página cargó
+      await expect(page.locator('body')).toBeVisible();
     }
   });
 });
@@ -212,7 +247,10 @@ test.describe('Comentarios - Con autenticación (flujo completo)', () => {
     // Este test solo pasará si hay sesión activa
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
@@ -238,7 +276,10 @@ test.describe('Comentarios - Con autenticación (flujo completo)', () => {
   test('debería tener el botón de enviar deshabilitado cuando el campo está vacío', async ({ page }) => {
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
@@ -263,7 +304,10 @@ test.describe('Comentarios - Con autenticación (flujo completo)', () => {
   test('debería habilitar el botón cuando hay texto', async ({ page }) => {
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
@@ -287,7 +331,10 @@ test.describe('Comentarios - Con autenticación (flujo completo)', () => {
   test('debería poder escribir y enviar un comentario', async ({ page }) => {
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
@@ -352,7 +399,7 @@ test.describe('Comentarios - Orden y paginación', () => {
     if (await tripLink.isVisible()) {
       await tripLink.click();
       await waitForPageLoad(page);
-      await page.waitForTimeout(1500);
+      await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => null);
       
       const dateElements = page.locator('.comentari-data, [class*="comment"] time, [class*="comment"] [class*="date"]');
       const dateCount = await dateElements.count();

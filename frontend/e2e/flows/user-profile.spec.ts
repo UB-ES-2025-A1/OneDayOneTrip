@@ -36,7 +36,10 @@ test.describe('Perfil de Usuario - Navegación', () => {
     // Navegar a la home y buscar un autor
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     // Buscar link al perfil de un autor en una tarjeta
     const authorLink = page.locator('[class*="author"] a, [class*="user"] a, a[href*="/perfil/"]').first();
@@ -60,7 +63,10 @@ test.describe('Perfil Público - Visualización', () => {
   test('debería mostrar nombre y foto del usuario', async ({ page }) => {
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a, .trip-card a').first();
     
@@ -91,7 +97,10 @@ test.describe('Perfil Público - Visualización', () => {
   test('debería mostrar estadísticas de seguidores/seguidos', async ({ page }) => {
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     // Navegar a un perfil (si hay rutas)
     const tripLink = page.locator('[class*="masonry"] a').first();
@@ -121,7 +130,10 @@ test.describe('Perfil Público - Visualización', () => {
   test('debería mostrar publicaciones del usuario', async ({ page }) => {
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
@@ -151,7 +163,10 @@ test.describe('Perfil Público - Interacción Social', () => {
   test('debería mostrar botón seguir en perfil de otro usuario', async ({ page }) => {
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     // Navegar a un perfil público
     const tripLink = page.locator('[class*="masonry"] a').first();
@@ -171,8 +186,17 @@ test.describe('Perfil Público - Interacción Social', () => {
         
         // Puede estar visible o no dependiendo del estado de auth
         if (await followButton.count() > 0) {
-          // El botón existe
-          expect(true).toBeTruthy();
+          // El botón existe - verificar que está visible o que requiere auth
+          const isVisible = await followButton.first().isVisible({ timeout: 2000 }).catch(() => false);
+          const loginButton = page.locator('.header-btn.login, button:has-text("Log in")');
+          const hasLogin = await loginButton.count() > 0 && await loginButton.first().isVisible({ timeout: 2000 }).catch(() => false);
+          
+          // El botón de seguir debería existir o requerir login
+          expect(isVisible || hasLogin).toBeTruthy();
+        } else {
+          // Si no hay botón de seguir, verificar que estamos en un perfil
+          const profileInfo = page.locator('[class*="profile"], [class*="user-info"]');
+          await expect(profileInfo.first()).toBeVisible({ timeout: 5000 });
         }
       }
     }
@@ -181,7 +205,10 @@ test.describe('Perfil Público - Interacción Social', () => {
   test('debería abrir modal de seguidores al hacer clic', async ({ page }) => {
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
@@ -200,7 +227,7 @@ test.describe('Perfil Público - Interacción Social', () => {
         
         if (await followersCount.isVisible()) {
           await followersCount.click();
-          await page.waitForTimeout(500);
+          await page.waitForLoadState('networkidle', { timeout: 2000 }).catch(() => null);
           
           // Debería abrirse un modal con la lista
           const modal = page.locator('.modal, [class*="modal"], [role="dialog"]');
@@ -213,7 +240,10 @@ test.describe('Perfil Público - Interacción Social', () => {
   test('debería poder ver lista de seguidos', async ({ page }) => {
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     
@@ -232,7 +262,7 @@ test.describe('Perfil Público - Interacción Social', () => {
         
         if (await followingCount.isVisible()) {
           await followingCount.click();
-          await page.waitForTimeout(500);
+          await page.waitForLoadState('networkidle', { timeout: 2000 }).catch(() => null);
           
           // Debería abrirse modal o lista
         }
@@ -267,12 +297,12 @@ test.describe('Perfil Propio - Edición (requiere auth)', () => {
     if (await publicationsTab.isVisible() && await savedTab.isVisible()) {
       // Hacer clic en guardadas
       await savedTab.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 2000 }).catch(() => null);
       
       // El contenido debería cambiar
       // Hacer clic en publicaciones
       await publicationsTab.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 2000 }).catch(() => null);
     }
   });
 });
@@ -284,7 +314,10 @@ test.describe('Perfil - Responsive', () => {
     
     await page.goto('/');
     await waitForPageLoad(page);
-    await page.waitForTimeout(2000);
+    await page.waitForResponse(
+      response => response.url().includes('/trips') && response.status() === 200,
+      { timeout: 10000 }
+    ).catch(() => null);
     
     const tripLink = page.locator('[class*="masonry"] a').first();
     

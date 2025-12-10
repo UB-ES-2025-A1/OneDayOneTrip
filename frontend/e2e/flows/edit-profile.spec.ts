@@ -35,7 +35,7 @@ test.describe('Editar Perfil - Acceso', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       // Verificar que se abre el modal
       const editModal = page.locator('.editar-perfil-card, .modal-backdrop, [class*="edit-profile-modal"]');
@@ -51,7 +51,7 @@ test.describe('Editar Perfil - Acceso', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       const editModal = page.locator('.editar-perfil-card, .modal-backdrop');
       
@@ -60,7 +60,7 @@ test.describe('Editar Perfil - Acceso', () => {
         const closeButton = page.locator('.close-btn, button:has-text("×"), button:has-text("✕")').first();
         await closeButton.click();
         
-        await page.waitForTimeout(500);
+        await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
         
         // El modal debería cerrarse
         await expect(editModal).not.toBeVisible();
@@ -79,7 +79,7 @@ test.describe('Editar Perfil - Campos del formulario', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       // Buscar campo de nombre
       const nameInput = page.locator('input[type="text"]').first();
@@ -99,7 +99,7 @@ test.describe('Editar Perfil - Campos del formulario', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       // Buscar campo de username
       const usernameInput = page.locator('input[type="text"]').nth(1);
@@ -117,7 +117,7 @@ test.describe('Editar Perfil - Campos del formulario', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       // Buscar input de archivo para foto
       const fileInputs = page.locator('input[type="file"][accept*="image"]');
@@ -136,7 +136,7 @@ test.describe('Editar Perfil - Campos del formulario', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       // Buscar inputs de archivo (debería haber 2: perfil y portada)
       const fileInputs = page.locator('input[type="file"]');
@@ -156,7 +156,7 @@ test.describe('Editar Perfil - Campos del formulario', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       // Los campos deberían tener valores precargados
       const nameInput = page.locator('input[type="text"]').first();
@@ -179,7 +179,7 @@ test.describe('Editar Perfil - Modificar datos', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       const nameInput = page.locator('input[type="text"]').first();
       
@@ -203,7 +203,7 @@ test.describe('Editar Perfil - Modificar datos', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       const usernameInput = page.locator('input[type="text"]').nth(1);
       
@@ -225,7 +225,7 @@ test.describe('Editar Perfil - Modificar datos', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       // Buscar input de archivo y preview
       const fileInput = page.locator('input[type="file"]').first();
@@ -244,7 +244,7 @@ test.describe('Editar Perfil - Modificar datos', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       const fileInputs = page.locator('input[type="file"]');
       
@@ -267,7 +267,7 @@ test.describe('Editar Perfil - Guardar cambios', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       // Buscar botón de guardar
       const saveButton = page.locator('.save-btn, button:has-text("Guardar"), button:has-text("Save")');
@@ -287,7 +287,7 @@ test.describe('Editar Perfil - Guardar cambios', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       const saveButton = page.locator('.save-btn, button:has-text("Guardar")');
       
@@ -306,7 +306,7 @@ test.describe('Editar Perfil - Guardar cambios', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       // Verificar que hay un contenedor para errores
       const errorContainer = page.locator('.text-red, [class*="error"]');
@@ -323,7 +323,7 @@ test.describe('Editar Perfil - Guardar cambios', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       const editModal = page.locator('.editar-perfil-card, .modal-backdrop');
       
@@ -346,14 +346,17 @@ test.describe('Editar Perfil - Layout de dos columnas', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       // Verificar layout de dos columnas
       const twoColumns = page.locator('.two-columns, [class*="grid"], [class*="columns"]');
       
       if (await twoColumns.count() > 0) {
         // Hay al menos una sección con dos columnas
-        expect(true).toBeTruthy();
+        await expect(twoColumns.first()).toBeVisible();
+      } else {
+        // Si no hay layout de dos columnas, verificar que el modal está abierto
+        await expect(editModal.first()).toBeVisible();
       }
     }
   });
@@ -368,7 +371,7 @@ test.describe('Editar Perfil - Layout de dos columnas', () => {
     
     if (await editButton.count() > 0 && await editButton.first().isVisible()) {
       await editButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => null);
       
       const editModal = page.locator('.editar-perfil-card, .modal-backdrop');
       
@@ -457,14 +460,14 @@ test.describe('Ver Perfil - Información y publicaciones', () => {
     
     if (await savedTab.count() > 0 && await savedTab.first().isVisible()) {
       // Hacer clic en guardadas
-      await savedTab.first().click();
-      await page.waitForTimeout(500);
+        await savedTab.first().click();
+        await page.waitForLoadState('networkidle', { timeout: 2000 }).catch(() => null);
       
       // El contenido debería cambiar
       // Volver a publicaciones
       if (await publicationsTab.count() > 0 && await publicationsTab.first().isVisible()) {
         await publicationsTab.first().click();
-        await page.waitForTimeout(500);
+        await page.waitForLoadState('networkidle', { timeout: 2000 }).catch(() => null);
       }
     }
   });

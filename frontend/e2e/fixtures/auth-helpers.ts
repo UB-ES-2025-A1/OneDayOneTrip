@@ -50,19 +50,16 @@ export async function loginAsTestUser(page: Page): Promise<boolean> {
     const submitButton = page.locator('button[type="submit"], .auth-button').first();
     await submitButton.click();
     
-    // Esperar a que se cierre el modal y aparezca botón de logout
-    await page.waitForTimeout(3000);
-    
     // Verificar que el login fue exitoso
-    const isLoggedIn = await logoutButton.isVisible({ timeout: 5000 }).catch(() => false);
+    const isLoggedIn = await logoutButton.isVisible({ timeout: 8000 }).catch(() => false);
     
     if (isLoggedIn) {
       console.log('✅ Login exitoso');
       return true;
-    } else {
-      console.log('❌ Login fallido');
-      return false;
     }
+    
+    console.log('❌ Login fallido');
+    return false;
     
   } catch (error) {
     console.error('❌ Error durante login:', error);
@@ -114,11 +111,7 @@ export async function withAuth(
 ): Promise<void> {
   const loggedIn = await loginAsTestUser(page);
   
-  if (!loggedIn) {
-    console.log('⚠️ Saltando test que requiere autenticación');
-    return;
-  }
-  
+  expect(loggedIn).toBeTruthy();
   await testFn();
 }
 

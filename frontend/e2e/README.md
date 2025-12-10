@@ -49,7 +49,7 @@ e2e/
    cd api
    # Configurar variables de entorno
    export MONGO_URI=mongodb://localhost:27018/OneDayOneTrip_E2E
-   uvicorn app.main:app --port 8001
+   uvicorn app.main:app --port 8000
    ```
 
 3. **Frontend corriendo**:
@@ -100,7 +100,8 @@ docker-compose -f docker-compose.e2e.yml down -v
 | Variable | Descripción | Default |
 |----------|-------------|---------|
 | `PLAYWRIGHT_BASE_URL` | URL del frontend | `http://localhost:5173` |
-| `API_URL` | URL del backend | `http://localhost:8001` |
+| `API_URL` / `VITE_API_URL` | URL del backend | `http://localhost:8000` |
+| `E2E_AUTH_TOKEN` | (Opcional) Bearer para seed de usuario | - |
 | `CI` | Indica entorno CI | - |
 
 ### playwright.config.ts

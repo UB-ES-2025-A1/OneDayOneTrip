@@ -7,7 +7,61 @@
 
 import { APIRequestContext } from '@playwright/test';
 
-const API_URL = process.env.VITE_API_URL || 'http://localhost:8001';
+const API_URL =
+  process.env.API_URL ||
+  process.env.VITE_API_URL ||
+  'http://localhost:8000';
+
+/**
+ * Obtiene un idToken de Firebase Auth usando REST.
+ * Devuelve null si falta alguna credencial o la petición falla.
+ */
+export async function getFirebaseIdToken(
+  email: string | undefined,
+  password: string | undefined,
+  apiKey: string | undefined,
+  verbose = false
+): Promise<string | null> {
+  if (!email || !password || !apiKey) {
+    if (verbose) {
+      console.log('⚠️ Falta email/password/apiKey para obtener idToken de Firebase');
+    }
+    return null;
+  }
+
+  try {
+    const res = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          returnSecureToken: true,
+        }),
+      },
+    );
+
+    if (!res.ok) {
+      if (verbose) {
+        console.log('⚠️ Firebase Auth devolvió error', res.status, await res.text());
+      }
+      return null;
+    }
+
+    const data = (await res.json()) as { idToken?: string };
+    if (verbose) {
+      console.log('✅ idToken obtenido de Firebase');
+    }
+    return data.idToken || null;
+  } catch (error) {
+    if (verbose) {
+      console.log('⚠️ Error obteniendo idToken de Firebase:', error);
+    }
+    return null;
+  }
+}
 
 export interface TestTrip {
   _id?: string;
@@ -120,10 +174,16 @@ export const ADDITIONAL_TEST_TRIPS: Partial<TestTrip>[] = [
 
 /**
  * Crea un usuario de prueba en la base de datos
+ * NOTA: Esta función es llamada por global-setup.ts, no debería llamarse desde tests individuales
  */
-export async function seedTestUser(request: APIRequestContext): Promise<TestUser> {
+export async function seedTestUser(
+  request: APIRequestContext,
+  verbose = false,
+  authToken?: string
+): Promise<TestUser> {
   try {
     const response = await request.post(`${API_URL}/users/register`, {
+      headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined,
       data: {
         userId: TEST_USER.userId,
         username: TEST_USER.username,
@@ -134,28 +194,33 @@ export async function seedTestUser(request: APIRequestContext): Promise<TestUser
       }
     });
     
-    if (response.ok()) {
-      console.log('✅ Usuario de prueba creado:', TEST_USER.username);
-    } else {
-      // El usuario puede ya existir, no es error
-      console.log('ℹ️ Usuario de prueba ya existe o error:', response.status());
+    if (verbose) {
+      if (response.ok()) {
+        console.log('✅ Usuario de prueba creado:', TEST_USER.username);
+      } else {
+        console.log('ℹ️ Usuario ya existe o requiere auth:', response.status());
+      }
     }
     
     return TEST_USER;
   } catch (error) {
-    console.log('⚠️ Error creando usuario de prueba:', error);
+    if (verbose) {
+      console.log('⚠️ Error creando usuario:', error);
+    }
     return TEST_USER;
   }
 }
 
 /**
  * Crea una ruta de prueba en la base de datos
+ * NOTA: Esta función es llamada por global-setup.ts, no debería llamarse desde tests individuales
  */
-export async function seedTestTrip(request: APIRequestContext, trip: TestTrip = TEST_TRIP): Promise<string | null> {
+export async function seedTestTrip(
+  request: APIRequestContext,
+  trip: TestTrip = TEST_TRIP,
+  verbose = false
+): Promise<string | null> {
   try {
-    // Primero asegurarnos de que el usuario existe
-    await seedTestUser(request);
-    
     // Crear la ruta usando el endpoint de trips
     const tripData = {
       title: trip.title,
@@ -182,30 +247,41 @@ export async function seedTestTrip(request: APIRequestContext, trip: TestTrip = 
     
     if (response.ok()) {
       const data = await response.json();
-      console.log('✅ Ruta de prueba creada:', trip.title);
+      if (verbose) {
+        console.log('✅ Ruta creada:', trip.title);
+      }
       return data._id || data.id || null;
     } else {
-      const errorText = await response.text();
-      console.log('⚠️ Error creando ruta:', response.status(), errorText);
+      if (verbose) {
+        const errorText = await response.text();
+        console.log('⚠️ Error creando ruta:', response.status(), errorText);
+      }
       return null;
     }
   } catch (error) {
-    console.log('⚠️ Error en seedTestTrip:', error);
+    if (verbose) {
+      console.log('⚠️ Error en seedTestTrip:', error);
+    }
     return null;
   }
 }
 
 /**
  * Seed completo: crea usuario y varias rutas de prueba
+ * Esta función se llama desde global-setup.ts con verbose=true
  */
-export async function seedDatabase(request: APIRequestContext): Promise<void> {
-  console.log('🌱 Iniciando seed de base de datos E2E...');
+export async function seedDatabase(
+  request: APIRequestContext,
+  verbose = true,
+  authToken?: string
+): Promise<void> {
+  if (verbose) console.log('🌱 Iniciando seed de base de datos E2E...');
   
   // Crear usuario de prueba
-  await seedTestUser(request);
+  await seedTestUser(request, verbose, authToken);
   
   // Crear ruta principal
-  await seedTestTrip(request, TEST_TRIP);
+  await seedTestTrip(request, TEST_TRIP, verbose);
   
   // Crear rutas adicionales
   for (const tripPartial of ADDITIONAL_TEST_TRIPS) {
@@ -217,10 +293,10 @@ export async function seedDatabase(request: APIRequestContext): Promise<void> {
       routeMap: [],
       trip_points: TEST_TRIP.trip_points
     };
-    await seedTestTrip(request, fullTrip);
+    await seedTestTrip(request, fullTrip, verbose);
   }
   
-  console.log('✅ Seed completado');
+  if (verbose) console.log('✅ Seed completado');
 }
 
 /**
@@ -228,12 +304,25 @@ export async function seedDatabase(request: APIRequestContext): Promise<void> {
  */
 export async function cleanupTestData(request: APIRequestContext): Promise<void> {
   try {
-    // Eliminar rutas del usuario de prueba
-    const response = await request.delete(`${API_URL}/users/${TEST_USER.userId}`);
-    
-    if (response.ok()) {
-      console.log('🧹 Datos de prueba eliminados');
+    const tripsResponse = await request.get(`${API_URL}/trips/`);
+    if (tripsResponse.ok()) {
+      const trips = await tripsResponse.json();
+      const candidates = trips.filter(
+        (trip: any) =>
+          trip?.author?.userId === TEST_USER.userId ||
+          String(trip?.title || '').toLowerCase().includes('e2e')
+      );
+
+      for (const trip of candidates) {
+        const res = await request.delete(`${API_URL}/trips/${trip._id}`);
+        if (res.ok()) {
+          console.log(`🧹 Eliminada trip de prueba: ${trip.title}`);
+        }
+      }
     }
+
+    // Intentar eliminar usuario si existe (requerirá auth si el backend lo exige)
+    await request.delete(`${API_URL}/users/${TEST_USER.userId}`).catch(() => null);
   } catch (error) {
     console.log('⚠️ Error limpiando datos:', error);
   }

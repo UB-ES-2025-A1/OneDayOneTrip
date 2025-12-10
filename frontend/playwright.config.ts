@@ -11,7 +11,10 @@ import { defineConfig, devices } from '@playwright/test';
  */
 
 // URL del backend (puede ser override via env)
-const API_URL = process.env.API_URL || 'http://localhost:8001';
+const API_URL =
+  process.env.API_URL ||
+  process.env.VITE_API_URL ||
+  'http://localhost:8000';
 const FRONTEND_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
 
 export default defineConfig({
@@ -20,11 +23,14 @@ export default defineConfig({
   /* Global Setup - crea datos de prueba antes de los tests */
   globalSetup: './e2e/global-setup.ts',
   
+  /* Global Teardown - limpia datos de prueba después de los tests */
+  globalTeardown: './e2e/global-teardown.ts',
+  
   /* Configuración general */
-  fullyParallel: true,
+  fullyParallel: false, // evitamos condiciones de carrera sobre datos compartidos
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 1, // un único worker para no pisar el seed
   
   /* Timeouts */
   timeout: 60 * 1000, // 60 segundos por test
