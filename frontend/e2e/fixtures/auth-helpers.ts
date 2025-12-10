@@ -138,7 +138,6 @@ async function createUserInBackend(uid: string, idToken: string): Promise<void> 
 export async function loginAsTestUser(page: Page): Promise<boolean> {
   try {
     if (LOGIN_RATE_LIMITED) {
-      console.log('⚠️ Login deshabilitado temporalmente (quota exceeded)');
       return false;
     }
     
@@ -157,7 +156,6 @@ export async function loginAsTestUser(page: Page): Promise<boolean> {
                             await profileButton.isVisible({ timeout: 2000 }).catch(() => false);
       
       if (hasUISession) {
-        console.log('✅ Usuario ya autenticado (vía storageState/localStorage)');
         return true;
       }
       
@@ -167,7 +165,6 @@ export async function loginAsTestUser(page: Page): Promise<boolean> {
                                      await profileButton.isVisible({ timeout: 2000 }).catch(() => false);
       
       if (hasUISessionAfterWait) {
-        console.log('✅ Usuario ya autenticado (vía storageState/localStorage - después de espera)');
         return true;
       }
     }
@@ -178,83 +175,62 @@ export async function loginAsTestUser(page: Page): Promise<boolean> {
 
     if (await logoutButton.isVisible({ timeout: 1000 }).catch(() => false) ||
         await profileButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-      console.log('✅ Usuario ya autenticado (vía UI)');
       return true;
     }
 
-    console.log('⚠️ No se detectó sesión activa, intentando login manual...');
-
-    // Si no, hacer login manual (fallback)
+    // Login manual necesario
     const loginButton = page.locator('button.header-btn.login, button:has-text("Login"), button:has-text("Entrar")').first();
     
     if (!await loginButton.isVisible({ timeout: 3000 }).catch(() => false)) {
-      console.log('⚠️ Botón de login no encontrado');
       return false;
     }
     
-    console.log('🔘 Haciendo clic en botón de login');
     await loginButton.click();
     
     // Esperar a que aparezca el modal de login
     const loginModal = page.locator('.modal-backdrop, .login-card').first();
     await expect(loginModal).toBeVisible({ timeout: 5000 });
-    console.log('✅ Modal de login abierto');
     
-    // Rellenar email
+    // Rellenar email y password
     const emailInput = page.locator('input[type="email"]').first();
     await expect(emailInput).toBeVisible({ timeout: 3000 });
     await emailInput.fill(E2E_TEST_USER.email);
-    console.log('📧 Email rellenado:', E2E_TEST_USER.email);
     
-    // Rellenar password
     const passwordInput = page.locator('input[type="password"]').first();
     await expect(passwordInput).toBeVisible({ timeout: 3000 });
     await passwordInput.fill(E2E_TEST_USER.password);
-    console.log('🔑 Password rellenado');
     
-    // Hacer clic en el botón de submit
+    // Enviar formulario
     const submitButton = page.locator('button[type="submit"], button.auth-button').first();
     await expect(submitButton).toBeVisible({ timeout: 2000 });
     await submitButton.click();
-    console.log('✅ Formulario enviado');
 
-    // Esperar eficientemente a que el login se complete
-    console.log('⏳ Esperando respuesta de Firebase...');
-
-    // Esperar a que el modal se cierre O aparezca un error - lo que ocurra primero
+    // Esperar a que el modal se cierre O aparezca un error
     try {
       await Promise.race([
-        // Esperar a que el modal se cierre (login exitoso)
         page.locator('.modal-backdrop, .login-card').first().waitFor({ state: 'hidden', timeout: 10000 }),
-        // O esperar a que aparezca un error
         page.locator('.text-red-500, .error-message, .auth-error, [class*="error"]').first().waitFor({ timeout: 10000 })
       ]);
     } catch {
       // Timeout - continuar verificando manualmente
     }
 
-    // Verificar si hay mensaje de error (timeout reducido)
+    // Verificar si hay mensaje de error
     const errorLocator = page.locator('.text-red-500, .error-message, .auth-error, [class*="error"]').first();
     const hasError = await errorLocator.isVisible().catch(() => false);
 
     if (hasError) {
       const errorText = await errorLocator.textContent();
-      console.log('❌ Error de login detectado:', errorText);
-      
-       // Si Firebase devuelve quota exceeded, evitar más intentos para no saturar
+      console.log('❌ Login error:', errorText?.substring(0, 50));
       if (errorText?.toLowerCase().includes('quota') || errorText?.toLowerCase().includes('too many')) {
         LOGIN_RATE_LIMITED = true;
       }
-      await page.screenshot({ path: 'test-results/login-error.png', fullPage: true });
       return false;
     }
 
     // Verificar si el modal se cerró (login exitoso)
     const modalVisible = await loginModal.isVisible().catch(() => true);
     if (!modalVisible) {
-      console.log('✅ Modal de login cerrado - login exitoso');
-
-      // Verificar que aparezca el botón de logout o perfil (timeout reducido)
       const logoutBtn = page.locator('button:has-text("Log out"), button:has-text("Logout"), button.logout').first();
       const profileBtn = page.locator('button.profile-btn, .header-profile-pic').first();
 
@@ -262,7 +238,6 @@ export async function loginAsTestUser(page: Page): Promise<boolean> {
                          await profileBtn.isVisible({ timeout: 2000 }).catch(() => false);
 
       if (isLoggedIn) {
-        console.log('✅ Sesión activa detectada');
         return true;
       }
     }
@@ -270,16 +245,12 @@ export async function loginAsTestUser(page: Page): Promise<boolean> {
     // Verificar localStorage como último recurso
     const storedUid = await page.evaluate(() => localStorage.getItem('uid'));
     if (storedUid) {
-      console.log('✅ Sesión activa en localStorage');
       return true;
     }
 
-    console.log('❌ Login falló - no se pudo verificar sesión');
-    await page.screenshot({ path: 'test-results/login-failed.png', fullPage: true });
     return false;
     
   } catch (error) {
-    console.error('❌ Excepción durante login:', error);
     if (String(error).toLowerCase().includes('quota')) {
       LOGIN_RATE_LIMITED = true;
     }
@@ -311,9 +282,6 @@ export async function logout(page: Page): Promise<void> {
   if (await logoutButton.isVisible({ timeout: 2000 })) {
     await logoutButton.click();
     await page.waitForTimeout(1000);
-    console.log('✅ Logout exitoso');
-  } else {
-    console.log('⚠️ No hay sesión activa para cerrar');
   }
 }
 

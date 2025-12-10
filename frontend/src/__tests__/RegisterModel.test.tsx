@@ -68,7 +68,8 @@ describe("RegisterModal", () => {
       "Juan Pérez",
       "juanp",
       "juan@example.com",
-      "secreta123"
+      "secreta123",
+      false // isPrivate - default value
     );
   });
 });

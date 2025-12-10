@@ -46,29 +46,7 @@ test.describe('Rutas - Verificación de datos de seed', () => {
     console.log(`✅ ${cardCount} tarjetas de rutas visibles`);
   });
 
-  test('DEBE navegar al detalle de una ruta (con auth)', async ({ page }) => {
-    const loggedIn = await loginAsTestUser(page);
-    if (!loggedIn) {
-      test.skip(true, 'Requiere autenticación Firebase real');
-      return;
-    }
-    
-    await page.goto('/');
-    await waitForPageLoad(page);
-    
-    // Verificar que hay tarjetas
-    const tripCards = page.locator(SELECTORS.tripCard);
-    await expect(tripCards.first()).toBeVisible({ timeout: 15000 });
-    
-    // Hacer clic en la primera
-    await tripCards.first().click();
-    await waitForPageLoad(page);
-    
-    // DEBE navegar a página de detalle
-    await page.waitForURL(/\/(ruta|trip)\//, { timeout: 10000 });
-    expect(page.url()).toMatch(/\/(ruta|trip)\//);
-    console.log(`✅ Navegación exitosa a: ${page.url()}`);
-  });
+  // NOTA: Test de navegación al detalle está en trip-detail.spec.ts
 
   test('DEBE mostrar información completa en el detalle', async ({ page }) => {
     const loggedIn = await loginAsTestUser(page);
@@ -231,55 +209,4 @@ test.describe('Rutas - Filtros y búsqueda', () => {
   });
 });
 
-test.describe('Rutas - Interacción social', () => {
-  
-  test('DEBE mostrar botón de seguir en perfil público', async ({ page }) => {
-    const loggedIn = await loginAsTestUser(page);
-    if (!loggedIn) {
-      test.skip(true, 'Requiere autenticación Firebase real');
-      return;
-    }
-    
-    await page.goto('/');
-    await waitForPageLoad(page);
-
-    // Navegar al detalle
-    const tripLink = page.locator(SELECTORS.tripCard).first();
-    await expect(tripLink).toBeVisible({ timeout: 15000 });
-
-    await tripLink.click();
-    await waitForPageLoad(page);
-
-    // Buscar elemento clickeable del autor (puede ser div con onClick, no necesariamente <a>)
-    const authorClickable = page.locator('.autor-icon, .autor-info, .autor a, a[href*="/user/"], a[href*="/perfil"]').first();
-    if (!(await authorClickable.isVisible({ timeout: 5000 }).catch(() => false))) {
-      console.log('ℹ️ Elemento de autor no disponible');
-      return;
-    }
-
-    await authorClickable.click();
-    await waitForPageLoad(page);
-
-    // Buscar botón de seguir
-    const followButton = page.locator(SELECTORS.followButton).first();
-    
-    if (await followButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-      console.log('✅ Botón de seguir visible en perfil');
-      
-      // Hacer clic
-      const responsePromise = page.waitForResponse(
-        response => response.url().includes('/follow') || response.url().includes('/users'),
-        { timeout: 10000 }
-      ).catch(() => null);
-      
-      await followButton.click();
-      
-      const response = await responsePromise;
-      if (response) {
-        console.log(`✅ API de follow respondió con status ${response.status()}`);
-      }
-    } else {
-      console.log('ℹ️ Botón de seguir no visible (puede ser el propio perfil)');
-    }
-  });
-});
+// NOTA: Tests de interacción social (seguir) están en user-profile.spec.ts

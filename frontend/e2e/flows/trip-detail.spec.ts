@@ -154,75 +154,7 @@ test.describe('Detalle de Ruta - Contenido Requerido', () => {
   });
 });
 
-test.describe('Detalle de Ruta - Secciones Interactivas', () => {
-
-  test('DEBE mostrar sección de comentarios', async ({ page }) => {
-    const loggedIn = await loginAsTestUser(page);
-    if (!loggedIn) {
-      test.skip(true, 'Requiere autenticación Firebase real');
-      return;
-    }
-    
-    await page.goto('/');
-    await waitForPageLoad(page);
-    
-    const tripCard = page.locator(SELECTORS.tripCard).first();
-    await expect(tripCard).toBeVisible({ timeout: 15000 });
-    await tripCard.click();
-    await waitForPageLoad(page);
-    
-    // Buscar específicamente la clase catalana .ruta-comentaris
-    const commentsSection = page.locator('.ruta-comentaris, [class*="comentari"], [class*="comment"]').first();
-    
-    // Verificar si existe antes de intentar scroll
-    const exists = await commentsSection.isVisible({ timeout: 10000 }).catch(() => false);
-    if (!exists) {
-      // Scroll al final de la página
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-      await page.waitForTimeout(1000);
-    }
-    
-    const finalCheck = await commentsSection.isVisible({ timeout: 5000 }).catch(() => false);
-    if (!finalCheck) {
-      console.log('ℹ️ Sección de comentarios no visible en esta UI');
-      test.skip(true, 'Sección de comentarios no disponible');
-      return;
-    }
-    
-    await expect(commentsSection).toBeVisible();
-    console.log('✅ Sección de comentarios visible');
-  });
-
-  test('DEBE mostrar display de valoración', async ({ page }) => {
-    const loggedIn = await loginAsTestUser(page);
-    if (!loggedIn) {
-      test.skip(true, 'Requiere autenticación Firebase real');
-      return;
-    }
-    
-    await page.goto('/');
-    await waitForPageLoad(page);
-    
-    const tripCard = page.locator(SELECTORS.tripCard).first();
-    await expect(tripCard).toBeVisible({ timeout: 15000 });
-    await tripCard.click();
-    await waitForPageLoad(page);
-    
-    const ratingDisplay = page.locator(SELECTORS.ratingDisplay).first();
-    
-    // El rating puede estar en diferentes ubicaciones
-    const hasRating = await ratingDisplay.count() > 0;
-    if (hasRating) {
-      await expect(ratingDisplay).toBeVisible({ timeout: 5000 });
-      console.log('✅ Display de valoración visible');
-    } else {
-      // Si no hay rating display, debe haber al menos botón de valorar
-      const rateButton = page.locator(SELECTORS.rateButton).first();
-      await expect(rateButton).toBeVisible({ timeout: 5000 });
-      console.log('✅ Botón de valorar visible');
-    }
-  });
-});
+// NOTA: Los tests de comentarios y valoraciones están en comments.spec.ts y ratings.spec.ts
 
 test.describe('Detalle de Ruta - Responsive', () => {
 

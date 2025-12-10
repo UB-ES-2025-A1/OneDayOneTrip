@@ -247,28 +247,7 @@ test.describe('Perfil Propio', () => {
     console.log('✅ Perfil propio cargado');
   });
 
-  test('DEBE mostrar botón de editar en perfil propio', async ({ page }) => {
-    const loggedIn = await loginAsTestUser(page);
-    if (!loggedIn) {
-      test.skip(true, 'Requiere autenticación Firebase real');
-      return;
-    }
-    
-    await page.goto('/perfil');
-    await waitForPageLoad(page);
-    
-    // El botón de editar DEBE estar visible
-    const editButton = page.locator(SELECTORS.editProfileButton).first();
-    
-    const isVisible = await editButton.isVisible({ timeout: 5000 }).catch(() => false);
-    
-    if (isVisible) {
-      await expect(editButton).toBeVisible();
-      console.log('✅ Botón de editar perfil visible');
-    } else {
-      console.log('⚠️ Botón de editar no visible - puede requerir configuración de perfil');
-    }
-  });
+  // NOTA: Test de botón de editar está en edit-profile.spec.ts
 
   test('DEBE mostrar tabs de publicaciones y guardadas', async ({ page }) => {
     const loggedIn = await loginAsTestUser(page);

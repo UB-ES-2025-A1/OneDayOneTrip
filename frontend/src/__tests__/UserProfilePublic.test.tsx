@@ -34,6 +34,14 @@ vi.mock("../api/trips", () => ({
   getAllTrips: mockGetAllTrips,
 }));
 
+// Mock del notifier para evitar errores de API 404
+vi.mock("../api/notifier", () => ({
+  getNotifications: vi.fn().mockResolvedValue([]),
+  createNotification: vi.fn().mockResolvedValue({}),
+  markNotificationAsRead: vi.fn().mockResolvedValue({}),
+  deleteNotification: vi.fn().mockResolvedValue({}),
+}));
+
 vi.mock("../components/Layout", () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => (
