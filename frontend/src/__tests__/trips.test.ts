@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { fallbackT } from "../api/trips";
+
 import {
   getAllTrips,
   getTripById,
@@ -319,7 +321,8 @@ describe("trips API", () => {
         tripPayload,
         mockFile,
         [mockFile],
-        [mockFile]
+        [mockFile],
+        fallbackT
       );
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -351,7 +354,7 @@ describe("trips API", () => {
         trip_points: [],
       };
 
-      await createTripMultipart(tripPayload, null, [], []);
+      await createTripMultipart(tripPayload, null, [], [], fallbackT);
 
       expect(mockFetch).toHaveBeenCalled();
     });
@@ -376,7 +379,7 @@ describe("trips API", () => {
         trip_points: [],
       };
 
-      await createTripMultipart(tripPayload, null, [], [null, null]);
+      await createTripMultipart(tripPayload, null, [], [null, null], fallbackT);
 
       expect(mockFetch).toHaveBeenCalled();
     });
@@ -402,7 +405,7 @@ describe("trips API", () => {
       };
 
       await expect(
-        createTripMultipart(tripPayload, null, [], [])
+        createTripMultipart(tripPayload, null, [], [], fallbackT)
       ).rejects.toThrow();
     });
   });

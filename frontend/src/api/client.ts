@@ -97,7 +97,7 @@ export async function updateUser(
   });
 
   if (!res.ok) {
-    let err = await res.json().catch(() => ({}));
+    const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Error updating user");
   }
 
