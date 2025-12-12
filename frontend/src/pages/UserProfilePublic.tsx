@@ -98,9 +98,11 @@ export default function UserProfilePublic() {
         setProfile(backendUser as BackendUser);
 
         const allTrips = await getAllTrips(true, t);
-        const pubIds = new Set((backendUser.publicacions || []).map(String));
-        const userTrips = allTrips.filter((t) => pubIds.has(String(t._id)));
+        const userTrips = allTrips.filter(
+          (trip) => String(trip.author?.userId) === String(id)
+        );
         setTrips(userTrips);
+
       } catch (err) {
         console.error(err);
         setError(t('profile_public_error_loading'));
@@ -280,37 +282,29 @@ export default function UserProfilePublic() {
     }
   };
 
-  // Convertir Trips → items de grid
   const publicacionsItems = useMemo(() => {
-
-    // Determinar si puc veure les publicacions del perfil
     const isOwner = currentUser?.uid === profile?.uid;
     const isProfilePrivate = !!profile?.isPrivate;
-    
-    // Si el perfil és privat i no sóc propietari ni segueixo, no mostrar rutes
-    if (isProfilePrivate && !isOwner && !isFollowing) {
-      return [];
-    }
 
-    const pubIds = new Set((profile?.publicacions || []).map(String));
-    return trips
-      .filter((trip) => pubIds.has(String(trip)))
-      .map((trip) => ({
-        id: String(trip._id),
-        title: trip.title || t('general_no_title'),
-        img:
-            trip.coverImage ||
-          (trip.gallery && trip.gallery[0]) ||
-          t('general_placeholder_no_image_public'),
-        user: trip.author?.name || t('general_anonymous'),
-        rating: typeof trip.avgRating === "number" ? trip.avgRating : 0,
-        temps: trip.duration || "—",
-        dificultat: trip.difficulty || "—",
-        authorPic: trip.author?.profilePic || "",
-        city: trip.city || "",
-        country: trip.country || "",
-      }));
-  }, [trips, profile, t]);
+    if (isProfilePrivate && !isOwner && !isFollowing) return [];
+
+    return trips.map((trip) => ({
+      id: String(trip._id),
+      title: trip.title || t('general_no_title'),
+      img:
+        trip.coverImage ||
+        (trip.gallery && trip.gallery[0]) ||
+        t('general_placeholder_no_image_public'),
+      user: trip.author?.name || t('general_anonymous'),
+      rating: typeof trip.avgRating === "number" ? trip.avgRating : 0,
+      temps: trip.duration || "—",
+      dificultat: trip.difficulty || "—",
+      authorPic: trip.author?.profilePic || "",
+      city: trip.city || "",
+      country: trip.country || "",
+    }));
+  }, [trips, profile?.uid, profile?.isPrivate, t, isFollowing, currentUser?.uid]);
+
 
   // Variables visuals fusionades
   const displayName = profile?.nom_i_cognoms || profile?.username || t('general_user');

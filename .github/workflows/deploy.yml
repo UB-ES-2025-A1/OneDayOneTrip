@@ -31,31 +31,15 @@ jobs:
             exit 1
           }
           echo "✅ Render deploy trigger enviado correctamente."
-      # Trigger test
 
-      # 3️⃣ Instala Node y construye el FRONTEND
-      - name: ⚙️ Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: 📦 Install dependencies
-        working-directory: ./frontend
-        run: npm ci
-
-      - name: 🏗️ Build frontend
-        working-directory: ./frontend
-        run: npm run build
-
-      # 4️⃣ Despliega el FRONTEND en Netlify
-      - name: 🚀 Deploy to Netlify
+      # 3️⃣ Trigger de deploy en Netlify (sin build)
+      - name: 🚀 Trigger Netlify deploy
         uses: nwtgck/actions-netlify@v2
         with:
-          publish-dir: ./frontend/dist
           production-deploy: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "🚀 Deploy automático desde GitHub Actions (merge a production)"
-          enable-commit-comment: false   # 👈 evita el error 403 de permisos en GitHub
+          deploy-message: "🚀 Deploy automático (production)"
+          enable-commit-comment: false
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

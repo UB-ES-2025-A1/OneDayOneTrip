@@ -5,7 +5,12 @@
 /* ---------- BASE GENERAL ---------- */
 .main-header {
   padding: 1.2rem 2rem;
-  background-color: #2e492e;
+  background: linear-gradient(
+    180deg,
+    #2e492e 0%,
+    #294328 55%,
+    #243a23 100%
+  );
   color: white;
   display: flex;
   align-items: center;
@@ -17,6 +22,8 @@
   box-sizing: border-box;
   min-height: 72px;
 }
+
+
 
 /* Variants (por si vols personalitzar més endavant) */
 .main-header.home,
@@ -149,8 +156,7 @@
   }
 
   .logo {
-    font-size: 1.2rem;
-    padding-right: 5.6rem;
+    display: none;
   }
 
   .header-btn {

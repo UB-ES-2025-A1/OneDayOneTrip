@@ -1,0 +1,57 @@
+/* ===============================
+   FOOTER — OneDayOneTrip
+   =============================== */
+
+.footer {
+  margin-top: 50px;
+  padding: 30px 40px;
+  color: #ffffff;
+
+  /* 🌿 Gradient verde botella → negro */
+  background: linear-gradient(
+    180deg,
+    #1f3a2b 0%,
+    #14261c 40%,
+    #000000 100%
+  );
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.footer p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.footer a {
+  color: #ffffff;
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.footer a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 600px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    text-align: center;
+  }
+}

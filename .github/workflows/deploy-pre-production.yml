@@ -1,15 +1,15 @@
-name: 🚀 Deploy API (Render) & Frontend (Netlify)
+name: 🚀 Deploy API (Render) & Frontend (Netlify) [Pre-Production]
 
 on:
   push:
     branches:
-      - pre-production   # 👈 solo al hacer merge o push real a production
+      - pre-production   # 👈 solo al hacer push o merge a pre-production
 
 jobs:
   deploy:
-    name: Deploy to Render & Netlify
+    name: Deploy to Render & Netlify (Pre-Production)
     runs-on: ubuntu-latest
-    environment: pre-production   # 👈 usa el entorno 'production' para los secrets
+    environment: pre-production   # 👈 usa el entorno 'pre-production' para los secrets
 
     steps:
       # 1️⃣ Clona el repositorio
@@ -17,11 +17,11 @@ jobs:
         uses: actions/checkout@v4
 
       # 2️⃣ Despliega el BACKEND en Render
-      - name: 🔁 Trigger Render deploy
+      - name: 🔁 Trigger Render deploy (Pre-Production)
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
-          echo "📡 Lanzando despliegue de FastAPI en Render..."
+          echo "📡 Lanzando despliegue de FastAPI en Render (pre-production)..."
           if [ -z "$RENDER_DEPLOY_HOOK" ]; then
             echo "❌ ERROR: Falta el secret RENDER_DEPLOY_HOOK"
             exit 1
@@ -31,31 +31,15 @@ jobs:
             exit 1
           }
           echo "✅ Render deploy trigger enviado correctamente."
-      # Trigger test
 
-      # 3️⃣ Instala Node y construye el FRONTEND
-      - name: ⚙️ Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: 📦 Install dependencies
-        working-directory: ./frontend
-        run: npm ci
-
-      - name: 🏗️ Build frontend
-        working-directory: ./frontend
-        run: npm run build
-
-      # 4️⃣ Despliega el FRONTEND en Netlify
-      - name: 🚀 Deploy to Netlify
+      # 3️⃣ Trigger de deploy en Netlify (Netlify hace el build)
+      - name: 🚀 Trigger Netlify deploy (Pre-Production)
         uses: nwtgck/actions-netlify@v2
         with:
-          publish-dir: ./frontend/dist
-          production-deploy: true
+          production-deploy: false   # 👈 MUY IMPORTANTE
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "🚀 Deploy automático desde GitHub Actions (merge a production)"
-          enable-commit-comment: false   # 👈 evita el error 403 de permisos en GitHub
+          deploy-message: "🚀 Deploy automático pre-production"
+          enable-commit-comment: false
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

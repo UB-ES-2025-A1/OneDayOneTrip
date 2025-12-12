@@ -1,21 +1,27 @@
 import { getAuth } from "firebase/auth";
 import { createNotification } from "../api/notifier";
 
-const API_URL = "https://onedayonetrip-api.onrender.com"; // Production
-
-//const API_URL = "https://onedayonetrip.onrender.com"; // PreProduction
-
-//const API_URL = "http://127.0.0.1:8000"; // Local
+const API_URL = import.meta.env.VITE_API_URL;
+if (!API_URL) throw new Error("❌ VITE_API_URL is not defined");
 
 // ------------------------------
-// Funciones base genéricas
+// Helpers base
 // ------------------------------
-export async function apiGet(path: string) {
+async function getAuthHeaders(): Promise<Headers> {
+  const headers = new Headers();
+
   const user = getAuth().currentUser;
-  const token = user ? await user.getIdToken() : null;
+  if (user) {
+    const token = await user.getIdToken();
+    headers.set("Authorization", `Bearer ${token}`);
+  }
 
+  return headers;
+}
+
+export async function apiGet(path: string) {
   const res = await fetch(`${API_URL}${path}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers: await getAuthHeaders(), // Headers es válido como HeadersInit
   });
 
   if (!res.ok) throw new Error(`API Error ${res.status}`);
@@ -23,15 +29,12 @@ export async function apiGet(path: string) {
 }
 
 export async function apiPost(path: string, body: object) {
-  const user = getAuth().currentUser;
-  const token = user ? await user.getIdToken() : null;
+  const headers = await getAuthHeaders();
+  headers.set("Content-Type", "application/json");
 
   const res = await fetch(`${API_URL}${path}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    headers,
     body: JSON.stringify(body),
   });
 
@@ -40,12 +43,9 @@ export async function apiPost(path: string, body: object) {
 }
 
 export async function apiDelete(path: string) {
-  const user = getAuth().currentUser;
-  const token = user ? await user.getIdToken() : null;
-
   const res = await fetch(`${API_URL}${path}`, {
     method: "DELETE",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers: await getAuthHeaders(),
   });
 
   if (!res.ok) throw new Error(`API Error ${res.status}`);
@@ -76,19 +76,23 @@ export async function getAllUsers() {
   return apiGet("/users");
 }
 
-export async function searchUsers(query: string, currentUserId?: string, blockedByMe?: string[]) {
+export async function searchUsers(
+  query: string,
+  currentUserId?: string,
+  blockedByMe?: string[]
+) {
   const params = new URLSearchParams();
   if (query) params.append("query", query);
   if (currentUserId) params.append("current_user_id", currentUserId);
-  if (blockedByMe && blockedByMe.length > 0) {
+  if (blockedByMe?.length) {
     params.append("blocked_by_me", JSON.stringify(blockedByMe));
   }
-  
+
   return apiGet(`/users/search?${params.toString()}`);
 }
 
 // ------------------------------
-// 🔥 NUEVO: actualizar perfil (multipart)
+// 🔥 Actualizar usuario (multipart)
 // ------------------------------
 export async function updateUser(
   userId: string,
@@ -96,18 +100,16 @@ export async function updateUser(
   fotoPerfil?: File | null,
   fotoPanell?: File | null
 ) {
-  const user = getAuth().currentUser;
-  const token = user ? await user.getIdToken() : null;
+  const headers = await getAuthHeaders();
 
   const formData = new FormData();
   formData.append("user_json", JSON.stringify(jsonData));
-
   if (fotoPerfil) formData.append("foto_perfil", fotoPerfil);
   if (fotoPanell) formData.append("foto_panell", fotoPanell);
 
   const res = await fetch(`${API_URL}/users/update/${userId}`, {
     method: "PATCH",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers,
     body: formData,
   });
 
@@ -118,6 +120,7 @@ export async function updateUser(
 
   return res.json();
 }
+
 
 // ------------------------------
 // Follows
@@ -145,7 +148,6 @@ export async function followUser(userId: string, targetId: string) {
   return res;
 }
 
-// Enviar sol·licitud de seguiment
 export async function askToFollowUser(userId: string, targetId: string) {
   const res = await apiPost(`/users/askToFollowUser/${userId}/${targetId}`, {});
 
@@ -173,7 +175,6 @@ export async function askToFollowUser(userId: string, targetId: string) {
   return res;
 }
 
-// Deixar de seguir un usuari
 export async function unfollowUser(userId: string, targetId: string) {
   const res = await apiPost(`/users/unfollow/${userId}/${targetId}`, {});
 
@@ -197,24 +198,20 @@ export async function unfollowUser(userId: string, targetId: string) {
   return res;
 }
 
-// Eliminar sol·licitud de seguiment
 export async function cancel_follow_request(userId: string, targetId: string) {
   return apiPost(`/users/cancel_follow_request/${userId}/${targetId}`, {});
 }
 
-// Acceptar sol·licitud de seguiment
 export async function accept_follow_request(userId: string, targetId: string) {
   return apiPost(`/users/accept_follow_request/${userId}/${targetId}`, {});
 }
 
-// Rebutjar sol·licitud de seguiment
 export async function reject_follow_request(userId: string, targetId: string) {
   return apiPost(`/users/reject_follow_request/${userId}/${targetId}`, {});
 }
 
-
 // ------------------------------
-// Saves, blocks y más
+// Saves, blocks, publicaciones
 // ------------------------------
 export async function saveTrip(userId: string, tripId: string) {
   return apiPost(`/users/save/${userId}/${tripId}`, {});

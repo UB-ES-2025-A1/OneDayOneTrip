@@ -2,10 +2,21 @@
    VARIABLES GLOBALS LIGHT MODE
    ================================ */
 :root {
-  --bg-page: #f8f9fa;
+  --bg-page: linear-gradient(
+    180deg,
+    #2e492e 5%,
+    #eaf3ee 60%,
+    #ffffff 100%
+  );
+  --bg-ruta: linear-gradient(
+    180deg,  
+    #ffffff 30%,
+    #47aa73 50%,
+    #2e492e 40%,
+  );
   --bg-card: #ffffff;
   --text-primary: #1b1b1b;
-  --text-secondary: #555;
+  --text-secondary: #030303;
   --tab-bg: #e6f3e6;
   --tab-text: #2e492e;
   --tab-bg-active: linear-gradient(135deg, #2e492e, #56a856);
@@ -21,12 +32,23 @@
   --search-icon: #6b7280;
 }
 
-
+/*#2d2d2d*/
 /* ================================
    VARIABLES GLOBALS DARK MODE
    ================================ */
 [data-theme="dark"] {
-  --bg-page: #2d2d2d;
+  --bg-page: linear-gradient(
+    180deg,
+    #2e492e 5%,
+    #2d2d2d 55%,
+    #000000 100%
+  );
+  --bg-ruta: linear-gradient(
+    180deg,  
+    #2e492e 5%,
+    #2d2d2d 55%,
+    #000000 100%
+  );
   --bg-card: #1a1d1f;
   --text-primary: #f0f0f0;
   --text-secondary: #c7c7c7;
@@ -271,22 +293,6 @@ ter-select:focus {
 }
 
 
-/* Responsive */
-@media (max-width: 600px) {
-  .search-bar {
-    padding: 0.15rem 0.6rem;
-  }
-
-  .search-filter-select {
-    font-size: 0.8rem;
-  }
-
-  .search-input {
-    font-size: 0.85rem;
-  }
-}
-
-
 
 /* ---------- Messages no TRIP LIST ---------- */
 
@@ -480,7 +486,27 @@ ter-select:focus {
     width: 100%;
     margin-top: 0.75rem;
   }
+  .search-bar {
+    padding: 0.15rem 0.6rem;
+  }
+
+  .search-filter-select {
+    font-size: 0.8rem;
+    padding-right: 0.25rem; /* abans 0.6rem */
+  }
+
+  .search-divider {
+    margin: 0 0.35rem;  /* abans 0.7rem */
+    height: 20px;       /* una mica més baix */
+    width: 1px;         /* una mica més fi */
+  }
+
+  .search-input {
+    font-size: 0.85rem;
+  }
 }
+
+
 
 /* Tablets (601px–992px) */
 @media (max-width: 992px) and (min-width: 601px) {

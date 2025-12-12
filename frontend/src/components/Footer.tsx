@@ -1,24 +1,41 @@
 import type { ReactNode } from "react";
-import { useTranslation } from 'react-i18next'; // Importa el hook
+import { useTranslation } from "react-i18next";
+import "../styles/Footer.css";
 
-export default function Footer({ children }: { children?: ReactNode }) {
+interface FooterProps {
+  children?: ReactNode;
+}
+
+export default function Footer({ children }: FooterProps) {
   const { t } = useTranslation();
+
   return (
-    <footer style={{marginTop: '50px',backgroundColor:'#2e492e', height: '200px', color: '#fff', paddingLeft: '30px', paddingTop:'1px'}} className="bg-gray-800 text-white py-4 mt-8">
-      <div style={{height: '3px', backgroundColor: '#2e492e'}}></div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gridGap: 20 }}>
-        <div className="container mx-auto text-center">
-            <h2>OneDayOneTrip</h2>
-        <p>&copy; {new Date().getFullYear()} OneDayOneTrip.All rights reserved.</p>
-        {children}
-      </div>
+    <footer className="footer">
+      <div className="footer-grid">
+        {/* Marca */}
         <div>
-            <h2>{t('footer_contact')}</h2>
-            <p> <a style={{color: '#fff', textDecoration: 'none'}} href="mailto:help@onedayonetrip.com">help@onedayonetrip.com</a></p>
-            <p><a  style={{color: '#fff', textDecoration: 'none'}} href="tel:+34 123 456 789">+34 123 456 789</a></p>
+          <h2>OneDayOneTrip</h2>
+          <p>
+            &copy; {new Date().getFullYear()} OneDayOneTrip. All rights reserved.
+          </p>
+          {children}
+        </div>
+
+        {/* Contacto */}
+        <div>
+          <h2>{t("footer_contact")}</h2>
+          <p>
+            <a href="mailto:onedayonetripes6@gmail.com">
+              onedayonetripes6@gmail.com
+            </a>
+          </p>
+          <p>
+            <a href="tel:+34601320227">
+              +34 601 320 227
+            </a>
+          </p>
         </div>
       </div>
-      
     </footer>
   );
 }

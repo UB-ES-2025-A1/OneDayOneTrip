@@ -6,7 +6,6 @@
   align-items: stretch;
   width: 100%;
   padding: 20px 0;
-  background: var(--bg-card);   /* 🔹 abans: white */
   gap: 10px;
   box-sizing: border-box;
   flex-wrap: wrap;
@@ -98,7 +97,21 @@
   object-fit: cover;
   cursor: pointer;
   flex-shrink: 0;
+  animation: zoomIn 0.25s ease;
 }
+
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 
 .zoom-overlay {
   position: fixed;
@@ -126,11 +139,6 @@
 /* Border de la miniatura activa amb verd clar en fosc */
 [data-theme="dark"] .miniatures img.active {
   border-color: #8fda8f;
-}
-
-/* Fons de la galeria manté el to de targeta del tema */
-[data-theme="dark"] .ruta-galeria-principal {
-  background: var(--bg-card);
 }
 
 /* Opcional: lleugerament menys agressiu el fons del “+X fotos” en dark */
