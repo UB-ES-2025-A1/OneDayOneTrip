@@ -459,6 +459,18 @@
   .empty-state p {
     font-size: 0.9rem;
   }
+  .edit-profile-btn,
+  .settings-btn,
+  .mailbox-btn {
+    right: 12px;
+    bottom: auto;     
+    transform: none; 
+  }
+
+  .edit-profile-btn { top: 12px; }
+  .settings-btn     { top: 62px; }   
+  .mailbox-btn      { top: 112px; } 
+  
 }
 
 /* Tablets (≤ 992px) */
@@ -491,6 +503,7 @@
 
 /* Mòbils (≤ 600px) */
 @media (max-width: 600px) {
+  
   .user-profile {
     padding: 2rem 1rem;
     border-radius: 0;
@@ -528,6 +541,16 @@
   .tab-btn {
     font-size: 0.9rem;
   }
+  .user-details {
+    min-width: 0;     /* clau: evita que desbordi */
+    width: 100%;
+  }
+
+  .user-stats {
+    width: 100%;
+    justify-content: center;
+  }
+  
 }
 
 /* ---------- MODAL OVERLAY ---------- */

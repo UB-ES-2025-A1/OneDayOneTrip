@@ -323,3 +323,72 @@
 [data-theme="dark"] .rating-summary .rating-count {
   opacity: 0.9;
 }
+
+/* =========================
+   RESPONSIVE HEADER RUTA
+   ========================= */
+@media (max-width: 600px) {
+
+  /* 1) Títol a dalt + accions a sota */
+  .ruta-header-line {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .ruta-titol {
+    font-size: 1.7rem;
+    line-height: 1.15;
+    word-break: break-word;
+  }
+
+  /* 2) Treu l'efecte "empeny cap a la dreta" en mòbil */
+  .ruta-actions,
+  .ruta-actions-left {
+    width: 100%;
+  }
+
+  .ruta-actions-left {
+    justify-content: flex-start; /* en lloc de space-between */
+    gap: 10px;
+    flex-wrap: wrap;             /* IMPORTANT: que pugui baixar de línia */
+    align-items: center;
+  }
+
+  .ruta-actions-buttons {
+    margin-left: 0;              /* anul·la l'auto */
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .valorar-button {
+    margin-left: 0;              /* anul·la l'auto a mòbil */
+    font-size: 0.95rem;
+    padding: 6px 8px;
+  }
+
+  .guardar-button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  /* 3) Rating summary més compacte i que no “xafi” */
+  .rating-summary {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .rating-summary .rating-star { font-size: 16px; }
+  .rating-summary .rating-value { font-size: 0.95rem; }
+  .rating-summary .rating-count { font-size: 0.8rem; }
+
+  /* Opcional: si tens ubicació com a pill/text al mateix row */
+  .ruta-location,
+  .ubicacio,
+  .location {
+    width: 100%;
+    margin-top: 2px;
+  }
+}
