@@ -61,6 +61,9 @@ export default function Home() {
   const [searchMode, setSearchMode] = useState<SearchMode>("trips");
   const [users, setUsers] = useState<any[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
+  const getFirebaseUid = (u: any) =>
+  String(u?.uid || u?.firebase_uid || u?.auth_uid || u?.userId || u?.firebaseUid || "");
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -248,13 +251,13 @@ export default function Home() {
 
   const usersByTab = users.filter((u) => {
     if (selectedTab === "following") {
-      // Només els usuaris que segueixo
-      return followingIds.includes(u.uid);
+      // Només els usuaris que segueixo (IMPORTANT: comparar amb Firebase UID real)
+      return followingIds.includes(getFirebaseUid(u));
     }
 
-    // En "recommended" de moment mostrem tots (pots canviar la lògica si vols)
     return true;
   });
+
 
   const visibleUsers = usersByTab.filter((u) => {
     if (!search) return true;
@@ -378,15 +381,20 @@ export default function Home() {
 
         {!usersLoading && !error && searchMode === "users" && visibleUsers.length > 0 ? (
           <div className="users-grid">
-            {visibleUsers.map((u) => (
-              <UserCard
-                key={u.uid}
-                uid={u.uid}
-                name={u.nom_i_cognoms || ""}
-                username={u.username}
-                profilePic={u.url_foto_perfil}
-              />
-            ))}
+            {visibleUsers.map((u) => {
+              const uid = getFirebaseUid(u);
+
+              return (
+                <UserCard
+                  key={uid}
+                  uid={uid}
+                  name={u.nom_i_cognoms || ""}
+                  username={u.username}
+                  profilePic={u.url_foto_perfil}
+                />
+              );
+            })}
+
           </div>
         ) : !loading && !error && searchMode === "trips" && visibleTrips.length > 0 ? (
           <MasonryGrid
