@@ -7,6 +7,7 @@ import {
   deleteAccount,
   accept_follow_request,
   getUserById,
+  updateUser,
 } from "../api/client";
 import { getNotifications, deleteNotification } from "../api/notifier";
 import i18n from "../i18n/i18n";
@@ -20,16 +21,15 @@ type Props = {
   onSavePrivacy?: (updatedProfile: BackendUser) => void;
 };
 
-const API_URL = "https://onedayonetrip-api.onrender.com"; // Production
-
 function getInitialTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "light";
 
   const stored = localStorage.getItem("theme");
   if (stored === "light" || stored === "dark") return stored;
 
-  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-  return prefersDark ? "dark" : "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }
 
 export default function UserSettings({
@@ -48,7 +48,7 @@ export default function UserSettings({
   const [language, setLanguage] = useState(i18n.language || "ca");
   const [isPrivate, setIsPrivate] = useState<boolean>(!!profile.isPrivate);
 
-  // Quan canvies de perfil (o refresques profile) → sincronitza isPrivate
+  // Sincroniza privacidad si cambia el perfil
   useEffect(() => {
     setIsPrivate(!!profile.isPrivate);
   }, [profile?.uid, profile?.isPrivate]);
@@ -69,34 +69,20 @@ export default function UserSettings({
     localStorage.setItem("lang", lng);
   };
 
+  // 🔐 Cambiar privacidad (USANDO client.ts)
   const handleChangePrivacy = async (newPrivacy: boolean) => {
     try {
       setPrivacyLoading(true);
       setError("");
 
-      const formData = new FormData();
-      formData.append("user_json", JSON.stringify({ isPrivate: newPrivacy }));
-
-      const response = await fetch(`${API_URL}/users/update/${profile.uid}`, {
-        method: "PATCH",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        let msg = t("profile_error_updating");
-        try {
-          const err = await response.json();
-          msg = err?.detail || msg;
-        } catch {}
-        throw new Error(msg);
-      }
+      // 1️⃣ Actualiza en backend
+      await updateUser(profile.uid, { isPrivate: newPrivacy });
 
       setIsPrivate(newPrivacy);
 
-      // Perfil local (optimitzat) mentre refresquem
       let updatedProfile: BackendUser = { ...profile, isPrivate: newPrivacy };
 
-      // Si passa a públic → accepta pendents + elimina notifs follow_request
+      // 2️⃣ Si pasa a público → aceptar solicitudes y limpiar notificaciones
       if (!newPrivacy) {
         try {
           const pending = profile.llista_solicitud_seguidors || [];
@@ -105,40 +91,45 @@ export default function UserSettings({
           }
 
           const notifications = await getNotifications(profile.uid, false);
-          const followReq = notifications.filter((n: any) => n.type === "follow_request");
+          const followReq = notifications.filter(
+            (n: any) => n.type === "follow_request"
+          );
+
           for (const notif of followReq) {
             await deleteNotification(notif.id);
           }
         } catch (err) {
-          console.error("⚠️ Error processant pendents/notificacions:", err);
+          console.error("⚠️ Error procesando solicitudes/notificaciones:", err);
         }
       }
 
-      // Refresca perfil real del backend
+      // 3️⃣ Refresca perfil real del backend
       try {
         const refreshed = await getUserById(profile.uid);
         updatedProfile = {
           ...(refreshed as BackendUser),
           llista_seguidors: refreshed.llista_seguidors || [],
           llista_seguits: refreshed.llista_seguits || [],
-          llista_solicitud_seguidors: refreshed.llista_solicitud_seguidors || [],
-          llista_solicitud_seguits: refreshed.llista_solicitud_seguits || [],
+          llista_solicitud_seguidors:
+            refreshed.llista_solicitud_seguidors || [],
+          llista_solicitud_seguits:
+            refreshed.llista_solicitud_seguits || [],
           publicacions: refreshed.publicacions || [],
           guardades: refreshed.guardades || [],
           llista_bloquejats: refreshed.llista_bloquejats || [],
           llista_bloquejadors: refreshed.llista_bloquejadors || [],
           isPrivate: !!refreshed.isPrivate,
         };
+
         setIsPrivate(!!updatedProfile.isPrivate);
       } catch (err) {
-        console.error("⚠️ Error refrescant perfil:", err);
+        console.error("⚠️ Error refrescando perfil:", err);
       }
 
       onSavePrivacy?.(updatedProfile);
     } catch (e: any) {
-      console.error(t("error"), e);
+      console.error("❌ Error cambiando privacidad:", e);
       setError(e?.message || t("profile_error_updating"));
-      // Reverteix toggle visual si ha fallat
       setIsPrivate(!!profile.isPrivate);
     } finally {
       setPrivacyLoading(false);
@@ -158,8 +149,8 @@ export default function UserSettings({
       return;
     }
 
-    const confirm1 = window.confirm(t("settings_confirm_delete"));
-    if (!confirm1) return;
+    const confirmDelete = window.confirm(t("settings_confirm_delete"));
+    if (!confirmDelete) return;
 
     try {
       setLoading(true);
@@ -171,7 +162,7 @@ export default function UserSettings({
       alert(t("settings_success_delete"));
       window.location.href = "/";
     } catch (err: any) {
-      console.error(t("error_deleting_account"), err);
+      console.error("❌ Error eliminando cuenta:", err);
       setError(err?.message || t("settings_error_delete"));
     } finally {
       setLoading(false);
@@ -188,13 +179,16 @@ export default function UserSettings({
         <h2 className="settings-title">{t("profile_settings_button")}</h2>
 
         <div className="settings-content">
+          {/* APARIENCIA */}
           <div className="settings-section">
-            <h3 className="settings-subtitle">{t("settings_subtitle_appearance")}</h3>
+            <h3 className="settings-subtitle">
+              {t("settings_subtitle_appearance")}
+            </h3>
 
             <div className="settings-row">
-              <div className="settings-row-info">
-                <span className="settings-row-label">{t("settings_label_dark_mode")}</span>
-              </div>
+              <span className="settings-row-label">
+                {t("settings_label_dark_mode")}
+              </span>
 
               <label className="toggle-wrapper">
                 <input
@@ -203,29 +197,36 @@ export default function UserSettings({
                   checked={theme === "dark"}
                   onChange={toggleTheme}
                 />
+
                 <div className="toggle-slot">
                   <div className="sun-icon-wrapper">
                     <div className="sun-icon">☀</div>
                   </div>
+
                   <div className="moon-icon-wrapper">
                     <div className="moon-icon">🌙</div>
                   </div>
+
                   <div className="toggle-button" />
                 </div>
               </label>
             </div>
           </div>
 
+          {/* PRIVACIDAD */}
           <div className="settings-section">
             <h3 className="settings-subtitle">{t("privacy")}</h3>
 
             <div className="settings-row">
-              <div className="settings-row-info">
+              <div>
                 <span className="settings-row-label">
-                  {t("profile")} {isPrivate ? t("private") : t("public")}
+                  {t("profile")}{" "}
+                  {isPrivate ? t("private") : t("public")}
                 </span>
                 <span className="settings-row-helper">
-                  {isPrivate ? t("only_followers_see_route") : t("all_users_see_route")}
+                  {isPrivate
+                    ? t("only_followers_see_route")
+                    : t("all_users_see_route")}
                 </span>
               </div>
 
@@ -237,47 +238,49 @@ export default function UserSettings({
                   onChange={(e) => handleChangePrivacy(e.target.checked)}
                   disabled={privacyLoading}
                 />
+
                 <div className="toggle-slot">
                   <div className="toggle-button" />
                 </div>
               </label>
+
             </div>
           </div>
 
+          {/* IDIOMA */}
           <div className="settings-section">
             <h3 className="settings-subtitle">{t("language")}</h3>
 
-            <div className="settings-row">
-              <div className="settings-row-info">
-                <span className="settings-row-label">{t("select_language")}</span>
-              </div>
+            <div className="settings-select-wrapper">
+              <select
+                className="settings-select"
+                value={language}
+                onChange={(e) => changeLanguage(e.target.value)}
+              >
+                <option value="ca">Català</option>
+                <option value="es">Castellà</option>
+                <option value="en">English</option>
+              </select>
 
-              <div className="settings-select-wrapper">
-                <select
-                  className="settings-select"
-                  value={language}
-                  onChange={(e) => changeLanguage(e.target.value)}
-                >
-                  <option value="ca">Català</option>
-                  <option value="es">Castellà</option>
-                  <option value="en">English</option>
-                </select>
-                <span className="settings-select-arrow">▾</span>
-              </div>
+              <span className="settings-select-arrow">▾</span>
             </div>
+
           </div>
 
+          {/* ELIMINAR CUENTA */}
           <div className="settings-section">
-            <p className="settings-warning">{t("settings_warning_delete")}</p>
+            <p className="settings-warning">
+              {t("settings_warning_delete")}
+            </p>
 
             <button
               className="danger-btn"
               onClick={handleDeleteAccount}
               disabled={loading}
             >
-              <span>
-                {loading ? t("settings_button_deleting") : t("settings_button_delete")}
-              </span>
+              {loading
+                ? t("settings_button_deleting")
+                : t("settings_button_delete")}
             </button>
 
             {error && <p className="settings-error">{error}</p>}

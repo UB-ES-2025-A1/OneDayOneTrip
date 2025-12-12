@@ -1,7 +1,7 @@
 /* -----------------COMENTARIS---------------------- */
 .ruta-comentaris {
   margin-top: 3rem;
-  background: var(--bg-card);
+  background: var(--bg-ruta);
   padding: 1.5rem 2rem;
   border-radius: 16px;
   box-shadow: 0 2px 6px var(--card-shadow);
@@ -116,7 +116,7 @@
   line-height: 1.5;
   font-size: 0.95rem;
   white-space: pre-wrap;
-  background: var(--bg-page);
+  background: var(--bg-card);
   padding: 0.8rem 1rem;
   border-radius: 8px;
   border: 1px solid rgba(0,0,0,0.05);
@@ -153,6 +153,7 @@
 }
 
 .comentari-nou-main {
+  background: var(--bg-card);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -166,7 +167,7 @@
   min-height: 60px;
   padding: 8px 10px;
   border-radius: 10px;
-  background: var(--bg-page);
+  background: var(--bg-card);
   font-size: 0.95rem;
   outline: none;
   color: var(--text-primary);

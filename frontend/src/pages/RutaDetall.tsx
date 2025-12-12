@@ -62,6 +62,10 @@ export default function RutaDetall() {
   const [isBlocked, setIsBlocked] = useState(false);
   const [imBlocked, setImBlocked] = useState(false);
 
+  const [zoomImage, setZoomImage] = useState<string | null>(null);
+
+
+
 
   // 🔹 Carregar usuari Firebase + backendUser
   useEffect(() => {
@@ -333,7 +337,11 @@ export default function RutaDetall() {
     >
       {/* Galeria */}
       <div className="ruta-galeria-principal">
-        <div className="imatge-gran">
+        <div
+          className="imatge-gran"
+          onClick={() => setZoomImage(mainImage)}
+          style={{ cursor: "zoom-in" }}
+        >
           {mainImage ? (
             <img src={mainImage} alt={t('route_detail_gallery_main_image')} />
           ) : (
@@ -341,11 +349,18 @@ export default function RutaDetall() {
           )}
         </div>
 
+
         <div className="miniatures">
           {tripData.gallery?.slice(0, 3).map((img, i) => (
-            <img key={i} src={img} />
+            <img
+              key={i}
+              src={img}
+              onClick={() => setZoomImage(img)}
+            />
           ))}
         </div>
+
+
       </div>
 
       {/* Dades */}
@@ -524,6 +539,29 @@ export default function RutaDetall() {
           </div>
         </div>
       )}
+
+      {zoomImage && (
+        <div
+          className="zoom-overlay"
+          onClick={() => setZoomImage(null)}
+        >
+          <button
+            className="close-zoom"
+            onClick={() => setZoomImage(null)}
+          >
+            ✕
+          </button>
+
+          <div
+            className="zoom-gallery"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img src={zoomImage} alt="Zoom" />
+          </div>
+        </div>
+      )}
+
+
     </Layout>
   );
 }

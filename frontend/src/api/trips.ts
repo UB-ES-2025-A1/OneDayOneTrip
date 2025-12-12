@@ -1,7 +1,6 @@
 import { createNotification } from "../api/notifier"; 
 import { getUserById } from "../api/client";
 import type { TFunction } from 'i18next';
-
 // ==========================================================
 // Interfaces base (Trip, TripPoint, Comment…)
 // ==========================================================
@@ -63,7 +62,8 @@ export interface Comment {
 // Base URL
 // ==========================================================
 
-const RAW_BASE_URL = "https://onedayonetrip-api.onrender.com"; // Production
+//const RAW_BASE_URL = "https://onedayonetrip-api.onrender.com"; // Production
+const RAW_BASE_URL = import.meta.env.VITE_API_URL;
 
 //const RAW_BASE_URL = "https://onedayonetrip.onrender.com"; // PreProduction
 
@@ -354,4 +354,74 @@ export async function rateTrip(
   }
 
   return stats;
+}
+
+/**
+ * Devuelve SOLO las trips visibles para el usuario actual
+ * Centraliza privacidad + bloqueos + seguidores
+ */
+export async function getVisibleTripsForUser(
+  currentUserUid: string | null,
+  backendUser: any | null,
+  t: any
+): Promise<Trip[]> {
+  const trips = await getAllTrips(true, t);
+
+  // Cache de autores para no pedirlos 20 veces
+  const authorCache = new Map<string, any>();
+
+  const getAuthor = async (uid: string) => {
+    if (authorCache.has(uid)) return authorCache.get(uid);
+    const user = await getUserById(uid);
+    authorCache.set(uid, user);
+    return user;
+  };
+
+  const visible: Trip[] = [];
+
+  for (const trip of trips) {
+    const authorId = trip.author?.userId;
+    if (!authorId) {
+      visible.push(trip);
+      continue;
+    }
+
+    try {
+      const author = await getAuthor(authorId);
+
+      // 👤 Usuario NO logueado → solo públicos
+      if (!currentUserUid) {
+        if (!author.isPrivate) visible.push(trip);
+        continue;
+      }
+
+      // 🚫 Bloqueos
+      const bloquejats = backendUser?.llista_bloquejats || [];
+      const bloquejadors = backendUser?.llista_bloquejadors || [];
+
+      if (
+        bloquejats.includes(authorId) ||
+        bloquejadors.includes(authorId)
+      ) {
+        continue;
+      }
+
+      // 🔒 Perfil privado
+      if (author.isPrivate) {
+        const seguits = backendUser?.llista_seguits || [];
+        const isOwner = currentUserUid === authorId;
+
+        if (!isOwner && !seguits.includes(authorId)) {
+          continue;
+        }
+      }
+
+      visible.push(trip);
+    } catch {
+      // En caso de error, mostramos la trip por defecto
+      visible.push(trip);
+    }
+  }
+
+  return visible;
 }
