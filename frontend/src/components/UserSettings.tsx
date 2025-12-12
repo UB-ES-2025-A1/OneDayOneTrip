@@ -216,7 +216,6 @@ export default function UserSettings({
           {/* PRIVACIDAD */}
           <div className="settings-section">
             <h3 className="settings-subtitle">{t("privacy")}</h3>
-
             <div className="settings-row">
               <div>
                 <span className="settings-row-label">
