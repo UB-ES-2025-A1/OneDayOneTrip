@@ -54,6 +54,12 @@
   font-weight: 400;
 }
 
+.settings-row-label,
+.settings-row-helper {
+  margin-top: 1rem;
+  display: block;
+}
+
 /* ---------- ESTADÍSTIQUES ---------- */
 .user-stats {
   display: flex;
@@ -442,6 +448,7 @@
    
 /* Versión responsive */
 @media (max-width: 600px) {
+
   .empty-state {
     margin: 3rem 0;
     gap: 0.6rem;
@@ -509,6 +516,7 @@
     border-radius: 0;
     box-shadow: none;
     background-position: center;
+    border-radius: 12px;
   }
 
   .user-photo img {

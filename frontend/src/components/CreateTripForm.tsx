@@ -437,23 +437,40 @@ export default function CreateTripForm({
                                     <input list="ciutats-espanya" value={city} onChange={(e) => setCity(e.target.value)} placeholder={t('create_trip_city_placeholder')} required />
                                     <datalist id="ciutats-espanya">{BIG_SPANISH_CITIES.map((c) => (<option key={c} value={c} />))}</datalist>
                                 </label>
-
                                 <label>
                                     {t('create_trip_region_label')}
-                                    <select value={region} onChange={(e) => setRegion(e.target.value)} required>
-                                        <option value="">{t('create_trip_select_region')}</option>
-                                        {AUTONOMOUS_REGIONS.map((reg) => (<option key={reg.value} value={reg.value}>{t(reg.labelKey)}</option>))}
-                                    </select>
+                                    <input
+                                        list="regions-list"
+                                        value={region}
+                                        onChange={(e) => setRegion(e.target.value)}
+                                        placeholder={t('create_trip_select_region')}
+                                        required
+                                    />
+                                    <datalist id="regions-list">
+                                        {AUTONOMOUS_REGIONS.map((reg) => (
+                                        <option key={reg.value} value={reg.value}>
+                                            {t(reg.labelKey)}
+                                        </option>
+                                        ))}
+                                    </datalist>
                                 </label>
-
                                 <label>
                                     {t('create_trip_country_label')}
-                                    <select value={country} onChange={(e) => setCountry(e.target.value)} required>
-                                        <option value="">{t('create_trip_select_country')}</option>
-                                        {TOP_COUNTRIES.map((p) => (<option key={p.value} value={p.value}>{t(p.labelKey)}</option>))}
-                                    </select>
+                                    <input
+                                        list="countries-list"
+                                        value={country}
+                                        onChange={(e) => setCountry(e.target.value)}
+                                        placeholder={t('create_trip_select_country')}
+                                        required
+                                    />
+                                    <datalist id="countries-list">
+                                        {TOP_COUNTRIES.map((p) => (
+                                        <option key={p.value} value={p.value}>
+                                            {t(p.labelKey)}
+                                        </option>
+                                        ))}
+                                    </datalist>
                                 </label>
-
                                 <label>
                                     {t('create_trip_distance_label')}
                                     <input type="number" min={1} max={1000} step="0.1" value={distance} onChange={(e) => setDistance(e.target.value)} required />
