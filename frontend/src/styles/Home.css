@@ -142,7 +142,7 @@ html, body, #root {
 .intro-text p:first-of-type {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #403f3f;
   margin-bottom: 0.5rem;
   max-width: 900px;
   margin-inline: auto;
@@ -151,7 +151,7 @@ html, body, #root {
 .intro-text p:last-of-type {
   font-size: 1.25rem;
   font-weight: 400;
-  color: var(--text-secondary);
+  color: #403f3f;
   line-height: 1.4;
   max-width: 900px;
   margin-inline: auto;
