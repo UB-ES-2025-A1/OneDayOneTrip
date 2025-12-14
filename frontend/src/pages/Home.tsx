@@ -79,6 +79,20 @@ export default function Home() {
         ""
     );
 
+  const followedIds = (backendUser?.llista_seguits || []).map(String);
+  const followedSet = new Set(followedIds);
+
+  const getAnyId = (u: any) =>
+    String(
+      getFirebaseUid(u) || u?._id || u?.userId || u?.id || u?.uid || ""
+    );
+
+  const visibleUsers =
+    selectedTab === "following"
+      ? users.filter((u) => followedSet.has(getAnyId(u)))
+      : users;
+
+
   /* ---------------- AUTH ---------------- */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -155,7 +169,8 @@ export default function Home() {
       try {
         setUsersLoading(true);
         const blocked = backendUser?.llista_bloquejats || [];
-        const data = await searchUsers("", currentUser.uid, blocked);
+        const q = searchTerm.trim(); // <--- usa el searchTerm
+        const data = await searchUsers(q, currentUser.uid, blocked);
         setUsers(data);
       } catch {
         setError("Error carregant usuaris");
@@ -165,7 +180,7 @@ export default function Home() {
     };
 
     loadUsers();
-  }, [searchMode, currentUser, backendUser]);
+  }, [searchMode, currentUser, backendUser, searchTerm]);
 
   /* ---------------- FILTERS ---------------- */
   const filteredTrips = trips
@@ -297,9 +312,9 @@ export default function Home() {
 
           {!usersLoading &&
             searchMode === "users" &&
-            users.length > 0 && (
+            visibleUsers.length > 0 && (
               <div className="users-grid">
-                {users.map((u) => (
+                {visibleUsers.map((u) => (
                   <UserCard
                     key={getFirebaseUid(u)}
                     uid={getFirebaseUid(u)}
